@@ -159,12 +159,20 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       foreach ($packages as $package) {
         if (!($package instanceof AliasPackage)) {
           $package_name = $package->getName();
+
           $extra = $package->getExtra();
-          $has_patches = isset($tmp_patches[$package_name]);
-          $has_applied_patches = isset($extra['patches_applied']);
-          if (($has_patches && !$has_applied_patches)
-            || (!$has_patches && $has_applied_patches)
-            || ($has_patches && $has_applied_patches && $tmp_patches[$package_name] !== $extra['patches_applied'])) {
+
+          $hasPatches = isset($tmp_patches[$package_name]);
+          $hasAppliedPatches = isset($extra['patches_applied']);
+
+          if (!$hasPatches && !$hasAppliedPatches) {
+            continue;
+          }
+
+          $allPatches = $hasPatches ? $tmp_patches[$package_name] : array();
+          $appliedPatches = $hasAppliedPatches? $extra['patches_applied'] : array();
+
+          if (array_diff_key($allPatches, $appliedPatches) || array_diff_key($appliedPatches, $allPatches)) {
             $uninstallOperation = new UninstallOperation($package, 'Removing package so it can be re-installed and re-patched.');
             $this->io->write('<info>Removing package ' . $package_name . ' so that it can be re-installed and re-patched.</info>');
             $installationManager->uninstall($localRepository, $uninstallOperation);
