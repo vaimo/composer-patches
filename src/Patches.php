@@ -345,7 +345,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         if (file_exists($absolutePatchPath)) {
           $ownerName  = implode('/', array_slice(explode('/', $url), 0, 2));
           $urlLabel = '<comment>' . $ownerName . '</comment>: ' . '<info>' . $url . '</info>';
-          $url = $absolutePatchPath;
+          $url = trim(substr($absolutePatchPath, strlen($ownerName)), '/');
         }
 
         $this->io->write('    ~ ' . $urlLabel . ' (<comment>' . $description. '</comment>)');
