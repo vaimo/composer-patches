@@ -72,8 +72,8 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       ScriptEvents::PRE_UPDATE_CMD => "checkPatches",
       PackageEvents::PRE_PACKAGE_INSTALL => "gatherPatches",
       PackageEvents::PRE_PACKAGE_UPDATE => "gatherPatches",
-      PackageEvents::POST_PACKAGE_INSTALL => "postInstall",
-      PackageEvents::POST_PACKAGE_UPDATE => "postInstall",
+      ScriptEvents::PRE_INSTALL_CMD => "postInstall",
+      ScriptEvents::POST_UPDATE_CMD => "postInstall",
     );
   }
 
@@ -245,53 +245,51 @@ class Patches implements PluginInterface, EventSubscriberInterface {
    * @param PackageEvent $event
    * @throws \Exception
    */
-  public function postInstall(PackageEvent $event) {
-    // Get the package object for the current operation.
-    $operation = $event->getOperation();
-    /** @var PackageInterface $package */
-    $package = $this->getPackageFromOperation($operation);
-    $package_name = $package->getName();
+  public function postInstall(Event $event) {
+    foreach ($this->composer->getRepositoryManager()->getLocalRepository()->getPackages() as $package) {
+      $package_name = $package->getName();
 
-    if (!isset($this->patches[$package_name])) {
-      if ($this->io->isVerbose()) {
-        $this->io->write('<info>No patches found for ' . $package_name . '.</info>');
+      if (!isset($this->patches[$package_name])) {
+        if ($this->io->isVerbose()) {
+          $this->io->write('<info>No patches found for ' . $package_name . '.</info>');
+        }
+        continue;
       }
-      return;
-    }
-    $this->io->write('  - Applying patches for <info>' . $package_name . '</info>');
+      $this->io->write('  - Applying patches for <info>' . $package_name . '</info>');
 
-    // Get the install path from the package object.
-    $manager = $event->getComposer()->getInstallationManager();
-    $install_path = $manager->getInstaller($package->getType())->getInstallPath($package);
+      // Get the install path from the package object.
+      $manager = $event->getComposer()->getInstallationManager();
+      $install_path = $manager->getInstaller($package->getType())->getInstallPath($package);
 
-    // Set up a downloader.
-    $downloader = new RemoteFilesystem($this->io, $this->composer->getConfig());
+      // Set up a downloader.
+      $downloader = new RemoteFilesystem($this->io, $this->composer->getConfig());
 
-    // Track applied patches in the package info in installed.json
-    $localRepository = $this->composer->getRepositoryManager()->getLocalRepository();
-    $localPackage = $localRepository->findPackage($package_name, $package->getVersion());
-    $extra = $localPackage->getExtra();
-    $extra['patches_applied'] = array();
+      // Track applied patches in the package info in installed.json
+      $localRepository = $this->composer->getRepositoryManager()->getLocalRepository();
+      $localPackage = $localRepository->findPackage($package_name, $package->getVersion());
+      $extra = $localPackage->getExtra();
+      $extra['patches_applied'] = array();
 
-    foreach ($this->patches[$package_name] as $description => $url) {
-      $this->io->write('    <info>' . $url . '</info> (<comment>' . $description. '</comment>)');
-      try {
-        $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $url, $description));
-        $this->getAndApplyPatch($downloader, $install_path, $url);
-        $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::POST_PATCH_APPLY, $package, $url, $description));
-        $extra['patches_applied'][$description] = $url;
-      }
-      catch (\Exception $e) {
-        $this->io->write('   <error>Could not apply patch! Skipping.</error>');
-        if (getenv('COMPOSER_EXIT_ON_PATCH_FAILURE')) {
-          throw new \Exception("Cannot apply patch $description ($url)!");
+      foreach ($this->patches[$package_name] as $description => $url) {
+        $this->io->write('    <info>' . $url . '</info> (<comment>' . $description. '</comment>)');
+        try {
+          $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $url, $description));
+          $this->getAndApplyPatch($downloader, $install_path, $url);
+          $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::POST_PATCH_APPLY, $package, $url, $description));
+          $extra['patches_applied'][$description] = $url;
+        }
+        catch (\Exception $e) {
+          $this->io->write('   <error>Could not apply patch! Skipping.</error>');
+          if (getenv('COMPOSER_EXIT_ON_PATCH_FAILURE')) {
+            throw new \Exception("Cannot apply patch $description ($url)!");
+          }
         }
       }
-    }
-    $localPackage->setExtra($extra);
+      $localPackage->setExtra($extra);
 
-    $this->io->write('');
-    $this->writePatchReport($this->patches[$package_name], $install_path);
+      $this->io->write('');
+      $this->writePatchReport($this->patches[$package_name], $install_path);
+    }
   }
 
   /**
