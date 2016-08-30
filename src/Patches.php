@@ -295,6 +295,9 @@ class Patches implements PluginInterface, EventSubscriberInterface {
             throw new \Exception("Cannot apply patch $description ($url)!");
           }
 
+          if ($this->io->isVerbose()) {
+            $this->io->write('<warning>' . $e->getMessage() . '</warning>');
+          }
         }
       }
 
