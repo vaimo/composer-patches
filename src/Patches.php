@@ -80,7 +80,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       ScriptEvents::PRE_UPDATE_CMD => "checkPatches",
       PackageEvents::PRE_PACKAGE_INSTALL => "gatherPatches",
       PackageEvents::PRE_PACKAGE_UPDATE => "gatherPatches",
-      ScriptEvents::PRE_INSTALL_CMD => "postInstall",
+      ScriptEvents::POST_INSTALL_CMD => "postInstall",
       ScriptEvents::POST_UPDATE_CMD => "postInstall",
     );
   }
@@ -185,16 +185,16 @@ class Patches implements PluginInterface, EventSubscriberInterface {
    * @param PackageEvent $event
    */
   public function gatherPatches(PackageEvent $event) {
-    // If we've already done this, then don't do it again.
-    if (isset($this->patches['_patchesGathered'])) {
-      return;
-    }
     // If patching has been disabled, bail out here.
-    elseif (!$this->isPatchingEnabled()) {
+    if (!$this->isPatchingEnabled()) {
       return;
     }
 
-    $this->patches = (array)$this->grabPatches();
+    if (!isset($this->patches['_patchesGathered'])) {
+      $this->patches = (array)$this->grabPatches();
+      $this->patches['_patchesGathered'] = true;
+    }
+
     if (empty($this->patches)) {
       $this->io->write('<info>No patches supplied.</info>');
     }
@@ -207,6 +207,12 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         $package = $this->getPackageFromOperation($operation);
         $extra = $package->getExtra();
         $packageName = $package->getName();
+
+        if ($operation->getJobType() == 'install') {
+          unset($extra['patches_applied']);
+          $package->setExtra($extra);
+          $this->patches['_patchesGathered'] = true;
+        }
 
         if (isset($extra['patches'])) {
           $patches = $this->normalizePatchPaths($extra['patches'], $package);
@@ -232,10 +238,6 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         $this->io->write('<info>Found ' . $number . ' patches for ' . $package . '.</info>');
       }
     }
-
-    // Make sure we don't gather patches again. Extra keys in $this->patches
-    // won't hurt anything, so we'll just stash it there.
-    $this->patches['_patchesGathered'] = TRUE;
   }
 
   /**
