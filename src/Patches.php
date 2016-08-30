@@ -217,7 +217,9 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         if (isset($extra['patches'])) {
           $patches = $this->normalizePatchPaths($extra['patches'], $package);
 
-          $this->patches = array_merge_recursive($this->patches, $patches);
+          foreach ($patches as $targetPackage => $packagePatches) {
+            $this->patches[$targetPackage] = array_merge($packagePatches, $this->patches[$targetPackage]);
+          }
         }
         // Unset installed patches for this package
         if(isset($this->installedPatches[$packageName])) {
@@ -227,8 +229,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     }
 
     // Merge installed patches from dependencies that did not receive an update.
-    foreach ($this->installedPatches as $packageName => $patches) {
-      $this->patches = array_merge_recursive($this->patches, $patches);
+    foreach ($this->installedPatches as $patches) {
+      foreach ($patches as $targetPackage => $packagePatches) {
+        $this->patches[$targetPackage] = array_merge($packagePatches, $this->patches[$targetPackage]);
+      }
     }
 
     // If we're in verbose mode, list the projects we're going to patch.
