@@ -293,12 +293,13 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         }
         catch (\Exception $e) {
           $this->io->write('   <error>Could not apply patch! Skipping.</error>');
-          if (getenv('COMPOSER_EXIT_ON_PATCH_FAILURE')) {
-            throw new \Exception("Cannot apply patch $description ($url)!");
-          }
 
           if ($this->io->isVerbose()) {
-            $this->io->write('<warning>' . $e->getMessage() . '</warning>');
+            $this->io->write('<warning>' . trim($e->getMessage(), "\n ") . '</warning>');
+          }
+
+          if (getenv('COMPOSER_EXIT_ON_PATCH_FAILURE')) {
+            throw new \Exception("Cannot apply patch $description ($url)!");
           }
         }
       }
