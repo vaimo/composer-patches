@@ -49,6 +49,11 @@ class Patches implements PluginInterface, EventSubscriberInterface {
   protected $patches;
 
   /**
+   * @var array $installedPatches
+   */
+  protected $installedPatches;
+
+  /**
    * Apply plugin modifications to composer
    *
    * @param Composer    $composer
@@ -242,11 +247,13 @@ class Patches implements PluginInterface, EventSubscriberInterface {
   }
 
   /**
-   * @param PackageEvent $event
+   * @param Event $event
    * @throws \Exception
    */
   public function postInstall(Event $event) {
-    foreach ($this->composer->getRepositoryManager()->getLocalRepository()->getPackages() as $package) {
+    $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
+
+    foreach ($packageRepository->getPackages() as $package) {
       $package_name = $package->getName();
 
       if (!isset($this->patches[$package_name])) {
@@ -255,6 +262,13 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         }
         continue;
       }
+
+      $extra = $package->getExtra();
+
+      if (isset($extra['patches_applied']) && $extra['patches_applied']) {
+        continue;
+      }
+
       $this->io->write('  - Applying patches for <info>' . $package_name . '</info>');
 
       // Get the install path from the package object.
@@ -265,9 +279,6 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $downloader = new RemoteFilesystem($this->io, $this->composer->getConfig());
 
       // Track applied patches in the package info in installed.json
-      $localRepository = $this->composer->getRepositoryManager()->getLocalRepository();
-      $localPackage = $localRepository->findPackage($package_name, $package->getVersion());
-      $extra = $localPackage->getExtra();
       $extra['patches_applied'] = array();
 
       foreach ($this->patches[$package_name] as $description => $url) {
@@ -283,13 +294,17 @@ class Patches implements PluginInterface, EventSubscriberInterface {
           if (getenv('COMPOSER_EXIT_ON_PATCH_FAILURE')) {
             throw new \Exception("Cannot apply patch $description ($url)!");
           }
+
         }
       }
-      $localPackage->setExtra($extra);
+
+      $package->setExtra($extra);
 
       $this->io->write('');
       $this->writePatchReport($this->patches[$package_name], $install_path);
     }
+
+    $packageRepository->write();
   }
 
   /**
