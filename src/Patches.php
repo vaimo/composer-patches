@@ -253,6 +253,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
   public function postInstall(Event $event) {
     $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
 
+    $patchesApplied = false;
     foreach ($packageRepository->getPackages() as $package) {
       $package_name = $package->getName();
 
@@ -288,6 +289,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
           $this->getAndApplyPatch($downloader, $install_path, $url);
           $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::POST_PATCH_APPLY, $package, $url, $description));
           $extra['patches_applied'][$description] = $url;
+          $patchesApplied = true;
         }
         catch (\Exception $e) {
           $this->io->write('   <error>Could not apply patch! Skipping.</error>');
@@ -307,7 +309,9 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $this->writePatchReport($this->patches[$package_name], $install_path);
     }
 
-    $packageRepository->write();
+    if ($patchesApplied) {
+      $packageRepository->write();
+    }
   }
 
   /**
