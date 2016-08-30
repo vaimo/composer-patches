@@ -87,7 +87,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
   protected function normalizePatchPaths($patches, $ownerPackage = null)
   {
-    $_patches = [];
+    $_patches = array();
 
     $vendorDir = $this->composer->getConfig()->get('vendor-dir');
 
@@ -100,7 +100,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
     foreach ($patches as $patchTarget => $packagePatches) {
       if (!isset($_patches[$patchTarget])) {
-        $_patches[$patchTarget] = [];
+        $_patches[$patchTarget] = array();
       }
 
       foreach ($packagePatches as $description => $url) {
@@ -301,12 +301,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
 
     $vendorDir = $this->composer->getConfig()->get('vendor-dir');
-    $packagesByName = array();
-    foreach ($packageRepository->getCanonicalPackages() as $package) {
-      if (!isset($packagesByName[$package->getName()])) {
-        $packagesByName[$package->getName()] = $package;
-      }
-    }
+    $manager = $event->getComposer()->getInstallationManager();
 
     $packagesUpdated = false;
     foreach ($packageRepository->getPackages() as $package) {
@@ -327,11 +322,8 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
       $this->io->write('  - Applying patches for <info>' . $package_name . '</info>');
 
-      // Get the install path from the package object.
-      $manager = $event->getComposer()->getInstallationManager();
       $installPath = $manager->getInstaller($package->getType())->getInstallPath($package);
 
-      // Set up a downloader.
       $downloader = new RemoteFilesystem($this->io, $this->composer->getConfig());
 
       // Track applied patches in the package info in installed.json
