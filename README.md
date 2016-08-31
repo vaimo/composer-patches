@@ -94,6 +94,27 @@ Please note that in both cases the patch path should be relative to the context 
 * For project, it should be relative to project root
 * For package, it should be relative to package root 
 
+## Alternative format
+
+In case it's important to retain the patching order, one can also use alternative declaration format that uses array wrapper:
+
+```
+{
+  "extra": {
+    "patches": {
+      "targeted/package": [
+        {
+          "label": "desription about my patch", 
+          "url": "my/file.patch"
+        }
+      ]
+    }
+  }
+}
+
+```
+
+
 ## Using patch url
 
 ```
