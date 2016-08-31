@@ -2,6 +2,24 @@
 
 Simple patches plugin for Composer. Applies a patch from a local or remote file to any package required with composer.
 
+## Enabling patching for a project
+
+Patching is enabled when:
+
+* project has "patches" key defined under "extra" 
+* project has "enable-patching" key defined under "extra" (use this one if there are no patches directly defined for the project)
+* 
+
+```
+{
+  "extra": {
+    "patches": {},
+    "enable-patching": true
+  }
+}
+
+```
+
 ## Usage
 
 Example composer.json:
