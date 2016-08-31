@@ -7,8 +7,9 @@ Simple patches plugin for Composer. Applies a patch from a local or remote file 
 Patching is enabled when:
 
 * project has "patches" key defined under "extra" 
-* project has "enable-patching" key defined under "extra" (use this one if there are no patches directly defined for the project)
-* 
+* project has "enable-patching" key defined under "extra" 
+
+_Note that the latter is only useful if you have no patches defined directly on the root level_
 
 ```
 {
