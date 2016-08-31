@@ -226,6 +226,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
           $patches = $this->normalizePatchPaths($extra['patches'], $package);
 
           foreach ($patches as $targetPackage => $packagePatches) {
+            if (!isset($this->patches[$targetPackage])) {
+              $this->patches[$targetPackage] = array();
+            }
+
             $this->patches[$targetPackage] = array_merge($packagePatches, $this->patches[$targetPackage]);
           }
         }
@@ -239,6 +243,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     // Merge installed patches from dependencies that did not receive an update.
     foreach ($this->installedPatches as $patches) {
       foreach ($patches as $targetPackage => $packagePatches) {
+        if (!isset($this->patches[$targetPackage])) {
+          $this->patches[$targetPackage] = array();
+        }
+        
         $this->patches[$targetPackage] = array_merge($packagePatches, $this->patches[$targetPackage]);
       }
     }
