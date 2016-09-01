@@ -59,6 +59,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
    * @var array $excludedPatches
    */
   protected $excludedPatches;
+  /**
+   * @var array
+   */
+  protected $packagesToReinstall = array();
 
   /**
    * Apply plugin modifications to composer
@@ -80,14 +84,17 @@ class Patches implements PluginInterface, EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return array(
-      ScriptEvents::PRE_INSTALL_CMD => "checkPatches",
-      ScriptEvents::PRE_UPDATE_CMD => "checkPatches",
+      PackageEvents::POST_PACKAGE_UNINSTALL => "removePatches",
       PackageEvents::PRE_PACKAGE_INSTALL => "gatherPatches",
       PackageEvents::PRE_PACKAGE_UPDATE => "gatherPatches",
       ScriptEvents::POST_INSTALL_CMD => "postInstall",
       ScriptEvents::POST_UPDATE_CMD => "postInstall",
     );
   }
+
+//if (!$this->isPatchingEnabled()) {
+//return;
+//}
 
   protected function preparePatchDefinitions($patches, $ownerPackage = null) {
     $_patches = array();
@@ -150,79 +157,40 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       }
     }
 
-    return $_patches;
+    return array_filter($_patches);
   }
 
+  protected function getAllPatches()
+  {
+    $repositoryManager = $this->composer->getRepositoryManager();
 
-  /**
-   * Before running composer install,
-   * @param Event $event
-   */
-  public function checkPatches(Event $event) {
-    if (!$this->isPatchingEnabled()) {
-      return;
-    }
+    $localRepository = $repositoryManager->getLocalRepository();
+    $packages = $localRepository->getPackages();
 
-    try {
-      $repositoryManager = $this->composer->getRepositoryManager();
-      $installationManager = $this->composer->getInstallationManager();
+    $tmp_patches = (array)$this->grabPatches();
 
-      $localRepository = $repositoryManager->getLocalRepository();
-      $packages = $localRepository->getPackages();
+    foreach ($packages as $package) {
+      $extra = $package->getExtra();
 
-      $tmp_patches = (array)$this->grabPatches();
-
-      foreach ($packages as $package) {
-        $extra = $package->getExtra();
-
-        if (!isset($extra['patches'])) {
-          continue;
-        }
-
-        $patches = isset($extra['patches']) ? $extra['patches'] : array();
-        $patches = $this->preparePatchDefinitions($patches, $package);
-
-        $this->installedPatches[$package->getName()] = $patches;
-
-        foreach ($patches as $targetPackage => $packagePatches) {
-          if (!isset($tmp_patches[$targetPackage])) {
-            $tmp_patches[$targetPackage] = array();
-          }
-
-          $tmp_patches[$targetPackage] = array_merge($packagePatches, $tmp_patches[$targetPackage]);
-        }
+      if (!isset($extra['patches'])) {
+        continue;
       }
 
-      // Remove packages for which the patch set has changed.
-      foreach ($packages as $package) {
-        if (!($package instanceof AliasPackage)) {
-          $package_name = $package->getName();
+      $patches = isset($extra['patches']) ? $extra['patches'] : array();
+      $patches = $this->preparePatchDefinitions($patches, $package);
 
-          $extra = $package->getExtra();
+      $this->installedPatches[$package->getName()] = $patches;
 
-          $hasPatches = isset($tmp_patches[$package_name]);
-          $hasAppliedPatches = isset($extra['patches_applied']);
-
-          if (!$hasPatches && !$hasAppliedPatches) {
-            continue;
-          }
-
-          $allPatches = $hasPatches ? $tmp_patches[$package_name] : array();
-          $appliedPatches = $hasAppliedPatches? $extra['patches_applied'] : array();
-
-          if (array_diff_key($allPatches, $appliedPatches) || array_diff_key($appliedPatches, $allPatches)) {
-            $uninstallOperation = new UninstallOperation($package, 'Removing package so it can be re-installed and re-patched.');
-            $this->io->write('<info>Removing package ' . $package_name . ' so that it can be re-installed and re-patched.</info>');
-            $installationManager->uninstall($localRepository, $uninstallOperation);
-          }
+      foreach ($patches as $targetPackage => $packagePatches) {
+        if (!isset($tmp_patches[$targetPackage])) {
+          $tmp_patches[$targetPackage] = array();
         }
+
+        $tmp_patches[$targetPackage] = array_merge($packagePatches, $tmp_patches[$targetPackage]);
       }
     }
-      // If the Locker isn't available, then we don't need to do this.
-      // It's the first time packages have been installed.
-    catch (\LogicException $e) {
-      return;
-    }
+
+    return $tmp_patches;
   }
 
   /**
@@ -371,31 +339,101 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     return array();
   }
 
+  public function removePatches(PackageEvent $event) {
+    $operations = $event->getOperations();
+
+    foreach ($operations as $operation) {
+      $package = $operation->getPackage();
+
+      $extra = $package->getExtra();
+
+      if (isset($extra['patches'])) {
+        $patches = $this->preparePatchDefinitions($extra['patches'], $package);
+
+        foreach ($patches as $targetPackageName => $packagePatches) {
+          $this->packagesToReinstall[] = $targetPackageName;
+        }
+      }
+    }
+  }
+
   /**
    * @param Event $event
    * @throws \Exception
    */
   public function postInstall(Event $event) {
+    $installationManager = $this->composer->getInstallationManager();
     $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
 
     $vendorDir = $this->composer->getConfig()->get('vendor-dir');
     $manager = $event->getComposer()->getInstallationManager();
 
     $packagesUpdated = false;
+
+    $allPatches = $this->getAllPatches();
+
+    // ,"vaimo/patches-magento": "~2.1.0.0"
+    /**
+     * Uninstall some things where patches have changed
+     */
     foreach ($packageRepository->getPackages() as $package) {
       $packageName = $package->getName();
 
-      if (!isset($this->patches[$packageName])) {
-        if ($this->io->isVerbose()) {
-          $this->io->write('<info>No patches found for ' . $packageName . '.</info>');
-        }
+      if (!isset($allPatches[$packageName])) {
         continue;
       }
 
+      $patches = $allPatches[$packageName];
       $extra = $package->getExtra();
 
-      if (isset($extra['patches_applied']) && $extra['patches_applied']) {
+      if (isset($extra['patches_applied'])) {
+        $applied = $extra['patches_applied'];
+
+        if (!array_diff_key($applied, $patches) && !array_diff_key($patches, $applied)) {
+          continue;
+        }
+      }
+
+      $this->packagesToReinstall[] = $package->getName();
+    }
+
+    if ($this->packagesToReinstall) {
+      $this->io->write('<info>Re-installing packages that were targeted by patches.</info>');
+      foreach ($this->packagesToReinstall as $packageName) {
+        $package = $packageRepository->findPackage($packageName, '*');
+
+        $uninstallOperation = new InstallOperation($package, 'Re-installing package.');
+        $installationManager->install($packageRepository, $uninstallOperation);
+
+        $extra = $package->getExtra();
+        unset($extra['patches_applied']);
+        $package->setExtra($extra);
+      }
+    }
+
+    /**
+     * Apply patches
+     */
+    foreach ($packageRepository->getPackages() as $package) {
+      $packageName = $package->getName();
+
+      if (!isset($allPatches[$packageName])) {
+        if ($this->io->isVerbose()) {
+          $this->io->write('<info>No patches found for ' . $packageName . '.</info>');
+        }
+
         continue;
+      }
+
+      $patches = $allPatches[$packageName];
+      $extra = $package->getExtra();
+
+      if (isset($extra['patches_applied'])) {
+        $applied = $extra['patches_applied'];
+
+        if (!array_diff_key($applied, $patches) && !array_diff_key($patches, $applied)) {
+          continue;
+        }
       }
 
       $this->io->write('  - Applying patches for <info>' . $packageName . '</info>');
@@ -408,20 +446,20 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $extra['patches_applied'] = array();
 
       $allPackagePatchesApplied = true;
-      foreach ($this->patches[$packageName] as $url => $description) {
+      foreach ($patches as $url => $description) {
         $urlLabel = '<info>' . $url . '</info>';
         $absolutePatchPath = $vendorDir . '/' . $url;
 
         if (file_exists($absolutePatchPath)) {
           $ownerName  = implode('/', array_slice(explode('/', $url), 0, 2));
 
-          $urlLabel = '<comment>' . $ownerName . '</comment>: ' . '<info>' .
-            trim(substr($url, strlen($ownerName)), '/') . '</info>';
+          $urlLabel = '<info>' . $ownerName . ': ' . trim(substr($url, strlen($ownerName)), '/') . '</info>';
 
           $url = $absolutePatchPath;
         }
 
-        $this->io->write('    ~ ' . $urlLabel . ' (<comment>' . $description. '</comment>)');
+        $this->io->write('    ~ ' . $urlLabel);
+        $this->io->write('      ' . '<comment>' . $description. '</comment>');
         
         try {
           $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $url, $description));
@@ -457,7 +495,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       }
 
       $this->io->write('');
-      $this->writePatchReport($this->patches[$packageName], $installPath);
+      $this->writePatchReport($patches, $installPath);
     }
 
     if ($packagesUpdated) {
