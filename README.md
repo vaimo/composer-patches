@@ -150,6 +150,41 @@ Patches can be stored in remote location and referred to by using the full URL o
 }
 ```
 
+## Excluding patch
+
+In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), patch exclusions can be defined.
+
+Package that owns the patch:
+
+```
+{
+  "name": "patch/owner",
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "desription about my patch": "path/to/file.patch"
+      }
+    }
+  }
+}
+
+```
+
+Project level:
+
+```
+{
+  "extra": {
+    "excluded-patches": {
+      "patch/owner": [
+        "path/to/file.patch"
+      ]
+    }
+  }
+}
+
+```
+
 ## Hints on creating a patch 
 
 The file-paths in the patch should be relative to the targeted package root and start with ./
