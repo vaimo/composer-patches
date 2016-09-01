@@ -55,6 +55,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
    * @var array $packagesByName
    */
   protected $packagesByName;
+  /**
+   * @var array $excludedPatches
+   */
+  protected $excludedPatches;
 
   /**
    * Apply plugin modifications to composer
@@ -105,6 +109,8 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       }
     }
 
+    $excludedPatches = $this->getExcludedPatches();
+
     foreach ($patches as $patchTarget => $packagePatches) {
       if (!isset($_patches[$patchTarget])) {
         $_patches[$patchTarget] = array();
@@ -115,13 +121,21 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
         if ($isExtendedFormat) {
           $label = $data['label'];
-          $url = $data['url'];
+          $url = (string)$data['url'];
 
           if (isset($data['require']) && array_diff_key($this->packagesByName, $data['require'])) {
             continue;
           }
         } else {
-          $url = $data;
+          $url = (string)$data;
+        }
+
+        if ($ownerPackage) {
+          $ownerPackageName = $ownerPackage->getName();
+
+          if (isset($excludedPatches[$ownerPackageName][$url])) {
+            continue;
+          }
         }
 
         if ($patchOwnerPath) {
@@ -278,6 +292,27 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         $this->io->write('<info>Found ' . $number . ' patches for ' . $package . '.</info>');
       }
     }
+  }
+
+  public function getExcludedPatches()
+  {
+    $extra = $this->composer->getPackage()->getExtra();
+
+    if (!$this->excludedPatches) {
+      $this->excludedPatches = array();
+
+      if (isset($extra['excluded-patches'])) {
+        foreach ($extra['excluded-patches'] as $patchOwner => $patches) {
+          if (!isset($this->excludedPatches[$patchOwner])) {
+            $this->excludedPatches[$patchOwner] = array();
+          }
+
+          $this->excludedPatches[$patchOwner] = array_flip($patches);
+        }
+      }
+    }
+
+    return $this->excludedPatches;
   }
 
   /**
