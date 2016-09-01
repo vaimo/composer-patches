@@ -385,6 +385,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $patches = $allPatches[$packageName];
       $extra = $package->getExtra();
 
+      if (!isset($extra['patches_applied'])) {
+        continue;
+      }
+
       if (isset($extra['patches_applied'])) {
         $applied = $extra['patches_applied'];
 
