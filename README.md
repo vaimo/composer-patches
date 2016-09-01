@@ -114,8 +114,31 @@ In case it's important to retain the patching order, one can also use alternativ
 
 ```
 
+## Dependency on certain packagess
+
+Using the extended formats opens up some possibilities to apply a patch only when certain 3rd party packages are available.
+
+```
+{
+  "extra": {
+    "patches": {
+      "targeted/package": [
+        {
+          "label": "desription about my patch", 
+          "url": "my/file.patch",
+          "require": {
+            "some/package": "1.2.3"
+          }
+        }
+      ]
+    }
+  }
+}
+```
 
 ## Using patch url
+
+Patches can be stored in remote location and referred to by using the full URL of tha patch.
 
 ```
 {
