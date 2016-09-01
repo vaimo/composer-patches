@@ -150,7 +150,7 @@ Patches can be stored in remote location and referred to by using the full URL o
 }
 ```
 
-## Excluding patch
+## Excluding patches
 
 In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), patch exclusions can be defined.
 
