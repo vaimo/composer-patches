@@ -92,10 +92,6 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     );
   }
 
-//if (!$this->isPatchingEnabled()) {
-//return;
-//}
-
   protected function preparePatchDefinitions($patches, $ownerPackage = null) {
     $_patches = array();
 
@@ -362,6 +358,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
    * @throws \Exception
    */
   public function postInstall(Event $event) {
+    if (!$this->isPatchingEnabled()) {
+      return;
+    }
+
     $installationManager = $this->composer->getInstallationManager();
     $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
 
@@ -372,7 +372,6 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
     $allPatches = $this->getAllPatches();
 
-    // ,"vaimo/patches-magento": "~2.1.0.0"
     /**
      * Uninstall some things where patches have changed
      */
@@ -388,6 +387,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
       if (isset($extra['patches_applied'])) {
         $applied = $extra['patches_applied'];
+
+        if (!$applied) {
+          continue;
+        }
 
         if (!array_diff_key($applied, $patches) && !array_diff_key($patches, $applied)) {
           continue;
