@@ -52,9 +52,9 @@ class Patches implements PluginInterface, EventSubscriberInterface {
    */
   protected $installedPatches;
   /**
-   * @var $patchOwners
+   * @var array $packagesByName
    */
-  protected $patchOwners;
+  protected $packagesByName;
 
   /**
    * Apply plugin modifications to composer
@@ -85,7 +85,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     );
   }
 
-  protected function normalizePatchPaths($patches, $ownerPackage = null) {
+  protected function preparePatchDefinitions($patches, $ownerPackage = null) {
     $_patches = array();
 
     $vendorDir = $this->composer->getConfig()->get('vendor-dir');
@@ -97,15 +97,29 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $patchOwnerPath = false;
     }
 
+    if (!$this->packagesByName) {
+      $this->packagesByName = [];
+      $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
+      foreach ($packageRepository->getPackages() as $package) {
+        $this->packagesByName[$package->getName()] = $package;
+      }
+    }
+
     foreach ($patches as $patchTarget => $packagePatches) {
       if (!isset($_patches[$patchTarget])) {
         $_patches[$patchTarget] = array();
       }
 
       foreach ($packagePatches as $label => $data) {
-        if (is_array($data) && is_numeric($label) && isset($data['label']) && isset($data['url'])) {
+        $isExtendedFormat = is_array($data) && is_numeric($label) && isset($data['label'], $data['url']);
+
+        if ($isExtendedFormat) {
           $label = $data['label'];
           $url = $data['url'];
+
+          if (isset($data['require']) && array_diff_key($this->packagesByName, $data['require'])) {
+            continue;
+          }
         } else {
           $url = $data;
         }
@@ -137,8 +151,9 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
     try {
       $repositoryManager = $this->composer->getRepositoryManager();
-      $localRepository = $repositoryManager->getLocalRepository();
       $installationManager = $this->composer->getInstallationManager();
+
+      $localRepository = $repositoryManager->getLocalRepository();
       $packages = $localRepository->getPackages();
 
       $tmp_patches = (array)$this->grabPatches();
@@ -151,7 +166,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         }
 
         $patches = isset($extra['patches']) ? $extra['patches'] : array();
-        $patches = $this->normalizePatchPaths($patches, $package);
+        $patches = $this->preparePatchDefinitions($patches, $package);
 
         $this->installedPatches[$package->getName()] = $patches;
 
@@ -228,7 +243,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         }
 
         if (isset($extra['patches'])) {
-          $patches = $this->normalizePatchPaths($extra['patches'], $package);
+          $patches = $this->preparePatchDefinitions($extra['patches'], $package);
 
           foreach ($patches as $targetPackage => $packagePatches) {
             if (!isset($this->patches[$targetPackage])) {
@@ -271,14 +286,15 @@ class Patches implements PluginInterface, EventSubscriberInterface {
    * @throws \Exception
    */
   public function grabPatches() {
-      // First, try to get the patches from the root composer.json.
+    // First, try to get the patches from the root composer.json.
     $extra = $this->composer->getPackage()->getExtra();
     if (isset($extra['patches'])) {
       $this->io->write('<info>Gathering patches for root package.</info>');
       $patches = $extra['patches'];
 
-      return $this->normalizePatchPaths($patches);
+      return $this->preparePatchDefinitions($patches);
     }
+
     // If it's not specified there, look for a patches-file definition.
     elseif (isset($extra['patches-file'])) {
       $this->io->write('<info>Gathering patches from patch file.</info>');
@@ -310,7 +326,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
         }
       if (isset($patches['patches'])) {
         $patches = $patches['patches'];
-        return $this->normalizePatchPaths($patches);
+        return $this->preparePatchDefinitions($patches);
       }
       elseif(!$patches) {
         throw new \Exception('There was an error in the supplied patch file');
