@@ -126,7 +126,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
           $label = $data['label'];
           $url = (string)$data['url'];
 
-          if (isset($data['require']) && array_diff_key($this->packagesByName, $data['require'])) {
+          if (isset($data['require']) && array_diff_key($data['require'], $this->packagesByName)) {
             continue;
           }
         } else {
