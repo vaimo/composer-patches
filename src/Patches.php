@@ -87,8 +87,8 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       PackageEvents::POST_PACKAGE_UNINSTALL => "removePatches",
       PackageEvents::PRE_PACKAGE_INSTALL => "gatherPatches",
       PackageEvents::PRE_PACKAGE_UPDATE => "gatherPatches",
-      ScriptEvents::POST_INSTALL_CMD => "postInstall",
-      ScriptEvents::POST_UPDATE_CMD => "postInstall",
+      ScriptEvents::PRE_AUTOLOAD_DUMP => "postInstall",
+      ScriptEvents::PRE_AUTOLOAD_DUMP => "postInstall",
     );
   }
 
