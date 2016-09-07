@@ -81,6 +81,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
   /**
    * Returns an array of event names this subscriber wants to listen to.
+   *
+   * Note that postInstall is locked to autoload dump instead of post-install. Reason for this is that
+   * post-install comes after auto-loader generation which means that in case patches target class
+   * namespaces or class names, the auto-loader will not get those changes applied to it correctly.
    */
   public static function getSubscribedEvents() {
     return array(
@@ -498,6 +502,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
       if ($allPackagePatchesApplied) {
         $packagesUpdated = true;
+        ksort($extra);
         $package->setExtra($extra);
       }
 
