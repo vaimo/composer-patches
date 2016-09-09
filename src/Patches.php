@@ -401,7 +401,17 @@ class Patches implements PluginInterface, EventSubscriberInterface {
           continue;
         }
 
-        if (!array_diff_key($applied, $patches) && !array_diff_key($patches, $applied)) {
+        foreach ($patches as $url => &$description) {
+          $absolutePatchPath = $vendorDir . '/' . $url;
+
+          if (file_exists($absolutePatchPath)) {
+            $url = $absolutePatchPath;
+          }
+
+          $description = $description . ', md5:' . md5_file($url);
+        }
+
+        if (!array_diff_assoc($applied, $patches) && !array_diff_assoc($patches, $applied)) {
           continue;
         }
       }
@@ -440,13 +450,25 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $patches = $allPatches[$packageName];
       $extra = $package->getExtra();
 
+      foreach ($patches as $url => &$description) {
+        $absolutePatchPath = $vendorDir . '/' . $url;
+
+        if (file_exists($absolutePatchPath)) {
+          $url = $absolutePatchPath;
+        }
+
+        $description = $description . ', md5:' . md5_file($url);
+      }
+
       if (isset($extra['patches_applied'])) {
         $applied = $extra['patches_applied'];
 
-        if (!array_diff_key($applied, $patches) && !array_diff_key($patches, $applied)) {
+        if (!array_diff_assoc($applied, $patches) && !array_diff_assoc($patches, $applied)) {
           continue;
         }
       }
+
+      $patches = $allPatches[$packageName];
 
       $this->io->write('  - Applying patches for <info>' . $packageName . '</info>');
 
@@ -485,7 +507,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
             $appliedPatchPath = trim(substr($appliedPatchPath, strlen($vendorDir)), '/');
           }
 
-          $extra['patches_applied'][$appliedPatchPath] = $description;
+          $extra['patches_applied'][$appliedPatchPath] = $description . ', md5:' . md5_file($url);
         } catch (\Exception $e) {
           $this->io->write('   <error>Could not apply patch! Skipping.</error>');
 
