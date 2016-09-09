@@ -191,6 +191,11 @@ The file-paths in the patch should be relative to the targeted package root and 
 
 This means that patch for a file <projet>/vendor/my/package/some/file.php whould be targeted in the patch as ./some/file.php
 
+## Environment variable feature flags
+
+COMPOSER_FORCE_REPATCH - will force all patches to be re-applied
+COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
+
 ## Difference between this and netresearch/composer-patches-plugin
 
 * Works on project AND package level

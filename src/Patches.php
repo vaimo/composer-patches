@@ -342,6 +342,10 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     $operations = $event->getOperations();
 
     foreach ($operations as $operation) {
+      if (!$operation instanceof UninstallOperation) {
+        continue;
+      }
+
       $package = $operation->getPackage();
 
       $extra = $package->getExtra();
@@ -375,6 +379,8 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
     $allPatches = $this->getAllPatches();
 
+    $forceReinstall = getenv('COMPOSER_FORCE_REPATCH');
+
     /**
      * Uninstall some things where patches have changed
      */
@@ -388,11 +394,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $patches = $allPatches[$packageName];
       $extra = $package->getExtra();
 
-      if (!isset($extra['patches_applied'])) {
-        continue;
-      }
-
-      if (isset($extra['patches_applied'])) {
+      if (isset($extra['patches_applied']) && !$forceReinstall) {
         $applied = $extra['patches_applied'];
 
         if (!$applied) {
