@@ -211,7 +211,6 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
     // Now add all the patches from dependencies that will be installed.
     $operations = $event->getOperations();
-    $this->io->write('<info>Gathering patches for dependencies. This might take a minute.</info>');
     foreach ($operations as $operation) {
       if ($operation->getJobType() == 'install' || $operation->getJobType() == 'update') {
         $package = $this->getPackageFromOperation($operation);
