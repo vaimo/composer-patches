@@ -191,6 +191,10 @@ The file-paths in the patch should be relative to the targeted package root and 
 
 This means that patch for a file <projet>/vendor/my/package/some/file.php whould be targeted in the patch as ./some/file.php
 
+Note that you don't have to change the patch name or description when you change it after it has already
+been used in some context by someone as the module will be aware of the patch contents and will re-apply
+it when it has changed since last time.
+
 ## Environment variable feature flags
 
 COMPOSER_FORCE_REPATCH - will force all patches to be re-applied
