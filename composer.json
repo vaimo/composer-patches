@@ -1,5 +1,5 @@
 {
-  "name": "cweagans/composer-patches",
+  "name": "vaimo/composer-patches",
   "description": "Provides a way to patch Composer packages.",
   "minimum-stability": "dev",
   "license": "BSD",
