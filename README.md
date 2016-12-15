@@ -96,7 +96,7 @@ Please note that in both cases the patch path should be relative to the context 
 
 ## Alternative format
 
-In case it's important to retain the patching order, one can also use alternative declaration format that uses array wrapper:
+In case it's important to retain the patching order (in case the patches have to be applied in certain sequence because they target same code segments), one can also use alternative declaration format that uses array wrapper:
 
 ```
 {
