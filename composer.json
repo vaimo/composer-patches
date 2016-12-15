@@ -21,6 +21,9 @@
     "composer/composer": "~1.0",
     "phpunit/phpunit": "~4.6"
   },
+  "conflict": {
+    "cweagans/composer-patches": "*"
+  },
   "autoload": {
     "psr-4": {"cweagans\\Composer\\": "src"}
   },
