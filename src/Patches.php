@@ -434,6 +434,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
         $extra = $package->getExtra();
         unset($extra['patches_applied']);
+        $packagesUpdated = true;
         $package->setExtra($extra);
       }
     }
