@@ -91,8 +91,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       PackageEvents::POST_PACKAGE_UNINSTALL => "removePatches",
       PackageEvents::PRE_PACKAGE_INSTALL => "gatherPatches",
       PackageEvents::PRE_PACKAGE_UPDATE => "gatherPatches",
-      ScriptEvents::PRE_AUTOLOAD_DUMP => "postInstall",
-      ScriptEvents::PRE_AUTOLOAD_DUMP => "postInstall",
+      ScriptEvents::PRE_AUTOLOAD_DUMP => "postInstall"
     );
   }
 
@@ -201,6 +200,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
   public function gatherPatches(PackageEvent $event) {
     // If patching has been disabled, bail out here.
     if (!$this->isPatchingEnabled()) {
+      $this->patches = [];
       return;
     }
 
@@ -365,10 +365,6 @@ class Patches implements PluginInterface, EventSubscriberInterface {
    * @throws \Exception
    */
   public function postInstall(Event $event) {
-    if (!$this->isPatchingEnabled()) {
-      return;
-    }
-
     $installationManager = $this->composer->getInstallationManager();
     $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
 
@@ -377,7 +373,11 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
     $packagesUpdated = false;
 
-    $allPatches = $this->getAllPatches();
+    if ($this->isPatchingEnabled()) {
+      $allPatches = $this->getAllPatches();
+    } else {
+      $allPatches = array();
+    }
 
     $forceReinstall = getenv('COMPOSER_FORCE_REPATCH');
 
@@ -387,12 +387,17 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     foreach ($packageRepository->getPackages() as $package) {
       $packageName = $package->getName();
 
-      if (!isset($allPatches[$packageName])) {
-        continue;
+      if (isset($allPatches[$packageName])) {
+        $patches = $allPatches[$packageName];
+      } else {
+        $patches = array();
       }
 
-      $patches = $allPatches[$packageName];
       $extra = $package->getExtra();
+
+      if (!isset($extra['patches_applied'])) {
+        continue;
+      }
 
       if (isset($extra['patches_applied']) && !$forceReinstall) {
         $applied = $extra['patches_applied'];
@@ -621,7 +626,8 @@ class Patches implements PluginInterface, EventSubscriberInterface {
   }
 
   /**
-   * Checks if the root package enables patching.
+   * Checks if the root package enables patching. Enabled by default if there are packages that introduce
+   * patches, but root package can still explicitly disable them.
    *
    * @return bool
    *   Whether patching is enabled. Defaults to TRUE.
@@ -630,12 +636,9 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     $extra = $this->composer->getPackage()->getExtra();
 
     if (empty($extra['patches'])) {
-      // The root package has no patches of its own, so only allow patching if
-      // it has specifically opted in.
       return isset($extra['enable-patching']) ? $extra['enable-patching'] : FALSE;
-    }
-    else {
-      return TRUE;
+    } else {
+      return isset($extra['enable-patching']) && !$extra['enable-patching'] ? FALSE : TRUE;
     }
   }
 
