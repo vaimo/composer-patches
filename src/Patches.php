@@ -88,8 +88,25 @@ class Patches implements PluginInterface, EventSubscriberInterface {
   public static function getSubscribedEvents() {
     return array(
       PackageEvents::POST_PACKAGE_UNINSTALL => "removePatches",
+      PackageEvents::PRE_PACKAGE_INSTALL => "resetAppliedPatches",
+      PackageEvents::PRE_PACKAGE_UPDATE => "resetAppliedPatches",
       ScriptEvents::PRE_AUTOLOAD_DUMP => "postInstall"
     );
+  }
+
+  public function resetAppliedPatches(\Composer\Installer\PackageEvent $event) {
+    foreach ($event->getOperations() as $operation) {
+      if ($operation->getJobType() != 'install') {
+        continue;
+      }
+
+      $package = $this->getPackageFromOperation($operation);
+      $extra = $package->getExtra();
+
+      unset($extra['patches_applied']);
+
+      $package->setExtra($extra);
+    }
   }
 
   protected function preparePatchDefinitions($patches, $ownerPackage = null) {
