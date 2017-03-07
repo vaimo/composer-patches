@@ -14,7 +14,6 @@ use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
-use Composer\Package\AliasPackage;
 use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Installer\PackageEvents;
@@ -89,8 +88,6 @@ class Patches implements PluginInterface, EventSubscriberInterface {
   public static function getSubscribedEvents() {
     return array(
       PackageEvents::POST_PACKAGE_UNINSTALL => "removePatches",
-      PackageEvents::PRE_PACKAGE_INSTALL => "gatherPatches",
-      PackageEvents::PRE_PACKAGE_UPDATE => "gatherPatches",
       ScriptEvents::PRE_AUTOLOAD_DUMP => "postInstall"
     );
   }
@@ -190,75 +187,6 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     }
 
     return $tmp_patches;
-  }
-
-  /**
-   * Gather patches from dependencies and store them for later use.
-   *
-   * @param PackageEvent $event
-   */
-  public function gatherPatches(PackageEvent $event) {
-    // If patching has been disabled, bail out here.
-    if (!$this->isPatchingEnabled()) {
-      $this->patches = [];
-      return;
-    }
-
-    if (!isset($this->patches['_patchesGathered'])) {
-      $this->patches = (array)$this->grabPatches();
-      $this->patches['_patchesGathered'] = true;
-    }
-
-    // Now add all the patches from dependencies that will be installed.
-    $operations = $event->getOperations();
-    foreach ($operations as $operation) {
-      if ($operation->getJobType() == 'install' || $operation->getJobType() == 'update') {
-        $package = $this->getPackageFromOperation($operation);
-        $extra = $package->getExtra();
-        $packageName = $package->getName();
-
-        if ($operation->getJobType() == 'install') {
-          unset($extra['patches_applied']);
-          $package->setExtra($extra);
-          $this->patches['_patchesGathered'] = true;
-        }
-
-        if (isset($extra['patches'])) {
-          $patches = $this->preparePatchDefinitions($extra['patches'], $package);
-
-          foreach ($patches as $targetPackage => $packagePatches) {
-            if (!isset($this->patches[$targetPackage])) {
-              $this->patches[$targetPackage] = array();
-            }
-
-            $this->patches[$targetPackage] = array_merge($packagePatches, $this->patches[$targetPackage]);
-          }
-        }
-        // Unset installed patches for this package
-        if(isset($this->installedPatches[$packageName])) {
-          unset($this->installedPatches[$packageName]);
-        }
-      }
-    }
-
-    // Merge installed patches from dependencies that did not receive an update.
-    foreach ($this->installedPatches as $patches) {
-      foreach ($patches as $targetPackage => $packagePatches) {
-        if (!isset($this->patches[$targetPackage])) {
-          $this->patches[$targetPackage] = array();
-        }
-        
-        $this->patches[$targetPackage] = array_merge($packagePatches, $this->patches[$targetPackage]);
-      }
-    }
-
-    // If we're in verbose mode, list the projects we're going to patch.
-    if ($this->io->isVerbose()) {
-      foreach ($this->patches as $package => $patches) {
-        $number = count($patches);
-        $this->io->write('<info>Found ' . $number . ' patches for ' . $package . '.</info>');
-      }
-    }
   }
 
   public function getExcludedPatches()
