@@ -19,11 +19,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     protected $eventDispatcher;
 
     /**
-     * @var array $installedPatches
-     */
-    protected $installedPatches;
-
-    /**
      * @var array $packagesByName
      */
     protected $packagesByName;
@@ -63,7 +58,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $this->composer = $composer;
         $this->io = $io;
         $this->eventDispatcher = $composer->getEventDispatcher();
-        $this->installedPatches = array();
 
         $executor = new \Composer\Util\ProcessExecutor($this->io);
         $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($executor, $this->io);
@@ -168,8 +162,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
             $patches = isset($extra['patches']) ? $extra['patches'] : array();
             $patches = $this->preparePatchDefinitions($patches, $package);
-
-            $this->installedPatches[$package->getName()] = $patches;
 
             foreach ($patches as $targetPackage => $packagePatches) {
                 if (!isset($projectPatches[$targetPackage])) {
