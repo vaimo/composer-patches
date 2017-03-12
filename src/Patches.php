@@ -19,11 +19,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     protected $eventDispatcher;
 
     /**
-     * @var \Composer\Util\ProcessExecutor $executor
-     */
-    protected $executor;
-
-    /**
      * @var array $installedPatches
      */
     protected $installedPatches;
@@ -42,6 +37,11 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
      * @var array
      */
     protected $packagesToReinstall = array();
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\Applier
+     */
+    protected $patchApplier;
 
     /**
      * Note that postInstall is locked to autoload dump instead of post-install. Reason for this is that
@@ -63,8 +63,10 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $this->composer = $composer;
         $this->io = $io;
         $this->eventDispatcher = $composer->getEventDispatcher();
-        $this->executor = new \Composer\Util\ProcessExecutor($this->io);
         $this->installedPatches = array();
+
+        $executor = new \Composer\Util\ProcessExecutor($this->io);
+        $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($executor, $this->io);
     }
 
     public function resetAppliedPatches(\Composer\Installer\PackageEvent $event)
@@ -451,7 +453,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                         $downloader->copy($hostname, $source, $filename, false);
                     }
 
-                    $this->applyPatch($filename, $packageInstallPath);
+                    $this->patchApplier->execute($filename, $packageInstallPath);
 
                     if (isset($hostname)) {
                         unlink($filename);
@@ -540,68 +542,5 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         }
 
         file_put_contents($directory . '/PATCHES.txt', implode("\n", $outputLines));
-    }
-
-    protected function applyPatch($filename, $cwd)
-    {
-        $patchApplied = false;
-        $patchLevelSequence = array('-p1', '-p0', '-p2');
-
-        foreach ($patchLevelSequence as $patchLevel) {
-            $patchValidated = $this->executeCommand('git apply --check %s %s', [$patchLevel, $filename], $cwd);
-
-            if (!$patchValidated) {
-                continue;
-            }
-
-            $patchApplied = $this->executeCommand('git apply %s %s', [$patchLevel, $filename], $cwd);
-
-            if ($patchApplied) {
-                break;
-            }
-        }
-
-        if (!$patchApplied) {
-            foreach ($patchLevelSequence as $patchLevel) {
-                $patchApplied = $this->executeCommand('patch %s --no-backup-if-mismatch < %s', [$patchLevel, $filename], $cwd);
-
-                if ($patchApplied) {
-                    break;
-                }
-            }
-        }
-
-        if (isset($hostname)) {
-            unlink($filename);
-        }
-
-        if (!$patchApplied) {
-            throw new \Exception(sprintf('Cannot apply patch %s', $filename));
-        }
-    }
-
-    protected function executeCommand($commandTemplate, array $arguments, $cwd = null)
-    {
-        foreach ($arguments as $index => $argument) {
-            $arguments[$index] = escapeshellarg($argument);
-        }
-
-        $command = vsprintf($commandTemplate, $arguments);
-
-        $outputHandler = '';
-
-        if ($this->io->isVerbose()) {
-            $io = $this->io;
-
-            $outputHandler = function ($type, $data) use ($io) {
-                if ($type == \Symfony\Component\Process\Process::ERR) {
-                    $io->write('<error>' . $data . '</error>');
-                } else {
-                    $io->write('<comment>' . $data . '</comment>');
-                }
-            };
-        }
-
-        return $this->executor->execute($command, $outputHandler, $cwd) == 0;
     }
 }
