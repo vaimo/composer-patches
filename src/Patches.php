@@ -1,5 +1,5 @@
 <?php
-namespace cweagans\Composer;
+namespace Vaimo\ComposerPatches;
 
 class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispatcher\EventSubscriberInterface
 {
@@ -269,14 +269,64 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             $package = $operation->getPackage();
             $extra = $package->getExtra();
 
-            if (isset($extra['patches'])) {
-                $patches = $this->preparePatchDefinitions($extra['patches'], $package);
+            if (!isset($extra['patches'])) {
+                continue;
+            }
 
-                foreach ($patches as $targetPackageName => $packagePatches) {
-                    $this->packagesToReinstall[] = $targetPackageName;
-                }
+            $patches = $this->preparePatchDefinitions($extra['patches'], $package);
+
+            foreach ($patches as $targetPackageName => $packagePatches) {
+                $this->packagesToReinstall[] = $targetPackageName;
             }
         }
+    }
+
+    public function resolvePackagesToReinstall($installedPackages)
+    {
+        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
+        $reinstallQueue = [];
+
+        foreach ($installedPackages as $package) {
+            $packageName = $package->getName();
+
+            if (isset($patches[$packageName])) {
+                $packagePatches = $patches[$packageName];
+            } else {
+                $packagePatches = array();
+            }
+
+            $extra = $package->getExtra();
+
+            if (!isset($extra['patches_applied'])) {
+                continue;
+            }
+
+            if (isset($extra['patches_applied'])) {
+                $applied = $extra['patches_applied'];
+
+                if (!$applied) {
+                    continue;
+                }
+
+                foreach ($packagePatches as $url => &$description) {
+                    $absolutePatchPath = $vendorDir . '/' . $url;
+
+                    if (file_exists($absolutePatchPath)) {
+                        $url = $absolutePatchPath;
+                    }
+
+                    $description = $description . ', md5:' . md5_file($url);
+                }
+
+                if (!array_diff_assoc($applied, $packagePatches) && !array_diff_assoc($packagePatches, $applied)) {
+                    continue;
+                }
+            }
+
+            $reinstallQueue[] = $package->getName();
+        }
+
+        return $reinstallQueue;
     }
 
     public function postInstall(\Composer\Script\Event $event)
@@ -299,47 +349,13 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
         $installedPackages = $packageRepository->getPackages();
 
-        /**
-         * Uninstall packages that are targeted by patches that have changed
-         */
-        foreach ($installedPackages as $package) {
-            $packageName = $package->getName();
-
-            if (isset($patches[$packageName])) {
-                $packagePatches = $patches[$packageName];
-            } else {
-                $packagePatches = array();
-            }
-
-            $extra = $package->getExtra();
-
-            if (!isset($extra['patches_applied'])) {
-                continue;
-            }
-
-            if (isset($extra['patches_applied']) && !$forceReinstall) {
-                $applied = $extra['patches_applied'];
-
-                if (!$applied) {
-                    continue;
-                }
-
-                foreach ($packagePatches as $url => &$description) {
-                    $absolutePatchPath = $vendorDir . '/' . $url;
-
-                    if (file_exists($absolutePatchPath)) {
-                        $url = $absolutePatchPath;
-                    }
-
-                    $description = $description . ', md5:' . md5_file($url);
-                }
-
-                if (!array_diff_assoc($applied, $packagePatches) && !array_diff_assoc($packagePatches, $applied)) {
-                    continue;
-                }
-            }
-
-            $this->packagesToReinstall[] = $package->getName();
+        if ($forceReinstall) {
+            $this->packagesToReinstall = array_keys($patches);
+        } else {
+            $this->packagesToReinstall = array_merge(
+                $this->packagesToReinstall,
+                $this->resolvePackagesToReinstall($installedPackages)
+            );
         }
 
         if ($this->packagesToReinstall) {
@@ -377,14 +393,14 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             $packagePatches = $patches[$packageName];
             $extra = $package->getExtra();
 
-            foreach ($packagePatches as $url => &$description) {
-                $absolutePatchPath = $vendorDir . '/' . $url;
+            foreach ($packagePatches as $source => &$description) {
+                $absolutePatchPath = $vendorDir . '/' . $source;
 
                 if (file_exists($absolutePatchPath)) {
-                    $url = $absolutePatchPath;
+                    $source = $absolutePatchPath;
                 }
 
-                $description = $description . ', md5:' . md5_file($url);
+                $description = $description . ', md5:' . md5_file($source);
             }
 
             if (isset($extra['patches_applied'])) {
@@ -408,30 +424,31 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             $extra['patches_applied'] = array();
 
             $allPackagePatchesApplied = true;
-            foreach ($packagePatches as $url => $description) {
-                $urlLabel = '<info>' . $url . '</info>';
-                $absolutePatchPath = $vendorDir . '/' . $url;
+            foreach ($packagePatches as $source => $description) {
+                $patchLabel = '<info>' . $source . '</info>';
+                $absolutePatchPath = $vendorDir . '/' . $source;
 
                 if (file_exists($absolutePatchPath)) {
-                    $ownerName  = implode('/', array_slice(explode('/', $url), 0, 2));
+                    $ownerName  = implode('/', array_slice(explode('/', $source), 0, 2));
 
-                    $urlLabel = '<info>' . $ownerName . ': ' . trim(substr($url, strlen($ownerName)), '/') . '</info>';
+                    $patchLabel = '<info>' . $ownerName . ': ' . trim(substr($source, strlen($ownerName)), '/') . '</info>';
 
-                    $url = $absolutePatchPath;
+                    $source = $absolutePatchPath;
                 }
 
-                $this->io->write('    ~ ' . $urlLabel);
+                $this->io->write('    ~ ' . $patchLabel);
                 $this->io->write('      ' . '<comment>' . $description. '</comment>');
 
                 try {
-                    $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $url, $description));
+                    $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $source, $description));
 
-                    if (file_exists($url)) {
-                        $filename = realpath($url);
+                    if (file_exists($source)) {
+                        $filename = realpath($source);
                     } else {
                         $filename = uniqid('/tmp/') . '.patch';
-                        $hostname = parse_url($url, PHP_URL_HOST);
-                        $downloader->copy($hostname, $url, $filename, false);
+                        $hostname = parse_url($source, PHP_URL_HOST);
+
+                        $downloader->copy($hostname, $source, $filename, false);
                     }
 
                     $this->applyPatch($filename, $packageInstallPath);
@@ -440,15 +457,15 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                         unlink($filename);
                     }
 
-                    $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::POST_PATCH_APPLY, $package, $url, $description));
+                    $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::POST_PATCH_APPLY, $package, $source, $description));
 
-                    $appliedPatchPath = $url;
+                    $appliedPatchPath = $source;
 
                     if (strpos($appliedPatchPath, $vendorDir) === 0) {
                         $appliedPatchPath = trim(substr($appliedPatchPath, strlen($vendorDir)), '/');
                     }
 
-                    $extra['patches_applied'][$appliedPatchPath] = $description . ', md5:' . md5_file($url);
+                    $extra['patches_applied'][$appliedPatchPath] = $description . ', md5:' . md5_file($source);
                 } catch (\Exception $e) {
                     $this->io->write('   <error>Could not apply patch! Skipping.</error>');
 
@@ -459,7 +476,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                     }
 
                     if (getenv('COMPOSER_EXIT_ON_PATCH_FAILURE')) {
-                        throw new \Exception(sprintf('Cannot apply patch %s (%s)!', $description, $url));
+                        throw new \Exception(sprintf('Cannot apply patch %s (%s)!', $description, $source));
                     }
                 }
             }
@@ -525,17 +542,14 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         file_put_contents($directory . '/PATCHES.txt', implode("\n", $outputLines));
     }
 
-    protected function applyPatch($patchFilename, $packageRoot)
+    protected function applyPatch($filename, $cwd)
     {
         $patchAppliedSuccessfully = false;
         $patchLevelSequence = array('-p1', '-p0', '-p2');
 
         foreach ($patchLevelSequence as $patchLevel) {
             $patchValidated = $this->executeCommand(
-                'cd %s && GIT_DIR=. git apply --check %s %s',
-                $packageRoot,
-                $patchLevel,
-                $patchFilename
+                'cd %s && GIT_DIR=. git apply --check %s %s', $cwd, $patchLevel, $filename
             );
 
             if (!$patchValidated) {
@@ -543,20 +557,18 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             }
 
             $patchAppliedSuccessfully = $this->executeCommand(
-                'cd %s && GIT_DIR=. git apply %s %s',
-                $packageRoot,
-                $patchLevel,
-                $patchFilename
+                'cd %s && GIT_DIR=. git apply %s %s', $cwd, $patchLevel, $filename
             );
+
+            if ($patchAppliedSuccessfully) {
+                break;
+            }
         }
 
         if (!$patchAppliedSuccessfully) {
             foreach ($patchLevelSequence as $patchLevel) {
                 $patchAppliedSuccessfully = $this->executeCommand(
-                    'patch %s --no-backup-if-mismatch -d %s < %s',
-                    $patchLevel,
-                    $packageRoot,
-                    $patchFilename
+                    'patch %s --no-backup-if-mismatch -d %s < %s', $patchLevel, $cwd, $filename
                 );
 
                 if ($patchAppliedSuccessfully) {
@@ -566,11 +578,11 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         }
 
         if (isset($hostname)) {
-            unlink($patchFilename);
+            unlink($filename);
         }
 
         if (!$patchAppliedSuccessfully) {
-            throw new \Exception(sprintf('Cannot apply patch %s', $patchFilename));
+            throw new \Exception(sprintf('Cannot apply patch %s', $filename));
         }
     }
 
@@ -578,23 +590,16 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     {
         $arguments = func_get_args();
 
-        foreach ($arguments as $index => $arg) {
-            if ($index == 0) {
-                continue;
-            }
-
-            $arguments[$index] = escapeshellarg($arg);
+        foreach (array_slice($arguments, 1, null, true) as $index => $argument) {
+            $arguments[$index] = escapeshellarg($argument);
         }
 
-        $command = call_user_func_array('sprintf', $arguments);
-
-        $outputGenerator = '';
+        $outputHandler = '';
 
         if ($this->io->isVerbose()) {
-            $this->io->write('<comment>' . $command . '</comment>');
             $io = $this->io;
 
-            $outputGenerator = function ($type, $data) use ($io) {
+            $outputHandler = function ($type, $data) use ($io) {
                 if ($type == \Symfony\Component\Process\Process::ERR) {
                     $io->write('<error>' . $data . '</error>');
                 } else {
@@ -603,6 +608,8 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             };
         }
 
-        return $this->executor->execute($command, $outputGenerator) == 0;
+        $result = $this->executor->execute(call_user_func_array('sprintf', $arguments), $outputHandler) == 0;
+
+        return $result === true;
     }
 }

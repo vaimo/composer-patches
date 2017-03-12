@@ -1,17 +1,17 @@
 <?php
-namespace cweagans\Composer;
+namespace Vaimo\ComposerPatches;
 
 class PatchEvents
 {
     /**
-     * The event listener method receives a cweagans\Composer\PatchEvent instance.
+     * The event listener method receives a Vaimo\ComposerPatches\PatchEvent instance.
      *
      * @var string
      */
     const PRE_PATCH_APPLY = 'pre-patch-apply';
 
     /**
-     * The event listener method receives a cweagans\Composer\PatchEvent instance.
+     * The event listener method receives a Vaimo\ComposerPatches\PatchEvent instance.
      *
      * @var string
      */

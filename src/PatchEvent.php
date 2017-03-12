@@ -1,5 +1,5 @@
 <?php
-namespace cweagans\Composer;
+namespace Vaimo\ComposerPatches;
 
 class PatchEvent extends \Composer\EventDispatcher\Event
 {

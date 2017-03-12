@@ -5,7 +5,7 @@
   "license": "BSD",
   "type": "composer-plugin",
   "extra": {
-    "class": "cweagans\\Composer\\Patches"
+    "class": "Vaimo\\ComposerPatches\\Patches"
   },
   "authors": [
     {
@@ -25,9 +25,9 @@
     "cweagans/composer-patches": "*"
   },
   "autoload": {
-    "psr-4": {"cweagans\\Composer\\": "src"}
+    "psr-4": {"Vaimo\\ComposerPatches\\": "src"}
   },
   "autoload-dev": {
-    "psr-4": {"cweagans\\Composer\\Tests\\": "tests"}
+    "psr-4": {"Vaimo\\ComposerPatches\\Tests\\": "tests"}
   }
 }
