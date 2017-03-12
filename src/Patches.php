@@ -24,11 +24,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     protected $executor;
 
     /**
-     * @var array $patches
-     */
-    protected $patches;
-
-    /**
      * @var array $installedPatches
      */
     protected $installedPatches;
@@ -69,7 +64,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $this->io = $io;
         $this->eventDispatcher = $composer->getEventDispatcher();
         $this->executor = new \Composer\Util\ProcessExecutor($this->io);
-        $this->patches = array();
         $this->installedPatches = array();
     }
 
@@ -91,7 +85,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
     protected function preparePatchDefinitions($patches, $ownerPackage = null)
     {
-        $_patches = array();
+        $patchesPerPackage = array();
 
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
 
@@ -113,8 +107,8 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $excludedPatches = $this->getExcludedPatches();
 
         foreach ($patches as $patchTarget => $packagePatches) {
-            if (!isset($_patches[$patchTarget])) {
-                $_patches[$patchTarget] = array();
+            if (!isset($patchesPerPackage[$patchTarget])) {
+                $patchesPerPackage[$patchTarget] = array();
             }
 
             foreach ($packagePatches as $label => $data) {
@@ -147,11 +141,11 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                     }
                 }
 
-                $_patches[$patchTarget][$url] = $label;
+                $patchesPerPackage[$patchTarget][$url] = $label;
             }
         }
 
-        return array_filter($_patches);
+        return array_filter($patchesPerPackage);
     }
 
     protected function getAllPatches()
@@ -161,7 +155,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $localRepository = $repositoryManager->getLocalRepository();
         $packages = $localRepository->getPackages();
 
-        $allPatchesFromPackages = (array)$this->grabPatches();
+        $allPatchesFromPackages = $this->collectPatchesFromPackages();
 
         foreach ($packages as $package) {
             $extra = $package->getExtra();
@@ -208,7 +202,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         return $this->excludedPatches;
     }
 
-    public function grabPatches()
+    public function collectPatchesFromPackages()
     {
         // First, try to get the patches from the root composer.json.
         $extra = $this->composer->getPackage()->getExtra();
@@ -217,14 +211,13 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             $patches = $extra['patches'];
 
             return $this->preparePatchDefinitions($patches);
-        }
-
-        // If it's not specified there, look for a patches-file definition.
-        elseif (isset($extra['patches-file'])) {
+        } elseif (isset($extra['patches-file'])) {
             $this->io->write('<info>Gathering patches from patch file.</info>');
+
             $patches = file_get_contents($extra['patches-file']);
             $patches = json_decode($patches, true);
             $error = json_last_error();
+
             if ($error != 0) {
                 switch ($error) {
                     case JSON_ERROR_DEPTH:
@@ -248,11 +241,12 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                 }
                 throw new \Exception('There was an error in the supplied patches file:' . $msg);
             }
+
             if (isset($patches['patches'])) {
                 $patches = $patches['patches'];
+
                 return $this->preparePatchDefinitions($patches);
-            }
-            elseif(!$patches) {
+            } elseif (!$patches) {
                 throw new \Exception('There was an error in the supplied patch file');
             }
         }
@@ -270,7 +264,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             }
 
             $package = $operation->getPackage();
-
             $extra = $package->getExtra();
 
             if (isset($extra['patches'])) {
@@ -358,7 +351,9 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                 $installationManager->install($packageRepository, $uninstallOperation);
 
                 $extra = $package->getExtra();
+
                 unset($extra['patches_applied']);
+
                 $packagesUpdated = true;
                 $package->setExtra($extra);
             }
@@ -434,6 +429,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                     $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::POST_PATCH_APPLY, $package, $url, $description));
 
                     $appliedPatchPath = $url;
+
                     if (strpos($appliedPatchPath, $vendorDir) === 0) {
                         $appliedPatchPath = trim(substr($appliedPatchPath, strlen($vendorDir)), '/');
                     }
@@ -482,19 +478,16 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         return $package;
     }
 
-    protected function getAndApplyPatch(\Composer\Util\RemoteFilesystem $downloader, $install_path, $patch_url)
+    protected function getAndApplyPatch(\Composer\Util\RemoteFilesystem $downloader, $installPatch, $patchSource)
     {
-        // Local patch file.
-        if (file_exists($patch_url)) {
-            $filename = realpath($patch_url);
-        }
-        else {
-            // Generate random (but not cryptographically so) filename.
+        if (file_exists($patchSource)) {
+            $filename = realpath($patchSource);
+        } else {
             $filename = uniqid('/tmp/') . '.patch';
 
             // Download file from remote filesystem to this location.
-            $hostname = parse_url($patch_url, PHP_URL_HOST);
-            $downloader->copy($hostname, $patch_url, $filename, false);
+            $hostname = parse_url($patchSource, PHP_URL_HOST);
+            $downloader->copy($hostname, $patchSource, $filename, false);
         }
 
         // Modified from drush6:make.project.inc
@@ -505,11 +498,12 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         // it might be useful.
         $patchLevels = array('-p1', '-p0', '-p2');
 
-        foreach ($patchLevels as $patch_level) {
-            $checked = $this->executeCommand('cd %s && GIT_DIR=. git apply --check %s %s', $install_path, $patch_level, $filename);
-            if ($checked) {
+        foreach ($patchLevels as $patchLevel) {
+            $patchCheckedSuccessfully = $this->executeCommand('cd %s && GIT_DIR=. git apply --check %s %s', $installPatch, $patchLevel, $filename);
+
+            if ($patchCheckedSuccessfully) {
                 // Apply the first successful style.
-                $patchAppliedSuccessfully = $this->executeCommand('cd %s && GIT_DIR=. git apply %s %s', $install_path, $patch_level, $filename);
+                $patchAppliedSuccessfully = $this->executeCommand('cd %s && GIT_DIR=. git apply %s %s', $installPatch, $patchLevel, $filename);
                 break;
             }
         }
@@ -517,23 +511,21 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         // In some rare cases, git will fail to apply a patch, fallback to using
         // the 'patch' command.
         if (!$patchAppliedSuccessfully) {
-            foreach ($patchLevels as $patch_level) {
+            foreach ($patchLevels as $patchLevel) {
                 // --no-backup-if-mismatch here is a hack that fixes some
                 // differences between how patch works on windows and unix.
-                if ($patchAppliedSuccessfully = $this->executeCommand('patch %s --no-backup-if-mismatch -d %s < %s', $patch_level, $install_path, $filename)) {
+                if ($patchAppliedSuccessfully = $this->executeCommand('patch %s --no-backup-if-mismatch -d %s < %s', $patchLevel, $installPatch, $filename)) {
                     break;
                 }
             }
         }
 
-        // Clean up the temporary patch file.
         if (isset($hostname)) {
             unlink($filename);
         }
-        // If the patch *still* isn't applied, then give up and throw an Exception.
-        // Otherwise, let the user know it worked.
+
         if (!$patchAppliedSuccessfully) {
-            throw new \Exception(sprintf('Cannot apply patch %s', $patch_url));
+            throw new \Exception(sprintf('Cannot apply patch %s', $patchSource));
         }
     }
 
@@ -570,31 +562,35 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         file_put_contents($directory . '/PATCHES.txt', implode("\n", $outputLines));
     }
 
-    protected function executeCommand($cmd)
+    protected function executeCommand()
     {
-        // Shell-escape all arguments except the command.
-        $args = func_get_args();
-        foreach ($args as $index => $arg) {
-            if ($index !== 0) {
-                $args[$index] = escapeshellarg($arg);
+        $arguments = func_get_args();
+
+        foreach ($arguments as $index => $arg) {
+            if ($index == 0) {
+                continue;
             }
+
+            $arguments[$index] = escapeshellarg($arg);
         }
 
-        // And replace the arguments.
-        $command = call_user_func_array('sprintf', $args);
-        $output = '';
+        $command = call_user_func_array('sprintf', $arguments);
+
+        $outputGenerator = '';
+
         if ($this->io->isVerbose()) {
             $this->io->write('<comment>' . $command . '</comment>');
             $io = $this->io;
-            $output = function ($type, $data) use ($io) {
+
+            $outputGenerator = function ($type, $data) use ($io) {
                 if ($type == \Symfony\Component\Process\Process::ERR) {
                     $io->write('<error>' . $data . '</error>');
-                }
-                else {
+                } else {
                     $io->write('<comment>' . $data . '</comment>');
                 }
             };
         }
-        return ($this->executor->execute($command, $output) == 0);
+
+        return $this->executor->execute($command, $outputGenerator) == 0;
     }
 }
