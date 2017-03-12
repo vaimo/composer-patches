@@ -544,34 +544,28 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
     protected function applyPatch($filename, $cwd)
     {
-        $patchAppliedSuccessfully = false;
+        $patchApplied = false;
         $patchLevelSequence = array('-p1', '-p0', '-p2');
 
         foreach ($patchLevelSequence as $patchLevel) {
-            $patchValidated = $this->executeCommand(
-                'cd %s && GIT_DIR=. git apply --check %s %s', $cwd, $patchLevel, $filename
-            );
+            $patchValidated = $this->executeCommand('git apply --check %s %s', [$patchLevel, $filename], $cwd);
 
             if (!$patchValidated) {
                 continue;
             }
 
-            $patchAppliedSuccessfully = $this->executeCommand(
-                'cd %s && GIT_DIR=. git apply %s %s', $cwd, $patchLevel, $filename
-            );
+            $patchApplied = $this->executeCommand('git apply %s %s', [$patchLevel, $filename], $cwd);
 
-            if ($patchAppliedSuccessfully) {
+            if ($patchApplied) {
                 break;
             }
         }
 
-        if (!$patchAppliedSuccessfully) {
+        if (!$patchApplied) {
             foreach ($patchLevelSequence as $patchLevel) {
-                $patchAppliedSuccessfully = $this->executeCommand(
-                    'patch %s --no-backup-if-mismatch -d %s < %s', $patchLevel, $cwd, $filename
-                );
+                $patchApplied = $this->executeCommand('patch %s --no-backup-if-mismatch < %s', [$patchLevel, $filename], $cwd);
 
-                if ($patchAppliedSuccessfully) {
+                if ($patchApplied) {
                     break;
                 }
             }
@@ -581,18 +575,18 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             unlink($filename);
         }
 
-        if (!$patchAppliedSuccessfully) {
+        if (!$patchApplied) {
             throw new \Exception(sprintf('Cannot apply patch %s', $filename));
         }
     }
 
-    protected function executeCommand()
+    protected function executeCommand($commandTemplate, array $arguments, $cwd = null)
     {
-        $arguments = func_get_args();
-
-        foreach (array_slice($arguments, 1, null, true) as $index => $argument) {
+        foreach ($arguments as $index => $argument) {
             $arguments[$index] = escapeshellarg($argument);
         }
+
+        $command = vsprintf($commandTemplate, $arguments);
 
         $outputHandler = '';
 
@@ -608,8 +602,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             };
         }
 
-        $result = $this->executor->execute(call_user_func_array('sprintf', $arguments), $outputHandler) == 0;
-
-        return $result === true;
+        return $this->executor->execute($command, $outputHandler, $cwd) == 0;
     }
 }
