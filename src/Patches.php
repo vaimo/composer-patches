@@ -1,100 +1,80 @@
 <?php
-
-/**
- * @file
- * Provides a way to patch Composer packages after installation.
- */
-
 namespace cweagans\Composer;
 
-use Composer\Composer;
-use Composer\DependencyResolver\Operation\InstallOperation;
-use Composer\DependencyResolver\Operation\UninstallOperation;
-use Composer\DependencyResolver\Operation\UpdateOperation;
-use Composer\DependencyResolver\Operation\OperationInterface;
-use Composer\EventDispatcher\EventSubscriberInterface;
-use Composer\IO\IOInterface;
-use Composer\Package\PackageInterface;
-use Composer\Plugin\PluginInterface;
-use Composer\Installer\PackageEvents;
-use Composer\Script\Event;
-use Composer\Script\ScriptEvents;
-use Composer\Script\PackageEvent;
-use Composer\Util\ProcessExecutor;
-use Composer\Util\RemoteFilesystem;
-use Symfony\Component\Process\Process;
-
-class Patches implements PluginInterface, EventSubscriberInterface {
-
+class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispatcher\EventSubscriberInterface
+{
   /**
-   * @var Composer $composer
+   * @var \Composer\Composer $composer
    */
   protected $composer;
+
   /**
-   * @var IOInterface $io
+   * @var \Composer\IO\IOInterface $io
    */
   protected $io;
+
   /**
    * @var EventDispatcher $eventDispatcher
    */
   protected $eventDispatcher;
+
   /**
-   * @var ProcessExecutor $executor
+   * @var \Composer\Util\ProcessExecutor $executor
    */
   protected $executor;
+
   /**
    * @var array $patches
    */
   protected $patches;
+
   /**
    * @var array $installedPatches
    */
   protected $installedPatches;
+
   /**
    * @var array $packagesByName
    */
   protected $packagesByName;
+
   /**
    * @var array $excludedPatches
    */
   protected $excludedPatches;
+
   /**
    * @var array
    */
   protected $packagesToReinstall = array();
 
   /**
-   * Apply plugin modifications to composer
-   *
-   * @param Composer    $composer
-   * @param IOInterface $io
-   */
-  public function activate(Composer $composer, IOInterface $io) {
-    $this->composer = $composer;
-    $this->io = $io;
-    $this->eventDispatcher = $composer->getEventDispatcher();
-    $this->executor = new ProcessExecutor($this->io);
-    $this->patches = array();
-    $this->installedPatches = array();
-  }
-
-  /**
-   * Returns an array of event names this subscriber wants to listen to.
-   *
    * Note that postInstall is locked to autoload dump instead of post-install. Reason for this is that
    * post-install comes after auto-loader generation which means that in case patches target class
    * namespaces or class names, the auto-loader will not get those changes applied to it correctly.
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents()
+  {
     return array(
-      PackageEvents::POST_PACKAGE_UNINSTALL => "removePatches",
-      PackageEvents::PRE_PACKAGE_INSTALL => "resetAppliedPatches",
-      PackageEvents::PRE_PACKAGE_UPDATE => "resetAppliedPatches",
-      ScriptEvents::PRE_AUTOLOAD_DUMP => "postInstall"
+      \Composer\Installer\PackageEvents::POST_PACKAGE_UNINSTALL => 'removePatches',
+      \Composer\Installer\PackageEvents::PRE_PACKAGE_INSTALL => 'resetAppliedPatches',
+      \Composer\Installer\PackageEvents::PRE_PACKAGE_UPDATE => 'resetAppliedPatches',
+      \Composer\Script\ScriptEvents::PRE_AUTOLOAD_DUMP => 'postInstall'
     );
   }
 
-  public function resetAppliedPatches(\Composer\Installer\PackageEvent $event) {
+  public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
+  {
+    $this->composer = $composer;
+    $this->io = $io;
+    $this->eventDispatcher = $composer->getEventDispatcher();
+    $this->executor = new \Composer\Util\ProcessExecutor($this->io);
+    $this->patches = array();
+    $this->installedPatches = array();
+  }
+
+  public function resetAppliedPatches(\Composer\Installer\PackageEvent $event)
+  {
     foreach ($event->getOperations() as $operation) {
       if ($operation->getJobType() != 'install') {
         continue;
@@ -109,7 +89,8 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     }
   }
 
-  protected function preparePatchDefinitions($patches, $ownerPackage = null) {
+  protected function preparePatchDefinitions($patches, $ownerPackage = null)
+  {
     $_patches = array();
 
     $vendorDir = $this->composer->getConfig()->get('vendor-dir');
@@ -180,7 +161,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     $localRepository = $repositoryManager->getLocalRepository();
     $packages = $localRepository->getPackages();
 
-    $tmp_patches = (array)$this->grabPatches();
+    $allPatchesFromPackages = (array)$this->grabPatches();
 
     foreach ($packages as $package) {
       $extra = $package->getExtra();
@@ -195,15 +176,15 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $this->installedPatches[$package->getName()] = $patches;
 
       foreach ($patches as $targetPackage => $packagePatches) {
-        if (!isset($tmp_patches[$targetPackage])) {
-          $tmp_patches[$targetPackage] = array();
+        if (!isset($allPatchesFromPackages[$targetPackage])) {
+          $allPatchesFromPackages[$targetPackage] = array();
         }
 
-        $tmp_patches[$targetPackage] = array_merge($packagePatches, $tmp_patches[$targetPackage]);
+        $allPatchesFromPackages[$targetPackage] = array_merge($packagePatches, $allPatchesFromPackages[$targetPackage]);
       }
     }
 
-    return $tmp_patches;
+    return $allPatchesFromPackages;
   }
 
   public function getExcludedPatches()
@@ -227,12 +208,8 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     return $this->excludedPatches;
   }
 
-  /**
-   * Get the patches from root composer or external file
-   * @return Patches
-   * @throws \Exception
-   */
-  public function grabPatches() {
+  public function grabPatches()
+  {
     // First, try to get the patches from the root composer.json.
     $extra = $this->composer->getPackage()->getExtra();
     if (isset($extra['patches'])) {
@@ -246,7 +223,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     elseif (isset($extra['patches-file'])) {
       $this->io->write('<info>Gathering patches from patch file.</info>');
       $patches = file_get_contents($extra['patches-file']);
-      $patches = json_decode($patches, TRUE);
+      $patches = json_decode($patches, true);
       $error = json_last_error();
       if ($error != 0) {
         switch ($error) {
@@ -283,11 +260,12 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     return array();
   }
 
-  public function removePatches(PackageEvent $event) {
+  public function removePatches(\Composer\Installer\PackageEvent $event)
+  {
     $operations = $event->getOperations();
 
     foreach ($operations as $operation) {
-      if (!$operation instanceof UninstallOperation) {
+      if (!$operation instanceof \Composer\DependencyResolver\Operation\UninstallOperation) {
         continue;
       }
 
@@ -305,11 +283,8 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     }
   }
 
-  /**
-   * @param Event $event
-   * @throws \Exception
-   */
-  public function postInstall(Event $event) {
+  public function postInstall(\Composer\Script\Event $event)
+  {
     $installationManager = $this->composer->getInstallationManager();
     $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
 
@@ -327,7 +302,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     $forceReinstall = getenv('COMPOSER_FORCE_REPATCH');
 
     /**
-     * Uninstall some things where patches have changed
+     * Uninstall packages that are targeted by patches that have changed
      */
     foreach ($packageRepository->getPackages() as $package) {
       $packageName = $package->getName();
@@ -371,10 +346,15 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
     if ($this->packagesToReinstall) {
       $this->io->write('<info>Re-installing packages that were targeted by patches.</info>');
-      foreach ($this->packagesToReinstall as $packageName) {
+
+      foreach (array_unique($this->packagesToReinstall) as $packageName) {
         $package = $packageRepository->findPackage($packageName, '*');
 
-        $uninstallOperation = new InstallOperation($package, 'Re-installing package.');
+        $uninstallOperation = new \Composer\DependencyResolver\Operation\InstallOperation(
+          $package,
+          'Re-installing package.'
+        );
+
         $installationManager->install($packageRepository, $uninstallOperation);
 
         $extra = $package->getExtra();
@@ -425,7 +405,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
       $installPath = $manager->getInstaller($package->getType())->getInstallPath($package);
 
-      $downloader = new RemoteFilesystem($this->io, $this->composer->getConfig());
+      $downloader = new \Composer\Util\RemoteFilesystem($this->io, $this->composer->getConfig());
 
       // Track applied patches in the package info in installed.json
       $extra['patches_applied'] = array();
@@ -445,7 +425,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
 
         $this->io->write('    ~ ' . $urlLabel);
         $this->io->write('      ' . '<comment>' . $description. '</comment>');
-        
+
         try {
           $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $url, $description));
 
@@ -469,7 +449,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
           }
 
           if (getenv('COMPOSER_EXIT_ON_PATCH_FAILURE')) {
-            throw new \Exception("Cannot apply patch $description ($url)!");
+            throw new \Exception(sprintf('Cannot apply patch %s (%s)!', $description, $url));
           }
         }
       }
@@ -489,72 +469,58 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     }
   }
 
-  /**
-   * Get a Package object from an OperationInterface object.
-   *
-   * @param OperationInterface $operation
-   * @return PackageInterface
-   * @throws \Exception
-   */
-  protected function getPackageFromOperation(OperationInterface $operation) {
-    if ($operation instanceof InstallOperation) {
+  protected function getPackageFromOperation(\Composer\DependencyResolver\Operation\OperationInterface $operation)
+  {
+    if ($operation instanceof \Composer\DependencyResolver\Operation\InstallOperation) {
       $package = $operation->getPackage();
-    }
-    elseif ($operation instanceof UpdateOperation) {
+    } elseif ($operation instanceof \Composer\DependencyResolver\Operation\UpdateOperation) {
       $package = $operation->getTargetPackage();
-    }
-    else {
-      throw new \Exception('Unknown operation: ' . get_class($operation));
+    } else {
+      throw new \Exception(sprintf('Unknown operation: %s', get_class($operation)));
     }
 
     return $package;
   }
 
-  /**
-   * Apply a patch on code in the specified directory.
-   *
-   * @param RemoteFilesystem $downloader
-   * @param $install_path
-   * @param $patch_url
-   * @throws \Exception
-   */
-  protected function getAndApplyPatch(RemoteFilesystem $downloader, $install_path, $patch_url) {
-
+  protected function getAndApplyPatch(\Composer\Util\RemoteFilesystem $downloader, $install_path, $patch_url)
+  {
     // Local patch file.
     if (file_exists($patch_url)) {
       $filename = realpath($patch_url);
     }
     else {
       // Generate random (but not cryptographically so) filename.
-      $filename = uniqid("/tmp/") . ".patch";
+      $filename = uniqid('/tmp/') . '.patch';
 
       // Download file from remote filesystem to this location.
       $hostname = parse_url($patch_url, PHP_URL_HOST);
-      $downloader->copy($hostname, $patch_url, $filename, FALSE);
+      $downloader->copy($hostname, $patch_url, $filename, false);
     }
 
     // Modified from drush6:make.project.inc
-    $patched = FALSE;
+    $patchAppliedSuccessfully = false;
+
     // The order here is intentional. p1 is most likely to apply with git apply.
     // p0 is next likely. p2 is extremely unlikely, but for some special cases,
     // it might be useful.
-    $patch_levels = array('-p1', '-p0', '-p2');
-    foreach ($patch_levels as $patch_level) {
+    $patchLevels = array('-p1', '-p0', '-p2');
+
+    foreach ($patchLevels as $patch_level) {
       $checked = $this->executeCommand('cd %s && GIT_DIR=. git apply --check %s %s', $install_path, $patch_level, $filename);
       if ($checked) {
         // Apply the first successful style.
-        $patched = $this->executeCommand('cd %s && GIT_DIR=. git apply %s %s', $install_path, $patch_level, $filename);
+        $patchAppliedSuccessfully = $this->executeCommand('cd %s && GIT_DIR=. git apply %s %s', $install_path, $patch_level, $filename);
         break;
       }
     }
 
     // In some rare cases, git will fail to apply a patch, fallback to using
     // the 'patch' command.
-    if (!$patched) {
-      foreach ($patch_levels as $patch_level) {
+    if (!$patchAppliedSuccessfully) {
+      foreach ($patchLevels as $patch_level) {
         // --no-backup-if-mismatch here is a hack that fixes some
         // differences between how patch works on windows and unix.
-        if ($patched = $this->executeCommand("patch %s --no-backup-if-mismatch -d %s < %s", $patch_level, $install_path, $filename)) {
+        if ($patchAppliedSuccessfully = $this->executeCommand('patch %s --no-backup-if-mismatch -d %s < %s', $patch_level, $install_path, $filename)) {
           break;
         }
       }
@@ -566,51 +532,46 @@ class Patches implements PluginInterface, EventSubscriberInterface {
     }
     // If the patch *still* isn't applied, then give up and throw an Exception.
     // Otherwise, let the user know it worked.
-    if (!$patched) {
-      throw new \Exception("Cannot apply patch $patch_url");
+    if (!$patchAppliedSuccessfully) {
+      throw new \Exception(sprintf('Cannot apply patch %s', $patch_url));
     }
   }
 
   /**
-   * Checks if the root package enables patching. Enabled by default if there are packages that introduce
-   * patches, but root package can still explicitly disable them.
+   * Enabled by default if there are project packages that include patches, but root package can still
+   * explicitly disable them.
    *
    * @return bool
-   *   Whether patching is enabled. Defaults to TRUE.
    */
-  protected function isPatchingEnabled() {
+  protected function isPatchingEnabled()
+  {
     $extra = $this->composer->getPackage()->getExtra();
 
     if (empty($extra['patches'])) {
-      return isset($extra['enable-patching']) ? $extra['enable-patching'] : FALSE;
+      return isset($extra['enable-patching']) ? $extra['enable-patching'] : false;
     } else {
-      return isset($extra['enable-patching']) && !$extra['enable-patching'] ? FALSE : TRUE;
+      return isset($extra['enable-patching']) && !$extra['enable-patching'] ? false : true;
     }
   }
 
-  /**
-   * Writes a patch report to the target directory.
-   *
-   * @param array $patches
-   * @param string $directory
-   */
   protected function writePatchReport($patches, $directory) {
-    $output = "This file was automatically generated by Composer Patches (https://github.com/cweagans/composer-patches)\n";
-    $output .= "Patches applied to this directory:\n\n";
-    foreach ($patches as $url => $description) {
-      $output .= $description . "\n";
-      $output .= 'Source: ' . $url . "\n\n\n";
+    $outputLines = array();
+    $outputLines[] = 'This file was automatically generated by Composer Patches';
+    $outputLines[] = 'Patches applied to this directory:';
+    $outputLines[] = '';
+
+    foreach ($patches as $source => $description) {
+      $outputLines[] = $description;
+      $outputLines[] = 'Source: ' . $source;
+      $outputLines[] = '';
+      $outputLines[] = '';
     }
-    file_put_contents($directory . "/PATCHES.txt", $output);
+
+    file_put_contents($directory . '/PATCHES.txt', implode("\n", $outputLines));
   }
 
-  /**
-   * Executes a shell command with escaping.
-   *
-   * @param string $cmd
-   * @return bool
-   */
-  protected function executeCommand($cmd) {
+  protected function executeCommand($cmd)
+  {
     // Shell-escape all arguments except the command.
     $args = func_get_args();
     foreach ($args as $index => $arg) {
@@ -626,7 +587,7 @@ class Patches implements PluginInterface, EventSubscriberInterface {
       $this->io->write('<comment>' . $command . '</comment>');
       $io = $this->io;
       $output = function ($type, $data) use ($io) {
-        if ($type == Process::ERR) {
+        if ($type == \Symfony\Component\Process\Process::ERR) {
           $io->write('<error>' . $data . '</error>');
         }
         else {
