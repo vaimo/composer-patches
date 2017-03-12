@@ -197,7 +197,7 @@ it when it has changed since last time.
 
 ## Environment variable feature flags
 
-COMPOSER_FORCE_REPATCH - will force all patches to be re-applied
+COMPOSER_FORCE_REAPPLY - will force all patches to be re-applied
 COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
 
 ## Difference between this and netresearch/composer-patches-plugin

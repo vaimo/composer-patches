@@ -148,14 +148,14 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         return array_filter($patchesPerPackage);
     }
 
-    protected function getAllPatches()
+    protected function collectPatches()
     {
         $repositoryManager = $this->composer->getRepositoryManager();
 
         $localRepository = $repositoryManager->getLocalRepository();
-        $packages = $localRepository->getPackages();
+        $projectPatches = $this->getProjectPatches();
 
-        $allPatchesFromPackages = $this->collectPatchesFromPackages();
+        $packages = $localRepository->getPackages();
 
         foreach ($packages as $package) {
             $extra = $package->getExtra();
@@ -170,15 +170,18 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             $this->installedPatches[$package->getName()] = $patches;
 
             foreach ($patches as $targetPackage => $packagePatches) {
-                if (!isset($allPatchesFromPackages[$targetPackage])) {
-                    $allPatchesFromPackages[$targetPackage] = array();
+                if (!isset($projectPatches[$targetPackage])) {
+                    $projectPatches[$targetPackage] = array();
                 }
 
-                $allPatchesFromPackages[$targetPackage] = array_merge($packagePatches, $allPatchesFromPackages[$targetPackage]);
+                $projectPatches[$targetPackage] = array_merge(
+                    $packagePatches,
+                    $projectPatches[$targetPackage]
+                );
             }
         }
 
-        return $allPatchesFromPackages;
+        return $projectPatches;
     }
 
     public function getExcludedPatches()
@@ -202,10 +205,10 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         return $this->excludedPatches;
     }
 
-    public function collectPatchesFromPackages()
+    public function getProjectPatches()
     {
-        // First, try to get the patches from the root composer.json.
         $extra = $this->composer->getPackage()->getExtra();
+
         if (isset($extra['patches'])) {
             $this->io->write('<info>Gathering patches for root package.</info>');
             $patches = $extra['patches'];
@@ -278,6 +281,8 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
     public function postInstall(\Composer\Script\Event $event)
     {
+        $forceReinstall = getenv('COMPOSER_FORCE_REAPPLY');
+
         $installationManager = $this->composer->getInstallationManager();
         $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
 
@@ -287,23 +292,23 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $packagesUpdated = false;
 
         if ($this->isPatchingEnabled()) {
-            $allPatches = $this->getAllPatches();
+            $patches = $this->collectPatches();
         } else {
-            $allPatches = array();
+            $patches = array();
         }
 
-        $forceReinstall = getenv('COMPOSER_FORCE_REPATCH');
+        $installedPackages = $packageRepository->getPackages();
 
         /**
          * Uninstall packages that are targeted by patches that have changed
          */
-        foreach ($packageRepository->getPackages() as $package) {
+        foreach ($installedPackages as $package) {
             $packageName = $package->getName();
 
-            if (isset($allPatches[$packageName])) {
-                $patches = $allPatches[$packageName];
+            if (isset($patches[$packageName])) {
+                $packagePatches = $patches[$packageName];
             } else {
-                $patches = array();
+                $packagePatches = array();
             }
 
             $extra = $package->getExtra();
@@ -319,7 +324,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                     continue;
                 }
 
-                foreach ($patches as $url => &$description) {
+                foreach ($packagePatches as $url => &$description) {
                     $absolutePatchPath = $vendorDir . '/' . $url;
 
                     if (file_exists($absolutePatchPath)) {
@@ -329,7 +334,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                     $description = $description . ', md5:' . md5_file($url);
                 }
 
-                if (!array_diff_assoc($applied, $patches) && !array_diff_assoc($patches, $applied)) {
+                if (!array_diff_assoc($applied, $packagePatches) && !array_diff_assoc($packagePatches, $applied)) {
                     continue;
                 }
             }
@@ -365,18 +370,14 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         foreach ($packageRepository->getPackages() as $package) {
             $packageName = $package->getName();
 
-            if (!isset($allPatches[$packageName])) {
-                if ($this->io->isVerbose()) {
-                    $this->io->write('<info>No patches found for ' . $packageName . '.</info>');
-                }
-
+            if (!isset($patches[$packageName])) {
                 continue;
             }
 
-            $patches = $allPatches[$packageName];
+            $packagePatches = $patches[$packageName];
             $extra = $package->getExtra();
 
-            foreach ($patches as $url => &$description) {
+            foreach ($packagePatches as $url => &$description) {
                 $absolutePatchPath = $vendorDir . '/' . $url;
 
                 if (file_exists($absolutePatchPath)) {
@@ -389,16 +390,17 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             if (isset($extra['patches_applied'])) {
                 $applied = $extra['patches_applied'];
 
-                if (!array_diff_assoc($applied, $patches) && !array_diff_assoc($patches, $applied)) {
+                if (!array_diff_assoc($applied, $packagePatches) && !array_diff_assoc($packagePatches, $applied)) {
                     continue;
                 }
             }
 
-            $patches = $allPatches[$packageName];
+            $packagePatches = $patches[$packageName];
 
             $this->io->write('  - Applying patches for <info>' . $packageName . '</info>');
 
-            $installPath = $manager->getInstaller($package->getType())->getInstallPath($package);
+            $packageInstaller = $manager->getInstaller($package->getType());
+            $packageInstallPath = $packageInstaller->getInstallPath($package);
 
             $downloader = new \Composer\Util\RemoteFilesystem($this->io, $this->composer->getConfig());
 
@@ -406,7 +408,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             $extra['patches_applied'] = array();
 
             $allPackagePatchesApplied = true;
-            foreach ($patches as $url => $description) {
+            foreach ($packagePatches as $url => $description) {
                 $urlLabel = '<info>' . $url . '</info>';
                 $absolutePatchPath = $vendorDir . '/' . $url;
 
@@ -424,7 +426,19 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                 try {
                     $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $url, $description));
 
-                    $this->getAndApplyPatch($downloader, $installPath, $url);
+                    if (file_exists($url)) {
+                        $filename = realpath($url);
+                    } else {
+                        $filename = uniqid('/tmp/') . '.patch';
+                        $hostname = parse_url($url, PHP_URL_HOST);
+                        $downloader->copy($hostname, $url, $filename, false);
+                    }
+
+                    $this->applyPatch($filename, $packageInstallPath);
+
+                    if (isset($hostname)) {
+                        unlink($filename);
+                    }
 
                     $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::POST_PATCH_APPLY, $package, $url, $description));
 
@@ -457,7 +471,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             }
 
             $this->io->write('');
-            $this->writePatchReport($patches, $installPath);
+            $this->writePatchReport($packagePatches, $packageInstallPath);
         }
 
         if ($packagesUpdated) {
@@ -476,57 +490,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         }
 
         return $package;
-    }
-
-    protected function getAndApplyPatch(\Composer\Util\RemoteFilesystem $downloader, $installPatch, $patchSource)
-    {
-        if (file_exists($patchSource)) {
-            $filename = realpath($patchSource);
-        } else {
-            $filename = uniqid('/tmp/') . '.patch';
-
-            // Download file from remote filesystem to this location.
-            $hostname = parse_url($patchSource, PHP_URL_HOST);
-            $downloader->copy($hostname, $patchSource, $filename, false);
-        }
-
-        // Modified from drush6:make.project.inc
-        $patchAppliedSuccessfully = false;
-
-        // The order here is intentional. p1 is most likely to apply with git apply.
-        // p0 is next likely. p2 is extremely unlikely, but for some special cases,
-        // it might be useful.
-        $patchLevels = array('-p1', '-p0', '-p2');
-
-        foreach ($patchLevels as $patchLevel) {
-            $patchCheckedSuccessfully = $this->executeCommand('cd %s && GIT_DIR=. git apply --check %s %s', $installPatch, $patchLevel, $filename);
-
-            if ($patchCheckedSuccessfully) {
-                // Apply the first successful style.
-                $patchAppliedSuccessfully = $this->executeCommand('cd %s && GIT_DIR=. git apply %s %s', $installPatch, $patchLevel, $filename);
-                break;
-            }
-        }
-
-        // In some rare cases, git will fail to apply a patch, fallback to using
-        // the 'patch' command.
-        if (!$patchAppliedSuccessfully) {
-            foreach ($patchLevels as $patchLevel) {
-                // --no-backup-if-mismatch here is a hack that fixes some
-                // differences between how patch works on windows and unix.
-                if ($patchAppliedSuccessfully = $this->executeCommand('patch %s --no-backup-if-mismatch -d %s < %s', $patchLevel, $installPatch, $filename)) {
-                    break;
-                }
-            }
-        }
-
-        if (isset($hostname)) {
-            unlink($filename);
-        }
-
-        if (!$patchAppliedSuccessfully) {
-            throw new \Exception(sprintf('Cannot apply patch %s', $patchSource));
-        }
     }
 
     /**
@@ -560,6 +523,55 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         }
 
         file_put_contents($directory . '/PATCHES.txt', implode("\n", $outputLines));
+    }
+
+    protected function applyPatch($patchFilename, $packageRoot)
+    {
+        $patchAppliedSuccessfully = false;
+        $patchLevelSequence = array('-p1', '-p0', '-p2');
+
+        foreach ($patchLevelSequence as $patchLevel) {
+            $patchValidated = $this->executeCommand(
+                'cd %s && GIT_DIR=. git apply --check %s %s',
+                $packageRoot,
+                $patchLevel,
+                $patchFilename
+            );
+
+            if (!$patchValidated) {
+                continue;
+            }
+
+            $patchAppliedSuccessfully = $this->executeCommand(
+                'cd %s && GIT_DIR=. git apply %s %s',
+                $packageRoot,
+                $patchLevel,
+                $patchFilename
+            );
+        }
+
+        if (!$patchAppliedSuccessfully) {
+            foreach ($patchLevelSequence as $patchLevel) {
+                $patchAppliedSuccessfully = $this->executeCommand(
+                    'patch %s --no-backup-if-mismatch -d %s < %s',
+                    $patchLevel,
+                    $packageRoot,
+                    $patchFilename
+                );
+
+                if ($patchAppliedSuccessfully) {
+                    break;
+                }
+            }
+        }
+
+        if (isset($hostname)) {
+            unlink($patchFilename);
+        }
+
+        if (!$patchAppliedSuccessfully) {
+            throw new \Exception(sprintf('Cannot apply patch %s', $patchFilename));
+        }
     }
 
     protected function executeCommand()
