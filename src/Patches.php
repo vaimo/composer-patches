@@ -44,6 +44,11 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     protected $jsonDecoder;
 
     /**
+     * @var \Vaimo\ComposerPatches\Json\Utils
+     */
+    protected $composerUtils;
+
+    /**
      * Note that postInstall is locked to autoload dump instead of post-install. Reason for this is that
      * post-install comes after auto-loader generation which means that in case patches target class
      * namespaces or class names, the auto-loader will not get those changes applied to it correctly.
@@ -65,9 +70,10 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $this->eventDispatcher = $composer->getEventDispatcher();
 
         $executor = new \Composer\Util\ProcessExecutor($this->io);
-        $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($executor, $this->io);
 
+        $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($executor, $this->io);
         $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
+        $this->composerUtils = new \Vaimo\ComposerPatches\Json\Utils();
     }
 
     public function resetAppliedPatches(\Composer\Installer\PackageEvent $event)
@@ -77,7 +83,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                 continue;
             }
 
-            $package = $this->getPackageFromOperation($operation);
+            $package = $this->composerUtils->getPackageFromOperation($operation);
             $extra = $package->getExtra();
 
             unset($extra['patches_applied']);
@@ -474,19 +480,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         if ($packagesUpdated) {
             $packageRepository->write();
         }
-    }
-
-    protected function getPackageFromOperation(\Composer\DependencyResolver\Operation\OperationInterface $operation)
-    {
-        if ($operation instanceof \Composer\DependencyResolver\Operation\InstallOperation) {
-            $package = $operation->getPackage();
-        } elseif ($operation instanceof \Composer\DependencyResolver\Operation\UpdateOperation) {
-            $package = $operation->getTargetPackage();
-        } else {
-            throw new \Exception(sprintf('Unknown operation: %s', get_class($operation)));
-        }
-
-        return $package;
     }
 
     /**
