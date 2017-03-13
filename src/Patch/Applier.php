@@ -82,9 +82,11 @@ class Applier
         }
 
         if ($this->io->isVerbose()) {
-            $this->io->write(sprintf('<info>SUCCESS with %s patch_level=%s</info>', $type, $patchLevel));
-        } else {
-            $this->io->write('<error>FAILURE</error>');
+            if ($result) {
+                $this->io->write(sprintf('<info>SUCCESS with %s patch_level=%s</info>', $type, $patchLevel));
+            } else {
+                $this->io->write('<error>FAILURE</error>');
+            }
         }
 
         if (!$result) {

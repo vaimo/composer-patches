@@ -107,10 +107,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         if ($ownerPackage) {
             $manager = $this->composer->getInstallationManager();
 
-            if ($ownerPackage == 'magento/module-catalog') {
-                $i = 0;
-            }
-
             $packageInstaller = $manager->getInstaller($ownerPackage->getType());
             $patchOwnerPath = $packageInstaller->getInstallPath($ownerPackage);
         } else {
@@ -146,9 +142,15 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                     $source = (string)$data;
                 }
 
-                if ($versionLimitation) {
-                    $test = $this->versionParser->normalize($versionLimitation);
-                    $i = 0;
+                if ($versionLimitation && isset($this->packagesByName[$patchTarget])) {
+                    $targetPackage = $this->packagesByName[$patchTarget];
+
+                    $packageConstraint = $this->versionParser->parseConstraints($targetPackage->getVersion());
+                    $patchConstraint = $this->versionParser->parseConstraints($versionLimitation);
+
+                    if (!$patchConstraint->matches($packageConstraint)) {
+                        continue;
+                    }
                 }
 
                 if ($ownerPackage) {
@@ -417,7 +419,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
             $packagePatches = $patches[$packageName];
 
-            $this->io->write('  - Applying patches for <info>' . $packageName . '</info>');
+            $this->io->write(sprintf('  - Applying patches for <info>%s</info>', $packageName));
 
             $packageInstaller = $manager->getInstaller($package->getType());
             $packageInstallPath = $packageInstaller->getInstallPath($package);
@@ -428,19 +430,19 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
             $allPackagePatchesApplied = true;
             foreach ($packagePatches as $source => $description) {
-                $patchLabel = '<info>' . $source . '</info>';
+                $patchLabel = sprintf('<info>%s</info>', $source);
                 $absolutePatchPath = $vendorDir . '/' . $source;
 
                 if (file_exists($absolutePatchPath)) {
                     $ownerName  = implode('/', array_slice(explode('/', $source), 0, 2));
 
-                    $patchLabel = '<info>' . $ownerName . ': ' . trim(substr($source, strlen($ownerName)), '/') . '</info>';
+                    $patchLabel = sprintf('<info>%s: %s</info>', $ownerName, trim(substr($source, strlen($ownerName)), '/'));;
 
                     $source = $absolutePatchPath;
                 }
 
-                $this->io->write('    ~ ' . $patchLabel);
-                $this->io->write('      ' . '<comment>' . $description. '</comment>');
+                $this->io->write(sprintf('    ~ %s', $patchLabel));
+                $this->io->write(sprintf('      <comment>%s</comment>', $description));
 
                 try {
                     $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $source, $description));

@@ -104,7 +104,7 @@ In case it's important to retain the patching order (in case the patches have to
     "patches": {
       "targeted/package": [
         {
-          "label": "desription about my patch", 
+          "label": "description for my patch",
           "url": "my/file.patch"
         }
       ]
@@ -113,6 +113,29 @@ In case it's important to retain the patching order (in case the patches have to
 }
 
 ```
+
+## Version restriction
+
+In case the patch is applied only on certain version of the package, a version restriction can be defined for the patch:
+
+```
+{
+  "extra": {
+    "patches": {
+      "description for my patch": {
+        "url": "my/file.patch",
+        "version": "~1.2.3"
+      }
+    }
+  }
+}
+
+```
+
+Please note that patch version constraint supports all version definition patterns supported by the version
+of Composer.
+
+Same "version" key can be used with alternative definition format as well.
 
 ## Using patch url
 
