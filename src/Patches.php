@@ -39,6 +39,11 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     protected $patchApplier;
 
     /**
+     * @var \Vaimo\ComposerPatches\Json\Decoder
+     */
+    protected $jsonDecoder;
+
+    /**
      * Note that postInstall is locked to autoload dump instead of post-install. Reason for this is that
      * post-install comes after auto-loader generation which means that in case patches target class
      * namespaces or class names, the auto-loader will not get those changes applied to it correctly.
@@ -61,6 +66,8 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
         $executor = new \Composer\Util\ProcessExecutor($this->io);
         $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($executor, $this->io);
+
+        $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
     }
 
     public function resetAppliedPatches(\Composer\Installer\PackageEvent $event)
@@ -93,7 +100,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         }
 
         if (!$this->packagesByName) {
-            $this->packagesByName = [];
+            $this->packagesByName = array();
             $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
             foreach ($packageRepository->getPackages() as $package) {
                 $this->packagesByName[$package->getName()] = $package;
@@ -108,36 +115,39 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             }
 
             foreach ($packagePatches as $label => $data) {
-                $isExtendedFormat = is_array($data) && is_numeric($label) && isset($data['label'], $data['url']);
+                $isExtendedFormat = (
+                    is_array($data) &&
+                    is_numeric($label) &&
+                    (
+                        isset($data['label'], $data['url']) ||
+                        isset($data['label'], $data['source'])
+                    )
+                );
 
                 if ($isExtendedFormat) {
                     $label = $data['label'];
-                    $url = (string)$data['url'];
-
-                    if (isset($data['require']) && array_diff_key($data['require'], $this->packagesByName)) {
-                        continue;
-                    }
+                    $source = isset($data['url']) ?: $data['source'];
                 } else {
-                    $url = (string)$data;
+                    $source = (string)$data;
                 }
 
                 if ($ownerPackage) {
                     $ownerPackageName = $ownerPackage->getName();
 
-                    if (isset($excludedPatches[$ownerPackageName][$url])) {
+                    if (isset($excludedPatches[$ownerPackageName][$source])) {
                         continue;
                     }
                 }
 
                 if ($patchOwnerPath) {
-                    $absolutePatchPath = $patchOwnerPath . '/' . $url;
+                    $absolutePatchPath = $patchOwnerPath . '/' . $source;
 
                     if (strpos($absolutePatchPath, $vendorDir) === 0) {
-                        $url = trim(substr($absolutePatchPath, strlen($vendorDir)), '/');
+                        $source = trim(substr($absolutePatchPath, strlen($vendorDir)), '/');
                     }
                 }
 
-                $patchesPerPackage[$patchTarget][$url] = $label;
+                $patchesPerPackage[$patchTarget][$source] = $label;
             }
         }
 
@@ -211,33 +221,9 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         } elseif (isset($extra['patches-file'])) {
             $this->io->write('<info>Gathering patches from patch file.</info>');
 
-            $patches = file_get_contents($extra['patches-file']);
-            $patches = json_decode($patches, true);
-            $error = json_last_error();
-
-            if ($error != 0) {
-                switch ($error) {
-                    case JSON_ERROR_DEPTH:
-                        $msg = ' - Maximum stack depth exceeded';
-                        break;
-                    case JSON_ERROR_STATE_MISMATCH:
-                        $msg =  ' - Underflow or the modes mismatch';
-                        break;
-                    case JSON_ERROR_CTRL_CHAR:
-                        $msg = ' - Unexpected control character found';
-                        break;
-                    case JSON_ERROR_SYNTAX:
-                        $msg =  ' - Syntax error, malformed JSON';
-                        break;
-                    case JSON_ERROR_UTF8:
-                        $msg =  ' - Malformed UTF-8 characters, possibly incorrectly encoded';
-                        break;
-                    default:
-                        $msg =  ' - Unknown error';
-                        break;
-                }
-                throw new \Exception('There was an error in the supplied patches file:' . $msg);
-            }
+            $patches = $this->jsonDecoder->decode(
+                file_get_contents($extra['patches-file'])
+            );
 
             if (isset($patches['patches'])) {
                 $patches = $patches['patches'];
@@ -325,7 +311,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
     public function postInstall(\Composer\Script\Event $event)
     {
-        $forceReinstall = getenv('COMPOSER_FORCE_REAPPLY');
+        $forceReinstall = getenv(\Vaimo\ComposerPatches\Environment::FORCE_REAPPLY);
 
         $installationManager = $this->composer->getInstallationManager();
         $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
@@ -469,7 +455,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                         $this->io->write('<warning>' . trim($e->getMessage(), "\n ") . '</warning>');
                     }
 
-                    if (getenv('COMPOSER_EXIT_ON_PATCH_FAILURE')) {
+                    if (getenv(\Vaimo\ComposerPatches\Environment::EXIT_ON_FAIL)) {
                         throw new \Exception(sprintf('Cannot apply patch %s (%s)!', $description, $source));
                     }
                 }
