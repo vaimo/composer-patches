@@ -27,47 +27,67 @@ class Applier
 
     public function execute($filename, $cwd)
     {
-        $patchApplied = false;
+        $result = false;
         $patchLevelSequence = array('1', '0', '2');
 
-        foreach ($patchLevelSequence as $sequenceIndex => $patchLevel) {
-            $patchValidated = $this->executeCommand('git apply --check -p%s %s', [$patchLevel, $filename], $cwd);
+        $patchers = array(
+            'GIT' => array(
+                'validate' => 'git apply --check -p%s %s',
+                'patch' => 'git apply -p%s %s'
+            ),
+            'PATCH' => array(
+                'validate' => 'patch -p%s --dry-run --no-backup-if-mismatch < %s',
+                'patch' => 'patch -p%s --no-backup-if-mismatch < %s'
+            )
+        );
 
-            if (!$patchValidated) {
-                if ($sequenceIndex < count($patchLevelSequence) && $this->io->isVerbose()) {
+        $operationSequence = array(
+            'validate' => 'Validation',
+            'patch' => 'Patching'
+        );
+
+        $type = 'UNKNOWN';
+        $patchLevel = 'UNKNOWN';
+        $operationName = 'UNKNOWN';
+
+        foreach ($patchers as $type => $patcher) {
+            foreach ($patchLevelSequence as $sequenceIndex => $patchLevel) {
+                $result = true;
+
+                foreach ($operationSequence as $operationCode => $operationName) {
+                    $result = $this->executeCommand($patcher[$operationCode], [$patchLevel, $filename], $cwd)
+                        && $result;
+
+                    if (!$result) {
+                        break;
+                    }
+                }
+
+                if ($result) {
+                    break 2;
+                }
+
+                if ($this->io->isVerbose() && $sequenceIndex < count($patchLevelSequence) - 1) {
                     $this->io->write(
                         sprintf(
-                            '<comment>Validation failed with patch_level=%s. Continuing with patch_level=%s</comment>',
+                            '<warning>%s (type=%s) failed with patch_level=%s. Retrying with patch_level=%s</warning>',
+                            $operationName,
+                            $type,
                             $patchLevel,
                             $patchLevelSequence[$sequenceIndex + 1]
                         )
                     );
                 }
-                continue;
-            }
-
-            $patchApplied = $this->executeCommand('git apply -p%s %s', [$patchLevel, $filename], $cwd);
-
-            if ($patchApplied) {
-                break;
             }
         }
 
-        if (!$patchApplied) {
-            foreach ($patchLevelSequence as $patchLevel) {
-                $patchApplied = $this->executeCommand('patch -p%s --no-backup-if-mismatch < %s', [$patchLevel, $filename], $cwd);
-
-                if ($patchApplied) {
-                    break;
-                }
-            }
+        if ($this->io->isVerbose()) {
+            $this->io->write(sprintf('<info>SUCCESS with %s patch_level=%s</info>', $type, $patchLevel));
+        } else {
+            $this->io->write('<error>FAILURE</error>');
         }
 
-        if (isset($hostname)) {
-            unlink($filename);
-        }
-
-        if (!$patchApplied) {
+        if (!$result) {
             throw new \Exception(sprintf('Cannot apply patch %s', $filename));
         }
     }

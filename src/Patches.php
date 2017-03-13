@@ -49,6 +49,11 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     protected $composerUtils;
 
     /**
+     * @var \Composer\Package\Version\VersionParser
+     */
+    protected $versionParser;
+
+    /**
      * Note that postInstall is locked to autoload dump instead of post-install. Reason for this is that
      * post-install comes after auto-loader generation which means that in case patches target class
      * namespaces or class names, the auto-loader will not get those changes applied to it correctly.
@@ -74,6 +79,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($executor, $this->io);
         $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
         $this->composerUtils = new \Vaimo\ComposerPatches\Composer\Utils();
+        $this->versionParser = new \Composer\Package\Version\VersionParser();
     }
 
     public function resetAppliedPatches(\Composer\Installer\PackageEvent $event)
@@ -100,7 +106,13 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
         if ($ownerPackage) {
             $manager = $this->composer->getInstallationManager();
-            $patchOwnerPath = $manager->getInstaller($ownerPackage->getType())->getInstallPath($ownerPackage);
+
+            if ($ownerPackage == 'magento/module-catalog') {
+                $i = 0;
+            }
+
+            $packageInstaller = $manager->getInstaller($ownerPackage->getType());
+            $patchOwnerPath = $packageInstaller->getInstallPath($ownerPackage);
         } else {
             $patchOwnerPath = false;
         }
@@ -108,6 +120,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         if (!$this->packagesByName) {
             $this->packagesByName = array();
             $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
+
             foreach ($packageRepository->getPackages() as $package) {
                 $this->packagesByName[$package->getName()] = $package;
             }
@@ -121,20 +134,21 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             }
 
             foreach ($packagePatches as $label => $data) {
-                $isExtendedFormat = (
-                    is_array($data) &&
-                    is_numeric($label) &&
-                    (
-                        isset($data['label'], $data['url']) ||
-                        isset($data['label'], $data['source'])
-                    )
-                );
+                $isExtendedFormat = is_array($data) && (isset($data['url']) || isset($data['source']));
+
+                $versionLimitation = false;
 
                 if ($isExtendedFormat) {
-                    $label = $data['label'];
-                    $source = isset($data['url']) ?: $data['source'];
+                    $source = isset($data['url']) ? $data['url'] : $data['source'];
+                    $label = isset($data['label']) ? $data['label'] : $label;
+                    $versionLimitation = isset($data['version']) ? $data['version'] : false;
                 } else {
                     $source = (string)$data;
+                }
+
+                if ($versionLimitation) {
+                    $test = $this->versionParser->normalize($versionLimitation);
+                    $i = 0;
                 }
 
                 if ($ownerPackage) {
@@ -350,6 +364,10 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             foreach (array_unique($this->packagesToReinstall) as $packageName) {
                 $package = $packageRepository->findPackage($packageName, '*');
 
+                if (!$package) {
+                    continue;
+                }
+
                 $uninstallOperation = new \Composer\DependencyResolver\Operation\InstallOperation(
                     $package,
                     'Re-installing package.'
@@ -406,7 +424,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
             $downloader = new \Composer\Util\RemoteFilesystem($this->io, $this->composer->getConfig());
 
-            // Track applied patches in the package info in installed.json
             $extra['patches_applied'] = array();
 
             $allPackagePatchesApplied = true;
@@ -474,6 +491,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
             }
 
             $this->io->write('');
+
             $this->writePatchReport($packagePatches, $packageInstallPath);
         }
 
