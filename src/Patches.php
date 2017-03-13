@@ -29,11 +29,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     protected $excludedPatches;
 
     /**
-     * @var array
-     */
-    protected $packagesToReinstall = array();
-
-    /**
      * @var \Vaimo\ComposerPatches\Patch\Applier
      */
     protected $patchApplier;
@@ -61,7 +56,6 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     public static function getSubscribedEvents()
     {
         return array(
-            \Composer\Installer\PackageEvents::POST_PACKAGE_UNINSTALL => 'removePatches',
             \Composer\Installer\PackageEvents::PRE_PACKAGE_INSTALL => 'resetAppliedPatches',
             \Composer\Installer\PackageEvents::PRE_PACKAGE_UPDATE => 'resetAppliedPatches',
             \Composer\Script\ScriptEvents::PRE_AUTOLOAD_DUMP => 'postInstall'
@@ -259,36 +253,12 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         return array();
     }
 
-    public function removePatches(\Composer\Installer\PackageEvent $event)
-    {
-        $operations = $event->getOperations();
-
-        foreach ($operations as $operation) {
-            if (!$operation instanceof \Composer\DependencyResolver\Operation\UninstallOperation) {
-                continue;
-            }
-
-            $package = $operation->getPackage();
-            $extra = $package->getExtra();
-
-            if (!isset($extra['patches'])) {
-                continue;
-            }
-
-            $patches = $this->preparePatchDefinitions($extra['patches'], $package);
-
-            foreach ($patches as $targetPackageName => $packagePatches) {
-                $this->packagesToReinstall[] = $targetPackageName;
-            }
-        }
-    }
-
-    public function resolvePackagesToReinstall($installedPackages)
+    public function resolvePackagesToReinstall($packages, $patches)
     {
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
         $reinstallQueue = [];
 
-        foreach ($installedPackages as $package) {
+        foreach ($packages as $package) {
             $packageName = $package->getName();
 
             if (isset($patches[$packageName])) {
@@ -303,26 +273,22 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
                 continue;
             }
 
-            if (isset($extra['patches_applied'])) {
-                $applied = $extra['patches_applied'];
+            if (!$appliedPatches = $extra['patches_applied']) {
+                continue;
+            }
 
-                if (!$applied) {
-                    continue;
+            foreach ($packagePatches as $url => &$description) {
+                $absolutePatchPath = $vendorDir . '/' . $url;
+
+                if (file_exists($absolutePatchPath)) {
+                    $url = $absolutePatchPath;
                 }
 
-                foreach ($packagePatches as $url => &$description) {
-                    $absolutePatchPath = $vendorDir . '/' . $url;
+                $description = $description . ', md5:' . md5_file($url);
+            }
 
-                    if (file_exists($absolutePatchPath)) {
-                        $url = $absolutePatchPath;
-                    }
-
-                    $description = $description . ', md5:' . md5_file($url);
-                }
-
-                if (!array_diff_assoc($applied, $packagePatches) && !array_diff_assoc($packagePatches, $applied)) {
-                    continue;
-                }
+            if (!array_diff_assoc($appliedPatches, $packagePatches) && !array_diff_assoc($packagePatches, $appliedPatches)) {
+                continue;
             }
 
             $reinstallQueue[] = $package->getName();
@@ -352,18 +318,34 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $installedPackages = $packageRepository->getPackages();
 
         if ($forceReinstall) {
-            $this->packagesToReinstall = array_keys($patches);
+            $reInstallationQueue = array_keys($patches);
         } else {
-            $this->packagesToReinstall = array_merge(
-                $this->packagesToReinstall,
-                $this->resolvePackagesToReinstall($installedPackages)
-            );
+            $reInstallationQueue = $this->resolvePackagesToReinstall($installedPackages, $patches);
         }
 
-        if ($this->packagesToReinstall) {
+        /**
+         * Detect targeted packages that have patches removed or changed
+         */
+        foreach ($packageRepository->getPackages() as $package) {
+            $packageName = $package->getName();
+            $extra = $package->getExtra();
+
+            if (!isset($extra['patches_applied'])) {
+                continue;
+            }
+
+            if (!isset($patches[$packageName]) || array_diff_key($extra['patches_applied'], $patches[$packageName])) {
+                $reInstallationQueue[] = $packageName;
+            }
+        }
+
+        /**
+         * Re-install packages (reset patches)
+         */
+        if ($reInstallationQueue) {
             $this->io->write('<info>Re-installing packages that were targeted by patches.</info>');
 
-            foreach (array_unique($this->packagesToReinstall) as $packageName) {
+            foreach (array_unique($reInstallationQueue) as $packageName) {
                 $package = $packageRepository->findPackage($packageName, '*');
 
                 if (!$package) {
