@@ -1,5 +1,5 @@
 <?php
-namespace Vaimo\ComposerPatches\Json;
+namespace Vaimo\ComposerPatches\Composer;
 
 class Utils
 {

@@ -44,7 +44,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     protected $jsonDecoder;
 
     /**
-     * @var \Vaimo\ComposerPatches\Json\Utils
+     * @var \Vaimo\ComposerPatches\Composer\Utils
      */
     protected $composerUtils;
 
@@ -73,7 +73,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
         $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($executor, $this->io);
         $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
-        $this->composerUtils = new \Vaimo\ComposerPatches\Json\Utils();
+        $this->composerUtils = new \Vaimo\ComposerPatches\Composer\Utils();
     }
 
     public function resetAppliedPatches(\Composer\Installer\PackageEvent $event)
