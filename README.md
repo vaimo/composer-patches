@@ -28,7 +28,7 @@ Example composer.json:
 ```
 {
   "require": {
-    "cweagans/composer-patches": "~1.0",
+    "vaimo/composer-patches": "^2.1.0",
     "drupal/drupal": "8.0.*@dev"
   },
   "config": {
@@ -52,7 +52,7 @@ Instead of a patches key in your root composer.json, use a patches-file key.
 ```
 {
   "require": {
-    "cweagans/composer-patches": "~1.0",
+    "vaimo/composer-patches": "^2.1.0",
     "drupal/drupal": "8.0.*@dev"
   },
   "config": {
@@ -72,7 +72,7 @@ Same format is used for both project (root level scope) patches and for package 
 ```
 {
   "require": {
-    "cweagans/composer-patches": "~1.0",
+    "vaimo/composer-patches": "^2.1.0",
     "drupal/drupal": "8.0.*@dev"
   },
   "config": {
@@ -198,8 +198,8 @@ it when it has changed since last time.
 
 ## Environment variable feature flags
 
-COMPOSER_FORCE_PATCH_REAPPLY - will force all patches to be re-applied
-COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
+* COMPOSER_FORCE_PATCH_REAPPLY - will force all patches to be re-applied
+* COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
 
 ## Difference between this and netresearch/composer-patches-plugin
 
@@ -211,4 +211,8 @@ COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
 
 ## Credits
 
-A ton of this code is adapted or taken straight from https://github.com/jpstacey/composer-patcher, which is abandoned in favor of https://github.com/netresearch/composer-patches-plugin, which is (IMHO) overly complex and difficult to use.
+Modified version of https://github.com/cweagans/composer-patches
+
+A ton of this code is adapted or taken straight from https://github.com/jpstacey/composer-patcher, which is
+abandoned in favor of https://github.com/netresearch/composer-patches-plugin, which is (IMHO) overly complex
+and difficult to use.
