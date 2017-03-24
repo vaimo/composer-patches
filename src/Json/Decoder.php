@@ -6,7 +6,6 @@ class Decoder
     public function decode($json)
     {
         $decodedJson = json_decode($json, true);
-
         $errorCode = json_last_error();
 
         if ($errorCode != 0) {

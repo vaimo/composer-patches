@@ -1,7 +1,7 @@
 <?php
 namespace Vaimo\ComposerPatches;
 
-class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispatcher\EventSubscriberInterface
+class Patches
 {
     /**
      * @var \Composer\Composer $composer
@@ -39,57 +39,50 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
     protected $jsonDecoder;
 
     /**
-     * @var \Vaimo\ComposerPatches\Composer\Utils
-     */
-    protected $composerUtils;
-
-    /**
      * @var \Composer\Package\Version\VersionParser
      */
     protected $versionParser;
 
     /**
-     * Note that postInstall is locked to autoload dump instead of post-install. Reason for this is that
-     * post-install comes after auto-loader generation which means that in case patches target class
-     * namespaces or class names, the auto-loader will not get those changes applied to it correctly.
+     * @var \Vaimo\ComposerPatches\Patch\Report
      */
-    public static function getSubscribedEvents()
-    {
-        return array(
-            \Composer\Installer\PackageEvents::PRE_PACKAGE_INSTALL => 'resetAppliedPatches',
-            \Composer\Installer\PackageEvents::PRE_PACKAGE_UPDATE => 'resetAppliedPatches',
-            \Composer\Script\ScriptEvents::PRE_AUTOLOAD_DUMP => 'postInstall'
-        );
-    }
+    protected $patchReport;
 
-    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
-    {
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\Config
+     */
+    protected $config;
+
+    /**
+     * @param \Composer\Composer $composer
+     * @param \Composer\IO\IOInterface $io
+     */
+    public function __construct(
+        \Composer\Composer $composer,
+        \Composer\IO\IOInterface $io
+    ) {
         $this->composer = $composer;
         $this->io = $io;
+
         $this->eventDispatcher = $composer->getEventDispatcher();
 
         $executor = new \Composer\Util\ProcessExecutor($this->io);
-
         $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($executor, $this->io);
+
+        $this->config = new \Vaimo\ComposerPatches\Patch\Config($composer);
+
         $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
-        $this->composerUtils = new \Vaimo\ComposerPatches\Composer\Utils();
         $this->versionParser = new \Composer\Package\Version\VersionParser();
+        $this->patchReport = new \Vaimo\ComposerPatches\Patch\Report();
     }
 
-    public function resetAppliedPatches(\Composer\Installer\PackageEvent $event)
+    public function resetAppliedPatchesInfoForPackage(\Composer\Package\PackageInterface $package)
     {
-        foreach ($event->getOperations() as $operation) {
-            if ($operation->getJobType() != 'install') {
-                continue;
-            }
+        $extra = $package->getExtra();
 
-            $package = $this->composerUtils->getPackageFromOperation($operation);
-            $extra = $package->getExtra();
+        unset($extra['patches_applied']);
 
-            unset($extra['patches_applied']);
-
-            $package->setExtra($extra);
-        }
+        $package->setExtra($extra);
     }
 
     protected function preparePatchDefinitions($patches, $ownerPackage = null)
@@ -297,7 +290,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         return $reinstallQueue;
     }
 
-    public function postInstall(\Composer\Script\Event $event)
+    public function applyPatches()
     {
         $forceReinstall = getenv(\Vaimo\ComposerPatches\Environment::FORCE_REAPPLY);
 
@@ -305,11 +298,10 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
         $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
 
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
-        $manager = $event->getComposer()->getInstallationManager();
 
         $packagesUpdated = false;
 
-        if ($this->isPatchingEnabled()) {
+        if ($this->config->isPatchingEnabled()) {
             $patches = $this->collectPatches();
         } else {
             $patches = array();
@@ -403,7 +395,7 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
             $this->io->write(sprintf('  - Applying patches for <info>%s</info>', $packageName));
 
-            $packageInstaller = $manager->getInstaller($package->getType());
+            $packageInstaller = $installationManager->getInstaller($package->getType());
             $packageInstallPath = $packageInstaller->getInstallPath($package);
 
             $downloader = new \Composer\Util\RemoteFilesystem($this->io, $this->composer->getConfig());
@@ -476,44 +468,11 @@ class Patches implements \Composer\Plugin\PluginInterface, \Composer\EventDispat
 
             $this->io->write('');
 
-            $this->writePatchReport($packagePatches, $packageInstallPath);
+            $this->patchReport->generate($packagePatches, $packageInstallPath);
         }
 
         if ($packagesUpdated) {
             $packageRepository->write();
         }
-    }
-
-    /**
-     * Enabled by default if there are project packages that include patches, but root package can still
-     * explicitly disable them.
-     *
-     * @return bool
-     */
-    protected function isPatchingEnabled()
-    {
-        $extra = $this->composer->getPackage()->getExtra();
-
-        if (empty($extra['patches'])) {
-            return isset($extra['enable-patching']) ? $extra['enable-patching'] : false;
-        } else {
-            return isset($extra['enable-patching']) && !$extra['enable-patching'] ? false : true;
-        }
-    }
-
-    protected function writePatchReport($patches, $directory) {
-        $outputLines = array();
-        $outputLines[] = 'This file was automatically generated by Composer Patches';
-        $outputLines[] = 'Patches applied to this directory:';
-        $outputLines[] = '';
-
-        foreach ($patches as $source => $description) {
-            $outputLines[] = $description;
-            $outputLines[] = 'Source: ' . $source;
-            $outputLines[] = '';
-            $outputLines[] = '';
-        }
-
-        file_put_contents($directory . '/PATCHES.txt', implode("\n", $outputLines));
     }
 }
