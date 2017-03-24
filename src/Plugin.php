@@ -8,8 +8,9 @@ class Plugin implements \Composer\Plugin\PluginInterface, \Composer\EventDispatc
      */
     protected $composerUtils;
 
-    /** @var \Vaimo\ComposerPatches\Patches */
-
+    /**
+     * @var \Vaimo\ComposerPatches\Patches
+     */
     protected $patchesManager;
 
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)

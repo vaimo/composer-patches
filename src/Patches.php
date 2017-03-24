@@ -19,29 +19,9 @@ class Patches
     protected $eventDispatcher;
 
     /**
-     * @var array $packagesByName
-     */
-    protected $packagesByName;
-
-    /**
-     * @var array $excludedPatches
-     */
-    protected $excludedPatches;
-
-    /**
      * @var \Vaimo\ComposerPatches\Patch\Applier
      */
     protected $patchApplier;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Json\Decoder
-     */
-    protected $jsonDecoder;
-
-    /**
-     * @var \Composer\Package\Version\VersionParser
-     */
-    protected $versionParser;
 
     /**
      * @var \Vaimo\ComposerPatches\Patch\Report
@@ -52,6 +32,26 @@ class Patches
      * @var \Vaimo\ComposerPatches\Patch\Config
      */
     protected $config;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\Collector
+     */
+    protected $patchesCollector;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\PathNormalizer
+     */
+    protected $patchPathNormalizer;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionParser
+     */
+    protected $patchDefinitionParser;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\Constraints
+     */
+    protected $patchConstraints;
 
     /**
      * @param \Composer\Composer $composer
@@ -66,14 +66,14 @@ class Patches
 
         $this->eventDispatcher = $composer->getEventDispatcher();
 
-        $executor = new \Composer\Util\ProcessExecutor($this->io);
-        $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($executor, $this->io);
-
         $this->config = new \Vaimo\ComposerPatches\Patch\Config($composer);
-
-        $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
-        $this->versionParser = new \Composer\Package\Version\VersionParser();
         $this->patchReport = new \Vaimo\ComposerPatches\Patch\Report();
+        $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($io);
+
+        $this->patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector();
+        $this->patchPathNormalizer = new \Vaimo\ComposerPatches\Patch\PathNormalizer($composer);
+        $this->patchDefinitionParser = new \Vaimo\ComposerPatches\Patch\DefinitionParser();
+        $this->patchConstraints = new \Vaimo\ComposerPatches\Patch\Constraints($composer);
     }
 
     public function resetAppliedPatchesInfoForPackage(\Composer\Package\PackageInterface $package)
@@ -83,167 +83,6 @@ class Patches
         unset($extra['patches_applied']);
 
         $package->setExtra($extra);
-    }
-
-    protected function preparePatchDefinitions($patches, $ownerPackage = null)
-    {
-        $patchesPerPackage = array();
-
-        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
-
-        if ($ownerPackage) {
-            $manager = $this->composer->getInstallationManager();
-
-            $packageInstaller = $manager->getInstaller($ownerPackage->getType());
-            $patchOwnerPath = $packageInstaller->getInstallPath($ownerPackage);
-        } else {
-            $patchOwnerPath = false;
-        }
-
-        if (!$this->packagesByName) {
-            $this->packagesByName = array();
-            $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
-
-            foreach ($packageRepository->getPackages() as $package) {
-                $this->packagesByName[$package->getName()] = $package;
-            }
-        }
-
-        $excludedPatches = $this->getExcludedPatches();
-
-        foreach ($patches as $patchTarget => $packagePatches) {
-            if (!isset($patchesPerPackage[$patchTarget])) {
-                $patchesPerPackage[$patchTarget] = array();
-            }
-
-            foreach ($packagePatches as $label => $data) {
-                $isExtendedFormat = is_array($data) && (isset($data['url']) || isset($data['source']));
-
-                $versionLimitation = false;
-
-                if ($isExtendedFormat) {
-                    $source = isset($data['url']) ? $data['url'] : $data['source'];
-                    $label = isset($data['label']) ? $data['label'] : $label;
-                    $versionLimitation = isset($data['version']) ? $data['version'] : false;
-                } else {
-                    $source = (string)$data;
-                }
-
-                if ($versionLimitation && isset($this->packagesByName[$patchTarget])) {
-                    $targetPackage = $this->packagesByName[$patchTarget];
-
-                    $packageConstraint = $this->versionParser->parseConstraints($targetPackage->getVersion());
-                    $patchConstraint = $this->versionParser->parseConstraints($versionLimitation);
-
-                    if (!$patchConstraint->matches($packageConstraint)) {
-                        continue;
-                    }
-                }
-
-                if ($ownerPackage) {
-                    $ownerPackageName = $ownerPackage->getName();
-
-                    if (isset($excludedPatches[$ownerPackageName][$source])) {
-                        continue;
-                    }
-                }
-
-                if ($patchOwnerPath) {
-                    $absolutePatchPath = $patchOwnerPath . '/' . $source;
-
-                    if (strpos($absolutePatchPath, $vendorDir) === 0) {
-                        $source = trim(substr($absolutePatchPath, strlen($vendorDir)), '/');
-                    }
-                }
-
-                $patchesPerPackage[$patchTarget][$source] = $label;
-            }
-        }
-
-        return array_filter($patchesPerPackage);
-    }
-
-    protected function collectPatches()
-    {
-        $repositoryManager = $this->composer->getRepositoryManager();
-
-        $localRepository = $repositoryManager->getLocalRepository();
-        $projectPatches = $this->getProjectPatches();
-
-        $packages = $localRepository->getPackages();
-
-        foreach ($packages as $package) {
-            $extra = $package->getExtra();
-
-            if (!isset($extra['patches'])) {
-                continue;
-            }
-
-            $patches = isset($extra['patches']) ? $extra['patches'] : array();
-            $patches = $this->preparePatchDefinitions($patches, $package);
-
-            foreach ($patches as $targetPackage => $packagePatches) {
-                if (!isset($projectPatches[$targetPackage])) {
-                    $projectPatches[$targetPackage] = array();
-                }
-
-                $projectPatches[$targetPackage] = array_merge(
-                    $packagePatches,
-                    $projectPatches[$targetPackage]
-                );
-            }
-        }
-
-        return $projectPatches;
-    }
-
-    public function getExcludedPatches()
-    {
-        $extra = $this->composer->getPackage()->getExtra();
-
-        if (!$this->excludedPatches) {
-            $this->excludedPatches = array();
-
-            if (isset($extra['excluded-patches'])) {
-                foreach ($extra['excluded-patches'] as $patchOwner => $patches) {
-                    if (!isset($this->excludedPatches[$patchOwner])) {
-                        $this->excludedPatches[$patchOwner] = array();
-                    }
-
-                    $this->excludedPatches[$patchOwner] = array_flip($patches);
-                }
-            }
-        }
-
-        return $this->excludedPatches;
-    }
-
-    public function getProjectPatches()
-    {
-        $extra = $this->composer->getPackage()->getExtra();
-
-        if (isset($extra['patches'])) {
-            $this->io->write('<info>Gathering patches for root package.</info>');
-            $patches = $extra['patches'];
-
-            return $this->preparePatchDefinitions($patches);
-        } elseif (isset($extra['patches-file'])) {
-            $this->io->write('<info>Gathering patches from patch file.</info>');
-
-            $patches = $this->jsonDecoder->decode(
-                file_get_contents($extra['patches-file'])
-            );
-
-            if (isset($patches['patches'])) {
-                $patches = $patches['patches'];
-
-                return $this->preparePatchDefinitions($patches);
-            } elseif (!$patches) {
-                throw new \Exception('There was an error in the supplied patch file');
-            }
-        }
-
-        return array();
     }
 
     public function resolvePackagesToReinstall($packages, $patches)
@@ -296,13 +135,21 @@ class Patches
 
         $installationManager = $this->composer->getInstallationManager();
         $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
+        $packages = $packageRepository->getPackages();
 
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
 
         $packagesUpdated = false;
 
         if ($this->config->isPatchingEnabled()) {
-            $patches = $this->collectPatches();
+            $patches = $this->patchesCollector->gatherAllPatches(array_merge(
+                $packages,
+                [$this->composer->getPackage()]
+            ));
+
+            $patches = $this->patchConstraints->apply($patches);
+            $patches = $this->patchPathNormalizer->process($patches);
+            $patches = $this->patchDefinitionParser->simplify($patches);
         } else {
             $patches = array();
         }
@@ -318,7 +165,7 @@ class Patches
         /**
          * Detect targeted packages that have patches removed or changed
          */
-        foreach ($packageRepository->getPackages() as $package) {
+        foreach ($packages as $package) {
             $packageName = $package->getName();
             $extra = $package->getExtra();
 

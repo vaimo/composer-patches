@@ -14,14 +14,12 @@ class Applier
     protected $io;
 
     /**
-     * @param \Composer\Util\ProcessExecutor $executor
      * @param \Composer\IO\IOInterface $io
      */
     public function __construct(
-        \Composer\Util\ProcessExecutor $executor,
         \Composer\IO\IOInterface $io
     ) {
-        $this->executor = $executor;
+        $this->executor =  new \Composer\Util\ProcessExecutor($io);
         $this->io = $io;
     }
 
