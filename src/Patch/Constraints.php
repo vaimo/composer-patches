@@ -37,12 +37,12 @@ class Constraints
         $extra = $this->composer->getPackage()->getExtra();
 
         if (isset($extra['excluded-patches'])) {
-            foreach ($extra['excluded-patches'] as $patchOwner => $patches) {
+            foreach ($extra['excluded-patches'] as $patchOwner => $patchPaths) {
                 if (!isset($excludedPatches[$patchOwner])) {
                     $excludedPatches[$patchOwner] = array();
                 }
 
-                $excludedPatches[$patchOwner] = array_flip($patches);
+                $excludedPatches[$patchOwner] = array_flip($patchPaths);
             }
         }
 
@@ -63,7 +63,10 @@ class Constraints
                     }
                 }
 
-                if (isset($excludedPatches[$patchData['owner']][$patchData['source']])) {
+                $owner = $patchData['owner'];
+                $source = $patchData['source'];
+
+                if (isset($excludedPatches[$owner][$source])) {
                     $patchData = false;
                 }
             }
