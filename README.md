@@ -122,10 +122,12 @@ In case the patch is applied only on certain version of the package, a version r
 {
   "extra": {
     "patches": {
-      "description for my patch": {
-        "url": "my/file.patch",
-        "version": "~1.2.3"
-      }
+      "targeted/package": [
+        "description for my patch": {
+          "url": "my/file.patch",
+          "version": "~1.2.3"
+        }
+      ]
     }
   }
 }
