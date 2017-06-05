@@ -1,39 +1,64 @@
 <?php
+namespace Vaimo\ComposerPatches\Tests;
 
-/**
- * @file
- * Tests event dispatching.
- */
+use Vaimo\ComposerPatches\PatchEvent as Model;
 
-namespace cweagans\Composer\Tests;
-
-use Vaimo\ComposerPatches\PatchEvent;
-use Vaimo\ComposerPatches\PatchEvents;
 use Composer\Package\PackageInterface;
+use Vaimo\ComposerPatches\PatchEvents;
 
-class PatchEventTest extends \PHPUnit_Framework_TestCase {
+class PatchEventTest extends \PHPUnit_Framework_TestCase
+{
+    public function patchEventDataProvider()
+    {
+        $package = $this->getMock('Composer\Package\PackageInterface');
 
-  /**
-   * Tests all the getters.
-   *
-   * @dataProvider patchEventDataProvider
-   */
-  public function testGetters($event_name, PackageInterface $package, $url, $description) {
-    $patch_event = new PatchEvent($event_name, $package, $url, $description);
-    $this->assertEquals($event_name, $patch_event->getName());
-    $this->assertEquals($package, $patch_event->getPackage());
-    $this->assertEquals($url, $patch_event->getUrl());
-    $this->assertEquals($description, $patch_event->getDescription());
-  }
+        return array(
+            array(PatchEvents::PRE_PATCH_APPLY, $package, 'https://www.drupal.org', 'A test patch'),
+            array(PatchEvents::POST_PATCH_APPLY, $package, 'https://www.drupal.org', 'A test patch'),
+        );
+    }
 
-  public function patchEventDataProvider() {
-    $prophecy = $this->prophesize('Composer\Package\PackageInterface');
-    $package = $prophecy->reveal();
+    /**
+     * @dataProvider patchEventDataProvider
+     */
+    public function testGetNameShouldReturnSpecifiedEventName(
+        $eventName, PackageInterface $package, $url, $description
+    ) {
+        $model = new Model($eventName, $package, $url, $description);
 
-    return array(
-      array(PatchEvents::PRE_PATCH_APPLY, $package, 'https://www.drupal.org', 'A test patch'),
-      array(PatchEvents::POST_PATCH_APPLY, $package, 'https://www.drupal.org', 'A test patch'),
-    );
-  }
+        $this->assertEquals($eventName, $model->getName());
+    }
 
+    /**
+     * @dataProvider patchEventDataProvider
+     */
+    public function testGetUrlShouldReturnSpecifiedUrl(
+        $eventName, PackageInterface $package, $url, $description
+    ) {
+        $model = new Model($eventName, $package, $url, $description);
+
+        $this->assertEquals($url, $model->getUrl());
+    }
+
+    /**
+     * @dataProvider patchEventDataProvider
+     */
+    public function testGetDescriptionShouldReturnSpecifiedDescription(
+        $eventName, PackageInterface $package, $url, $description
+    ) {
+        $model = new Model($eventName, $package, $url, $description);
+
+        $this->assertEquals($description, $model->getDescription());
+    }
+
+    /**
+     * @dataProvider patchEventDataProvider
+     */
+    public function testGetPackageReturnSpecifiedPackageInstance(
+        $eventName, PackageInterface $package, $url, $description
+    ) {
+        $model = new Model($eventName, $package, $url, $description);
+
+        $this->assertSame($package, $model->getPackage());
+    }
 }

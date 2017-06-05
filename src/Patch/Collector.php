@@ -45,7 +45,7 @@ class Collector
             }
 
             foreach ($patchDefinitionSources as $patches) {
-                $patches = $this->definitionsProcessor->normalize($patches);
+                $patches = $this->definitionsProcessor->normalizeDefinitions($patches);
 
                 foreach ($patches as $target => $definitions) {
                     if (!isset($allPatches[$target])) {

@@ -3,7 +3,17 @@ namespace Vaimo\ComposerPatches\Patch;
 
 class DefinitionsProcessor
 {
-    public function normalize($patches)
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionNormalizer
+     */
+    protected $definitionNormalizer;
+
+    public function __construct()
+    {
+        $this->definitionNormalizer = new \Vaimo\ComposerPatches\Patch\DefinitionNormalizer();
+    }
+
+    public function normalizeDefinitions($patches)
     {
         $patchesPerPackage = array();
 
@@ -11,28 +21,14 @@ class DefinitionsProcessor
             $normalizedPatches = array();
 
             foreach ($packagePatches as $label => $data) {
-                if (!is_array($data)) {
-                    $data = array(
-                        'source' => (string)$data
-                    );
-                }
-
-                if (!isset($data['url']) && !isset($data['source'])) {
-                    continue;
-                }
-
-                $normalizedPatches[] = array(
-                    'source' => isset($data['url']) ? $data['url'] : $data['source'],
-                    'label' => isset($data['label']) ? $data['label'] : $label,
-                    'version' => isset($data['version']) ? $data['version'] : false
-                );
+                $normalizedPatches[] = $this->definitionNormalizer->process($label, $data);
             }
 
-            if (!$normalizedPatches) {
+            if (!$validPatches = array_filter($normalizedPatches)) {
                 continue;
             }
 
-            $patchesPerPackage[$patchTarget] = $normalizedPatches;
+            $patchesPerPackage[$patchTarget] = $validPatches;
         }
 
         return $patchesPerPackage;
@@ -68,9 +64,9 @@ class DefinitionsProcessor
         foreach ($patches as $patchTarget => $packagePatches) {
             $allPatches[$patchTarget] = array();
 
-            foreach ($packagePatches as $patchInfo) {
-                $allPatches[$patchTarget][$patchInfo['source']] =
-                    $patchInfo['label'] . ', md5:' . $patchInfo['md5'];
+            foreach ($packagePatches as $info) {
+                $allPatches[$patchTarget][$info['source']] = $info['label']
+                    . (isset($info['md5']) ? ', md5:' . $info['md5'] : '');
             }
         }
 
