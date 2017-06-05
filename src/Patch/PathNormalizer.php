@@ -37,11 +37,13 @@ class PathNormalizer
                     continue;
                 }
 
-                if (!isset($packagesByName[$patchData['owner']])) {
+                $patchOwner = $patchData['owner'];
+
+                if (!isset($packagesByName[$patchOwner])) {
                     continue;
                 }
 
-                $patchOwnerPackage = $packagesByName[$patchData['owner']];
+                $patchOwnerPackage = $packagesByName[$patchOwner];
                 $packageInstaller = $manager->getInstaller($patchOwnerPackage->getType());
                 $patchOwnerPath = $packageInstaller->getInstallPath($patchOwnerPackage);
 

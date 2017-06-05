@@ -1,6 +1,8 @@
 <?php
 namespace Vaimo\ComposerPatches;
 
+use Vaimo\ComposerPatches\Composer\ResetOperation;
+
 class Patches
 {
     /**
@@ -54,6 +56,16 @@ class Patches
     protected $patchConstraints;
 
     /**
+     * @var \Vaimo\ComposerPatches\Patch\PackageUtils
+     */
+    protected $packageUtils;
+
+    /**
+     * @var \Composer\Util\RemoteFilesystem
+     */
+    protected $patchDownloader;
+
+    /**
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
      */
@@ -70,10 +82,16 @@ class Patches
         $this->patchReport = new \Vaimo\ComposerPatches\Patch\Report();
         $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($io);
 
+        $this->patchDownloader = new \Composer\Util\RemoteFilesystem(
+            $this->io,
+            $this->composer->getConfig()
+        );
+
         $this->patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector();
         $this->patchPathNormalizer = new \Vaimo\ComposerPatches\Patch\PathNormalizer($composer);
         $this->patchDefinitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
         $this->patchConstraints = new \Vaimo\ComposerPatches\Patch\Constraints($composer);
+        $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
     }
 
     public function resetAppliedPatchesInfoForPackage(\Composer\Package\PackageInterface $package)
@@ -87,30 +105,13 @@ class Patches
 
     public function resolvePackagesToReinstall($packages, $patches)
     {
-        $reinstallQueue = [];
+        $reinstallQueue = array();
 
         foreach ($packages as $package) {
             $packageName = $package->getName();
+            $packagePatches = isset($patches[$packageName]) ? $patches[$packageName] : array();
 
-            if (isset($patches[$packageName])) {
-                $patchesForPackage = $patches[$packageName];
-            } else {
-                $patchesForPackage = array();
-            }
-
-            $extra = $package->getExtra();
-
-            if (!isset($extra['patches_applied'])) {
-                continue;
-            }
-
-            if (!$appliedPatches = $extra['patches_applied']) {
-                continue;
-            }
-
-            if (!array_diff_assoc($appliedPatches, $patchesForPackage)
-                && !array_diff_assoc($patchesForPackage, $appliedPatches)
-            ) {
+            if (!$this->packageUtils->shouldReinstall($package, $packagePatches)) {
                 continue;
             }
 
@@ -122,126 +123,76 @@ class Patches
 
     public function applyPatches()
     {
-        $forceReinstall = getenv(\Vaimo\ComposerPatches\Environment::FORCE_REAPPLY);
-
         $installationManager = $this->composer->getInstallationManager();
         $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
         $packages = $packageRepository->getPackages();
-
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
 
-        $packagesUpdated = false;
-
         if ($this->config->isPatchingEnabled()) {
-            $patches = $this->patchesCollector->gatherAllPatches(array_merge(
-                $packages,
-                [$this->composer->getPackage()]
-            ));
+            $patches = $this->patchesCollector->gatherAllPatches(
+                array_merge($packages, [$this->composer->getPackage()])
+            );
 
             $patches = $this->patchConstraints->apply($patches);
             $patches = $this->patchPathNormalizer->process($patches);
-            $patches = $this->patchDefinitionsProcessor->includeCheckSums($patches, $vendorDir);
+
+            $patches = $this->patchDefinitionsProcessor->validate($patches, $vendorDir);
             $patches = $this->patchDefinitionsProcessor->flatten($patches);
         } else {
             $patches = array();
         }
 
-        $installedPackages = $packageRepository->getPackages();
+        $packageResetFlags = array_fill_keys(
+            !getenv(Environment::FORCE_REAPPLY)
+                ? $this->resolvePackagesToReinstall($packageRepository->getPackages(), $patches)
+                : array_keys($patches),
+            true
+        );
 
-        if ($forceReinstall) {
-            $reInstallationQueue = array_keys($patches);
-        } else {
-            $reInstallationQueue = $this->resolvePackagesToReinstall($installedPackages, $patches);
-        }
-
-        /**
-         * Detect targeted packages that have patches removed or changed
-         */
-        foreach ($packages as $package) {
-            $packageName = $package->getName();
-            $extra = $package->getExtra();
-
-            if (!isset($extra['patches_applied'])) {
-                continue;
-            }
-
-            if (!isset($patches[$packageName]) || array_diff_key($extra['patches_applied'], $patches[$packageName])) {
-                $reInstallationQueue[] = $packageName;
-            }
-        }
-
-        /**
-         * Re-install packages (reset patches)
-         */
-        if ($reInstallationQueue) {
-            $this->io->write('<info>Re-installing packages that were targeted by patches.</info>');
-
-            foreach (array_unique($reInstallationQueue) as $packageName) {
-                $package = $packageRepository->findPackage($packageName, '*');
-
-                if (!$package) {
-                    continue;
-                }
-
-                $uninstallOperation = new \Composer\DependencyResolver\Operation\InstallOperation(
-                    $package,
-                    'Re-installing package.'
-                );
-
-                $installationManager->install($packageRepository, $uninstallOperation);
-
-                $extra = $package->getExtra();
-
-                unset($extra['patches_applied']);
-
-                $packagesUpdated = true;
-                $package->setExtra($extra);
-            }
-        }
-
-        /**
-         * Apply patches
-         */
+        $packagesUpdated = false;
         foreach ($packageRepository->getPackages() as $package) {
             $packageName = $package->getName();
+
+            if (isset($packageResetFlags[$packageName])) {
+                $installationManager->install($packageRepository, new ResetOperation(
+                    $package,
+                    'Re-installing package due to patch configuration change'
+                ));
+
+                $packagesUpdated = $this->packageUtils->resetAppliedPatches($package);
+            }
 
             if (!isset($patches[$packageName])) {
                 continue;
             }
 
             $patchesForPackage = $patches[$packageName];
-            $extra = $package->getExtra();
 
-            if (isset($extra['patches_applied'])) {
-                $applied = $extra['patches_applied'];
-
-                if (!array_diff_assoc($applied, $patchesForPackage)
-                    && !array_diff_assoc($patchesForPackage, $applied)
-                ) {
-                    continue;
-                }
+            if (!$this->packageUtils->hasPatchChanges($package, $patchesForPackage)) {
+                continue;
             }
 
-            $patchesForPackage = $patches[$packageName];
+            $extra = $package->getExtra();
+            $extra['patches_applied'] = array();
 
             $this->io->write(sprintf('  - Applying patches for <info>%s</info>', $packageName));
 
             $packageInstaller = $installationManager->getInstaller($package->getType());
             $packageInstallPath = $packageInstaller->getInstallPath($package);
 
-            $downloader = new \Composer\Util\RemoteFilesystem($this->io, $this->composer->getConfig());
-
-            $extra['patches_applied'] = array();
-
             $allPackagePatchesApplied = true;
+
             foreach ($patchesForPackage as $source => $description) {
-                $patchLabel = sprintf('<info>%s</info>', $source);
+                $relativePath = $source;
+
+                $patchSourceLabel = sprintf('<info>%s</info>', $source);
                 $absolutePatchPath = $vendorDir . '/' . $source;
+                $patchComment = substr($description, 0, strrpos($description, ','));
 
                 if (file_exists($absolutePatchPath)) {
                     $ownerName  = implode('/', array_slice(explode('/', $source), 0, 2));
 
-                    $patchLabel = sprintf(
+                    $patchSourceLabel = sprintf(
                         '<info>%s: %s</info>',
                         $ownerName,
                         trim(substr($source, strlen($ownerName)), '/')
@@ -250,71 +201,76 @@ class Patches
                     $source = $absolutePatchPath;
                 }
 
-                $this->io->write(sprintf(
-                    '    ~ %s',
-                    $patchLabel
-                ));
-
-                $this->io->write(sprintf(
-                    '      <comment>%s</comment>',
-                    substr($description, 0, strrpos($description, ','))
-                ));
+                $this->io->write(sprintf('    ~ %s', $patchSourceLabel));
+                $this->io->write(sprintf('      <comment>%s</comment>', $patchComment));
 
                 try {
-                    $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $source, $description));
+                    $this->eventDispatcher->dispatch(
+                        null,
+                        new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $source, $description)
+                    );
 
                     if (file_exists($source)) {
                         $filename = realpath($source);
                     } else {
                         $filename = uniqid('/tmp/') . '.patch';
-                        $hostname = parse_url($source, PHP_URL_HOST);
 
-                        $downloader->copy($hostname, $source, $filename, false);
+                        $hostname = parse_url($source, PHP_URL_HOST);
+                        $this->patchDownloader->copy($hostname, $source, $filename, false);
                     }
 
                     $this->patchApplier->execute($filename, $packageInstallPath);
 
                     if (isset($hostname)) {
+                        unset($hostname);
                         unlink($filename);
                     }
 
-                    $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::POST_PATCH_APPLY, $package, $source, $description));
+                    $this->eventDispatcher->dispatch(
+                        null,
+                        new PatchEvent(PatchEvents::POST_PATCH_APPLY, $package, $source, $description)
+                    );
 
-                    $appliedPatchPath = $source;
-
-                    if (strpos($appliedPatchPath, $vendorDir) === 0) {
-                        $appliedPatchPath = trim(substr($appliedPatchPath, strlen($vendorDir)), '/');
-                    }
-
-                    $extra['patches_applied'][$appliedPatchPath] = $description;
+                    $extra['patches_applied'][$relativePath] = $description;
                 } catch (\Exception $e) {
-                    $this->io->write('   <error>Could not apply patch! Skipping.</error>');
-
                     $allPackagePatchesApplied = false;
 
                     if ($this->io->isVerbose()) {
-                        $this->io->write('<warning>' . trim($e->getMessage(), "\n ") . '</warning>');
+                        $this->io->write(sprintf('<warning>%s</warning>', trim($e->getMessage(), "\n ")));
                     }
 
-                    if (getenv(\Vaimo\ComposerPatches\Environment::EXIT_ON_FAIL)) {
-                        throw new \Exception(sprintf('Cannot apply patch %s (%s)!', $description, $source));
+                    if (getenv(Environment::EXIT_ON_FAIL)) {
+                        break;
                     }
+
+                    $this->io->write('   <error>Could not apply patch! Skipping.</error>');
                 }
-            }
-
-            if ($allPackagePatchesApplied) {
-                $packagesUpdated = true;
-                ksort($extra);
-                $package->setExtra($extra);
             }
 
             $this->io->write('');
 
-            $this->patchReport->generate($patchesForPackage, $packageInstallPath);
+            if ($allPackagePatchesApplied) {
+                $this->patchReport->generate($patchesForPackage, $packageInstallPath);
+            }
+
+            ksort($extra);
+            $package->setExtra($extra);
+            $packagesUpdated = true;
+
+            if (getenv(Environment::EXIT_ON_FAIL) && !$allPackagePatchesApplied) {
+                break;
+            }
         }
 
         if ($packagesUpdated) {
             $packageRepository->write();
+            $this->io->write('<info>Writing updated patch info to lock file</info>');
+        }
+
+        if (getenv(Environment::EXIT_ON_FAIL)
+            && isset($allPackagePatchesApplied, $relativePath, $patchComment) && !$allPackagePatchesApplied
+        ) {
+            throw new \Exception(sprintf('Failed to apply %s (%s)!', $relativePath, $patchComment));
         }
     }
 }

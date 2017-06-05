@@ -34,27 +34,32 @@ class DefinitionsProcessor
         return $patchesPerPackage;
     }
 
-    public function includeCheckSums($patches, $vendorDir)
+    public function validate($patches, $vendorDir)
     {
-        foreach ($patches as $patchTarget => &$packagePatches) {
-            $allPatches[$patchTarget] = array();
+        $validatedPatches = array();
 
-            foreach ($packagePatches as &$patchInfo) {
-                $source = $patchInfo['source'];
-                $absolutePatchPath = $vendorDir . '/' . $source;
+        foreach ($patches as $patchTarget => $packagePatches) {
+            $validItems = array();
 
-                if (file_exists($absolutePatchPath)) {
-                    $source = $absolutePatchPath;
-                }
+            foreach ($packagePatches as $patch) {
+                $absolutePatchPath = $vendorDir . '/' . $patch['source'];
 
-                $patchInfo['md5'] = md5(implode('|', array(
-                    md5_file($source),
-                    $patchInfo['version']
+                $patch['md5'] = md5(implode('|', array(
+                    file_exists($absolutePatchPath) ? md5_file($absolutePatchPath) : md5($patch['source']),
+                    $patch['version']
                 )));
+
+                $validItems[] = $patch;
             }
+
+            if (!$validItems) {
+                continue;
+            }
+
+            $validatedPatches[$patchTarget] = $validItems;
         }
 
-        return $patches;
+        return $validatedPatches;
     }
 
     public function flatten($patches)
