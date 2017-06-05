@@ -1,7 +1,7 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
-class DefinitionParser
+class DefinitionsProcessor
 {
     public function normalize($patches)
     {
@@ -38,15 +38,39 @@ class DefinitionParser
         return $patchesPerPackage;
     }
 
-    public function simplify($patches)
+    public function includeCheckSums($patches, $vendorDir)
+    {
+        foreach ($patches as $patchTarget => &$packagePatches) {
+            $allPatches[$patchTarget] = array();
+
+            foreach ($packagePatches as &$patchInfo) {
+                $source = $patchInfo['source'];
+                $absolutePatchPath = $vendorDir . '/' . $source;
+
+                if (file_exists($absolutePatchPath)) {
+                    $source = $absolutePatchPath;
+                }
+
+                $patchInfo['md5'] = md5(implode('|', array(
+                    md5_file($source),
+                    $patchInfo['version']
+                )));
+            }
+        }
+
+        return $patches;
+    }
+
+    public function flatten($patches)
     {
         $allPatches = array();
 
         foreach ($patches as $patchTarget => $packagePatches) {
             $allPatches[$patchTarget] = array();
 
-            foreach ($packagePatches as $patchData) {
-                $allPatches[$patchTarget][$patchData['source']] = $patchData['label'];
+            foreach ($packagePatches as $patchInfo) {
+                $allPatches[$patchTarget][$patchInfo['source']] =
+                    $patchInfo['label'] . ', md5:' . $patchInfo['md5'];
             }
         }
 

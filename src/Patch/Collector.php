@@ -4,9 +4,9 @@ namespace Vaimo\ComposerPatches\Patch;
 class Collector
 {
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionParser
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionsProcessor
      */
-    protected $definitionParser;
+    protected $definitionsProcessor;
 
     /**
      * @var \Vaimo\ComposerPatches\Json\Decoder
@@ -15,7 +15,7 @@ class Collector
 
     public function __construct()
     {
-        $this->definitionParser = new \Vaimo\ComposerPatches\Patch\DefinitionParser();
+        $this->definitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
         $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
     }
 
@@ -45,7 +45,7 @@ class Collector
             }
 
             foreach ($patchDefinitionSources as $patches) {
-                $patches = $this->definitionParser->normalize($patches);
+                $patches = $this->definitionsProcessor->normalize($patches);
 
                 foreach ($patches as $target => $definitions) {
                     if (!isset($allPatches[$target])) {

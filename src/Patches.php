@@ -44,9 +44,9 @@ class Patches
     protected $patchPathNormalizer;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionParser
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionsProcessor
      */
-    protected $patchDefinitionParser;
+    protected $patchDefinitionsProcessor;
 
     /**
      * @var \Vaimo\ComposerPatches\Patch\Constraints
@@ -72,7 +72,7 @@ class Patches
 
         $this->patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector();
         $this->patchPathNormalizer = new \Vaimo\ComposerPatches\Patch\PathNormalizer($composer);
-        $this->patchDefinitionParser = new \Vaimo\ComposerPatches\Patch\DefinitionParser();
+        $this->patchDefinitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
         $this->patchConstraints = new \Vaimo\ComposerPatches\Patch\Constraints($composer);
     }
 
@@ -87,16 +87,15 @@ class Patches
 
     public function resolvePackagesToReinstall($packages, $patches)
     {
-        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
         $reinstallQueue = [];
 
         foreach ($packages as $package) {
             $packageName = $package->getName();
 
             if (isset($patches[$packageName])) {
-                $packagePatches = $patches[$packageName];
+                $patchesForPackage = $patches[$packageName];
             } else {
-                $packagePatches = array();
+                $patchesForPackage = array();
             }
 
             $extra = $package->getExtra();
@@ -109,21 +108,13 @@ class Patches
                 continue;
             }
 
-            foreach ($packagePatches as $url => &$description) {
-                $absolutePatchPath = $vendorDir . '/' . $url;
-
-                if (file_exists($absolutePatchPath)) {
-                    $url = $absolutePatchPath;
-                }
-
-                $description = $description . ', md5:' . md5_file($url);
-            }
-
-            if (!array_diff_assoc($appliedPatches, $packagePatches) && !array_diff_assoc($packagePatches, $appliedPatches)) {
+            if (!array_diff_assoc($appliedPatches, $patchesForPackage)
+                && !array_diff_assoc($patchesForPackage, $appliedPatches)
+            ) {
                 continue;
             }
 
-            $reinstallQueue[] = $package->getName();
+            $reinstallQueue[] = $packageName;
         }
 
         return $reinstallQueue;
@@ -149,7 +140,8 @@ class Patches
 
             $patches = $this->patchConstraints->apply($patches);
             $patches = $this->patchPathNormalizer->process($patches);
-            $patches = $this->patchDefinitionParser->simplify($patches);
+            $patches = $this->patchDefinitionsProcessor->includeCheckSums($patches, $vendorDir);
+            $patches = $this->patchDefinitionsProcessor->flatten($patches);
         } else {
             $patches = array();
         }
@@ -217,28 +209,20 @@ class Patches
                 continue;
             }
 
-            $packagePatches = $patches[$packageName];
+            $patchesForPackage = $patches[$packageName];
             $extra = $package->getExtra();
-
-            foreach ($packagePatches as $source => &$description) {
-                $absolutePatchPath = $vendorDir . '/' . $source;
-
-                if (file_exists($absolutePatchPath)) {
-                    $source = $absolutePatchPath;
-                }
-
-                $description = $description . ', md5:' . md5_file($source);
-            }
 
             if (isset($extra['patches_applied'])) {
                 $applied = $extra['patches_applied'];
 
-                if (!array_diff_assoc($applied, $packagePatches) && !array_diff_assoc($packagePatches, $applied)) {
+                if (!array_diff_assoc($applied, $patchesForPackage)
+                    && !array_diff_assoc($patchesForPackage, $applied)
+                ) {
                     continue;
                 }
             }
 
-            $packagePatches = $patches[$packageName];
+            $patchesForPackage = $patches[$packageName];
 
             $this->io->write(sprintf('  - Applying patches for <info>%s</info>', $packageName));
 
@@ -250,20 +234,31 @@ class Patches
             $extra['patches_applied'] = array();
 
             $allPackagePatchesApplied = true;
-            foreach ($packagePatches as $source => $description) {
+            foreach ($patchesForPackage as $source => $description) {
                 $patchLabel = sprintf('<info>%s</info>', $source);
                 $absolutePatchPath = $vendorDir . '/' . $source;
 
                 if (file_exists($absolutePatchPath)) {
                     $ownerName  = implode('/', array_slice(explode('/', $source), 0, 2));
 
-                    $patchLabel = sprintf('<info>%s: %s</info>', $ownerName, trim(substr($source, strlen($ownerName)), '/'));;
+                    $patchLabel = sprintf(
+                        '<info>%s: %s</info>',
+                        $ownerName,
+                        trim(substr($source, strlen($ownerName)), '/')
+                    );
 
                     $source = $absolutePatchPath;
                 }
 
-                $this->io->write(sprintf('    ~ %s', $patchLabel));
-                $this->io->write(sprintf('      <comment>%s</comment>', $description));
+                $this->io->write(sprintf(
+                    '    ~ %s',
+                    $patchLabel
+                ));
+
+                $this->io->write(sprintf(
+                    '      <comment>%s</comment>',
+                    substr($description, 0, strrpos($description, ','))
+                ));
 
                 try {
                     $this->eventDispatcher->dispatch(NULL, new PatchEvent(PatchEvents::PRE_PATCH_APPLY, $package, $source, $description));
@@ -291,7 +286,7 @@ class Patches
                         $appliedPatchPath = trim(substr($appliedPatchPath, strlen($vendorDir)), '/');
                     }
 
-                    $extra['patches_applied'][$appliedPatchPath] = $description . ', md5:' . md5_file($source);
+                    $extra['patches_applied'][$appliedPatchPath] = $description;
                 } catch (\Exception $e) {
                     $this->io->write('   <error>Could not apply patch! Skipping.</error>');
 
@@ -315,7 +310,7 @@ class Patches
 
             $this->io->write('');
 
-            $this->patchReport->generate($packagePatches, $packageInstallPath);
+            $this->patchReport->generate($patchesForPackage, $packageInstallPath);
         }
 
         if ($packagesUpdated) {
