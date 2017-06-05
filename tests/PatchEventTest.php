@@ -7,8 +7,8 @@
 
 namespace cweagans\Composer\Tests;
 
-use cweagans\Composer\PatchEvent;
-use cweagans\Composer\PatchEvents;
+use Vaimo\ComposerPatches\PatchEvent;
+use Vaimo\ComposerPatches\PatchEvents;
 use Composer\Package\PackageInterface;
 
 class PatchEventTest extends \PHPUnit_Framework_TestCase {
