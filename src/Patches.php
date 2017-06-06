@@ -128,7 +128,7 @@ class Patches
         $packages = $packageRepository->getPackages();
         $vendorDir = $this->composer->getConfig()->get('vendor-dir');
 
-        if ($this->config->isPatchingEnabled()) {
+        if ($patchingEnabled = $this->config->isPatchingEnabled()) {
             $patches = $this->patchesCollector->gatherAllPatches(
                 array_merge($packages, [$this->composer->getPackage()])
             );
@@ -143,7 +143,7 @@ class Patches
         }
 
         $packageResetFlags = array_fill_keys(
-            !getenv(Environment::FORCE_REAPPLY)
+            !getenv(Environment::FORCE_REAPPLY) || !$patchingEnabled
                 ? $this->resolvePackagesToReinstall($packageRepository->getPackages(), $patches)
                 : array_keys($patches),
             true
