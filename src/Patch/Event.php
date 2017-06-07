@@ -6,20 +6,30 @@ class Event extends \Composer\EventDispatcher\Event
     /**
      * @var \Composer\Package\PackageInterface $package
      */
-    protected $package;
+    private $package;
 
     /**
      * @var string $url
      */
-    protected $url;
+    private $url;
 
     /**
      * @var string $description
      */
-    protected $description;
+    private $description;
 
-    public function __construct($eventName, \Composer\Package\PackageInterface $package, $url, $description)
-    {
+    /**
+     * @param string $eventName
+     * @param \Composer\Package\PackageInterface $package
+     * @param array $url
+     * @param string $description
+     */
+    public function __construct(
+        $eventName,
+        \Composer\Package\PackageInterface $package,
+        $url,
+        $description
+    ) {
         parent::__construct($eventName);
 
         $this->package = $package;

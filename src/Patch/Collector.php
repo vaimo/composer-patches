@@ -6,12 +6,12 @@ class Collector
     /**
      * @var \Vaimo\ComposerPatches\Patch\DefinitionsProcessor
      */
-    protected $definitionsProcessor;
+    private $definitionsProcessor;
 
     /**
      * @var \Vaimo\ComposerPatches\Json\Decoder
      */
-    protected $jsonDecoder;
+    private $jsonDecoder;
 
     public function __construct()
     {

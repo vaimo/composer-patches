@@ -6,14 +6,14 @@ class DefinitionsProcessor
     /**
      * @var \Vaimo\ComposerPatches\Patch\DefinitionNormalizer
      */
-    protected $definitionNormalizer;
+    private $definitionNormalizer;
 
     public function __construct()
     {
         $this->definitionNormalizer = new \Vaimo\ComposerPatches\Patch\DefinitionNormalizer();
     }
 
-    public function normalizeDefinitions($patches)
+    public function normalizeDefinitions(array $patches)
     {
         $patchesPerPackage = array();
 
@@ -34,7 +34,7 @@ class DefinitionsProcessor
         return $patchesPerPackage;
     }
 
-    public function validate($patches, $vendorDir)
+    public function validate(array $patches, $vendorDir)
     {
         $validatedPatches = array();
 
@@ -62,7 +62,7 @@ class DefinitionsProcessor
         return $validatedPatches;
     }
 
-    public function flatten($patches)
+    public function flatten(array $patches)
     {
         $allPatches = array();
 

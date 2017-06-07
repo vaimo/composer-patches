@@ -3,6 +3,14 @@ namespace Vaimo\ComposerPatches\Patch;
 
 class PathNormalizer
 {
+    /**
+     * @var \Composer\Installer\InstallationManager
+     */
+    private $installationManager;
+
+    /**
+     * @param \Composer\Installer\InstallationManager $installationManager
+     */
     public function __construct(
         \Composer\Installer\InstallationManager $installationManager
     ) {
@@ -30,6 +38,7 @@ class PathNormalizer
                 }
 
                 $patchOwnerPackage = $packagesByName[$patchOwner];
+
                 $packageInstaller = $this->installationManager->getInstaller($patchOwnerPackage->getType());
                 $patchOwnerPath = $packageInstaller->getInstallPath($patchOwnerPackage);
 

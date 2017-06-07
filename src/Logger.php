@@ -6,7 +6,7 @@ class Logger
     /**
      * @var \Composer\IO\IOInterface $io
      */
-    protected $io;
+    private $io;
 
     /**
      * @param \Composer\IO\IOInterface $io

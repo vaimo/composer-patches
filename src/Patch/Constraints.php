@@ -4,10 +4,18 @@ namespace Vaimo\ComposerPatches\Patch;
 class Constraints
 {
     /**
+     * @var array
+     */
+    private $config;
+
+    /**
      * @var \Composer\Package\Version\VersionParser
      */
-    protected $versionParser;
+    private $versionParser;
 
+    /**
+     * @param array $config
+     */
     public function __construct(
         array $config
     ) {

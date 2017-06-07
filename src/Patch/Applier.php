@@ -6,12 +6,12 @@ class Applier
     /**
      * @var \Vaimo\ComposerPatches\Shell
      */
-    protected $shell;
+    private $shell;
 
     /**
      * @var \Vaimo\ComposerPatches\Logger
      */
-    protected $logger;
+    private $logger;
 
     /**
      * @param \Vaimo\ComposerPatches\Logger $logger

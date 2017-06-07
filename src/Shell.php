@@ -4,14 +4,14 @@ namespace Vaimo\ComposerPatches;
 class Shell
 {
     /**
-     * @var \Composer\Util\ProcessExecutor
-     */
-    protected $executor;
-
-    /**
      * @var \Vaimo\ComposerPatches\Logger
      */
     protected $logger;
+
+    /**
+     * @var \Composer\Util\ProcessExecutor
+     */
+    protected $executor;
 
     /**
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -19,8 +19,9 @@ class Shell
     public function __construct(
         \Vaimo\ComposerPatches\Logger $logger
     ) {
-        $this->executor =  new \Composer\Util\ProcessExecutor($logger->getOutputInstance());
         $this->logger = $logger;
+
+        $this->executor =  new \Composer\Util\ProcessExecutor($logger->getOutputInstance());
     }
 
     public function execute($commandTemplate, array $arguments, $cwd = null)

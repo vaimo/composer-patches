@@ -3,6 +3,11 @@ namespace Vaimo\ComposerPatches\Patch;
 
 class PackagesResolver
 {
+    /**
+     * @var PackageUtils
+     */
+    private $packageUtils;
+
     public function __construct()
     {
         $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
