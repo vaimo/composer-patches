@@ -9,7 +9,7 @@ Patching is enabled when:
 * project has "patches" key defined under "extra" 
 * project has "enable-patching" key defined under "extra" 
 
-_Note that the latter is only useful if you have no patches defined directly on the root level_
+_Note that the latter is only useful if you have no patches defined directly on the root/project level_
 
 ```
 {
@@ -21,66 +21,23 @@ _Note that the latter is only useful if you have no patches defined directly on 
 
 ```
 
-## Usage
+In case you have patches defined on root/project level, it's not required to have **enable-patching** key to be defined unless you want to explicitly disable the functionality.
 
-Example composer.json:
+When patching is disabled and **composer install** is re-executed, all patched package will be re-installed (to wipe the patched in changes).
 
-```
-{
-  "require": {
-    "vaimo/composer-patches": "^2.1.0",
-    "drupal/drupal": "8.0.*@dev"
-  },
-  "config": {
-    "preferred-install": "source"
-  },
-  "extra": {
-    "patches": {
-      "drupal/drupal": {
-        "Add startup configuration for PHP server": "https://www.drupal.org/files/issues/add_a_startup-1543858-30.patch"
-      }
-    }
-  }
-}
-
-```
-
-## Using an external patch file
-
-Instead of a patches key in your root composer.json, use a patches-file key.
-
-```
-{
-  "require": {
-    "vaimo/composer-patches": "^2.1.0",
-    "drupal/drupal": "8.0.*@dev"
-  },
-  "config": {
-    "preferred-install": "source"
-  },
-  "extra": {
-    "patches-file": "local/path/to/your/composer.patches.json"
-  }
-}
-
-```
-
-## Using patch file
+## Usage: patch file
 
 Same format is used for both project (root level scope) patches and for package patches.
 
 ```
 {
   "require": {
-    "vaimo/composer-patches": "^2.1.0",
-    "drupal/drupal": "8.0.*@dev"
-  },
-  "config": {
-    "preferred-install": "source"
+    "some/package": "1.2.3",
+    "vaimo/composer-patches": "^3.0.0"
   },
   "extra": {
     "patches": {
-      "targeted/package": {
+      "some/package": {
         "desription about my patch": "my/file.patch"
       }
     }
@@ -89,10 +46,29 @@ Same format is used for both project (root level scope) patches and for package 
 
 ```
 
+## Usage: patch list
+
+Same format is used for both project (root level scope) patches and for package patches.
+
+```
+{
+  "require": {
+    "some/package": "1.2.3",
+    "vaimo/composer-patches": "^3.0.0"
+  },
+  "extra": {
+    "patches-file": "path/to/composer.patches.json"
+  }
+}
+
+```
+
+## Patch file path format
+
 Please note that in both cases the patch path should be relative to the context where it's defined:
 
-* For project, it should be relative to project root
-* For package, it should be relative to package root 
+* For project, it should be relative to project root (relative to <project>)
+* For package, it should be relative to package root (relative to <project>/vendor/myvendor/module)
 
 ## Version restriction
 
@@ -133,7 +109,7 @@ Patches can be stored in remote location and referred to by using the full URL o
 }
 ```
 
-## Sequencing patches
+## Sequencing the patches
 
 In case it's important to apply the patches in a certain order, use an array wrapper around the patch definitions.
 
