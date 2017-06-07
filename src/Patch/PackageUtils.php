@@ -45,11 +45,13 @@ class PackageUtils
     {
         $extra = $package->getExtra();
 
+        $patchesApplied = isset($extra['patches_applied']) ? $extra['patches_applied'] : [];
+
         unset($extra['patches_applied']);
 
         $package->setExtra($extra);
 
-        return true;
+        return $patchesApplied;
     }
 
     public function registerPatch(PackageInterface $package, $path, $description)

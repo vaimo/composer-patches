@@ -19,6 +19,11 @@ class Plugin implements \Composer\Plugin\PluginInterface,
      */
     private $packageUtils;
 
+    /**
+     * @var \Vaimo\ComposerPatches\Managers\AppliedPatchesManager
+     */
+    private $appliedPatchesManager;
+
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
     {
         $logger = new \Vaimo\ComposerPatches\Logger($io);
@@ -27,6 +32,8 @@ class Plugin implements \Composer\Plugin\PluginInterface,
             $io,
             $composer->getConfig()
         );
+
+        $this->appliedPatchesManager = new \Vaimo\ComposerPatches\Managers\AppliedPatchesManager();
 
         $patchesManager = new \Vaimo\ComposerPatches\Managers\PatchesManager(
             $composer->getEventDispatcher(),
@@ -48,31 +55,28 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     public static function getSubscribedEvents()
     {
         return array(
-            \Composer\Installer\PackageEvents::PRE_PACKAGE_INSTALL => 'resetAppliedPatches',
-            \Composer\Installer\PackageEvents::PRE_PACKAGE_UPDATE => 'resetAppliedPatches',
+            \Composer\Script\ScriptEvents::PRE_UPDATE_CMD => 'extractPatchesFromLock',
+            \Composer\Script\ScriptEvents::PRE_INSTALL_CMD => 'extractPatchesFromLock',
             \Composer\Script\ScriptEvents::PRE_AUTOLOAD_DUMP => 'postInstall'
         );
     }
 
-    public function resetAppliedPatches(\Composer\Installer\PackageEvent $event)
+    public function extractPatchesFromLock(\Composer\Script\Event $event)
     {
-        foreach ($event->getOperations() as $operation) {
-            if ($operation->getJobType() != 'install') {
-                continue;
-            }
-
-            $this->packageUtils->resetAppliedPatches(
-                $this->composerUtils->getPackageFromOperation($operation)
-            );
-        }
+        $this->appliedPatchesManager->extractAppliedPatchesInfo(
+            $event->getComposer()->getRepositoryManager()->getLocalRepository()
+        );
     }
 
     public function postInstall(\Composer\Script\Event $event)
     {
         $composer = $event->getComposer();
+        $repository = $composer->getRepositoryManager()->getLocalRepository();
+
+        $this->appliedPatchesManager->restoreAppliedPatchesInfo($repository);
 
         $this->repositoryManager->processRepository(
-            $composer->getRepositoryManager()->getLocalRepository(),
+            $repository,
             $composer->getConfig()->get('vendor-dir')
         );
     }

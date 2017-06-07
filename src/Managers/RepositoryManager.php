@@ -67,6 +67,11 @@ class RepositoryManager
     private $packagesResolver;
 
     /**
+     * @var array
+     */
+    private $appliedPatches = array();
+
+    /**
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param \Composer\Package\RootPackageInterface $rootPackage
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -191,10 +196,10 @@ class RepositoryManager
 
         if (!$packagesUpdated) {
             $this->logger->writeRaw('Nothing to patch');
-            return;
         }
 
-        $this->logger->write('Writing patch info to lock file', 'info');
+        $this->logger->write('Writing patch info to install file', 'info');
+
         $repository->write();
     }
 }
