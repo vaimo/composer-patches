@@ -94,26 +94,6 @@ Please note that in both cases the patch path should be relative to the context 
 * For project, it should be relative to project root
 * For package, it should be relative to package root 
 
-## Alternative format
-
-In case it's important to retain the patching order (in case the patches have to be applied in certain sequence because they target same code segments), one can also use alternative declaration format that uses array wrapper:
-
-```
-{
-  "extra": {
-    "patches": {
-      "targeted/package": [
-        {
-          "label": "description for my patch",
-          "url": "my/file.patch"
-        }
-      ]
-    }
-  }
-}
-
-```
-
 ## Version restriction
 
 In case the patch is applied only on certain version of the package, a version restriction can be defined for the patch:
@@ -122,12 +102,12 @@ In case the patch is applied only on certain version of the package, a version r
 {
   "extra": {
     "patches": {
-      "targeted/package": [
+      "targeted/package": {
         "description for my patch": {
           "url": "my/file.patch",
           "version": "~1.2.3"
         }
-      ]
+      }
     }
   }
 }
@@ -153,11 +133,45 @@ Patches can be stored in remote location and referred to by using the full URL o
 }
 ```
 
+## Sequencing patches
+
+In case it's important to apply the patches in a certain order, use an array wrapper around the patch definitions.
+
+```
+{
+  "extra": {
+    "patches": {
+      "targeted/package": [
+        {
+          "label": "my patch description",
+          "source": "my/file.patch"
+        }
+      ]
+    }
+  }
+}
+
+```
+Note that this way of declaring the patches also support versioning and remote patches (in which case one should use "url" key).
+
 ## Excluding patches
 
-In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), patch exclusions can be defined.
+In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), exclusions records can be defined in the project's composer.json:
 
-Package that owns the patch:
+```
+{
+  "extra": {
+    "excluded-patches": {
+      "patch/owner": [
+        "path/to/file.patch"
+      ]
+    }
+  }
+}
+
+```
+
+Will exclude the a patch that was defined in a package in following (or similar) manner ...
 
 ```
 {
@@ -173,20 +187,7 @@ Package that owns the patch:
 
 ```
 
-Project level:
-
-```
-{
-  "extra": {
-    "excluded-patches": {
-      "patch/owner": [
-        "path/to/file.patch"
-      ]
-    }
-  }
-}
-
-```
+The important part to note here is the file-path and patch owner. Description is not part of the exclusion logic.
 
 ## Hints on creating a patch 
 
@@ -207,13 +208,13 @@ it when it has changed since last time.
 
 * Works on project AND package level
 * This plugin is much more simple to use and maintain
-* This plugin doesn't require you to specify which package version you're patching
+* This plugin doesn't require you to specify which package version you're patching (but you'll still have the option to do so).
 * This plugin is easy to use with Drupal modules (which don't use semantic versioning).
 * This plugin will gather patches from all dependencies and apply them as if they were in the root composer.json
 
 ## Credits
 
-Modified version of https://github.com/cweagans/composer-patches
+Heavily modified version of https://github.com/cweagans/composer-patches
 
 A ton of this code is adapted or taken straight from https://github.com/jpstacey/composer-patcher, which is
 abandoned in favor of https://github.com/netresearch/composer-patches-plugin, which is (IMHO) overly complex
