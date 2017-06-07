@@ -1,9 +1,11 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
+use Composer\Package\PackageInterface;
+
 class PackageUtils
 {
-    public function shouldReinstall($package, $patches)
+    public function shouldReinstall(PackageInterface $package, array $patches)
     {
         $extra = $package->getExtra();
 
@@ -22,7 +24,7 @@ class PackageUtils
         return true;
     }
 
-    public function hasPatchChanges($package, $patches)
+    public function hasPatchChanges(PackageInterface $package, array $patches)
     {
         $extra = $package->getExtra();
 
@@ -39,7 +41,7 @@ class PackageUtils
         return (bool)count($patches);
     }
 
-    public function resetAppliedPatches($package)
+    public function resetAppliedPatches(PackageInterface $package)
     {
         $extra = $package->getExtra();
 
@@ -50,7 +52,7 @@ class PackageUtils
         return true;
     }
 
-    public function registerPatch($package, $path, $description)
+    public function registerPatch(PackageInterface $package, $path, $description)
     {
         $extra = $package->getExtra();
 
@@ -63,7 +65,7 @@ class PackageUtils
         $package->setExtra($extra);
     }
 
-    public function sortPatches($package)
+    public function sortPatches(PackageInterface $package)
     {
         $extra = $package->getExtra();
 

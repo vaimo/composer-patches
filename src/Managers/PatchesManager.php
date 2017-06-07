@@ -69,14 +69,13 @@ class PatchesManager
         ));
     }
 
-    public function processPatches(
-        array $patches, PackageInterface $package, $packageInstallPath, $vendorDir
-    ) {
+    public function processPatches(array $patches, PackageInterface $package, $installPath, $vendorRoot)
+    {
         foreach ($patches as $source => $description) {
             $relativePath = $source;
 
             $patchSourceLabel = sprintf('<info>%s</info>', $source);
-            $absolutePatchPath = $vendorDir . '/' . $source;
+            $absolutePatchPath = $vendorRoot . '/' . $source;
             $patchComment = substr($description, 0, strrpos($description, ','));
 
             if (file_exists($absolutePatchPath)) {
@@ -109,7 +108,7 @@ class PatchesManager
                     $this->patchDownloader->copy($hostname, $source, $filename, false);
                 }
 
-                $this->patchApplier->execute($filename, $packageInstallPath);
+                $this->patchApplier->execute($filename, $installPath);
 
                 if (isset($hostname)) {
                     unset($hostname);

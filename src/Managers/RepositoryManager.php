@@ -87,7 +87,11 @@ class RepositoryManager
 
         $this->config = new \Vaimo\ComposerPatches\Patch\Config($extraInfo);
 
-        $this->patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector();
+        $this->patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector(array(
+            'patches' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
+            'patches-file' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
+        ));
+
         $this->patchPathNormalizer = new \Vaimo\ComposerPatches\Patch\PathNormalizer($installationManager);
         $this->patchDefinitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
         $this->patchConstraints = new \Vaimo\ComposerPatches\Patch\Constraints($extraInfo);
@@ -95,7 +99,7 @@ class RepositoryManager
         $this->packagesResolver = new \Vaimo\ComposerPatches\Patch\PackagesResolver();
     }
 
-    public function processRepository(WritableRepositoryInterface $repository, $vendorDir)
+    public function processRepository(WritableRepositoryInterface $repository, $vendorRoot)
     {
         $packages = $repository->getPackages();
 
@@ -106,8 +110,8 @@ class RepositoryManager
             ));
 
             $patches = $this->patchConstraints->apply($patches, $packages);
-            $patches = $this->patchPathNormalizer->process($patches, $packages, $vendorDir);
-            $patches = $this->patchDefinitionsProcessor->validate($patches, $vendorDir);
+            $patches = $this->patchPathNormalizer->process($patches, $packages, $vendorRoot);
+            $patches = $this->patchDefinitionsProcessor->validate($patches, $vendorRoot);
             $patches = $this->patchDefinitionsProcessor->flatten($patches);
         } else {
             $patches = array();
@@ -159,10 +163,6 @@ class RepositoryManager
                 continue;
             }
 
-            if ($packagesUpdated) {
-                $this->logger->writeNewLine();
-            }
-
             $patchesForPackage = $patches[$packageName];
 
             if (!$this->packageUtils->hasPatchChanges($package, $patchesForPackage)) {
@@ -178,13 +178,15 @@ class RepositoryManager
                     $patchesForPackage,
                     $package,
                     $this->installationManager->getInstallPath($package),
-                    $vendorDir
+                    $vendorRoot
                 );
             } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $e) {
                 $repository->write();
 
                 throw $e;
             }
+
+            $this->logger->writeNewLine();
         }
 
         if (!$packagesUpdated) {

@@ -1,60 +1,58 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
+use \Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface;
+
 class Collector
 {
+    /**
+     * @var PatchSourceLoaderInterface[]
+     */
+    private $sourceLoaders;
+
     /**
      * @var \Vaimo\ComposerPatches\Patch\DefinitionsProcessor
      */
     private $definitionsProcessor;
 
     /**
-     * @var \Vaimo\ComposerPatches\Json\Decoder
+     * @param PatchSourceLoaderInterface[] $sourceLoaders
      */
-    private $jsonDecoder;
-
-    public function __construct()
-    {
+    public function __construct(
+        array $sourceLoaders
+    ) {
+        $this->sourceLoaders = $sourceLoaders;
         $this->definitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
-        $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
     }
 
-    public function gatherAllPatches($packages)
+    /**
+     * @param \Composer\Package\PackageInterface[] $packages
+     * @return array
+     */
+    public function gatherAllPatches(array $packages)
     {
         $allPatches = array();
 
-        foreach ($packages as $patchOwnerPackage) {
-            $extra = $patchOwnerPackage->getExtra();
-            $patchDefinitionSources = array();
+        foreach ($packages as $patchOwner) {
+            $extra = $patchOwner->getExtra();
 
-            if (isset($extra['patches'])) {
-                $patchDefinitionSources[] = $extra['patches'];
-            }
+            /** @var PatchSourceLoaderInterface[] $sourceLoaders */
+            $sourceLoaders = array_intersect_key($this->sourceLoaders, $extra);
 
-            if (isset($extra['patches-file'])) {
-                $parsedPatchFileContents = $this->jsonDecoder->decode(
-                    file_get_contents($extra['patches-file'])
+            foreach ($sourceLoaders as $key => $loader) {
+                $patchesByTarget = $this->definitionsProcessor->normalizeDefinitions(
+                    $loader->load($extra[$key])
                 );
 
-                if (isset($parsedPatchFileContents['patches'])) {
-                    $patchDefinitionSources[] = $parsedPatchFileContents['patches'];
-                } elseif (!$parsedPatchFileContents) {
-                    throw new \Exception('There was an error in the supplied patch file');
-                }
-            }
-
-            foreach ($patchDefinitionSources as $patches) {
-                $patches = $this->definitionsProcessor->normalizeDefinitions($patches);
-
-                foreach ($patches as $target => $definitions) {
+                foreach ($patchesByTarget as $target => $patches) {
                     if (!isset($allPatches[$target])) {
                         $allPatches[$target] = array();
                     }
 
-                    foreach ($definitions as $definition) {
-                        $allPatches[$target][] = array_replace($definition, array(
-                            'owner' => $patchOwnerPackage->getName(),
-                            'owner_type' => $patchOwnerPackage->getType()
+                    foreach ($patches as $patch) {
+                        $allPatches[$target][] = array_replace($patch, array(
+                            'owner' => $patchOwner->getName(),
+                            'owner_type' => $patchOwner->getType()
                         ));
                     }
                 }
