@@ -25,7 +25,6 @@ class Collector
 
         foreach ($packages as $patchOwnerPackage) {
             $extra = $patchOwnerPackage->getExtra();
-
             $patchDefinitionSources = array();
 
             if (isset($extra['patches'])) {

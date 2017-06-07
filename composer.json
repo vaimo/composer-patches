@@ -11,6 +11,10 @@
         {
             "name": "Cameron Eagans",
             "email": "me@cweagans.net"
+        },
+        {
+            "name": "Allan Paiste",
+            "email": "allan.paiste@vaimo.com"
         }
     ],
     "require": {

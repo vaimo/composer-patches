@@ -53,7 +53,7 @@ Same format is used for both project (root level scope) patches and for package 
 
 ```
 
-## Usage: patch list
+## Usage: patch list file
 
 Same format is used for both project (root level scope) patches and for package patches.
 
@@ -65,6 +65,20 @@ Same format is used for both project (root level scope) patches and for package 
   },
   "extra": {
     "patches-file": "path/to/composer.patches.json"
+  }
+}
+
+```
+
+In which case the file should contain patches listed in following format:
+
+```
+
+{
+  "patches": {
+    "some/package": {
+      "desription about my patch": "my/file.patch"
+    }
   }
 }
 
