@@ -1,7 +1,7 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
-use \Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface;
+use Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface;
 
 class Collector
 {
@@ -29,9 +29,9 @@ class Collector
      * @param \Composer\Package\PackageInterface[] $packages
      * @return array
      */
-    public function gatherAllPatches(array $packages)
+    public function collect(array $packages)
     {
-        $allPatches = array();
+        $patchList = array();
 
         foreach ($packages as $patchOwner) {
             $extra = $patchOwner->getExtra();
@@ -45,12 +45,12 @@ class Collector
                 );
 
                 foreach ($patchesByTarget as $target => $patches) {
-                    if (!isset($allPatches[$target])) {
-                        $allPatches[$target] = array();
+                    if (!isset($patchList[$target])) {
+                        $patchList[$target] = array();
                     }
 
                     foreach ($patches as $patch) {
-                        $allPatches[$target][] = array_replace($patch, array(
+                        $patchList[$target][] = array_replace($patch, array(
                             'owner' => $patchOwner->getName(),
                             'owner_type' => $patchOwner->getType()
                         ));
@@ -59,6 +59,6 @@ class Collector
             }
         }
 
-        return $allPatches;
+        return $patchList;
     }
 }

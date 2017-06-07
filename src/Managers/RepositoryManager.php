@@ -104,7 +104,7 @@ class RepositoryManager
         $packages = $repository->getPackages();
 
         if ($patchingEnabled = $this->config->isPatchingEnabled()) {
-            $patches = $this->patchesCollector->gatherAllPatches(array_merge(
+            $patches = $this->patchesCollector->collect(array_merge(
                 $this->config->isPackageScopeEnabled() ? $packages : array(),
                 array($this->rootPackage)
             ));
