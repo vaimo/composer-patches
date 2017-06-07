@@ -146,6 +146,7 @@ class RepositoryManager
                 }
 
                 $output = $this->logger->getOutputInstance();
+
                 $verbosityLevel = OutputUtils::resetVerbosity($output, OutputInterface::VERBOSITY_QUIET);
 
                 try {

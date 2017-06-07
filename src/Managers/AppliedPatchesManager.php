@@ -29,7 +29,11 @@ class AppliedPatchesManager
                 continue;
             }
 
-            $this->appliedPatches[$package->getName()] = $this->packageUtils->resetAppliedPatches($package);
+            if (!$patches = $this->packageUtils->resetAppliedPatches($package, true)) {
+                continue;
+            }
+
+            $this->appliedPatches[$package->getName()] = $patches;
         }
     }
 
@@ -39,12 +43,11 @@ class AppliedPatchesManager
             $packageName = $package->getName();
             $extra = $package->getExtra();
 
-            $extra['patches_applied'] = array_merge(
-                isset($extra['patches_applied']) ? $extra['patches_applied'] : array(),
-                isset($this->appliedPatches[$packageName]) ? $this->appliedPatches[$packageName] : array()
-            );
+            if (!isset($this->appliedPatches[$packageName])) {
+                continue;
+            }
 
-            if (!$extra['patches_applied']) {
+            if (!$extra['patches_applied'] = $this->appliedPatches[$packageName]) {
                 continue;
             }
 

@@ -9,6 +9,10 @@ class OutputUtils extends \Composer\IO\ConsoleIO
     {
         $oldValue = $io->output->getVerbosity();
 
+        if ($io->isVerbose()) {
+            return $oldValue;
+        }
+
         $io->output->setVerbosity($verbosity);
 
         return $oldValue;

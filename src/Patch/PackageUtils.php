@@ -17,11 +17,11 @@ class PackageUtils
             return false;
         }
 
-        if (!array_diff_assoc($applied, $patches) && !array_diff_assoc($patches, $applied)) {
-            return false;
+        if ($applied === true) {
+            return true;
         }
 
-        return true;
+        return array_diff_assoc($applied, $patches) || array_diff_assoc($patches, $applied);
     }
 
     public function hasPatchChanges(PackageInterface $package, array $patches)
@@ -30,6 +30,10 @@ class PackageUtils
 
         if (isset($extra['patches_applied'])) {
             $appliedPatches = $extra['patches_applied'];
+
+            if ($appliedPatches === true) {
+                return true;
+            }
 
             if (!array_diff_assoc($appliedPatches, $patches)
                 && !array_diff_assoc($patches, $appliedPatches)
@@ -41,13 +45,17 @@ class PackageUtils
         return (bool)count($patches);
     }
 
-    public function resetAppliedPatches(PackageInterface $package)
+    public function resetAppliedPatches(PackageInterface $package, $replacement = null)
     {
         $extra = $package->getExtra();
 
         $patchesApplied = isset($extra['patches_applied']) ? $extra['patches_applied'] : [];
 
         unset($extra['patches_applied']);
+
+        if ($replacement !== null && $patchesApplied) {
+            $extra['patches_applied'] = $replacement;
+        }
 
         $package->setExtra($extra);
 
