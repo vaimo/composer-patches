@@ -4,15 +4,15 @@ namespace Vaimo\ComposerPatches;
 class Logger
 {
     /**
-     * @var \Composer\IO\IOInterface $io
+     * @var \Composer\IO\ConsoleIO $io
      */
     private $io;
 
     /**
-     * @param \Composer\IO\IOInterface $io
+     * @param \Composer\IO\ConsoleIO $io
      */
     public function __construct(
-        \Composer\IO\IOInterface $io
+        \Composer\IO\ConsoleIO $io
     ) {
         $this->io = $io;
     }

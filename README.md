@@ -15,15 +15,22 @@ _Note that the latter is only useful if you have no patches defined directly on 
 {
   "extra": {
     "patches": {},
-    "enable-patching": true
+    "enable-patching": true,
+    "enable-patching-from-packages": false
   }
 }
 
 ```
 
-In case you have patches defined on root/project level, it's not required to have **enable-patching** key to be defined unless you want to explicitly disable the functionality.
+* **enable-patching** - In case you have patches defined on root/project level, it's not required to
+  have **enable-patching** key to be defined unless you want to explicitly disable the functionality.
+* **enable-patching-from-packages** - Enabled by default (when not defined), can be used to omit all patches
+  from packages. For more granular exclusion, see "Excluding patches" sub-secion.
 
-When patching is disabled and **composer install** is re-executed, all patched package will be re-installed (to wipe the patched in changes).
+When patching is disabled and **composer install** is re-executed, all patched package will be re-installed
+(to wipe the patched in changes).
+
+
 
 ## Usage: patch file
 

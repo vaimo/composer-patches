@@ -2,9 +2,12 @@
 namespace Vaimo\ComposerPatches\Managers;
 
 use Composer\Repository\WritableRepositoryInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use Vaimo\ComposerPatches\Composer\ResetOperation;
 use Vaimo\ComposerPatches\Environment;
+
+use Vaimo\ComposerPatches\Composer\OutputUtils;
 
 class RepositoryManager
 {
@@ -97,9 +100,10 @@ class RepositoryManager
         $packages = $repository->getPackages();
 
         if ($patchingEnabled = $this->config->isPatchingEnabled()) {
-            $patches = $this->patchesCollector->gatherAllPatches(
-                array_merge($packages, [$this->rootPackage])
-            );
+            $patches = $this->patchesCollector->gatherAllPatches(array_merge(
+                $this->config->isPackageScopeEnabled() ? $packages : array(),
+                array($this->rootPackage)
+            ));
 
             $patches = $this->patchConstraints->apply($patches, $packages);
             $patches = $this->patchPathNormalizer->process($patches, $packages, $vendorDir);
@@ -109,31 +113,54 @@ class RepositoryManager
             $patches = array();
         }
 
-        $packageResetFlags = array_fill_keys(
-            !getenv(Environment::FORCE_REAPPLY) || !$patchingEnabled
-                ? $this->packagesResolver->resolvePackagesToReinstall($packages, $patches)
-                : array_keys($patches),
-            true
+        $packagesToReset = array_merge(
+            $this->packagesResolver->resolvePackagesToReinstall($packages, $patches),
+            getenv(Environment::FORCE_REAPPLY) ? array_keys($patches) : array()
         );
 
+        $packageResetFlags = array_fill_keys($packagesToReset, true);
         $packagesUpdated = false;
+
+        if ($packagesToReset || $patches) {
+            $this->logger->write('Processing patches configuration', 'info');
+        }
 
         foreach ($packages as $package) {
             $packageName = $package->getName();
+            $hasPatches = !empty($patches[$packageName]);
 
             if (isset($packageResetFlags[$packageName])) {
-                $this->logger->writeNewLine();
+                if (!$hasPatches) {
+                    $this->logger->writeRaw(
+                        '  - Resetting patched package <info>%s</info>', array($packageName)
+                    );
+                }
 
-                $this->installationManager->install($repository, new ResetOperation(
-                    $package,
-                    'Re-installing package due to patch configuration change'
-                ));
+                $output = $this->logger->getOutputInstance();
+                $verbosityLevel = OutputUtils::resetVerbosity($output, OutputInterface::VERBOSITY_QUIET);
+
+                try {
+                    $this->installationManager->install(
+                        $repository,
+                        new ResetOperation($package, 'Package reset due to changes in patches configuration')
+                    );
+
+                    OutputUtils::resetVerbosity($output, $verbosityLevel);
+                } catch (\Exception $e) {
+                    OutputUtils::resetVerbosity($output, $verbosityLevel);
+
+                    throw $e;
+                }
 
                 $packagesUpdated = $this->packageUtils->resetAppliedPatches($package);
             }
 
-            if (!isset($patches[$packageName])) {
+            if (!$hasPatches) {
                 continue;
+            }
+
+            if ($packagesUpdated) {
+                $this->logger->writeNewLine();
             }
 
             $patchesForPackage = $patches[$packageName];
@@ -161,12 +188,11 @@ class RepositoryManager
         }
 
         if (!$packagesUpdated) {
+            $this->logger->writeRaw('Nothing to patch');
             return;
         }
 
-        $this->logger->writeNewLine();
-        $this->logger->write('Writing updated patch info to lock file', 'info');
-
+        $this->logger->write('Writing patch info to lock file', 'info');
         $repository->write();
     }
 }
