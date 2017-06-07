@@ -1,19 +1,19 @@
 <?php
 namespace Vaimo\ComposerPatches;
 
-class PatchEvents
+class Events
 {
     /**
      * The event listener method receives a Vaimo\ComposerPatches\PatchEvent instance.
      *
      * @var string
      */
-    const PRE_PATCH_APPLY = 'pre-patch-apply';
+    const PRE_APPLY = 'pre-patch-apply';
 
     /**
      * The event listener method receives a Vaimo\ComposerPatches\PatchEvent instance.
      *
      * @var string
      */
-    const POST_PATCH_APPLY = 'post-patch-apply';
+    const POST_APPLY = 'post-patch-apply';
 }

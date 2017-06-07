@@ -1,7 +1,7 @@
 <?php
-namespace Vaimo\ComposerPatches;
+namespace Vaimo\ComposerPatches\Patch;
 
-class PatchEvent extends \Composer\EventDispatcher\Event
+class Event extends \Composer\EventDispatcher\Event
 {
     /**
      * @var \Composer\Package\PackageInterface $package

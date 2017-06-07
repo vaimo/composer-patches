@@ -4,33 +4,25 @@ namespace Vaimo\ComposerPatches\Patch;
 class Config
 {
     /**
-     * @var \Composer\Composer $composer
+     * @var array
      */
-    protected $composer;
+    protected $config;
 
     /**
-     * @param \Composer\Composer $composer
+     * @param array $config
      */
     public function __construct(
-        \Composer\Composer $composer
+        array $config
     ) {
-        $this->composer = $composer;
+        $this->config = $config;
     }
 
-    /**
-     * Enabled by default if there are project packages that include patches, but root package can still
-     * explicitly disable them.
-     *
-     * @return bool
-     */
     public function isPatchingEnabled()
     {
-        $extra = $this->composer->getPackage()->getExtra();
-
-        if (empty($extra['patches'])) {
-            return isset($extra['enable-patching']) ? $extra['enable-patching'] : false;
+        if (empty($this->config['patches'])) {
+            return isset($this->config['enable-patching']) ? $this->config['enable-patching'] : false;
         } else {
-            return isset($extra['enable-patching']) && !$extra['enable-patching'] ? false : true;
+            return isset($this->config['enable-patching']) && !$this->config['enable-patching'] ? false : true;
         }
     }
 }

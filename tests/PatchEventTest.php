@@ -1,10 +1,10 @@
 <?php
 namespace Vaimo\ComposerPatches\Tests;
 
-use Vaimo\ComposerPatches\PatchEvent as Model;
+use Vaimo\ComposerPatches\Patch\Event as Model;
 
 use Composer\Package\PackageInterface;
-use Vaimo\ComposerPatches\PatchEvents;
+use Vaimo\ComposerPatches\Events;
 
 class PatchEventTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,8 +13,8 @@ class PatchEventTest extends \PHPUnit_Framework_TestCase
         $package = $this->getMock('Composer\Package\PackageInterface');
 
         return array(
-            array(PatchEvents::PRE_PATCH_APPLY, $package, 'https://www.drupal.org', 'A test patch'),
-            array(PatchEvents::POST_PATCH_APPLY, $package, 'https://www.drupal.org', 'A test patch'),
+            array(Events::PRE_APPLY, $package, 'https://www.drupal.org', 'A test patch'),
+            array(Events::POST_APPLY, $package, 'https://www.drupal.org', 'A test patch'),
         );
     }
 

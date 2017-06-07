@@ -4,23 +4,27 @@ namespace Vaimo\ComposerPatches\Patch;
 class Applier
 {
     /**
-     * @var \Composer\Util\ProcessExecutor $executor
+     * @var \Vaimo\ComposerPatches\Shell
      */
-    protected $executor;
+    protected $shell;
 
     /**
-     * @var \Composer\IO\IOInterface $io
+     * @var \Vaimo\ComposerPatches\Logger
      */
-    protected $io;
+    protected $logger;
 
     /**
-     * @param \Composer\IO\IOInterface $io
+     * @param \Vaimo\ComposerPatches\Logger $logger
+     * @param array $patchers
      */
     public function __construct(
-        \Composer\IO\IOInterface $io
+        \Vaimo\ComposerPatches\Logger $logger,
+        array $patchers
     ) {
-        $this->executor =  new \Composer\Util\ProcessExecutor($io);
-        $this->io = $io;
+        $this->logger = $logger;
+        $this->patchers = $patchers;
+
+        $this->shell = new \Vaimo\ComposerPatches\Shell($logger);
     }
 
     public function execute($filename, $cwd)
@@ -28,32 +32,19 @@ class Applier
         $result = false;
         $patchLevelSequence = array('1', '0', '2');
 
-        $patchers = array(
-            'GIT' => array(
-                'validate' => 'git apply --check -p%s %s',
-                'patch' => 'git apply -p%s %s'
-            ),
-            'PATCH' => array(
-                'validate' => 'patch -p%s --dry-run --no-backup-if-mismatch < %s',
-                'patch' => 'patch -p%s --no-backup-if-mismatch < %s'
-            )
-        );
-
         $operationSequence = array(
             'validate' => 'Validation',
             'patch' => 'Patching'
         );
 
-        $type = 'UNKNOWN';
-        $patchLevel = 'UNKNOWN';
-        $operationName = 'UNKNOWN';
+        list($type, $patchLevel, $operationName) = array_fill(0, 3, 'UNKNOWN');
 
-        foreach ($patchers as $type => $patcher) {
+        foreach ($this->patchers as $type => $patcher) {
             foreach ($patchLevelSequence as $sequenceIndex => $patchLevel) {
                 $result = true;
 
                 foreach ($operationSequence as $operationCode => $operationName) {
-                    $result = $this->executeCommand($patcher[$operationCode], [$patchLevel, $filename], $cwd)
+                    $result = $this->shell->execute($patcher[$operationCode], [$patchLevel, $filename], $cwd)
                         && $result;
 
                     if (!$result) {
@@ -65,51 +56,26 @@ class Applier
                     break 2;
                 }
 
-                if ($this->io->isVerbose() && $sequenceIndex < count($patchLevelSequence) - 1) {
-                    $this->io->write(
-                        sprintf(
-                            '<warning>%s (type=%s) failed with patch_level=%s. Retrying with patch_level=%s</warning>',
-                            $operationName,
-                            $type,
-                            $patchLevel,
-                            $patchLevelSequence[$sequenceIndex + 1]
-                        )
-                    );
+                if ($sequenceIndex >= count($patchLevelSequence) - 1) {
+                    continue;
                 }
+
+                $this->logger->writeVerbose(
+                    '%s (type=%s) failed with patch_level=%s. Retrying with patch_level=%s',
+                    'warning',
+                    array($operationName, $type, $patchLevel, $patchLevelSequence[$sequenceIndex + 1])
+                );
             }
         }
 
-        if ($this->io->isVerbose()) {
-            if ($result) {
-                $this->io->write(sprintf('<info>SUCCESS with %s patch_level=%s</info>', $type, $patchLevel));
-            } else {
-                $this->io->write('<error>FAILURE</error>');
-            }
+        if ($result) {
+            $this->logger->writeVerbose('SUCCESS with %s patch_level=%s', 'info', array($type, $patchLevel));
+        } else {
+            $this->logger->writeVerbose('FAILURE', 'error');
         }
 
         if (!$result) {
             throw new \Exception(sprintf('Cannot apply patch %s', $filename));
         }
-    }
-
-    protected function executeCommand($commandTemplate, array $arguments, $cwd = null)
-    {
-        foreach ($arguments as $index => $argument) {
-            $arguments[$index] = escapeshellarg($argument);
-        }
-
-        $command = vsprintf($commandTemplate, $arguments);
-
-        $outputHandler = '';
-
-        if ($this->io->isVerbose()) {
-            $io = $this->io;
-
-            $outputHandler = function ($type, $data) use ($io) {
-                $io->write('<comment>' . trim($data) . '</comment>');
-            };
-        }
-
-        return $this->executor->execute($command, $outputHandler, $cwd) == 0;
     }
 }

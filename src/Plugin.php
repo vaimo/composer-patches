@@ -1,22 +1,48 @@
 <?php
 namespace Vaimo\ComposerPatches;
 
-class Plugin implements \Composer\Plugin\PluginInterface, \Composer\EventDispatcher\EventSubscriberInterface
+class Plugin implements \Composer\Plugin\PluginInterface,
+    \Composer\EventDispatcher\EventSubscriberInterface
 {
     /**
      * @var \Vaimo\ComposerPatches\Composer\Utils
      */
-    protected $composerUtils;
+    private $composerUtils;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patches
+     * @var \Vaimo\ComposerPatches\Managers\RepositoryManager
      */
-    protected $patchesManager;
+    private $repositoryManager;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\PackageUtils
+     */
+    private $packageUtils;
 
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
     {
-        $this->patchesManager = new \Vaimo\ComposerPatches\Patches($composer, $io);
+        $logger = new \Vaimo\ComposerPatches\Logger($io);
+
+        $downloader = new \Composer\Util\RemoteFilesystem(
+            $io,
+            $composer->getConfig()
+        );
+
+        $patchesManager = new \Vaimo\ComposerPatches\Managers\PatchesManager(
+            $composer->getEventDispatcher(),
+            $downloader,
+            $logger
+        );
+
+        $this->repositoryManager = new \Vaimo\ComposerPatches\Managers\RepositoryManager(
+            $composer->getInstallationManager(),
+            $composer->getPackage(),
+            $logger,
+            $patchesManager
+        );
+
         $this->composerUtils = new \Vaimo\ComposerPatches\Composer\Utils();
+        $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
     }
 
     public static function getSubscribedEvents()
@@ -35,7 +61,7 @@ class Plugin implements \Composer\Plugin\PluginInterface, \Composer\EventDispatc
                 continue;
             }
 
-            $this->patchesManager->resetAppliedPatchesInfoForPackage(
+            $this->packageUtils->resetAppliedPatches(
                 $this->composerUtils->getPackageFromOperation($operation)
             );
         }
@@ -43,6 +69,11 @@ class Plugin implements \Composer\Plugin\PluginInterface, \Composer\EventDispatc
 
     public function postInstall(\Composer\Script\Event $event)
     {
-        $this->patchesManager->applyPatches();
+        $composer = $event->getComposer();
+
+        $this->repositoryManager->processRepository(
+            $composer->getRepositoryManager()->getLocalRepository(),
+            $composer->getConfig()->get('vendor-dir')
+        );
     }
 }

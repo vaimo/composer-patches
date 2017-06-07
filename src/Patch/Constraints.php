@@ -8,33 +8,22 @@ class Constraints
      */
     protected $versionParser;
 
-    /**
-     * @var \Composer\Composer $composer
-     */
-    protected $composer;
-
-    /**
-     * @param \Composer\Composer $composer
-     */
     public function __construct(
-        \Composer\Composer $composer
+        array $config
     ) {
-        $this->composer = $composer;
+        $this->config = $config;
 
         $this->versionParser = new \Composer\Package\Version\VersionParser();
     }
 
-    public function apply($patches)
+    public function apply($patches, $packages)
     {
-        $packageRepository = $this->composer->getRepositoryManager()->getLocalRepository();
-        $packages = $packageRepository->getPackages();
-
         $packagesByName = array();
         foreach ($packages as $package) {
             $packagesByName[$package->getName()] = $package;
         }
 
-        $extra = $this->composer->getPackage()->getExtra();
+        $extra = $this->config;
 
         if (isset($extra['excluded-patches'])) {
             foreach ($extra['excluded-patches'] as $patchOwner => $patchPaths) {

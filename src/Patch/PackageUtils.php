@@ -49,4 +49,28 @@ class PackageUtils
 
         return true;
     }
+
+    public function registerPatch($package, $path, $description)
+    {
+        $extra = $package->getExtra();
+
+        if (!isset($extra['patches_applied'])) {
+            $extra['patches_applied'] = array();
+        }
+
+        $extra['patches_applied'][$path] = $description;
+
+        $package->setExtra($extra);
+    }
+
+    public function sortPatches($package)
+    {
+        $extra = $package->getExtra();
+
+        if (isset($extra['patches_applied'])) {
+            ksort($extra['patches_applied']);
+        }
+
+        $package->setExtra($extra);
+    }
 }
