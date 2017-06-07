@@ -67,33 +67,8 @@ Same format is used for both project (root level scope) patches and for package 
 
 Please note that in both cases the patch path should be relative to the context where it's defined:
 
-* For project, it should be relative to project root (relative to <project>)
-* For package, it should be relative to package root (relative to <project>/vendor/myvendor/module)
-
-## Version restriction
-
-In case the patch is applied only on certain version of the package, a version restriction can be defined for the patch:
-
-```
-{
-  "extra": {
-    "patches": {
-      "targeted/package": {
-        "description for my patch": {
-          "url": "my/file.patch",
-          "version": "~1.2.3"
-        }
-      }
-    }
-  }
-}
-
-```
-
-Please note that patch version constraint supports all version definition patterns supported by the version
-of Composer.
-
-Same "version" key can be used with alternative definition format as well.
+* For project, it should be relative to project root (relative to **{project}**)
+* For package, it should be relative to package root (relative to **{project}/vendor/myvendor/module**)
 
 ## Using patch url
 
@@ -128,7 +103,33 @@ In case it's important to apply the patches in a certain order, use an array wra
 }
 
 ```
+
 Note that this way of declaring the patches also support versioning and remote patches (in which case one should use "url" key).
+
+## Version restriction
+
+In case the patch is applied only on certain version of the package, a version restriction can be defined for the patch:
+
+```
+{
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "description for my patch": {
+          "url": "my/file.patch",
+          "version": "~1.2.3"
+        }
+      }
+    }
+  }
+}
+
+```
+
+Please note that patch version constraint supports all version definition patterns supported by the version
+of Composer.
+
+Same "version" key can be used with alternative definition format as well.
 
 ## Excluding patches
 
@@ -182,11 +183,10 @@ it when it has changed since last time.
 
 ## Difference between this and netresearch/composer-patches-plugin
 
-* Works on project AND package level
+* Gathers patches from both root/project composer.json AND from packages
 * This plugin is much more simple to use and maintain
 * This plugin doesn't require you to specify which package version you're patching (but you'll still have the option to do so).
 * This plugin is easy to use with Drupal modules (which don't use semantic versioning).
-* This plugin will gather patches from all dependencies and apply them as if they were in the root composer.json
 
 ## Credits
 
