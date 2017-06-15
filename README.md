@@ -170,6 +170,7 @@ targeted package is always on certain version) alternative format may be more su
     }
   }
 }
+```
 
 The patch will be applied if at least ONE indirect dependency ends up being a version constrain match.
 
