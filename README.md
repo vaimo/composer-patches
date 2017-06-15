@@ -162,7 +162,7 @@ targeted package is always on certain version) alternative format may be more su
       "magento/module-swatches": {
         "Fix: https://github.com/magento/magento2/issues/7959": {
           "source": "Magento_Swatches/100.1.2/fix-javascript-crash-when-all-options-not-selected.patch",
-          "version": {
+          "depends": {
             "magento/magento2-base": ">=2.1.7"
           }
         }

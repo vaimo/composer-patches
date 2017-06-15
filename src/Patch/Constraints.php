@@ -45,7 +45,7 @@ class Constraints
                     continue;
                 }
 
-                $patchConstraints = $patchData[PatchDefinition::VERSION];
+                $patchConstraints = $patchData[PatchDefinition::DEPENDS];
                 $patchConstraintsResults = [];
 
                 foreach ($patchConstraints as $constraintTarget => &$version) {

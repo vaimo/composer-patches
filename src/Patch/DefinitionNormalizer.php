@@ -13,22 +13,26 @@ class DefinitionNormalizer
             );
         }
 
-        if (!isset($data['url']) && !isset($data[PatchDefinition::SOURCE])) {
+        if (!isset($data[PatchDefinition::URL]) && !isset($data[PatchDefinition::SOURCE])) {
             return false;
         }
 
         return array(
-            PatchDefinition::SOURCE => isset($data['url'])
-                ? $data['url']
+            PatchDefinition::SOURCE => isset($data[PatchDefinition::URL])
+                ? $data[PatchDefinition::URL]
                 : $data[PatchDefinition::SOURCE],
             PatchDefinition::LABEL => isset($data[PatchDefinition::LABEL])
                 ? $data[PatchDefinition::LABEL]
                 : $label,
-            PatchDefinition::VERSION => isset($data[PatchDefinition::VERSION])
-                ? (is_array($data[PatchDefinition::VERSION])
-                    ? $data[PatchDefinition::VERSION]
-                    : array($patchTarget => $data[PatchDefinition::VERSION]))
-                : array()
+            PatchDefinition::DEPENDS => isset($data[PatchDefinition::DEPENDS])
+                ? $data[PatchDefinition::DEPENDS]
+                : (isset($data[PatchDefinition::VERSION])
+                    ? (is_array($data[PatchDefinition::VERSION])
+                        ? $data[PatchDefinition::VERSION]
+                        : array($patchTarget => $data[PatchDefinition::VERSION])
+                    )
+                    : array()
+                )
         );
     }
 }
