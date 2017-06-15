@@ -1,6 +1,8 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+
 class DefinitionsProcessor
 {
     /**
@@ -21,7 +23,7 @@ class DefinitionsProcessor
             $normalizedPatches = array();
 
             foreach ($packagePatches as $label => $data) {
-                $normalizedPatches[] = $this->definitionNormalizer->process($label, $data);
+                $normalizedPatches[] = $this->definitionNormalizer->process($patchTarget, $label, $data);
             }
 
             if (!$validPatches = array_filter($normalizedPatches)) {
@@ -42,11 +44,16 @@ class DefinitionsProcessor
             $validItems = array();
 
             foreach ($packagePatches as $patch) {
-                $absolutePatchPath = $vendorDir . '/' . $patch['source'];
+                $relativePath = $patch[PatchDefinition::SOURCE];
+                $absolutePatchPath = $vendorDir . '/' . $relativePath;
 
-                $patch['md5'] = md5(implode('|', array(
-                    file_exists($absolutePatchPath) ? md5_file($absolutePatchPath) : md5($patch['source']),
-                    $patch['version']
+                $patchPath = file_exists($absolutePatchPath)
+                    ? $absolutePatchPath
+                    : $relativePath;
+
+                $patch[PatchDefinition::HASH] = md5(implode('|', array(
+                    file_exists($patchPath) ? md5_file($patchPath) : md5($patchPath),
+                    serialize($patch[PatchDefinition::VERSION])
                 )));
 
                 $validItems[] = $patch;
@@ -70,8 +77,8 @@ class DefinitionsProcessor
             $allPatches[$patchTarget] = array();
 
             foreach ($packagePatches as $info) {
-                $allPatches[$patchTarget][$info['source']] = $info['label']
-                    . (isset($info['md5']) ? ', md5:' . $info['md5'] : '');
+                $allPatches[$patchTarget][$info[PatchDefinition::SOURCE]] = $info[PatchDefinition::LABEL]
+                    . (isset($info[PatchDefinition::HASH]) ? ', md5:' . $info[PatchDefinition::HASH] : '');
             }
         }
 

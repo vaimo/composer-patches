@@ -1,24 +1,34 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+
 class DefinitionNormalizer
 {
-    public function process($label, $data)
+    public function process($patchTarget, $label, $data)
     {
         if (!is_array($data)) {
             $data = array(
-                'source' => (string)$data
+                PatchDefinition::SOURCE => (string)$data
             );
         }
 
-        if (!isset($data['url']) && !isset($data['source'])) {
+        if (!isset($data['url']) && !isset($data[PatchDefinition::SOURCE])) {
             return false;
         }
 
         return array(
-            'source' => isset($data['url']) ? $data['url'] : $data['source'],
-            'label' => isset($data['label']) ? $data['label'] : $label,
-            'version' => isset($data['version']) ? $data['version'] : false
+            PatchDefinition::SOURCE => isset($data['url'])
+                ? $data['url']
+                : $data[PatchDefinition::SOURCE],
+            PatchDefinition::LABEL => isset($data[PatchDefinition::LABEL])
+                ? $data[PatchDefinition::LABEL]
+                : $label,
+            PatchDefinition::VERSION => isset($data[PatchDefinition::VERSION])
+                ? (is_array($data[PatchDefinition::VERSION])
+                    ? $data[PatchDefinition::VERSION]
+                    : array($patchTarget => $data[PatchDefinition::VERSION]))
+                : array()
         );
     }
 }

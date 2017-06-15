@@ -149,10 +149,29 @@ In case the patch is applied only on certain version of the package, a version r
 
 ```
 
-Please note that patch version constraint supports all version definition patterns supported by the version
+The version version constraint defintion supports all version definition patterns supported by the version
 of Composer.
 
-Same "version" key can be used with alternative definition format as well.
+In projects that rely on certain framework's base package version (which will always guarantee that the patch
+targeted package is always on certain version) alternative format may be more suitable:
+
+```
+{
+  "extra": {
+    "patches": {
+      "magento/module-swatches": {
+        "Fix: https://github.com/magento/magento2/issues/7959": {
+          "source": "Magento_Swatches/100.1.2/fix-javascript-crash-when-all-options-not-selected.patch",
+          "version": {
+            "magento/magento2-base": ">=2.1.7"
+          }
+        }
+      }
+    }
+  }
+}
+
+The patch will be applied if at least ONE indirect dependency ends up being a version constrain match.
 
 ## Excluding patches
 

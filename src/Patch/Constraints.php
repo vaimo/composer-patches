@@ -1,6 +1,8 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+
 class Constraints
 {
     /**
@@ -24,17 +26,10 @@ class Constraints
         $this->versionParser = new \Composer\Package\Version\VersionParser();
     }
 
-    public function apply($patches, $packages)
+    public function apply(array $patches, array $packages)
     {
-        $packagesByName = array();
-        foreach ($packages as $package) {
-            $packagesByName[$package->getName()] = $package;
-        }
-
-        $extra = $this->config;
-
-        if (isset($extra['excluded-patches'])) {
-            foreach ($extra['excluded-patches'] as $patchOwner => $patchPaths) {
+        if (isset($this->config['excluded-patches'])) {
+            foreach ($this->config['excluded-patches'] as $patchOwner => $patchPaths) {
                 if (!isset($excludedPatches[$patchOwner])) {
                     $excludedPatches[$patchOwner] = array();
                 }
@@ -45,23 +40,33 @@ class Constraints
 
         foreach ($patches as $targetPackageName => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
-                if (!isset($packagesByName[$targetPackageName])) {
+                if (!isset($packages[$targetPackageName])) {
                     $patchData = false;
                     continue;
                 }
 
-                if ($patchData['version']) {
-                    $targetPackage = $packagesByName[$targetPackageName];
-                    $packageConstraint = $this->versionParser->parseConstraints($targetPackage->getVersion());
-                    $patchConstraint = $this->versionParser->parseConstraints($patchData['version']);
+                $patchConstraints = $patchData[PatchDefinition::VERSION];
+                $patchConstraintsResults = [];
 
-                    if (!$patchConstraint->matches($packageConstraint)) {
-                        $patchData = false;
+                foreach ($patchConstraints as $constraintTarget => &$version) {
+                    if (!isset($packages[$constraintTarget])) {
+                        continue;
                     }
+
+                    $package = $packages[$constraintTarget];
+
+                    $packageConstraint = $this->versionParser->parseConstraints($package->getVersion());
+                    $patchConstraint = $this->versionParser->parseConstraints($version);
+
+                    $patchConstraintsResults[] = $patchConstraint->matches($packageConstraint);
                 }
 
-                $owner = $patchData['owner'];
-                $source = $patchData['source'];
+                if ($patchConstraints && !array_filter($patchConstraintsResults)) {
+                    $patchData = false;
+                }
+
+                $owner = $patchData[PatchDefinition::OWNER];
+                $source = $patchData[PatchDefinition::SOURCE];
 
                 if (isset($excludedPatches[$owner][$source])) {
                     $patchData = false;

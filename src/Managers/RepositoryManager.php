@@ -114,8 +114,14 @@ class RepositoryManager
                 array($this->rootPackage)
             ));
 
-            $patches = $this->patchConstraints->apply($patches, $packages);
-            $patches = $this->patchPathNormalizer->process($patches, $packages, $vendorRoot);
+            $packagesByName = array();
+            foreach ($packages as $package) {
+                $packagesByName[$package->getName()] = $package;
+            }
+
+            $patches = $this->patchPathNormalizer->process($patches, $packagesByName, $vendorRoot);
+
+            $patches = $this->patchConstraints->apply($patches, $packagesByName);
             $patches = $this->patchDefinitionsProcessor->validate($patches, $vendorRoot);
             $patches = $this->patchDefinitionsProcessor->flatten($patches);
         } else {

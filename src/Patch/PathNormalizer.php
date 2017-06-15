@@ -1,6 +1,9 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Patch\Owner as PatchOwner;
+
 class PathNormalizer
 {
     /**
@@ -19,33 +22,31 @@ class PathNormalizer
 
     public function process(array $patches, array $packages, $vendorDir)
     {
-        $packagesByName = array();
-
-        foreach ($packages as $package) {
-            $packagesByName[$package->getName()] = $package;
-        }
-
         foreach ($patches as $targetPackage => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
-                if ($patchData['owner_type'] == 'project') {
+                if ($patchData[PatchDefinition::OWNER_TYPE] == PatchOwner::PROJECT) {
                     continue;
                 }
 
-                $patchOwner = $patchData['owner'];
+                $patchOwner = $patchData[PatchDefinition::OWNER];
 
-                if (!isset($packagesByName[$patchOwner])) {
+                if (!isset($packages[$patchOwner])) {
                     continue;
                 }
 
-                $patchOwnerPackage = $packagesByName[$patchOwner];
+                $patchOwnerPackage = $packages[$patchOwner];
 
                 $packageInstaller = $this->installationManager->getInstaller($patchOwnerPackage->getType());
                 $patchOwnerPath = $packageInstaller->getInstallPath($patchOwnerPackage);
 
-                $absolutePatchPath = $patchOwnerPath . '/' . $patchData['source'];
+                $absolutePatchPath = $patchOwnerPath . '/'
+                    . $patchData[PatchDefinition::SOURCE];
 
                 if (strpos($absolutePatchPath, $vendorDir) === 0) {
-                    $patchData['source'] = trim(substr($absolutePatchPath, strlen($vendorDir)), '/');
+                    $patchData[PatchDefinition::SOURCE] = trim(
+                        substr($absolutePatchPath, strlen($vendorDir)),
+                        '/'
+                    );
                 }
             }
         }

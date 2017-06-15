@@ -51,8 +51,8 @@ class Collector
 
                     foreach ($patches as $patch) {
                         $patchList[$target][] = array_replace($patch, array(
-                            'owner' => $patchOwner->getName(),
-                            'owner_type' => $patchOwner->getType()
+                            \Vaimo\ComposerPatches\Patch\Definition::OWNER => $patchOwner->getName(),
+                            \Vaimo\ComposerPatches\Patch\Definition::OWNER_TYPE => $patchOwner->getType()
                         ));
                     }
                 }
