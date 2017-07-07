@@ -116,6 +116,10 @@ class RepositoryManager
 
             $packagesByName = array();
             foreach ($packages as $package) {
+                if ($package instanceof \Composer\Package\AliasPackage) {
+                    $package = $package->getAliasOf();
+                }
+
                 $packagesByName[$package->getName()] = $package;
             }
 
@@ -141,6 +145,10 @@ class RepositoryManager
         }
 
         foreach ($packages as $package) {
+            if ($package instanceof \Composer\Package\AliasPackage) {
+                continue;
+            }
+
             $packageName = $package->getName();
             $hasPatches = !empty($patches[$packageName]);
 

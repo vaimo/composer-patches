@@ -25,6 +25,10 @@ class AppliedPatchesManager
         $this->appliedPatches = array();
 
         foreach ($repository->getPackages() as $package) {
+            if ($package instanceof \Composer\Package\AliasPackage) {
+                $package = $package->getAliasOf();
+            }
+
             if (isset($this->appliedPatches[$package->getName()])) {
                 continue;
             }
@@ -41,6 +45,11 @@ class AppliedPatchesManager
     {
         foreach ($repository->getPackages() as $package) {
             $packageName = $package->getName();
+
+            if ($package instanceof \Composer\Package\AliasPackage) {
+                $package = $package->getAliasOf();
+            }
+
             $extra = $package->getExtra();
 
             if (!isset($this->appliedPatches[$packageName])) {
