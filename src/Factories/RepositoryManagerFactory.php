@@ -20,12 +20,14 @@ class RepositoryManagerFactory
 
         $loaders = array(
             'patches' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
-            'patches-dev' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchListDev(),
             'patches-file' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
         );
 
-        if (!$event->isDevMode()) {
-            unset($loaders['patches-dev']);
+        if ($event->isDevMode()) {
+            $loaders = array_replace($loaders, array(
+                'patches-dev' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
+                'patches-file-dev' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
+            ));
         }
 
         return new \Vaimo\ComposerPatches\Managers\RepositoryManager(

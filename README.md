@@ -194,7 +194,10 @@ sub-group can be defined is similar manner to how one would define development p
 }
 ```
 
-These patches will not be applied when installing the project with `--no-dev` option. 
+These patches will not be applied when installing the project with `--no-dev` option.
+ 
+Note that same definition pattern can be used for patches-file, where the key would become `patches-file-dev`
+and patch list inside the file would still use the key `patches`.
 
 ## Excluding patches
 
