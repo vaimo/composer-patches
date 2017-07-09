@@ -1,6 +1,17 @@
 {
     "name": "vaimo/composer-patches",
-    "description": "Provides a way to patch Composer packages.",
+    "version": "3.4.1",
+    "description": "Provides a way to patch Composer packages with optional version restriction",
+    "keywords": [
+        "composer plugin", "patching", "version restriction", "indirect restrictions", "patch description",
+        "remote patch files", "downloaded patches", "package bug-fix", "package patches", "patch exclusion",
+        "development patches", "hot-fixes"
+    ],
+    "support": {
+        "source": "https://github.com/vaimo/composer-patches",
+        "docs": "https://github.com/vaimo/composer-patches",
+        "issues": "https://github.com/vaimo/composer-patches/issues"
+    },
     "minimum-stability": "dev",
     "license": "BSD",
     "type": "composer-plugin",
