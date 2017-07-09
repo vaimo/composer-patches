@@ -86,12 +86,85 @@ In which case the file should contain patches listed in following format:
 
 ```
 
+## Patch definition format
+
+The format of a patch definition has several levers of complexity to cater for usage in context of different
+frameworks.
+
+```
+
+{
+  "patches": {
+    "some/package": {
+      "desription about my patch": "my/file.patch"
+    }
+  }
+}
+
+```
+
+Which is the same as (which allows optional version restrictions) ... 
+
+```
+
+{
+  "patches": {
+    "some/package": {
+      "desription about my patch": {
+        "source": "my/file.patch"
+      }
+    }
+  }
+}
+
+```
+
+Which is the same as (which allows optional patch sequencing) ... 
+
+```
+
+{
+  "patches": {
+    "some/package": [
+        {
+          "label": "desription about my patch",
+          "source": "my/file.patch"
+        }
+      ]
+    }
+  }
+}
+
+```
+
+In case there's no need to add version restrictions or sequence patches, the simple format use is recommended.
+
 ## Patch file path format
 
-Please note that in both cases the patch path should be relative to the context where it's defined:
+The targeted file format in the patch should be relative to the patched package - or - in other words: relative
+to the context it was defined for:
 
-* For project, it should be relative to project root (relative to **{project}**)
-* For package, it should be relative to package root (relative to **{project}/vendor/myvendor/module**)
+So it the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
+the patch would target it with
+
+```
+--- Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
++++ Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+```
+
+Note that you don't have to change the patch name or description when you change it after it has already
+been used in some context by someone as the module will be aware of the patch contents and will re-apply
+it when it has changed since last time.
 
 ## Using patch url
 
@@ -107,6 +180,9 @@ Patches can be stored in remote location and referred to by using the full URL o
 }
 ```
 
+Note that in case of other patch definition formats, the url of the patch file should be defined 
+under "url" key of the patch definition (instead of "source").
+
 ## Sequencing the patches
 
 In case it's important to apply the patches in a certain order, use an array wrapper around the patch definitions.
@@ -119,6 +195,10 @@ In case it's important to apply the patches in a certain order, use an array wra
         {
           "label": "my patch description",
           "source": "my/file.patch"
+        },
+        {
+          "label": "other patch (depends on my/file.patch being applied)",
+          "source": "other/file.patch"
         }
       ]
     }
@@ -127,7 +207,7 @@ In case it's important to apply the patches in a certain order, use an array wra
 
 ```
 
-Note that this way of declaring the patches also support versioning and remote patches (in which case one should use "url" key).
+When defined in the following format, `my/file.patch` will always be applied before `other/file.patch`.
 
 ## Version restriction
 
@@ -139,7 +219,7 @@ In case the patch is applied only on certain version of the package, a version r
     "patches": {
       "targeted/package": {
         "description for my patch": {
-          "url": "my/file.patch",
+          "source": "my/file.patch",
           "version": "~1.2.3"
         }
       }
@@ -174,30 +254,25 @@ targeted package is always on certain version) alternative format may be more su
 
 The patch will be applied if at least ONE indirect dependency ends up being a version constrain match.
 
-## Development patches
+## Bundled patches
 
-In case there's a need to include patches just for the sake of development convenience, an alternative
-sub-group can be defined is similar manner to how one would define development packages in project context
- 
- ```
+In case there's a need to define a patch that targets multiple packages within a single patch file, 
+alternative patch definition format is recommended:
+
+```
 {
   "extra": {
-    "patches-dev": {
-      "symfony/console": {
-        "Development: suppress deprecation warnings for classes used by magento (needed for latest codeception)": {
-          "source": "patches/Symfony_Console/2.7.0/suppress-deprecation-warnings.patch",
-          "version": ">=v2.7.0"
-        }
+    "patches": {
+      "*": {
+        "Some bundle patch": "path/to/bundle/patch.patch"
       }
     }
   }
 }
 ```
 
-These patches will not be applied when installing the project with `--no-dev` option.
- 
-Note that same definition pattern can be used for patches-file, where the key would become `patches-file-dev`
-and patch list inside the file would still use the key `patches`.
+Patches defined like this will be applied relative to the project root instead of being relative to the
+targeted package (which in this case is not really known).
 
 ## Excluding patches
 
@@ -234,15 +309,30 @@ Will exclude the a patch that was defined in a package in following (or similar)
 
 The important part to note here is the file-path and patch owner. Description is not part of the exclusion logic.
 
-## Hints on creating a patch 
+## Development patches
 
-The file-paths in the patch should be relative to the targeted package root and start with ./
+In case there's a need to include patches just for the sake of development convenience, an alternative
+sub-group can be defined is similar manner to how one would define development packages in project context
+ 
+ ```
+{
+  "extra": {
+    "patches-dev": {
+      "symfony/console": {
+        "Development: suppress deprecation warnings for classes used by magento (needed for latest codeception)": {
+          "source": "patches/Symfony_Console/2.7.0/suppress-deprecation-warnings.patch",
+          "version": ">=v2.7.0"
+        }
+      }
+    }
+  }
+}
+```
 
-This means that patch for a file <projet>/vendor/my/package/some/file.php whould be targeted in the patch as ./some/file.php
-
-Note that you don't have to change the patch name or description when you change it after it has already
-been used in some context by someone as the module will be aware of the patch contents and will re-apply
-it when it has changed since last time.
+These patches will not be applied when installing the project with `--no-dev` option.
+ 
+Note that same definition pattern can be used for patches-file, where the key would become `patches-file-dev`
+and patch list inside the file would still use the key `patches`.
 
 ## Environment variable feature flags
 
