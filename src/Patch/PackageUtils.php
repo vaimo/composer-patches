@@ -2,6 +2,7 @@
 namespace Vaimo\ComposerPatches\Patch;
 
 use Composer\Package\PackageInterface;
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class PackageUtils
 {
@@ -66,7 +67,7 @@ class PackageUtils
     {
         $extra = $package->getExtra();
 
-        if (!isset($extra['patches_applied'])) {
+        if (!isset($extra['patches_applied']) || !is_array($extra['patches_applied'])) {
             $extra['patches_applied'] = array();
         }
 
@@ -84,5 +85,24 @@ class PackageUtils
         }
 
         $package->setExtra($extra);
+    }
+
+    public function groupPatchesByTarget($patches)
+    {
+        $patchesByTarget = array();
+
+        foreach ($patches as $patchGroup) {
+            foreach ($patchGroup as $patchPath => $patchInfo) {
+                foreach ($patchInfo[PatchDefinition::TARGETS] as $target) {
+                    if (!isset($patchesByTarget[$target])) {
+                        $patchesByTarget[$target] = array();
+                    }
+
+                    $patchesByTarget[$target][$patchPath] = $patchInfo['label'];
+                }
+            }
+        }
+
+        return $patchesByTarget;
     }
 }

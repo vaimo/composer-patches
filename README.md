@@ -264,7 +264,14 @@ alternative patch definition format is recommended:
   "extra": {
     "patches": {
       "*": {
-        "Some bundle patch": "path/to/bundle/patch.patch"
+        "Some bundle patch": {
+          "source": "path/to/bundle/patch.patch",
+          "targets": [
+            "vendor1/module1",
+            "vendor1/module2",
+            "vendor2/module3"
+          ]
+        }
       }
     }
   }
@@ -273,6 +280,10 @@ alternative patch definition format is recommended:
 
 Patches defined like this will be applied relative to the project root instead of being relative to the
 targeted package (which in this case is not really known).
+
+Note that it's important still to have all the targeted packages listed as they'd need to be re-installed 
+in case the patch changes or patch-reapply is called (see below for the environment variable that allows
+that to be triggered).
 
 ## Excluding patches
 

@@ -69,7 +69,7 @@ class DefinitionsProcessor
         return $validatedPatches;
     }
 
-    public function flatten(array $patches)
+    public function simplify(array $patches)
     {
         $allPatches = array();
 
@@ -77,11 +77,17 @@ class DefinitionsProcessor
             $allPatches[$patchTarget] = array();
 
             foreach ($packagePatches as $info) {
-                $allPatches[$patchTarget][$info[PatchDefinition::SOURCE]] = $info[PatchDefinition::LABEL]
-                    . (isset($info[PatchDefinition::HASH]) ? ', md5:' . $info[PatchDefinition::HASH] : '');
+                $allPatches[$patchTarget][$info[PatchDefinition::SOURCE]] = array(
+                    'targets' => $info[PatchDefinition::TARGETS],
+                    'label' => $info[PatchDefinition::LABEL] . (
+                        isset($info[PatchDefinition::HASH])
+                            ? ', md5:' . $info[PatchDefinition::HASH]
+                            : ''
+                        )
+                );
             }
         }
 
-        return $allPatches;
+        return array_filter($allPatches);
     }
 }

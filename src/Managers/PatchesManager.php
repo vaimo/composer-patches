@@ -71,7 +71,10 @@ class PatchesManager
 
     public function processPatches(array $patches, PackageInterface $package, $installPath, $vendorRoot)
     {
-        foreach ($patches as $source => $description) {
+        $appliedPatches = array();
+
+        foreach ($patches as $source => $patchInfo) {
+            $description = $patchInfo['label'];
             $relativePath = $source;
 
             $patchSourceLabel = sprintf('<info>%s</info>', $source);
@@ -120,7 +123,7 @@ class PatchesManager
                     new Event(Events::POST_APPLY, $package, $source, $description)
                 );
 
-                $this->packageUtils->registerPatch($package, $relativePath, $description);
+                $appliedPatches[$relativePath] = $patchInfo;
             } catch (\Exception $e) {
                 $this->logger->writeException($e);
 
@@ -134,6 +137,6 @@ class PatchesManager
             }
         }
 
-        $this->packageUtils->sortPatches($package);
+        return $appliedPatches;
     }
 }

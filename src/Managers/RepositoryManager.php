@@ -103,54 +103,84 @@ class RepositoryManager
     ) {
         $packages = $repository->getPackages();
 
+        $packagesByName = array();
+
+        foreach ($packages as $package) {
+            if ($package instanceof \Composer\Package\AliasPackage) {
+                $package = $package->getAliasOf();
+            }
+
+            $packagesByName[$package->getName()] = $package;
+        }
+
+        $packagesByName[$this->rootPackage->getName()] = $this->rootPackage;
+
         if ($patchingEnabled = $this->config->isPatchingEnabled()) {
             $patches = $this->patchesCollector->collect(array_merge(
                 $this->config->isPackageScopeEnabled() ? $packages : array(),
                 array($this->rootPackage)
             ));
 
-            $packagesByName = array();
-            foreach ($packages as $package) {
-                if ($package instanceof \Composer\Package\AliasPackage) {
-                    $package = $package->getAliasOf();
+            if (isset($patches['*'])) {
+                $rootName = $this->rootPackage->getName();
+
+                if (!isset($patches[$rootName])) {
+                    $patches[$rootName] = array();
                 }
 
-                $packagesByName[$package->getName()] = $package;
+                $patches[$rootName] = array_merge($patches[$rootName], $patches['*']);
+                unset($patches['*']);
             }
 
             $patches = $this->patchPathNormalizer->process($patches, $packagesByName, $vendorRoot);
-
             $patches = $this->patchConstraints->apply($patches, $packagesByName);
             $patches = $this->patchDefinitionsProcessor->validate($patches, $vendorRoot);
-            $patches = $this->patchDefinitionsProcessor->flatten($patches);
+            $patches = $this->patchDefinitionsProcessor->simplify($patches);
         } else {
             $patches = array();
         }
 
+        $groupedPatches = $this->packageUtils->groupPatchesByTarget($patches);
+
         $packagesToReset = array_merge(
-            $this->packagesResolver->resolvePackagesToReinstall($packages, $patches),
-            getenv(Environment::FORCE_REAPPLY) ? array_keys($patches) : array()
+            $this->packagesResolver->resolvePackagesToReinstall($packagesByName, $groupedPatches),
+            getenv(Environment::FORCE_REAPPLY) ? array_keys($groupedPatches) : array()
         );
 
-        $packageResetFlags = array_fill_keys($packagesToReset, true);
+        $packageResetFlags = array_fill_keys($packagesToReset, false);
         $packagesUpdated = false;
 
         if ($packagesToReset || $patches) {
             $this->logger->write('Processing patches configuration', 'info');
         }
 
-        foreach ($packages as $package) {
-            if ($package instanceof \Composer\Package\AliasPackage) {
-                continue;
-            }
-
-            $packageName = $package->getName();
+        foreach ($packagesByName as $packageName => $package) {
             $hasPatches = !empty($patches[$packageName]);
 
-            if (isset($packageResetFlags[$packageName])) {
+            $patchGroupTargets = array();
+
+            if ($hasPatches) {
+                foreach ($patches[$packageName] as $patch) {
+                    $patchGroupTargets = array_merge($patchGroupTargets, $patch['targets']);
+                }
+
+                $patchGroupTargets = array_unique($patchGroupTargets);
+            } else {
+                $patchGroupTargets = array($packageName);
+            }
+
+            foreach ($patchGroupTargets as $target) {
+                if (!isset($packageResetFlags[$target])) {
+                    continue;
+                }
+
+                if ($packageResetFlags[$target] === true) {
+                    continue;
+                }
+
                 if (!$hasPatches) {
                     $this->logger->writeRaw(
-                        '  - Resetting patched package <info>%s</info>', array($packageName)
+                        '  - Resetting patched package <info>%s</info>', array($target)
                     );
                 }
 
@@ -172,6 +202,7 @@ class RepositoryManager
                 }
 
                 $packagesUpdated = $this->packageUtils->resetAppliedPatches($package);
+                $packageResetFlags[$target] = true;
             }
 
             if (!$hasPatches) {
@@ -180,7 +211,15 @@ class RepositoryManager
 
             $patchesForPackage = $patches[$packageName];
 
-            if (!$this->packageUtils->hasPatchChanges($package, $patchesForPackage)) {
+            $hasPatchChanges = false;
+            foreach ($patchGroupTargets as $target) {
+                $hasPatchChanges = $hasPatchChanges || $this->packageUtils->hasPatchChanges(
+                        $packagesByName[$target],
+                        $groupedPatches[$target]
+                    );
+            }
+
+            if (!$hasPatchChanges) {
                 continue;
             }
 
@@ -189,12 +228,32 @@ class RepositoryManager
             $this->logger->writeRaw('  - Applying patches for <info>%s</info>', array($packageName));
 
             try {
-                $this->patchesManager->processPatches(
+                $appliedPatches = $this->patchesManager->processPatches(
                     $patchesForPackage,
                     $package,
-                    $this->installationManager->getInstallPath($package),
+                    !$package instanceof \Composer\Package\RootPackage 
+                        ? $this->installationManager->getInstallPath($package) 
+                        : '',
                     $vendorRoot
                 );
+
+                $targetedPackages = array();
+                
+                foreach ($appliedPatches as $source => $patchInfo) {
+                    foreach ($patchInfo['targets'] as $target) {
+                        $targetedPackages[] = $packagesByName[$target];
+
+                        $this->packageUtils->registerPatch(
+                            $packagesByName[$target],
+                            $source,
+                            $patchInfo['label']
+                        );
+                    }
+                }
+
+                foreach ($targetedPackages as $targetPackage) {
+                    $this->packageUtils->sortPatches($targetPackage);
+                }
             } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $e) {
                 $repository->write();
 

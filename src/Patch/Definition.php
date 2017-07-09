@@ -11,4 +11,5 @@ class Definition
     const OWNER_TYPE = 'owner_type';
     const OWNER = 'owner';
     const HASH = 'md5';
+    const TARGETS = 'targets';
 }

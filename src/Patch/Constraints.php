@@ -40,7 +40,7 @@ class Constraints
 
         foreach ($patches as $targetPackageName => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
-                if (!isset($packages[$targetPackageName])) {
+                if ($targetPackageName != '*' && !isset($packages[$targetPackageName])) {
                     $patchData = false;
                     continue;
                 }

@@ -18,6 +18,9 @@ class DefinitionNormalizer
         }
 
         return array(
+            PatchDefinition::TARGETS => isset($data[PatchDefinition::TARGETS])
+                ? $data[PatchDefinition::TARGETS]
+                : array($patchTarget),
             PatchDefinition::SOURCE => isset($data[PatchDefinition::URL])
                 ? $data[PatchDefinition::URL]
                 : $data[PatchDefinition::SOURCE],

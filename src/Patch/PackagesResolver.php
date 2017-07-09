@@ -1,6 +1,8 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+
 class PackagesResolver
 {
     /**
@@ -13,13 +15,12 @@ class PackagesResolver
         $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
     }
 
-    public function resolvePackagesToReinstall($packages, $patches)
+    public function resolvePackagesToReinstall($packages, $groupedPatches)
     {
         $reinstallQueue = array();
 
-        foreach ($packages as $package) {
-            $packageName = $package->getName();
-            $packagePatches = isset($patches[$packageName]) ? $patches[$packageName] : array();
+        foreach ($packages as $packageName => $package) {
+            $packagePatches = isset($groupedPatches[$packageName]) ? $groupedPatches[$packageName] : array();
 
             if (!$this->packageUtils->shouldReinstall($package, $packagePatches)) {
                 continue;

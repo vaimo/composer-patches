@@ -43,7 +43,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
 
         $this->appliedPatchesManager->restoreAppliedPatchesInfo($repository);
 
-        $repositoryManager  = $this->repositoryManagerFactory->createForEvent($event);
+        $repositoryManager = $this->repositoryManagerFactory->createForEvent($event);
 
         $repositoryManager->processRepository(
             $repository,
