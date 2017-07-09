@@ -67,21 +67,18 @@ class RepositoryManager
     private $packagesResolver;
 
     /**
-     * @var array
-     */
-    private $appliedPatches = array();
-
-    /**
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param \Composer\Package\RootPackageInterface $rootPackage
      * @param \Vaimo\ComposerPatches\Logger $logger
      * @param PatchesManager $patchesManager
+     * @param array $loaders
      */
     public function __construct(
         \Composer\Installer\InstallationManager $installationManager,
         \Composer\Package\RootPackageInterface $rootPackage,
+        \Vaimo\ComposerPatches\Managers\PatchesManager $patchesManager,
         \Vaimo\ComposerPatches\Logger $logger,
-        \Vaimo\ComposerPatches\Managers\PatchesManager $patchesManager
+        array $loaders
     ) {
         $this->installationManager = $installationManager;
         $this->rootPackage = $rootPackage;
@@ -92,10 +89,7 @@ class RepositoryManager
 
         $this->config = new \Vaimo\ComposerPatches\Patch\Config($extraInfo);
 
-        $this->patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector(array(
-            'patches' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
-            'patches-file' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
-        ));
+        $this->patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector($loaders);
 
         $this->patchPathNormalizer = new \Vaimo\ComposerPatches\Patch\PathNormalizer($installationManager);
         $this->patchDefinitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
@@ -104,8 +98,9 @@ class RepositoryManager
         $this->packagesResolver = new \Vaimo\ComposerPatches\Patch\PackagesResolver();
     }
 
-    public function processRepository(WritableRepositoryInterface $repository, $vendorRoot)
-    {
+    public function processRepository(
+        WritableRepositoryInterface $repository, $vendorRoot
+    ) {
         $packages = $repository->getPackages();
 
         if ($patchingEnabled = $this->config->isPatchingEnabled()) {

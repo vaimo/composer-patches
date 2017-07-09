@@ -5,51 +5,19 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     \Composer\EventDispatcher\EventSubscriberInterface
 {
     /**
-     * @var \Vaimo\ComposerPatches\Composer\Utils
-     */
-    private $composerUtils;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Managers\RepositoryManager
-     */
-    private $repositoryManager;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Patch\PackageUtils
-     */
-    private $packageUtils;
-
-    /**
      * @var \Vaimo\ComposerPatches\Managers\AppliedPatchesManager
      */
     private $appliedPatchesManager;
 
+    /**
+     * @var \Vaimo\ComposerPatches\Factories\RepositoryManagerFactory
+     */
+    private $repositoryManagerFactory;
+
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
     {
-        $logger = new \Vaimo\ComposerPatches\Logger($io);
-
-        $downloader = new \Composer\Util\RemoteFilesystem(
-            $io,
-            $composer->getConfig()
-        );
-
         $this->appliedPatchesManager = new \Vaimo\ComposerPatches\Managers\AppliedPatchesManager();
-
-        $patchesManager = new \Vaimo\ComposerPatches\Managers\PatchesManager(
-            $composer->getEventDispatcher(),
-            $downloader,
-            $logger
-        );
-
-        $this->repositoryManager = new \Vaimo\ComposerPatches\Managers\RepositoryManager(
-            $composer->getInstallationManager(),
-            $composer->getPackage(),
-            $logger,
-            $patchesManager
-        );
-
-        $this->composerUtils = new \Vaimo\ComposerPatches\Composer\Utils();
-        $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
+        $this->repositoryManagerFactory = new \Vaimo\ComposerPatches\Factories\RepositoryManagerFactory();
     }
 
     public static function getSubscribedEvents()
@@ -75,7 +43,9 @@ class Plugin implements \Composer\Plugin\PluginInterface,
 
         $this->appliedPatchesManager->restoreAppliedPatchesInfo($repository);
 
-        $this->repositoryManager->processRepository(
+        $repositoryManager  = $this->repositoryManagerFactory->createForEvent($event);
+
+        $repositoryManager->processRepository(
             $repository,
             $composer->getConfig()->get('vendor-dir')
         );

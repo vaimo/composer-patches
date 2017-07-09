@@ -174,6 +174,28 @@ targeted package is always on certain version) alternative format may be more su
 
 The patch will be applied if at least ONE indirect dependency ends up being a version constrain match.
 
+## Development patches
+
+In case there's a need to include patches just for the sake of development convenience, an alternative
+sub-group can be defined is similar manner to how one would define development packages in project context
+ 
+ ```
+{
+  "extra": {
+    "patches-dev": {
+      "symfony/console": {
+        "Development: suppress deprecation warnings for classes used by magento (needed for latest codeception)": {
+          "source": "patches/Symfony_Console/2.7.0/suppress-deprecation-warnings.patch",
+          "version": ">=v2.7.0"
+        }
+      }
+    }
+  }
+}
+```
+
+These patches will not be applied when installing the project with `--no-dev` option. 
+
 ## Excluding patches
 
 In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), exclusions records can be defined in the project's composer.json:

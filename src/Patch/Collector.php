@@ -44,6 +44,10 @@ class Collector
                     $loader->load($extra[$key])
                 );
 
+                if ($loader instanceof \Vaimo\ComposerPatches\Interfaces\PatchListUpdaterInterface) {
+                    $patchesByTarget = $loader->update($patchesByTarget);
+                }
+
                 foreach ($patchesByTarget as $target => $patches) {
                     if (!isset($patchList[$target])) {
                         $patchList[$target] = array();
