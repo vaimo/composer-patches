@@ -53,7 +53,8 @@ class DefinitionsProcessor
 
                 $patch[PatchDefinition::HASH] = md5(implode('|', array(
                     file_exists($patchPath) ? md5_file($patchPath) : md5($patchPath),
-                    serialize($patch[PatchDefinition::DEPENDS])
+                    serialize($patch[PatchDefinition::DEPENDS]),
+                    serialize($patch[PatchDefinition::TARGETS]),
                 )));
 
                 $validItems[] = $patch;

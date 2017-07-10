@@ -178,7 +178,7 @@ class RepositoryManager
                     continue;
                 }
 
-                if (!$hasPatches) {
+                if (!$hasPatches && !isset($groupedPatches[$target])) {
                     $this->logger->writeRaw(
                         '  - Resetting patched package <info>%s</info>', array($target)
                     );
