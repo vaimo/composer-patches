@@ -25,7 +25,13 @@ class ConstraintsApplier implements \Vaimo\ComposerPatches\Interfaces\PatchDefin
 
         $this->versionParser = new \Composer\Package\Version\VersionParser();
     }
-    
+
+    /**
+     * @param array $patches
+     * @param \Composer\Package\PackageInterface[] $packagesByName
+     * @param string $vendorRoot
+     * @return array
+     */
     public function process(array $patches, array $packagesByName, $vendorRoot) 
     {
         if (isset($this->config['excluded-patches'])) {
@@ -46,7 +52,7 @@ class ConstraintsApplier implements \Vaimo\ComposerPatches\Interfaces\PatchDefin
                 }
 
                 $patchConstraints = $patchData[PatchDefinition::DEPENDS];
-                $patchConstraintsResults = [];
+                $patchConstraintsResults = array();
 
                 foreach ($patchConstraints as $constraintTarget => &$version) {
                     if (!isset($packagesByName[$constraintTarget])) {

@@ -18,7 +18,13 @@ class PathNormalizer implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitio
     ) {
         $this->installationManager = $installationManager;
     }
-    
+
+    /**
+     * @param array $patches
+     * @param \Composer\Package\PackageInterface[] $packagesByName
+     * @param string $vendorRoot
+     * @return array
+     */
     public function process(array $patches, array $packagesByName, $vendorRoot)
     {
         foreach ($patches as $targetPackage => &$packagePatches) {
@@ -38,8 +44,7 @@ class PathNormalizer implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitio
                 $packageInstaller = $this->installationManager->getInstaller($patchOwnerPackage->getType());
                 $patchOwnerPath = $packageInstaller->getInstallPath($patchOwnerPackage);
 
-                $absolutePatchPath = $patchOwnerPath . '/'
-                    . $patchData[PatchDefinition::SOURCE];
+                $absolutePatchPath = $patchOwnerPath . '/' . $patchData[PatchDefinition::SOURCE];
 
                 if (strpos($absolutePatchPath, $vendorRoot) === 0) {
                     $patchData[PatchDefinition::SOURCE] = trim(

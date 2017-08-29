@@ -5,6 +5,12 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class Simplifier implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitionProcessorInterface
 {
+    /**
+     * @param array $patches
+     * @param \Composer\Package\PackageInterface[] $packagesByName
+     * @param string $vendorRoot
+     * @return array
+     */
     public function process(array $patches, array $packagesByName, $vendorRoot)
     {
         $allPatches = array();

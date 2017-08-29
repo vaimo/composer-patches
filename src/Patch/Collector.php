@@ -1,7 +1,10 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
+use Composer\Package\RootPackage;
+
 use Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface;
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class Collector
 {
@@ -54,10 +57,9 @@ class Collector
                     }
 
                     foreach ($patches as $patch) {
-                        $isRoot = $patchOwner instanceof \Composer\Package\RootPackage;
                         $patchList[$target][] = array_replace($patch, array(
-                            \Vaimo\ComposerPatches\Patch\Definition::OWNER => $patchOwner->getName(),
-                            \Vaimo\ComposerPatches\Patch\Definition::OWNER_IS_ROOT => $isRoot,
+                            PatchDefinition::OWNER => $patchOwner->getName(),
+                            PatchDefinition::OWNER_IS_ROOT => $patchOwner instanceof RootPackage,
                         ));
                     }
                 }

@@ -5,7 +5,7 @@ interface PatchDefinitionProcessorInterface
 {
     /**
      * @param array $patches
-     * @param array $packagesByName
+     * @param \Composer\Package\PackageInterface[] $packagesByName
      * @param string $vendorRoot
      * @return array
      */
