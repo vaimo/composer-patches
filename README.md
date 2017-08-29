@@ -273,7 +273,7 @@ under same label like this:
             "version": ">=100.1.7"
           }
         }
-      },
+      }
     }
   }
 }
