@@ -50,7 +50,7 @@ class PackageUtils
     {
         $extra = $package->getExtra();
 
-        $patchesApplied = isset($extra['patches_applied']) ? $extra['patches_applied'] : [];
+        $patchesApplied = isset($extra['patches_applied']) ? $extra['patches_applied'] : array();
 
         unset($extra['patches_applied']);
 

@@ -25,6 +25,6 @@ class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoader
             throw new \Exception('There was an error in the supplied patch file');
         }
 
-        return [];
+        return array();
     }
 }

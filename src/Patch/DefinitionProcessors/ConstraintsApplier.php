@@ -1,9 +1,9 @@
 <?php
-namespace Vaimo\ComposerPatches\Patch;
+namespace Vaimo\ComposerPatches\Patch\DefinitionProcessors;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
-class Constraints
+class ConstraintsApplier implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitionProcessorInterface
 {
     /**
      * @var array
@@ -26,7 +26,13 @@ class Constraints
         $this->versionParser = new \Composer\Package\Version\VersionParser();
     }
 
-    public function apply(array $patches, array $packages)
+    /**
+     * @param array $patches
+     * @param \Composer\Package\PackageInterface[] $packagesByName
+     * @param string $vendorRoot
+     * @return array
+     */
+    public function process(array $patches, array $packagesByName, $vendorRoot) 
     {
         if (isset($this->config['excluded-patches'])) {
             foreach ($this->config['excluded-patches'] as $patchOwner => $patchPaths) {
@@ -40,20 +46,20 @@ class Constraints
 
         foreach ($patches as $targetPackageName => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
-                if ($targetPackageName != '*' && !isset($packages[$targetPackageName])) {
+                if ($targetPackageName != '*' && !isset($packagesByName[$targetPackageName])) {
                     $patchData = false;
                     continue;
                 }
 
                 $patchConstraints = $patchData[PatchDefinition::DEPENDS];
-                $patchConstraintsResults = [];
+                $patchConstraintsResults = array();
 
                 foreach ($patchConstraints as $constraintTarget => &$version) {
-                    if (!isset($packages[$constraintTarget])) {
+                    if (!isset($packagesByName[$constraintTarget])) {
                         continue;
                     }
 
-                    $package = $packages[$constraintTarget];
+                    $package = $packagesByName[$constraintTarget];
 
                     $packageConstraint = $this->versionParser->parseConstraints($package->getVersion());
                     $patchConstraint = $this->versionParser->parseConstraints($version);

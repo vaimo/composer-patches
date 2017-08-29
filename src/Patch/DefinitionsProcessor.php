@@ -1,8 +1,6 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
 class DefinitionsProcessor
 {
     /**
@@ -10,8 +8,14 @@ class DefinitionsProcessor
      */
     private $definitionNormalizer;
 
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionExploder
+     */
+    private $definitionExploder;
+
     public function __construct()
     {
+        $this->definitionExploder = new \Vaimo\ComposerPatches\Patch\DefinitionExploder();
         $this->definitionNormalizer = new \Vaimo\ComposerPatches\Patch\DefinitionNormalizer();
     }
 
@@ -19,76 +23,26 @@ class DefinitionsProcessor
     {
         $patchesPerPackage = array();
 
-        foreach ($patches as $patchTarget => $packagePatches) {
+        foreach ($patches as $target => $packagePatches) {
             $normalizedPatches = array();
-
-            foreach ($packagePatches as $label => $data) {
-                $normalizedPatches[] = $this->definitionNormalizer->process($patchTarget, $label, $data);
+            
+            foreach ($packagePatches as $patchLabel => $patchConfig) {
+                $definitionItems = $this->definitionExploder->process($patchLabel, $patchConfig);
+                
+                foreach ($definitionItems as $patchItem) {
+                    list($label, $data) = $patchItem;
+                    
+                    $normalizedPatches[] = $this->definitionNormalizer->process($target, $label, $data);    
+                }
             }
 
             if (!$validPatches = array_filter($normalizedPatches)) {
                 continue;
             }
 
-            $patchesPerPackage[$patchTarget] = $validPatches;
+            $patchesPerPackage[$target] = $validPatches;
         }
 
         return $patchesPerPackage;
-    }
-
-    public function validate(array $patches, $vendorDir)
-    {
-        $validatedPatches = array();
-
-        foreach ($patches as $patchTarget => $packagePatches) {
-            $validItems = array();
-
-            foreach ($packagePatches as $patch) {
-                $relativePath = $patch[PatchDefinition::SOURCE];
-                $absolutePatchPath = $vendorDir . '/' . $relativePath;
-
-                $patchPath = file_exists($absolutePatchPath)
-                    ? $absolutePatchPath
-                    : $relativePath;
-
-                $patch[PatchDefinition::HASH] = md5(implode('|', array(
-                    file_exists($patchPath) ? md5_file($patchPath) : md5($patchPath),
-                    serialize($patch[PatchDefinition::DEPENDS]),
-                    serialize($patch[PatchDefinition::TARGETS]),
-                )));
-
-                $validItems[] = $patch;
-            }
-
-            if (!$validItems) {
-                continue;
-            }
-
-            $validatedPatches[$patchTarget] = $validItems;
-        }
-
-        return $validatedPatches;
-    }
-
-    public function simplify(array $patches)
-    {
-        $allPatches = array();
-
-        foreach ($patches as $patchTarget => $packagePatches) {
-            $allPatches[$patchTarget] = array();
-
-            foreach ($packagePatches as $info) {
-                $allPatches[$patchTarget][$info[PatchDefinition::SOURCE]] = array(
-                    'targets' => $info[PatchDefinition::TARGETS],
-                    'label' => $info[PatchDefinition::LABEL] . (
-                        isset($info[PatchDefinition::HASH])
-                            ? ', md5:' . $info[PatchDefinition::HASH]
-                            : ''
-                        )
-                );
-            }
-        }
-
-        return array_filter($allPatches);
     }
 }

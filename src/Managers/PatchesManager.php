@@ -68,7 +68,7 @@ class PatchesManager
             )
         ));
     }
-
+    
     public function processPatches(array $patches, PackageInterface $package, $installPath, $vendorRoot)
     {
         $appliedPatches = array();

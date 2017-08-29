@@ -86,7 +86,7 @@ In which case the file should contain patches listed in following format:
 
 ```
 
-## Patch definition format
+## Patch definition in composer.json
 
 The format of a patch definition has several levers of complexity to cater for usage in context of different
 frameworks.
@@ -139,7 +139,7 @@ Which is the same as (which allows optional patch sequencing) ...
 
 In case there's no need to add version restrictions or sequence patches, the simple format use is recommended.
 
-## Patch file path format
+## Patch file format
 
 The targeted file format in the patch should be relative to the patched package - or - in other words: relative
 to the context it was defined for:
@@ -166,7 +166,7 @@ Note that you don't have to change the patch name or description when you change
 been used in some context by someone as the module will be aware of the patch contents and will re-apply
 it when it has changed since last time.
 
-## Using patch url
+## Patch URL
 
 Patches can be stored in remote location and referred to by using the full URL of tha patch.
 
@@ -183,7 +183,7 @@ Patches can be stored in remote location and referred to by using the full URL o
 Note that in case of other patch definition formats, the url of the patch file should be defined 
 under "url" key of the patch definition (instead of "source").
 
-## Sequencing the patches
+## Sequenced patches
 
 In case it's important to apply the patches in a certain order, use an array wrapper around the patch definitions.
 
@@ -253,6 +253,33 @@ targeted package is always on certain version) alternative format may be more su
 ```
 
 The patch will be applied if at least ONE indirect dependency ends up being a version constrain match.
+
+## Version branching
+
+When there are almost identical patches for different version of some package, then they can be declared
+under same label like this:
+
+
+```
+{
+  "extra": {
+    "patches": {
+      "magento/module-sales": {
+        "Fix: Wrong time format for orders in admin grid": {
+          "Magento_Sales/100.1.6/fix-wrong-time-format-for-orders-in-admin-grid.patch": {
+            "version": "100.1.* <100.1.7"
+          },
+          "Magento_Sales/100.1.7/fix-wrong-time-format-for-orders-in-admin-grid.patch": {
+            "version": ">=100.1.7"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Note that indirect version dependency can be used in this case as well (see the "depends" example above).
 
 ## Bundled patches
 
@@ -345,17 +372,11 @@ These patches will not be applied when installing the project with `--no-dev` op
 Note that same definition pattern can be used for patches-file, where the key would become `patches-file-dev`
 and patch list inside the file would still use the key `patches`.
 
-## Environment variable feature flags
+## Environment variables
 
 * COMPOSER_FORCE_PATCH_REAPPLY - will force all patches to be re-applied
 * COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
-
-## Difference between this and netresearch/composer-patches-plugin
-
-* Gathers patches from both root/project composer.json AND from packages
-* This plugin is much more simple to use and maintain
-* This plugin doesn't require you to specify which package version you're patching (but you'll still have the option to do so).
-* This plugin is easy to use with Drupal modules (which don't use semantic versioning).
+* COMPOSER_SKIP_PATCH_PACKAGES - comma-separated package names to exclude from patching, useful when updating patches
 
 ## Credits
 
@@ -364,3 +385,27 @@ Heavily modified version of https://github.com/cweagans/composer-patches
 A ton of this code is adapted or taken straight from https://github.com/jpstacey/composer-patcher, which is
 abandoned in favor of https://github.com/netresearch/composer-patches-plugin, which is (IMHO) overly complex
 and difficult to use.
+
+## Changelog 
+
+### 3.6.0
+
+* Feature: Allow multiple patch files to be declared under same label (see: Version branching)
+* Feature: Allow certain patches for packages to be excluded (see: Environment variables)
+* Fix: Restored backwards compatibility with PHP versions that do not support new new array markup.
+
+### 3.5.2
+
+* Fix: Make sure that path normalizer does not touch root-level patch declarations
+
+### 3.5.1
+
+* Fix\Cosmetic: Make sure that 'resetting patched package' is not shown when package is indirectly targeted
+
+### 3.5.0
+
+* Feature: Allow bundled patches to be declared (and tracked, reverted correctly when changed or removed). (see: Bundled patches)
+
+### 3.4.0
+
+* Feature: Allow dev-only patches to be declared (see: Development patches)
