@@ -391,9 +391,12 @@ and difficult to use.
 ### 3.6.0
 
 * Feature: Allow multiple patch files to be declared under same label (see: Version branching)
-* Feature: Allow certain patches for packages to be excluded (see: Environment variables) 
+* Feature: Allow certain patches for packages to be excluded (see: Environment variables)
+* Fix: Restored backwards compatibility with PHP versions that do not support new new array markup.
 
 ### 3.5.2
+
+* Fix: Make sure that path normalizer does not touch root-level patch declarations
 
 ### 3.5.1
 
@@ -401,6 +404,8 @@ and difficult to use.
 
 ### 3.5.0
 
-* Feature: Allow multiple patch files to be declared under same label (see: Version branching)
+* Feature: Allow bundled patches to be declared (and tracked, reverted correctly when changed or removed). (see: Bundled patches)
 
-### 3.5.0
+### 3.4.0
+
+* Feature: Allow dev-only patches to be declared (see: Development patches)
