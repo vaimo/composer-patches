@@ -2,7 +2,6 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionProcessors;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-use Vaimo\ComposerPatches\Patch\Owner as PatchOwner;
 
 class PathNormalizer implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitionProcessorInterface
 {
@@ -24,7 +23,7 @@ class PathNormalizer implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitio
     {
         foreach ($patches as $targetPackage => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
-                if ($patchData[PatchDefinition::OWNER_TYPE] == PatchOwner::PROJECT) {
+                if ($patchData[PatchDefinition::OWNER_IS_ROOT]) {
                     continue;
                 }
 
