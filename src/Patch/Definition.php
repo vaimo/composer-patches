@@ -8,8 +8,8 @@ class Definition
     const LABEL = 'label';
     const DEPENDS = 'depends';
     const VERSION = 'version';
-    const OWNER_TYPE = 'owner_type';
     const OWNER = 'owner';
+    const OWNER_IS_ROOT = 'owner_is_root';
     const HASH = 'md5';
     const TARGETS = 'targets';
 }

@@ -54,9 +54,10 @@ class Collector
                     }
 
                     foreach ($patches as $patch) {
+                        $isRoot = $patchOwner instanceof \Composer\Package\RootPackage;
                         $patchList[$target][] = array_replace($patch, array(
                             \Vaimo\ComposerPatches\Patch\Definition::OWNER => $patchOwner->getName(),
-                            \Vaimo\ComposerPatches\Patch\Definition::OWNER_TYPE => $patchOwner->getType()
+                            \Vaimo\ComposerPatches\Patch\Definition::OWNER_IS_ROOT => $isRoot,
                         ));
                     }
                 }
