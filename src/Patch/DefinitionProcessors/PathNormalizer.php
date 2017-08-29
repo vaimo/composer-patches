@@ -1,10 +1,10 @@
 <?php
-namespace Vaimo\ComposerPatches\Patch;
+namespace Vaimo\ComposerPatches\Patch\DefinitionProcessors;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Vaimo\ComposerPatches\Patch\Owner as PatchOwner;
 
-class PathNormalizer
+class PathNormalizer implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitionProcessorInterface
 {
     /**
      * @var \Composer\Installer\InstallationManager
@@ -19,8 +19,8 @@ class PathNormalizer
     ) {
         $this->installationManager = $installationManager;
     }
-
-    public function process(array $patches, array $packages, $vendorDir)
+    
+    public function process(array $patches, array $packagesByName, $vendorRoot)
     {
         foreach ($patches as $targetPackage => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
@@ -30,11 +30,11 @@ class PathNormalizer
 
                 $patchOwner = $patchData[PatchDefinition::OWNER];
 
-                if (!isset($packages[$patchOwner])) {
+                if (!isset($packagesByName[$patchOwner])) {
                     continue;
                 }
 
-                $patchOwnerPackage = $packages[$patchOwner];
+                $patchOwnerPackage = $packagesByName[$patchOwner];
 
                 $packageInstaller = $this->installationManager->getInstaller($patchOwnerPackage->getType());
                 $patchOwnerPath = $packageInstaller->getInstallPath($patchOwnerPackage);
@@ -42,9 +42,9 @@ class PathNormalizer
                 $absolutePatchPath = $patchOwnerPath . '/'
                     . $patchData[PatchDefinition::SOURCE];
 
-                if (strpos($absolutePatchPath, $vendorDir) === 0) {
+                if (strpos($absolutePatchPath, $vendorRoot) === 0) {
                     $patchData[PatchDefinition::SOURCE] = trim(
-                        substr($absolutePatchPath, strlen($vendorDir)),
+                        substr($absolutePatchPath, strlen($vendorRoot)),
                         '/'
                     );
                 }

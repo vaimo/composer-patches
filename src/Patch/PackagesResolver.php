@@ -1,8 +1,6 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
 class PackagesResolver
 {
     /**

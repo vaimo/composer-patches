@@ -37,26 +37,6 @@ class RepositoryManager
     private $config;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\Collector
-     */
-    private $patchesCollector;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Patch\PathNormalizer
-     */
-    private $patchPathNormalizer;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionsProcessor
-     */
-    private $patchDefinitionsProcessor;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Patch\Constraints
-     */
-    private $patchConstraints;
-
-    /**
      * @var \Vaimo\ComposerPatches\Patch\PackageUtils
      */
     private $packageUtils;
@@ -88,65 +68,57 @@ class RepositoryManager
         $extraInfo = $this->rootPackage->getExtra();
 
         $this->config = new \Vaimo\ComposerPatches\Patch\Config($extraInfo);
-
-        $this->patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector($loaders);
-
-        $this->patchPathNormalizer = new \Vaimo\ComposerPatches\Patch\PathNormalizer($installationManager);
-        $this->patchDefinitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
-        $this->patchConstraints = new \Vaimo\ComposerPatches\Patch\Constraints($extraInfo);
+        
         $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
         $this->packagesResolver = new \Vaimo\ComposerPatches\Patch\PackagesResolver();
+
+        $patchProcessors = array(
+            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\PathNormalizer($installationManager),
+            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\ConstraintsApplier($extraInfo),
+            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\Validator(),
+            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\Simplifier(),
+        );
+        
+        $this->packagesManager = new \Vaimo\ComposerPatches\Managers\PackagesManager(
+            $rootPackage,
+            $loaders,
+            $patchProcessors
+        );
     }
 
     public function processRepository(
         WritableRepositoryInterface $repository, $vendorRoot
     ) {
-        $packages = $repository->getPackages();
+        $patches = array();
 
-        $packagesByName = array();
-
-        foreach ($packages as $package) {
-            if ($package instanceof \Composer\Package\AliasPackage) {
-                $package = $package->getAliasOf();
+        $packagesByName = $this->packagesManager->getPackagesByName(
+            $repository->getPackages()
+        );
+        
+        if ($this->config->isPatchingEnabled()) {
+            $sourcePackages = $packagesByName;
+            
+            if (!$this->config->isPackageScopeEnabled()) {
+                $sourcePackages = array(
+                    $this->rootPackage->getName() => $this->rootPackage
+                );
             }
-
-            $packagesByName[$package->getName()] = $package;
+            
+            $patches = array_diff_key(
+                $this->packagesManager->collectPatches($sourcePackages, $vendorRoot),
+                array_flip(array_filter(
+                    explode(',', getenv(Environment::PACKAGE_SKIP))
+                ))
+            );
         }
-
-        $packagesByName[$this->rootPackage->getName()] = $this->rootPackage;
-
-        if ($patchingEnabled = $this->config->isPatchingEnabled()) {
-            $patches = $this->patchesCollector->collect(array_merge(
-                $this->config->isPackageScopeEnabled() ? $packages : array(),
-                array($this->rootPackage)
-            ));
-
-            if (isset($patches['*'])) {
-                $rootName = $this->rootPackage->getName();
-
-                if (!isset($patches[$rootName])) {
-                    $patches[$rootName] = array();
-                }
-
-                $patches[$rootName] = array_merge($patches[$rootName], $patches['*']);
-                unset($patches['*']);
-            }
-
-            $patches = $this->patchPathNormalizer->process($patches, $packagesByName, $vendorRoot);
-            $patches = $this->patchConstraints->apply($patches, $packagesByName);
-            $patches = $this->patchDefinitionsProcessor->validate($patches, $vendorRoot);
-            $patches = $this->patchDefinitionsProcessor->simplify($patches);
-        } else {
-            $patches = array();
-        }
-
+        
         $groupedPatches = $this->packageUtils->groupPatchesByTarget($patches);
 
         $packagesToReset = array_merge(
             $this->packagesResolver->resolvePackagesToReinstall($packagesByName, $groupedPatches),
             getenv(Environment::FORCE_REAPPLY) ? array_keys($groupedPatches) : array()
         );
-
+        
         $packageResetFlags = array_fill_keys($packagesToReset, false);
         $packagesUpdated = false;
 
@@ -215,7 +187,7 @@ class RepositoryManager
             foreach ($patchGroupTargets as $target) {
                 $hasPatchChanges = $hasPatchChanges || $this->packageUtils->hasPatchChanges(
                         $packagesByName[$target],
-                        $groupedPatches[$target]
+                        isset($groupedPatches[$target]) ? $groupedPatches[$target] : array() 
                     );
             }
 
