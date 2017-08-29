@@ -1,48 +1,61 @@
 {
-    "name": "vaimo/composer-patches",
-    "version": "3.5.2",
-    "description": "Provides a way to patch Composer packages with optional version restriction",
+    "name": "vaimo/composer-patches", 
+    "version": "3.5.3", 
+    "description": "Provides a way to patch Composer packages with optional version restriction", 
     "keywords": [
-        "composer plugin", "patching", "version restriction", "indirect restrictions", "patch description",
-        "remote patch files", "downloaded patches", "package bug-fix", "package patches", "patch exclusion",
-        "development patches", "hot-fixes"
-    ],
+        "composer plugin", 
+        "patching", 
+        "version restriction", 
+        "indirect restrictions", 
+        "patch description", 
+        "remote patch files", 
+        "downloaded patches", 
+        "package bug-fix", 
+        "package patches", 
+        "patch exclusion", 
+        "development patches", 
+        "hot-fixes"
+    ], 
     "support": {
-        "source": "https://github.com/vaimo/composer-patches",
-        "docs": "https://github.com/vaimo/composer-patches",
+        "source": "https://github.com/vaimo/composer-patches", 
+        "docs": "https://github.com/vaimo/composer-patches", 
         "issues": "https://github.com/vaimo/composer-patches/issues"
-    },
-    "minimum-stability": "dev",
-    "license": "BSD",
-    "type": "composer-plugin",
+    }, 
+    "minimum-stability": "dev", 
+    "license": "BSD", 
+    "type": "composer-plugin", 
     "extra": {
         "class": "Vaimo\\ComposerPatches\\Plugin"
-    },
+    }, 
     "authors": [
         {
-            "name": "Cameron Eagans",
+            "name": "Cameron Eagans", 
             "email": "me@cweagans.net"
-        },
+        }, 
         {
-            "name": "Allan Paiste",
+            "name": "Allan Paiste", 
             "email": "allan.paiste@vaimo.com"
         }
-    ],
+    ], 
     "require": {
-        "php": ">=5.3.0",
+        "php": ">=5.3.0", 
         "composer-plugin-api": "^1.0"
-    },
+    }, 
     "require-dev": {
-        "composer/composer": "~1.0",
+        "composer/composer": "~1.0", 
         "phpunit/phpunit": "~4.6"
-    },
+    }, 
     "conflict": {
         "cweagans/composer-patches": "*"
-    },
+    }, 
     "autoload": {
-        "psr-4": {"Vaimo\\ComposerPatches\\": "src"}
-    },
+        "psr-4": {
+            "Vaimo\\ComposerPatches\\": "src"
+        }
+    }, 
     "autoload-dev": {
-        "psr-4": {"Vaimo\\ComposerPatches\\Tests\\": "tests"}
+        "psr-4": {
+            "Vaimo\\ComposerPatches\\Tests\\": "tests"
+        }
     }
 }
