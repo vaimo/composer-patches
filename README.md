@@ -444,6 +444,10 @@ and difficult to use.
 
 List of generalized changes for each release.
 
+### 3.7.1
+
+* Maintenance: Code cleanup (some debugging code removed)
+
 ### 3.7.0
 
 * Feature: Added version branching for sequenced items
