@@ -19,12 +19,6 @@ class DefinitionExploder
     
     public function process($label, $data)
     {
-        if (is_array($data) && isset($data['label'])) {
-            if ($data['label'] === 'Fix: Category tree items in admin get double-escaped due to ExtJs and Magento both doing the escaping') {
-                $i = 0;
-            }
-        }
-        
         foreach ($this->processors as $processor) {
             if (!$processor->shouldProcess($label, $data)) {
                 continue;
