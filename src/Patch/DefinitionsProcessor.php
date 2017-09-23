@@ -15,7 +15,15 @@ class DefinitionsProcessor
 
     public function __construct()
     {
-        $this->definitionExploder = new \Vaimo\ComposerPatches\Patch\DefinitionExploder();
+        $processors = array(
+            new \Vaimo\ComposerPatches\Patch\DefinitionExploders\VersionItemExploder(),
+            new \Vaimo\ComposerPatches\Patch\DefinitionExploders\ComplexItemExploder(),
+            new \Vaimo\ComposerPatches\Patch\DefinitionExploders\SequenceVersionItemExploder(),
+            new \Vaimo\ComposerPatches\Patch\DefinitionExploders\SequenceItemExploder()
+        );
+        
+        $this->definitionExploder = new \Vaimo\ComposerPatches\Patch\DefinitionExploder($processors);
+        
         $this->definitionNormalizer = new \Vaimo\ComposerPatches\Patch\DefinitionNormalizer();
     }
 

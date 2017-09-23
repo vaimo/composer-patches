@@ -13,7 +13,8 @@ Patching is enabled when:
 
 _The latter is only useful if you have no patches defined directly on the root/project level as the default state of the patches enabled/disabled state will be: disabled_
 
-```
+```json
+
 {
   "extra": {
     "patches": {},
@@ -38,7 +39,8 @@ When patching is disabled and **composer install** is re-executed, all patched p
 
 Same format is used for both project (root level scope) patches and for package patches.
 
-```
+```json
+
 {
   "require": {
     "some/package": "1.2.3",
@@ -59,7 +61,8 @@ Same format is used for both project (root level scope) patches and for package 
 
 Same format is used for both project (root level scope) patches and for package patches.
 
-```
+```json
+
 {
   "require": {
     "some/package": "1.2.3",
@@ -74,7 +77,7 @@ Same format is used for both project (root level scope) patches and for package 
 
 In which case the file should contain patches listed in following format:
 
-```
+```json
 
 {
   "patches": {
@@ -91,7 +94,7 @@ In which case the file should contain patches listed in following format:
 The format of a patch definition has several levers of complexity to cater for usage in context of different
 frameworks.
 
-```
+```json
 
 {
   "patches": {
@@ -105,7 +108,7 @@ frameworks.
 
 Which is the same as (which allows optional version restrictions) ... 
 
-```
+```json
 
 {
   "patches": {
@@ -121,17 +124,20 @@ Which is the same as (which allows optional version restrictions) ...
 
 Which is the same as (which allows optional patch sequencing) ... 
 
-```
+```json
 
 {
   "patches": {
     "some/package": [
-        {
-          "label": "desription about my patch",
-          "source": "my/file.patch"
-        }
-      ]
-    }
+      {
+        "label": "Fix: will be applied first",
+        "source": "my/file.patch"
+      },
+      {
+        "label": "Fix: will be applied after the first",
+        "source": "my/other-file.patch"
+      }
+    ]
   }
 }
 
@@ -147,7 +153,7 @@ to the context it was defined for:
 So it the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
 the patch would target it with
 
-```
+```diff
 --- Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
 +++ Models/Example.php	2017-05-24 14:14:06.640560761 +0200
 
@@ -170,7 +176,7 @@ it when it has changed since last time.
 
 Patches can be stored in remote location and referred to by using the full URL of tha patch.
 
-```
+```json
 {
   "patches": {
     "vendor/project": {
@@ -187,7 +193,7 @@ under "url" key of the patch definition (instead of "source").
 
 In case it's important to apply the patches in a certain order, use an array wrapper around the patch definitions.
 
-```
+```json
 {
   "extra": {
     "patches": {
@@ -213,7 +219,7 @@ When defined in the following format, `my/file.patch` will always be applied bef
 
 In case the patch is applied only on certain version of the package, a version restriction can be defined for the patch:
 
-```
+```json
 {
   "extra": {
     "patches": {
@@ -235,7 +241,7 @@ of Composer.
 In projects that rely on certain framework's base package version (which will always guarantee that the patch
 targeted package is always on certain version) alternative format may be more suitable:
 
-```
+```json
 {
   "extra": {
     "patches": {
@@ -260,7 +266,7 @@ When there are almost identical patches for different version of some package, t
 under same label like this:
 
 
-```
+```json
 {
   "extra": {
     "patches": {
@@ -280,6 +286,51 @@ under same label like this:
 ```
 
 Note that indirect version dependency can be used in this case as well (see the "depends" example above).
+
+Same can be achieved with sequenced patches ...
+
+```json
+{
+  "extra": {
+    "patches": {
+      "magento/module-widget": [
+        {
+          "label": "Fix: Some description",
+          "source": "some-source.patch"
+        },
+        {
+          "label": "Fix: Category tree items in admin get double-escaped due to ExtJs and Magento both doing the escaping",
+          "source": {
+            "Magento_Widget/100.1.5/other-patch.patch": {
+              "version": "<=100.1.5"
+            },
+            "Magento_Widget/100.1.5/avoid-double-escaping-special-chars-and-quotes-for-extjs-tree-item-names.patch": {
+              "version": ">100.1.5"
+            }
+          }
+        }      
+      ]
+    }
+  }
+}
+```
+
+In both of the above cases, a simplified definition format can be used
+
+```json
+{
+  "extra": {
+    "patches": {
+      "magento/module-sales": {
+        "Fix: Wrong time format for orders in admin grid": {
+          "100.1.* <100.1.7": "Magento_Sales/100.1.6/fix-wrong-time-format-for-orders-in-admin-grid.patch",
+          ">=100.1.7": "Magento_Sales/100.1.7/fix-wrong-time-format-for-orders-in-admin-grid.patch"
+        }
+      }
+    }
+  }
+}
+```
 
 ## Bundled patches
 
@@ -316,7 +367,8 @@ that to be triggered).
 
 In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), exclusions records can be defined in the project's composer.json:
 
-```
+```json
+
 {
   "extra": {
     "excluded-patches": {
@@ -331,7 +383,8 @@ In case some patches that are defined in packages have to be excluded from the p
 
 Will exclude the a patch that was defined in a package in following (or similar) manner ...
 
-```
+```json
+
 {
   "name": "patch/owner",
   "extra": {
@@ -352,7 +405,8 @@ The important part to note here is the file-path and patch owner. Description is
 In case there's a need to include patches just for the sake of development convenience, an alternative
 sub-group can be defined is similar manner to how one would define development packages in project context
  
- ```
+ ```json
+ 
 {
   "extra": {
     "patches-dev": {
@@ -387,6 +441,13 @@ abandoned in favor of https://github.com/netresearch/composer-patches-plugin, wh
 and difficult to use.
 
 ## Changelog 
+
+List of generalized changes for each release.
+
+### 3.7.0
+
+* Feature: Added version branching for sequenced items
+* Feature: Added simplified version branching format where json object key is constraint and value the source
 
 ### 3.6.0
 

@@ -1,36 +1,42 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
 class DefinitionExploder
 {
+    /**
+     * @var \Vaimo\ComposerPatches\Interfaces\DefinitionExploderProcessorInterface[]
+     */
+    private $processors;
+    
+    /**
+     * @param \Vaimo\ComposerPatches\Interfaces\DefinitionExploderProcessorInterface[] $processors
+     */
+    public function __construct(
+        array $processors
+    ) {
+        $this->processors = $processors;
+    }
+    
     public function process($label, $data)
     {
-        $explodedItems = array();
-
-        if (is_array($data)) {
-            $key = key($data);
-            $value = reset($data);
-
-            if (!is_numeric($key) && is_array($value) 
-                && (isset($value[PatchDefinition::VERSION]) || $value[PatchDefinition::DEPENDS])
-            ) {
-                foreach ($data as $source => $subItem) {
-                    $explodedItems[] = array(
-                        $label,
-                        array_replace($subItem, array(
-                            PatchDefinition::SOURCE => $source
-                        ))
-                    );
-                }
-            }   
+        if (is_array($data) && isset($data['label'])) {
+            if ($data['label'] === 'Fix: Category tree items in admin get double-escaped due to ExtJs and Magento both doing the escaping') {
+                $i = 0;
+            }
         }
         
-        if (!$explodedItems) {
-            $explodedItems[] = array($label, $data);   
+        foreach ($this->processors as $processor) {
+            if (!$processor->shouldProcess($label, $data)) {
+                continue;
+            }
+
+            if ($items = $processor->explode($label, $data)) {
+                return $items;
+            }
         }
         
-        return $explodedItems;
+        return array(
+            array($label, $data)
+        );
     }
 }
