@@ -14,7 +14,6 @@ Patching is enabled when:
 _The latter is only useful if you have no patches defined directly on the root/project level as the default state of the patches enabled/disabled state will be: disabled_
 
 ```json
-
 {
   "extra": {
     "patches": {},
@@ -22,7 +21,6 @@ _The latter is only useful if you have no patches defined directly on the root/p
     "enable-patching-from-packages": false
   }
 }
-
 ```
 
 * **enable-patching** - In case you have patches defined on root/project level, it's not required to
@@ -40,7 +38,6 @@ When patching is disabled and **composer install** is re-executed, all patched p
 Same format is used for both project (root level scope) patches and for package patches.
 
 ```json
-
 {
   "require": {
     "some/package": "1.2.3",
@@ -54,7 +51,6 @@ Same format is used for both project (root level scope) patches and for package 
     }
   }
 }
-
 ```
 
 ## Usage: patch list file
@@ -62,7 +58,6 @@ Same format is used for both project (root level scope) patches and for package 
 Same format is used for both project (root level scope) patches and for package patches.
 
 ```json
-
 {
   "require": {
     "some/package": "1.2.3",
@@ -72,13 +67,11 @@ Same format is used for both project (root level scope) patches and for package 
     "patches-file": "path/to/composer.patches.json"
   }
 }
-
 ```
 
 In which case the file should contain patches listed in following format:
 
 ```json
-
 {
   "patches": {
     "some/package": {
@@ -86,7 +79,6 @@ In which case the file should contain patches listed in following format:
     }
   }
 }
-
 ```
 
 ## Patch definition in composer.json
@@ -95,7 +87,6 @@ The format of a patch definition has several levers of complexity to cater for u
 frameworks.
 
 ```json
-
 {
   "patches": {
     "some/package": {
@@ -103,13 +94,11 @@ frameworks.
     }
   }
 }
-
 ```
 
 Which is the same as (which allows optional version restrictions) ... 
 
 ```json
-
 {
   "patches": {
     "some/package": {
@@ -119,13 +108,11 @@ Which is the same as (which allows optional version restrictions) ...
     }
   }
 }
-
 ```
 
 Which is the same as (which allows optional patch sequencing) ... 
 
 ```json
-
 {
   "patches": {
     "some/package": [
@@ -140,7 +127,6 @@ Which is the same as (which allows optional patch sequencing) ...
     ]
   }
 }
-
 ```
 
 In case there's no need to add version restrictions or sequence patches, the simple format use is recommended.
@@ -337,7 +323,7 @@ In both of the above cases, a simplified definition format can be used
 In case there's a need to define a patch that targets multiple packages within a single patch file, 
 alternative patch definition format is recommended:
 
-```
+```json
 {
   "extra": {
     "patches": {
@@ -368,7 +354,6 @@ that to be triggered).
 In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), exclusions records can be defined in the project's composer.json:
 
 ```json
-
 {
   "extra": {
     "excluded-patches": {
@@ -378,13 +363,11 @@ In case some patches that are defined in packages have to be excluded from the p
     }
   }
 }
-
 ```
 
 Will exclude the a patch that was defined in a package in following (or similar) manner ...
 
 ```json
-
 {
   "name": "patch/owner",
   "extra": {
@@ -395,7 +378,6 @@ Will exclude the a patch that was defined in a package in following (or similar)
     }
   }
 }
-
 ```
 
 The important part to note here is to remember that exclusion ignores patch target and focuses on the owner
@@ -410,7 +392,6 @@ declaration lines.
 **NOTE: it's useful to use this in combination with the COMPOSER_PATCHES_PREFER_OWNER env flag**
 
 ```json
-
 {
   "name": "patch/owner",
   "extra": {
@@ -424,13 +405,11 @@ declaration lines.
     }
   }
 }
-
 ```
 
 Same could be achieved when using the brief format by adding #skip to the end of the patch filename
 
 ```json
-
 {
   "name": "patch/owner",
   "extra": {
@@ -441,7 +420,6 @@ Same could be achieved when using the brief format by adding #skip to the end of
     }
   }
 }
-
 ```
 
 ## Development patches
@@ -450,7 +428,6 @@ In case there's a need to include patches just for the sake of development conve
 sub-group can be defined is similar manner to how one would define development packages in project context
  
  ```json
- 
 {
   "extra": {
     "patches-dev": {
