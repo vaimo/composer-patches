@@ -40,18 +40,26 @@ class PatchesManager
     private $patchApplier;
 
     /**
+     * @var string
+     */
+    private $vendorRoot;
+
+    /**
      * @param \Composer\EventDispatcher\EventDispatcher $eventDispatcher
      * @param \Composer\Util\RemoteFilesystem $downloader
      * @param \Vaimo\ComposerPatches\Logger $logger
+     * @param string $vendorRoot
      */
     public function __construct(
         \Composer\EventDispatcher\EventDispatcher $eventDispatcher,
         \Composer\Util\RemoteFilesystem $downloader,
-        \Vaimo\ComposerPatches\Logger $logger
+        \Vaimo\ComposerPatches\Logger $logger,
+        $vendorRoot
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->downloader = $downloader;
         $this->logger = $logger;
+        $this->vendorRoot = $vendorRoot;
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
 
@@ -69,16 +77,17 @@ class PatchesManager
         ));
     }
     
-    public function processPatches(array $patches, PackageInterface $package, $installPath, $vendorRoot)
+    public function applyPatches(array $patches, PackageInterface $package, $installPath)
     {
         $appliedPatches = array();
 
         foreach ($patches as $source => $patchInfo) {
-            $description = $patchInfo['label'];
+            $absolutePatchPath = $this->vendorRoot . '/' . $source;
             $relativePath = $source;
 
+            $description = $patchInfo['label'];
+
             $patchSourceLabel = sprintf('<info>%s</info>', $source);
-            $absolutePatchPath = $vendorRoot . '/' . $source;
             $patchComment = substr($description, 0, strrpos($description, ','));
 
             if (file_exists($absolutePatchPath)) {

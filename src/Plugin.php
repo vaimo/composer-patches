@@ -45,9 +45,6 @@ class Plugin implements \Composer\Plugin\PluginInterface,
 
         $repositoryManager = $this->repositoryManagerFactory->createForEvent($event);
 
-        $repositoryManager->processRepository(
-            $repository,
-            $composer->getConfig()->get('vendor-dir')
-        );
+        $repositoryManager->processRepository($repository);
     }
 }

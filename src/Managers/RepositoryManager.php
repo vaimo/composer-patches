@@ -1,7 +1,6 @@
 <?php
 namespace Vaimo\ComposerPatches\Managers;
 
-use Composer\Repository\WritableRepositoryInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Vaimo\ComposerPatches\Composer\ResetOperation;
@@ -49,48 +48,33 @@ class RepositoryManager
     /**
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param \Composer\Package\RootPackageInterface $rootPackage
+     * @param \Vaimo\ComposerPatches\Managers\PatchesManager $patchesManager
+     * @param \Vaimo\ComposerPatches\Managers\PackagesManager $packagesManager
      * @param \Vaimo\ComposerPatches\Logger $logger
-     * @param PatchesManager $patchesManager
-     * @param array $loaders
      */
     public function __construct(
         \Composer\Installer\InstallationManager $installationManager,
         \Composer\Package\RootPackageInterface $rootPackage,
         \Vaimo\ComposerPatches\Managers\PatchesManager $patchesManager,
-        \Vaimo\ComposerPatches\Logger $logger,
-        array $loaders
+        \Vaimo\ComposerPatches\Managers\PackagesManager $packagesManager,
+        \Vaimo\ComposerPatches\Logger $logger
     ) {
         $this->installationManager = $installationManager;
         $this->rootPackage = $rootPackage;
-        $this->logger = $logger;
         $this->patchesManager = $patchesManager;
-
-        $extraInfo = $this->rootPackage->getExtra();
+        $this->packagesManager = $packagesManager;
+        $this->logger = $logger;
+        
+        $extraInfo = $rootPackage->getExtra();
 
         $this->config = new \Vaimo\ComposerPatches\Patch\Config($extraInfo);
         
         $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
         $this->packagesResolver = new \Vaimo\ComposerPatches\Patch\PackagesResolver();
-
-        $patchProcessors = array(
-            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\GlobalExcluder($extraInfo),
-            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\LocalExcluder(),
-            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\PathNormalizer($installationManager),
-            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\ConstraintsApplier($extraInfo),
-            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\Validator(),
-            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\Simplifier(),
-        );
-        
-        $this->packagesManager = new \Vaimo\ComposerPatches\Managers\PackagesManager(
-            $rootPackage,
-            $loaders,
-            $patchProcessors
-        );
     }
 
-    public function processRepository(
-        WritableRepositoryInterface $repository, $vendorRoot
-    ) {
+    public function processRepository(\Composer\Repository\WritableRepositoryInterface $repository) 
+    {
         $patches = array();
 
         $packagesByName = $this->packagesManager->getPackagesByName(
@@ -105,12 +89,16 @@ class RepositoryManager
                     $this->rootPackage->getName() => $this->rootPackage
                 );
             }
+
+            $skippedPackageFlags = array_flip(
+                array_filter(
+                    explode(',', getenv(Environment::PACKAGE_SKIP))
+                )
+            );
             
             $patches = array_diff_key(
-                $this->packagesManager->collectPatches($sourcePackages, $vendorRoot),
-                array_flip(array_filter(
-                    explode(',', getenv(Environment::PACKAGE_SKIP))
-                ))
+                $this->packagesManager->getPatches($sourcePackages),
+                $skippedPackageFlags
             );
         }
         
@@ -205,13 +193,12 @@ class RepositoryManager
             );
 
             try {
-                $appliedPatches = $this->patchesManager->processPatches(
+                $appliedPatches = $this->patchesManager->applyPatches(
                     $patchesForPackage,
                     $package,
                     !$package instanceof \Composer\Package\RootPackage 
                         ? $this->installationManager->getInstallPath($package) 
-                        : '',
-                    $vendorRoot
+                        : ''
                 );
 
                 $targetedPackages = array();

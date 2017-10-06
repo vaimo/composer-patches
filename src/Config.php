@@ -3,6 +3,8 @@ namespace Vaimo\ComposerPatches;
 
 class Config
 {
+    const CONFIG_ROOT = 'extra';
+
     const LIST = 'patches';
     const DEV_LIST = 'patches-dev';
 

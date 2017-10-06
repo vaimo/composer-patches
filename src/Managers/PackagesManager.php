@@ -21,19 +21,26 @@ class PackagesManager
     private $processors;
 
     /**
+     * @var string
+     */
+    private $vendorRoot;
+
+    /**
      * @param \Composer\Package\RootPackageInterface $rootPackage
-     * @param \Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface[] $loaders
+     * @param \Vaimo\ComposerPatches\Patch\Collector $patchesCollector
      * @param \Vaimo\ComposerPatches\Interfaces\PatchDefinitionProcessorInterface[] $processors
+     * @param string $vendorRoot
      */
     public function __construct(
         \Composer\Package\RootPackageInterface $rootPackage,
-        array $loaders,
-        array $processors
+        \Vaimo\ComposerPatches\Patch\Collector $patchesCollector,
+        array $processors,
+        $vendorRoot
     ) {
-        $this->patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector($loaders);
-        
+        $this->patchesCollector = $patchesCollector;
         $this->rootPackage = $rootPackage;
         $this->processors = $processors;
+        $this->vendorRoot = $vendorRoot;
     }
     
     public function getPackagesByName(array $packages)
@@ -55,10 +62,10 @@ class PackagesManager
         return $packagesByName;
     }
     
-    public function collectPatches(array $packages, $vendorRoot)
+    public function getPatches(array $packages)
     {
-        $rootName = $this->rootPackage->getName();
         $patches = $this->patchesCollector->collect($packages);
+        $rootName = $this->rootPackage->getName();
 
         if (isset($patches[PatchConfig::BUNDLE_TARGET])) {
             if (!isset($patches[$rootName])) {
@@ -74,7 +81,7 @@ class PackagesManager
         }
 
         foreach ($this->processors as $processor) {
-            $patches = $processor->process($patches, $packages, $vendorRoot);
+            $patches = $processor->process($patches, $packages, $this->vendorRoot);
         }
         
         return $patches;

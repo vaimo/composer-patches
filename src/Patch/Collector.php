@@ -22,10 +22,12 @@ class Collector
      * @param PatchSourceLoaderInterface[] $sourceLoaders
      */
     public function __construct(
-        array $sourceLoaders
+        array $sourceLoaders,
+        \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor
     ) {
         $this->sourceLoaders = $sourceLoaders;
         $this->definitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
+        $this->infoExtractor = $infoExtractor;
     }
 
     /**
@@ -36,15 +38,18 @@ class Collector
     {
         $patchList = array();
 
-        foreach ($packages as $patchOwner) {
-            $extra = $patchOwner->getExtra();
+        foreach ($packages as $owner) {
+            $packageConfig = $this->infoExtractor->getConfig($owner);
 
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
-            $sourceLoaders = array_intersect_key($this->sourceLoaders, $extra);
+            $sourceLoaders = array_intersect_key(
+                $this->sourceLoaders, 
+                $packageConfig
+            );
 
             foreach ($sourceLoaders as $key => $loader) {
                 $patchesByTarget = $this->definitionsProcessor->normalizeDefinitions(
-                    $loader->load($extra[$key])
+                    $loader->load($packageConfig[$key])
                 );
 
                 if ($loader instanceof \Vaimo\ComposerPatches\Interfaces\PatchListUpdaterInterface) {
@@ -56,11 +61,14 @@ class Collector
                         $patchList[$target] = array();
                     }
 
-                    foreach ($patches as $patch) {
-                        $patchList[$target][] = array_replace($patch, array(
-                            PatchDefinition::OWNER => $patchOwner->getName(),
-                            PatchDefinition::OWNER_IS_ROOT => $patchOwner instanceof RootPackage,
-                        ));
+                    foreach ($patches as $patchDefinition) {
+                        $patchList[$target][] = array_replace(
+                            $patchDefinition,
+                            array(
+                                PatchDefinition::OWNER => $owner->getName(),
+                                PatchDefinition::OWNER_IS_ROOT => ($owner instanceof RootPackage),
+                            )
+                        );
                     }
                 }
             }

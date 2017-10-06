@@ -407,8 +407,7 @@ In case there's a need to temporarily fast-exclude patches which is usually the 
 maintenance or upgrade of the underlying project's framework, a skip flag can be used to pass over certain 
 declaration lines.
 
-**NOTE: To see these flags have any effect before re-installing the patch owner package, one has to add/remove 
-them in the vendor/composer/installed.json**
+**NOTE: it's useful to use this in combination with the COMPOSER_PATCHES_PREFER_OWNER env flag**
 
 ```json
 
@@ -476,6 +475,7 @@ and patch list inside the file would still use the key `patches`.
 * COMPOSER_FORCE_PATCH_REAPPLY - will force all patches to be re-applied
 * COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
 * COMPOSER_SKIP_PATCH_PACKAGES - comma-separated package names to exclude from patching, useful when updating patches
+* COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using installed.json
 
 ## Credits
 
@@ -488,6 +488,10 @@ and difficult to use.
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.9.0
+
+* Feature: Added new environment flag to force patcher to extract the patch info from vendor folder instead of using the information from installed.json (mainly for patch maintenance). 
 
 ### 3.8.1
 
