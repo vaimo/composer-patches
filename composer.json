@@ -1,6 +1,6 @@
 {
     "name": "vaimo/composer-patches", 
-    "version": "3.8.1", 
+    "version": "3.9.0", 
     "description": "Provides a way to patch Composer packages with optional version restriction", 
     "keywords": [
         "composer plugin", 
@@ -14,7 +14,14 @@
         "package patches", 
         "patch exclusion", 
         "development patches", 
-        "hot-fixes"
+        "hotfixes",
+        "environment flags",
+        "skipped packages",
+        "patch skipping",
+        "maintenance tools",
+        "multiple formats",
+        "patch branching",
+        "multi-version patches"
     ], 
     "support": {
         "source": "https://github.com/vaimo/composer-patches", 
