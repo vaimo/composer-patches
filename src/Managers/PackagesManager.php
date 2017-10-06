@@ -1,6 +1,8 @@
 <?php
 namespace Vaimo\ComposerPatches\Managers;
 
+use Vaimo\ComposerPatches\Patch\Config as PatchConfig;
+
 class PackagesManager
 {
     /**
@@ -58,13 +60,17 @@ class PackagesManager
         $rootName = $this->rootPackage->getName();
         $patches = $this->patchesCollector->collect($packages);
 
-        if (isset($patches['*'])) {
+        if (isset($patches[PatchConfig::BUNDLE_TARGET])) {
             if (!isset($patches[$rootName])) {
                 $patches[$rootName] = array();
             }
 
-            $patches[$rootName] = array_merge($patches[$rootName], $patches['*']);
-            unset($patches['*']);
+            $patches[$rootName] = array_merge(
+                $patches[$rootName], 
+                $patches[PatchConfig::BUNDLE_TARGET]
+            );
+            
+            unset($patches[PatchConfig::BUNDLE_TARGET]);
         }
 
         foreach ($this->processors as $processor) {

@@ -12,18 +12,18 @@ class SequenceItemExploder implements \Vaimo\ComposerPatches\Interfaces\Definiti
         }
         
         return is_numeric($label) 
-            && isset($data['label'], $data['source']) 
-            && is_array($data['source'])
-            && is_array(reset($data['source']));
+            && isset($data[PatchDefinition::LABEL], $data[PatchDefinition::SOURCE]) 
+            && is_array($data[PatchDefinition::SOURCE])
+            && is_array(reset($data[PatchDefinition::SOURCE]));
     }
 
     public function explode($label, $data)
     {
         $items = array();
 
-        foreach ($data['source'] as $source => $subItem) {
+        foreach ($data[PatchDefinition::SOURCE] as $source => $subItem) {
             $items[] = array(
-                $data['label'],
+                $data[PatchDefinition::LABEL],
                 array_replace($subItem, array(
                     PatchDefinition::SOURCE => $source
                 ))

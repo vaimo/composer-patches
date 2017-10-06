@@ -2,6 +2,7 @@
 namespace Vaimo\ComposerPatches\Managers;
 
 use Composer\Repository\WritableRepositoryInterface;
+use Vaimo\ComposerPatches\Config as PluginConfig;
 
 class AppliedPatchesManager
 {
@@ -56,7 +57,7 @@ class AppliedPatchesManager
                 continue;
             }
 
-            if (!$extra['patches_applied'] = $this->appliedPatches[$packageName]) {
+            if (!$extra[PluginConfig::APPLIED_FLAG] = $this->appliedPatches[$packageName]) {
                 continue;
             }
 

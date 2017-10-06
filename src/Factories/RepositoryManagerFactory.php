@@ -1,6 +1,8 @@
 <?php
 namespace Vaimo\ComposerPatches\Factories;
 
+use Vaimo\ComposerPatches\Config as PluginConfig;
+
 class RepositoryManagerFactory
 {
     public function createForEvent($event)
@@ -19,14 +21,14 @@ class RepositoryManagerFactory
         );
 
         $loaders = array(
-            'patches' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
-            'patches-file' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
+            PluginConfig::LIST => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
+            PluginConfig::FILE => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
         );
 
         if ($event->isDevMode()) {
             $loaders = array_replace($loaders, array(
-                'patches-dev' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
-                'patches-file-dev' => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
+                PluginConfig::DEV_LIST => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
+                PluginConfig::DEV_FILE => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
             ));
         }
 

@@ -3,6 +3,7 @@ namespace Vaimo\ComposerPatches\Patch;
 
 use Composer\Package\PackageInterface;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Config as PluginConfig;
 
 class PackageUtils
 {
@@ -10,11 +11,11 @@ class PackageUtils
     {
         $extra = $package->getExtra();
 
-        if (!isset($extra['patches_applied'])) {
+        if (!isset($extra[PluginConfig::APPLIED_FLAG])) {
             return false;
         }
 
-        if (!$applied = $extra['patches_applied']) {
+        if (!$applied = $extra[PluginConfig::APPLIED_FLAG]) {
             return false;
         }
 
@@ -29,8 +30,8 @@ class PackageUtils
     {
         $extra = $package->getExtra();
 
-        if (isset($extra['patches_applied'])) {
-            $appliedPatches = $extra['patches_applied'];
+        if (isset($extra[PluginConfig::APPLIED_FLAG])) {
+            $appliedPatches = $extra[PluginConfig::APPLIED_FLAG];
 
             if ($appliedPatches === true) {
                 return true;
@@ -50,12 +51,14 @@ class PackageUtils
     {
         $extra = $package->getExtra();
 
-        $patchesApplied = isset($extra['patches_applied']) ? $extra['patches_applied'] : array();
+        $patchesApplied = isset($extra[PluginConfig::APPLIED_FLAG]) 
+            ? $extra[PluginConfig::APPLIED_FLAG] 
+            : array();
 
-        unset($extra['patches_applied']);
+        unset($extra[PluginConfig::APPLIED_FLAG]);
 
         if ($replacement !== null && $patchesApplied) {
-            $extra['patches_applied'] = $replacement;
+            $extra[PluginConfig::APPLIED_FLAG] = $replacement;
         }
 
         $package->setExtra($extra);
@@ -67,11 +70,11 @@ class PackageUtils
     {
         $extra = $package->getExtra();
 
-        if (!isset($extra['patches_applied']) || !is_array($extra['patches_applied'])) {
-            $extra['patches_applied'] = array();
+        if (!isset($extra[PluginConfig::APPLIED_FLAG]) || !is_array($extra[PluginConfig::APPLIED_FLAG])) {
+            $extra[PluginConfig::APPLIED_FLAG] = array();
         }
 
-        $extra['patches_applied'][$path] = $description;
+        $extra[PluginConfig::APPLIED_FLAG][$path] = $description;
 
         $package->setExtra($extra);
     }
@@ -80,8 +83,8 @@ class PackageUtils
     {
         $extra = $package->getExtra();
 
-        if (isset($extra['patches_applied'])) {
-            ksort($extra['patches_applied']);
+        if (isset($extra[PluginConfig::APPLIED_FLAG])) {
+            ksort($extra[PluginConfig::APPLIED_FLAG]);
         }
 
         $package->setExtra($extra);
@@ -98,7 +101,7 @@ class PackageUtils
                         $patchesByTarget[$target] = array();
                     }
 
-                    $patchesByTarget[$target][$patchPath] = $patchInfo['label'];
+                    $patchesByTarget[$target][$patchPath] = $patchInfo[PatchDefinition::LABEL];
                 }
             }
         }

@@ -73,6 +73,8 @@ class RepositoryManager
         $this->packagesResolver = new \Vaimo\ComposerPatches\Patch\PackagesResolver();
 
         $patchProcessors = array(
+            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\GlobalExcluder($extraInfo),
+            new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\LocalExcluder(),
             new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\PathNormalizer($installationManager),
             new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\ConstraintsApplier($extraInfo),
             new \Vaimo\ComposerPatches\Patch\DefinitionProcessors\Validator(),
@@ -197,7 +199,10 @@ class RepositoryManager
 
             $packagesUpdated = true;
 
-            $this->logger->writeRaw('  - Applying patches for <info>%s</info>', array($packageName));
+            $this->logger->writeRaw(
+                '  - Applying patches for <info>%s</info> (%s)', 
+                array($packageName, count($patchesForPackage))
+            );
 
             try {
                 $appliedPatches = $this->patchesManager->processPatches(

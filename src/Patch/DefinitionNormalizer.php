@@ -8,8 +8,15 @@ class DefinitionNormalizer
     public function process($patchTarget, $label, $data)
     {
         if (!is_array($data)) {
+            $sourceSegments = explode('#', $data);
+            $lastSegment = array_pop($sourceSegments);
+            $hasSkip = ($lastSegment === PatchDefinition::SKIP);
+            
             $data = array(
-                PatchDefinition::SOURCE => (string)$data
+                PatchDefinition::SOURCE => $hasSkip 
+                    ? implode('#', $sourceSegments) 
+                    : (string)$data,
+                PatchDefinition::SKIP => $hasSkip
             );
         }
 
@@ -18,6 +25,9 @@ class DefinitionNormalizer
         }
 
         return array(
+            PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP])
+                ? $data[PatchDefinition::SKIP]
+                : false,
             PatchDefinition::TARGETS => isset($data[PatchDefinition::TARGETS])
                 ? $data[PatchDefinition::TARGETS]
                 : array($patchTarget),

@@ -22,23 +22,23 @@ class SequenceVersionItemExploder implements \Vaimo\ComposerPatches\Interfaces\D
         }
         
         return is_numeric($label)
-            && isset($data['label'], $data['source'])
-            && is_array($data['source'])
-            && !is_array(reset($data['source']))
-            && $this->isConstraint(key($data['source']));
+            && isset($data[PatchDefinition::LABEL], $data[PatchDefinition::SOURCE])
+            && is_array($data[PatchDefinition::SOURCE])
+            && !is_array(reset($data[PatchDefinition::SOURCE]))
+            && $this->isConstraint(key($data[PatchDefinition::SOURCE]));
     }
 
     public function explode($label, $data)
     {
         $items = array();
 
-        foreach ($data['source'] as $constraint => $source) {
+        foreach ($data[PatchDefinition::SOURCE] as $constraint => $source) {
             if (!$this->isConstraint($constraint)) {
                 continue;
             }
             
             $items[] = array(
-                $data['label'],
+                $data[PatchDefinition::LABEL],
                 array(
                     PatchDefinition::VERSION => $constraint,
                     PatchDefinition::SOURCE => $source

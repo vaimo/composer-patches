@@ -2,27 +2,17 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionProcessors;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Patch\Config as PatchConfig;
 
 class ConstraintsApplier implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitionProcessorInterface
 {
     /**
-     * @var array
-     */
-    private $config;
-
-    /**
      * @var \Composer\Package\Version\VersionParser
      */
     private $versionParser;
-
-    /**
-     * @param array $config
-     */
-    public function __construct(
-        array $config
-    ) {
-        $this->config = $config;
-
+    
+    public function __construct() 
+    {
         $this->versionParser = new \Composer\Package\Version\VersionParser();
     }
 
@@ -34,19 +24,9 @@ class ConstraintsApplier implements \Vaimo\ComposerPatches\Interfaces\PatchDefin
      */
     public function process(array $patches, array $packagesByName, $vendorRoot) 
     {
-        if (isset($this->config['excluded-patches'])) {
-            foreach ($this->config['excluded-patches'] as $patchOwner => $patchPaths) {
-                if (!isset($excludedPatches[$patchOwner])) {
-                    $excludedPatches[$patchOwner] = array();
-                }
-
-                $excludedPatches[$patchOwner] = array_flip($patchPaths);
-            }
-        }
-
-        foreach ($patches as $targetPackageName => &$packagePatches) {
+        foreach ($patches as $target => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
-                if ($targetPackageName != '*' && !isset($packagesByName[$targetPackageName])) {
+                if ($target != PatchConfig::BUNDLE_TARGET && !isset($packagesByName[$target])) {
                     $patchData = false;
                     continue;
                 }
@@ -68,13 +48,6 @@ class ConstraintsApplier implements \Vaimo\ComposerPatches\Interfaces\PatchDefin
                 }
 
                 if ($patchConstraints && !array_filter($patchConstraintsResults)) {
-                    $patchData = false;
-                }
-
-                $owner = $patchData[PatchDefinition::OWNER];
-                $source = $patchData[PatchDefinition::SOURCE];
-
-                if (isset($excludedPatches[$owner][$source])) {
                     $patchData = false;
                 }
             }

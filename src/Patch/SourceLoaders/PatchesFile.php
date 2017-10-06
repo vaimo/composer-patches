@@ -1,6 +1,8 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch\SourceLoaders;
 
+use Vaimo\ComposerPatches\Config as PluginConfig;
+
 class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface
 {
     /**
@@ -19,8 +21,8 @@ class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoader
             file_get_contents($source)
         );
 
-        if (isset($fileContents['patches'])) {
-            return $fileContents['patches'];
+        if (isset($fileContents[PluginConfig::LIST])) {
+            return $fileContents[PluginConfig::LIST];
         } elseif (!$fileContents) {
             throw new \Exception('There was an error in the supplied patch file');
         }

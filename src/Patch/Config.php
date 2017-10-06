@@ -1,9 +1,14 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
+use Vaimo\ComposerPatches\Config as PluginConfig;
+
 class Config
 {
+    const BUNDLE_TARGET = '*';
+    
     const ENABLED = 'enable-patching';
+    const ENABLED_FOR_PACKAGES = 'enable-patching-from-packages';
 
     /**
      * @var array
@@ -21,7 +26,7 @@ class Config
 
     public function isPatchingEnabled()
     {
-        if (empty($this->config['patches']) && !isset($this->config[self::ENABLED])) {
+        if (empty($this->config[PluginConfig::LIST]) && !isset($this->config[self::ENABLED])) {
             return false;
         }
 
@@ -30,10 +35,10 @@ class Config
 
     public function isPackageScopeEnabled()
     {
-        if (!isset($this->config['enable-patching-from-packages'])) {
+        if (!isset($this->config[self::ENABLED_FOR_PACKAGES])) {
             return true;
         }
 
-        return $this->config['enable-patching-from-packages'];
+        return $this->config[self::ENABLED_FOR_PACKAGES];
     }
 }

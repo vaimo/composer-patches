@@ -390,7 +390,7 @@ Will exclude the a patch that was defined in a package in following (or similar)
   "extra": {
     "patches": {
       "targeted/package": {
-        "desription about my patch": "path/to/file.patch"
+        "Some patch description": "path/to/file.patch"
       }
     }
   }
@@ -398,7 +398,52 @@ Will exclude the a patch that was defined in a package in following (or similar)
 
 ```
 
-The important part to note here is the file-path and patch owner. Description is not part of the exclusion logic.
+The important part to note here is to remember that exclusion ignores patch target and focuses on the owner
+instead. Description is also not part of the exclusion logic.
+
+## Skipping patches
+
+In case there's a need to temporarily fast-exclude patches which is usually the case when going through
+maintenance or upgrade of the underlying project's framework, a skip flag can be used to pass over certain 
+declaration lines.
+
+**NOTE: To see these flags have any effect before re-installing the patch owner package, one has to add/remove 
+them in the vendor/composer/installed.json**
+
+```json
+
+{
+  "name": "patch/owner",
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "Some patch description": {
+          "source": "path/to/file.patch",
+          "skip": true
+        }
+      }
+    }
+  }
+}
+
+```
+
+Same could be achieved when using the brief format by adding #skip to the end of the patch filename
+
+```json
+
+{
+  "name": "patch/owner",
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "Some patch description": "path/to/file.patch#skip"
+      }
+    }
+  }
+}
+
+```
 
 ## Development patches
 
@@ -443,6 +488,11 @@ and difficult to use.
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.8.0
+
+* Feature: Allow patches to be skipped by adding 'skip' flag in it's definition (good as maintenance flags when doing major base-framework upgrades).
+* Fix: excluded patches required develop to specify patch owner vendor path instead of just the path that was relative to the patch owner folder 
 
 ### 3.7.1
 

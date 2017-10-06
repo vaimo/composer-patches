@@ -12,4 +12,5 @@ class Definition
     const OWNER_IS_ROOT = 'owner_is_root';
     const HASH = 'md5';
     const TARGETS = 'targets';
+    const SKIP = 'skip';
 }
