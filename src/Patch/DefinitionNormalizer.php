@@ -8,15 +8,8 @@ class DefinitionNormalizer
     public function process($patchTarget, $label, $data)
     {
         if (!is_array($data)) {
-            $sourceSegments = explode('#', $data);
-            $lastSegment = array_pop($sourceSegments);
-            $hasSkip = ($lastSegment === PatchDefinition::SKIP);
-            
             $data = array(
-                PatchDefinition::SOURCE => $hasSkip 
-                    ? implode('#', $sourceSegments) 
-                    : (string)$data,
-                PatchDefinition::SKIP => $hasSkip
+                PatchDefinition::SOURCE => (string)$data
             );
         }
 
@@ -24,16 +17,26 @@ class DefinitionNormalizer
             return false;
         }
 
+        $source = isset($data[PatchDefinition::URL])
+            ? $data[PatchDefinition::URL]
+            : $data[PatchDefinition::SOURCE];
+
+        $sourceSegments = explode('#', $source);
+        $lastSegment = array_pop($sourceSegments);
+
+        if ($lastSegment === PatchDefinition::SKIP) {
+            $source = implode('#', $sourceSegments);
+            $data[PatchDefinition::SKIP] = true;
+        }
+        
         return array(
-            PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP])
-                ? $data[PatchDefinition::SKIP]
-                : false,
+            PatchDefinition::SOURCE => $source,
             PatchDefinition::TARGETS => isset($data[PatchDefinition::TARGETS])
                 ? $data[PatchDefinition::TARGETS]
                 : array($patchTarget),
-            PatchDefinition::SOURCE => isset($data[PatchDefinition::URL])
-                ? $data[PatchDefinition::URL]
-                : $data[PatchDefinition::SOURCE],
+            PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP])
+                ? $data[PatchDefinition::SKIP]
+                : false,
             PatchDefinition::LABEL => isset($data[PatchDefinition::LABEL])
                 ? $data[PatchDefinition::LABEL]
                 : $label,

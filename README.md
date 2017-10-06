@@ -489,6 +489,10 @@ and difficult to use.
 
 List of generalized changes for each release.
 
+### 3.8.1
+
+* Fix: process every source path and check for 'skip' flag. In certain cases, the source-path flag was ignored.  
+
 ### 3.8.0
 
 * Feature: Allow patches to be skipped by adding 'skip' flag in it's definition (good as maintenance flags when doing major base-framework upgrades).
