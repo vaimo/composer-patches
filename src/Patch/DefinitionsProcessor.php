@@ -23,7 +23,6 @@ class DefinitionsProcessor
         );
         
         $this->definitionExploder = new \Vaimo\ComposerPatches\Patch\DefinitionExploder($processors);
-        
         $this->definitionNormalizer = new \Vaimo\ComposerPatches\Patch\DefinitionNormalizer();
     }
 

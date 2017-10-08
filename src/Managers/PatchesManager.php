@@ -88,15 +88,12 @@ class PatchesManager
             $description = $patchInfo['label'];
 
             $patchSourceLabel = sprintf('<info>%s</info>', $source);
-            $patchComment = substr($description, 0, strrpos($description, ','));
+            $patchComment = strtok($description, ',');
 
             if (file_exists($absolutePatchPath)) {
-                $ownerName  = implode('/', array_slice(explode('/', $source), 0, 2));
-
-                $patchSourceLabel = sprintf(
+                $patchSourceLabel = vsprintf(
                     '<info>%s: %s</info>',
-                    $ownerName,
-                    trim(substr($source, strlen($ownerName)), '/')
+                    $this->packageUtils->extractPackageFromVendorPath($source)
                 );
 
                 $source = $absolutePatchPath;
@@ -120,7 +117,7 @@ class PatchesManager
                     $this->patchDownloader->copy($hostname, $source, $filename, false);
                 }
 
-                $this->patchApplier->execute($filename, $installPath);
+                $this->patchApplier->processFile($filename, $installPath);
 
                 if (isset($hostname)) {
                     unset($hostname);
@@ -147,5 +144,26 @@ class PatchesManager
         }
 
         return $appliedPatches;
+    }
+
+    public function registerAppliedPatches(array $patches, array $packages)
+    {
+        $affectedPackages = array();
+        
+        foreach ($patches as $source => $patchInfo) {
+            foreach ($patchInfo['targets'] as $target) {
+                $affectedPackages[] = $packages[$target];
+
+                $this->packageUtils->registerPatch(
+                    $packages[$target],
+                    $source,
+                    $patchInfo['label']
+                );
+            }
+        }
+
+        foreach ($affectedPackages as $targetPackage) {
+            $this->packageUtils->sortPatches($targetPackage);
+        }
     }
 }

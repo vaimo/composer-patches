@@ -27,7 +27,7 @@ class Applier
         $this->shell = new \Vaimo\ComposerPatches\Shell($logger);
     }
 
-    public function execute($filename, $cwd)
+    public function processFile($filename, $cwd)
     {
         $result = false;
         $patchLevelSequence = array('1', '0', '2');

@@ -65,10 +65,7 @@ class RepositoryManager
         $this->packagesManager = $packagesManager;
         $this->logger = $logger;
         
-        $extraInfo = $rootPackage->getExtra();
-
-        $this->config = new \Vaimo\ComposerPatches\Patch\Config($extraInfo);
-        
+        $this->config = new \Vaimo\ComposerPatches\Patch\Config($rootPackage->getExtra());
         $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
         $this->packagesResolver = new \Vaimo\ComposerPatches\Patch\PackagesResolver();
     }
@@ -192,32 +189,21 @@ class RepositoryManager
                 array($packageName, count($patchesForPackage))
             );
 
+            $installPath = !$package instanceof \Composer\Package\RootPackage
+                ? $this->installationManager->getInstallPath($package)
+                : '';
+            
             try {
                 $appliedPatches = $this->patchesManager->applyPatches(
                     $patchesForPackage,
                     $package,
-                    !$package instanceof \Composer\Package\RootPackage 
-                        ? $this->installationManager->getInstallPath($package) 
-                        : ''
+                    $installPath
                 );
 
-                $targetedPackages = array();
-                
-                foreach ($appliedPatches as $source => $patchInfo) {
-                    foreach ($patchInfo['targets'] as $target) {
-                        $targetedPackages[] = $packagesByName[$target];
-
-                        $this->packageUtils->registerPatch(
-                            $packagesByName[$target],
-                            $source,
-                            $patchInfo['label']
-                        );
-                    }
-                }
-
-                foreach ($targetedPackages as $targetPackage) {
-                    $this->packageUtils->sortPatches($targetPackage);
-                }
+                $this->patchesManager->registerAppliedPatches(
+                    $appliedPatches, 
+                    $packagesByName
+                );
             } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $e) {
                 $repository->write();
 

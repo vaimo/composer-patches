@@ -6,7 +6,7 @@ use Vaimo\ComposerPatches\Environment;
 
 class RepositoryManagerFactory
 {
-    public function createForEvent($event)
+    public function createForEvent(\Composer\Script\Event $event)
     {
         $composer = $event->getComposer();
         $config = $composer->getConfig();

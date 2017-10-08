@@ -26,8 +26,9 @@ class Collector
         \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor
     ) {
         $this->sourceLoaders = $sourceLoaders;
-        $this->definitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
         $this->infoExtractor = $infoExtractor;
+
+        $this->definitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
     }
 
     /**

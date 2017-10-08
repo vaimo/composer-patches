@@ -20,10 +20,10 @@ class Simplifier implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitionPro
 
             foreach ($packagePatches as $info) {
                 $allPatches[$patchTarget][$info[PatchDefinition::SOURCE]] = array(
-                    'targets' => $info[PatchDefinition::TARGETS],
-                    'label' => $info[PatchDefinition::LABEL] . (
+                    PatchDefinition::TARGETS => $info[PatchDefinition::TARGETS],
+                    PatchDefinition::LABEL => $info[PatchDefinition::LABEL] . (
                         isset($info[PatchDefinition::HASH])
-                            ? ', md5:' . $info[PatchDefinition::HASH]
+                            ? sprintf(', %s:%s', PatchDefinition::HASH, $info[PatchDefinition::HASH])
                             : ''
                         )
                 );

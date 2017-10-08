@@ -108,4 +108,12 @@ class PackageUtils
 
         return $patchesByTarget;
     }
+    
+    public function extractPackageFromVendorPath($path)
+    {
+        $package = implode('/', array_slice(explode('/', $path), 0, 2));
+        $path = trim(substr($path, strlen($package)), '/');
+
+        return array($package, $path);
+    }
 }
