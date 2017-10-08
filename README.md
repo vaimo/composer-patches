@@ -2,7 +2,8 @@
 
 Simple patches plugin for Composer. Applies a patch from a local or remote file to any package required with composer.
 
-_The information about applied patches on local installed project will be only kept in the installed.json._
+_The information about applied patches on local installed project will be kept in the installed.json (simple 
+boolean flag for patched packages will be also included when running composer update command)_
 
 ## Enabling patching for a project
 
