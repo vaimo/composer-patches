@@ -9,6 +9,11 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class Collector
 {
     /**
+     * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
+     */
+    private $infoExtractor;
+    
+    /**
      * @var PatchSourceLoaderInterface[]
      */
     private $sourceLoaders;
@@ -19,11 +24,12 @@ class Collector
     private $definitionsProcessor;
 
     /**
+     * @param \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor
      * @param PatchSourceLoaderInterface[] $sourceLoaders
      */
     public function __construct(
-        array $sourceLoaders,
-        \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor
+        \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor,
+        array $sourceLoaders
     ) {
         $this->sourceLoaders = $sourceLoaders;
         $this->infoExtractor = $infoExtractor;

@@ -20,6 +20,11 @@ class PatchesManager
     private $downloader;
 
     /**
+     * @var
+     */
+    private $failureHandler;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
@@ -28,11 +33,6 @@ class PatchesManager
      * @var \Vaimo\ComposerPatches\Patch\PackageUtils
      */
     private $packageUtils;
-
-    /**
-     * @var \Composer\Util\RemoteFilesystem
-     */
-    private $patchDownloader;
 
     /**
      * @var \Vaimo\ComposerPatches\Patch\Applier
@@ -47,24 +47,25 @@ class PatchesManager
     /**
      * @param \Composer\EventDispatcher\EventDispatcher $eventDispatcher
      * @param \Composer\Util\RemoteFilesystem $downloader
+     * @param \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler
      * @param \Vaimo\ComposerPatches\Logger $logger
      * @param string $vendorRoot
      */
     public function __construct(
         \Composer\EventDispatcher\EventDispatcher $eventDispatcher,
         \Composer\Util\RemoteFilesystem $downloader,
+        \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler,
         \Vaimo\ComposerPatches\Logger $logger,
         $vendorRoot
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->downloader = $downloader;
+        $this->failureHandler = $failureHandler;
         $this->logger = $logger;
         $this->vendorRoot = $vendorRoot;
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
-
-        $this->patchDownloader = $downloader;
-
+        
         $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($this->logger, array(
             'GIT' => array(
                 'validate' => 'git apply --check -p%s %s',
@@ -114,7 +115,7 @@ class PatchesManager
                     $filename = uniqid('/tmp/') . '.patch';
                     $hostname = parse_url($source, PHP_URL_HOST);
 
-                    $this->patchDownloader->copy($hostname, $source, $filename, false);
+                    $this->downloader->copy($hostname, $source, $filename, false);
                 }
 
                 $this->patchApplier->processFile($filename, $installPath);
@@ -123,7 +124,7 @@ class PatchesManager
                     unset($hostname);
                     unlink($filename);
                 }
-
+                
                 $this->eventDispatcher->dispatch(
                     Events::POST_APPLY,
                     new Event(Events::POST_APPLY, $package, $source, $description)
@@ -132,14 +133,9 @@ class PatchesManager
                 $appliedPatches[$relativePath] = $patchInfo;
             } catch (\Exception $e) {
                 $this->logger->writeException($e);
-
-                if (getenv(Environment::EXIT_ON_FAIL)) {
-                    throw new \Vaimo\ComposerPatches\Exceptions\PatchFailureException(
-                        sprintf('Failed to apply %s (%s)!', $relativePath, $patchComment)
-                    );
-                }
-
-                $this->logger->writeRaw('   <error>Could not apply patch! Skipping.</error>');
+                $this->failureHandler->execute(
+                    sprintf('Failed to apply %s (%s)!', $relativePath, $patchComment)
+                );
             }
         }
 

@@ -451,7 +451,7 @@ and patch list inside the file would still use the key `patches`.
 
 * COMPOSER_FORCE_PATCH_REAPPLY - will force all patches to be re-applied
 * COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
-* COMPOSER_SKIP_PATCH_PACKAGES - comma-separated package names to exclude from patching, useful when updating patches
+* COMPOSER_SKIP_PATCH_PACKAGES - comma-separated package names to exclude from patching, useful when maintaining patches on package upgrade. Does not affect bundled patches.
 * COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using installed.json
 
 ## Credits

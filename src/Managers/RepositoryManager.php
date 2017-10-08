@@ -41,7 +41,7 @@ class RepositoryManager
     private $packageUtils;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\PackagesResolver
+     * @var \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface
      */
     private $packagesResolver;
 
@@ -57,17 +57,18 @@ class RepositoryManager
         \Composer\Package\RootPackageInterface $rootPackage,
         \Vaimo\ComposerPatches\Managers\PatchesManager $patchesManager,
         \Vaimo\ComposerPatches\Managers\PackagesManager $packagesManager,
+        \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface $packagesResolver,
         \Vaimo\ComposerPatches\Logger $logger
     ) {
         $this->installationManager = $installationManager;
         $this->rootPackage = $rootPackage;
         $this->patchesManager = $patchesManager;
         $this->packagesManager = $packagesManager;
+        $this->packagesResolver = $packagesResolver;
         $this->logger = $logger;
         
         $this->config = new \Vaimo\ComposerPatches\Patch\Config($rootPackage->getExtra());
         $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
-        $this->packagesResolver = new \Vaimo\ComposerPatches\Patch\PackagesResolver();
     }
 
     public function processRepository(\Composer\Repository\WritableRepositoryInterface $repository) 
@@ -86,30 +87,20 @@ class RepositoryManager
                     $this->rootPackage->getName() => $this->rootPackage
                 );
             }
-
-            $skippedPackageFlags = array_flip(
-                array_filter(
-                    explode(',', getenv(Environment::PACKAGE_SKIP))
-                )
-            );
             
-            $patches = array_diff_key(
-                $this->packagesManager->getPatches($sourcePackages),
-                $skippedPackageFlags
-            );
+            $patches = $this->packagesManager->getPatches($sourcePackages);
         }
         
         $groupedPatches = $this->packageUtils->groupPatchesByTarget($patches);
-
-        $packagesToReset = array_merge(
-            $this->packagesResolver->resolvePackagesToReinstall($packagesByName, $groupedPatches),
-            getenv(Environment::FORCE_REAPPLY) ? array_keys($groupedPatches) : array()
-        );
         
-        $packageResetFlags = array_fill_keys($packagesToReset, false);
+        $resetFlags = array_fill_keys(
+            $this->packagesResolver->resolve($groupedPatches, $packagesByName), 
+            false
+        );
+
         $packagesUpdated = false;
 
-        if ($packagesToReset || $patches) {
+        if ($resetFlags || $patches) {
             $this->logger->write('Processing patches configuration', 'info');
         }
 
@@ -129,11 +120,11 @@ class RepositoryManager
             }
 
             foreach ($patchGroupTargets as $target) {
-                if (!isset($packageResetFlags[$target])) {
+                if (!isset($resetFlags[$target])) {
                     continue;
                 }
 
-                if ($packageResetFlags[$target] === true) {
+                if ($resetFlags[$target] === true) {
                     continue;
                 }
 
@@ -161,7 +152,7 @@ class RepositoryManager
                 }
 
                 $packagesUpdated = $this->packageUtils->resetAppliedPatches($package);
-                $packageResetFlags[$target] = true;
+                $resetFlags[$target] = true;
             }
 
             if (!$hasPatches) {

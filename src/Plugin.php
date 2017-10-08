@@ -13,7 +13,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
      * @var \Vaimo\ComposerPatches\Factories\RepositoryManagerFactory
      */
     private $repositoryManagerFactory;
-
+    
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
     {
         $this->appliedPatchesManager = new \Vaimo\ComposerPatches\Managers\AppliedPatchesManager();
