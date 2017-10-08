@@ -407,7 +407,7 @@ declaration lines.
 }
 ```
 
-Same could be achieved when using the brief format by adding #skip to the end of the patch filename
+Same could be achieved when using the brief format by adding #skip to the end of the patch filename ...
 
 ```json
 {
@@ -451,14 +451,15 @@ and patch list inside the file would still use the key `patches`.
 
 * COMPOSER_PATCHES_REAPPLY_ALL - will force all patches to be re-applied
 * COMPOSER_PATCHES_FATAL_FAIL - exit after first patch failure is encountered
-* COMPOSER_PATCHES_SKIP_PACKAGES - comma-separated package names to exclude from patching, useful when maintaining patches on package upgrade. Does not affect bundled patches.
+* COMPOSER_PATCHES_SKIP_PACKAGES - comma-separated package names to exclude from patching, useful when 
+  maintaining patches on package upgrade. Does not affect bundled patches.
 * COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using installed.json
 
 ### Deprecated flag names
 
-* COMPOSER_FORCE_PATCH_REAPPLY - will force all patches to be re-applied
-* COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
-* COMPOSER_SKIP_PATCH_PACKAGES - comma-separated package names to exclude from patching, useful when maintaining patches on package upgrade. Does not affect bundled patches.
+* COMPOSER_FORCE_PATCH_REAPPLY => COMPOSER_PATCHES_REAPPLY_ALL.
+* COMPOSER_EXIT_ON_PATCH_FAILURE => COMPOSER_PATCHES_FATAL_FAIL.
+* COMPOSER_SKIP_PATCH_PACKAGES => COMPOSER_PATCHES_SKIP_PACKAGES.
 
 ## Credits
 
@@ -472,16 +473,17 @@ and difficult to use.
 
 List of generalized changes for each release.
 
-### 3.9.1
+### 3.10.0
 
+* Feature: environment variable names standardized (old names still supported).
 * Fix: Patches not re-applied when package is upgraded (old 'applied_patches' incorrectly restored instead).
-* Fix: Root package ignored when using COMPOSER_PATCHES_PREFER_OWNER
-* Maintenance: environment variable names standardized (old names still supported)
-* Maintenance: Code re-organized to centralize the access to env flags  
+* Fix: Root package ignored when using COMPOSER_PATCHES_PREFER_OWNER.
+* Maintenance: Code re-organized to centralize the access to env flags.
 
 ### 3.9.0
 
-* Feature: Added new environment flag to force patcher to extract the patch info from vendor folder instead of using the information from installed.json (mainly for patch maintenance). 
+* Feature: Added new environment flag to force patcher to extract the patch info from vendor folder instead 
+  of using the information from installed.json (mainly for patch maintenance). 
 
 ### 3.8.1
 
@@ -489,36 +491,39 @@ List of generalized changes for each release.
 
 ### 3.8.0
 
-* Feature: Allow patches to be skipped by adding 'skip' flag in it's definition (good as maintenance flags when doing major base-framework upgrades).
-* Fix: excluded patches required develop to specify patch owner vendor path instead of just the path that was relative to the patch owner folder 
+* Feature: Allow patches to be skipped by adding 'skip' flag in it's definition (good as maintenance flags 
+  when doing major base-framework upgrades).
+* Fix: excluded patches required develop to specify patch owner vendor path instead of just the path that 
+  was relative to the patch owner folder.
 
 ### 3.7.1
 
-* Maintenance: Code cleanup (some debugging code removed)
+* Maintenance: Code cleanup (some debugging code removed).
 
 ### 3.7.0
 
-* Feature: Added version branching for sequenced items
-* Feature: Added simplified version branching format where json object key is constraint and value the source
+* Feature: Added version branching for sequenced items.
+* Feature: Added simplified version branching format where json object key is constraint and value the source.
 
 ### 3.6.0
 
-* Feature: Allow multiple patch files to be declared under same label (see: Version branching)
-* Feature: Allow certain patches for packages to be excluded (see: Environment variables)
+* Feature: Allow multiple patch files to be declared under same label (see: Version branching).
+* Feature: Allow certain patches for packages to be excluded (see: Environment variables).
 * Fix: Restored backwards compatibility with PHP versions that do not support new new array markup.
 
 ### 3.5.2
 
-* Fix: Make sure that path normalizer does not touch root-level patch declarations
+* Fix: Make sure that path normalizer does not touch root-level patch declarations.
 
 ### 3.5.1
 
-* Fix\Cosmetic: Make sure that 'resetting patched package' is not shown when package is indirectly targeted
+* Fix\Cosmetic: Make sure that 'resetting patched package' is not shown when package is indirectly targeted.
 
 ### 3.5.0
 
-* Feature: Allow bundled patches to be declared (and tracked, reverted correctly when changed or removed). (see: Bundled patches)
+* Feature: Allow bundled patches (that target multiple packages) to be declared, tracked, reverted correctly 
+  when changed or removed (see: Bundled patches).
 
 ### 3.4.0
 
-* Feature: Allow dev-only patches to be declared (see: Development patches)
+* Feature: Allow dev-only patches to be declared (see: Development patches).
