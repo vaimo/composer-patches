@@ -30,7 +30,7 @@ class PatchesManager
     private $logger;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\PackageUtils
+     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
 
@@ -64,7 +64,7 @@ class PatchesManager
         $this->logger = $logger;
         $this->vendorRoot = $vendorRoot;
 
-        $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
+        $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         
         $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($this->logger, array(
             'GIT' => array(

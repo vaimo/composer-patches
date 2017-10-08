@@ -5,19 +5,13 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     \Composer\EventDispatcher\EventSubscriberInterface
 {
     /**
-     * @var \Vaimo\ComposerPatches\Managers\AppliedPatchesManager
+     * @var \Vaimo\ComposerPatches\Bootstrap
      */
-    private $appliedPatchesManager;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Factories\RepositoryManagerFactory
-     */
-    private $repositoryManagerFactory;
+    private $bootstrap;
     
-    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
+    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io) 
     {
-        $this->appliedPatchesManager = new \Vaimo\ComposerPatches\Managers\AppliedPatchesManager();
-        $this->repositoryManagerFactory = new \Vaimo\ComposerPatches\Factories\RepositoryManagerFactory();
+        $this->bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $io);
     }
 
     public static function getSubscribedEvents()
@@ -29,22 +23,15 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         );
     }
 
-    public function extractPatchesFromLock(\Composer\Script\Event $event)
+    public function extractPatchesFromLock()
     {
-        $this->appliedPatchesManager->extractAppliedPatchesInfo(
-            $event->getComposer()->getRepositoryManager()->getLocalRepository()
-        );
+        $this->bootstrap->prepare();
     }
 
     public function postInstall(\Composer\Script\Event $event)
     {
-        $composer = $event->getComposer();
-        $repository = $composer->getRepositoryManager()->getLocalRepository();
-
-        $this->appliedPatchesManager->restoreAppliedPatchesInfo($repository);
-
-        $repositoryManager = $this->repositoryManagerFactory->createForEvent($event);
-
-        $repositoryManager->processRepository($repository);
+        $this->bootstrap->activate(
+            $event->isDevMode()
+        );
     }
 }

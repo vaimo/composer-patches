@@ -6,24 +6,44 @@ use Vaimo\ComposerPatches\Patch\DefinitionProcessors;
 
 class RepositoryManagerFactory
 {
-    public function createForEvent(\Composer\Script\Event $event)
-    {
-        $composer = $event->getComposer();
-        $io = $event->getIO();
-        $includeDevPatches = $event->isDevMode();
+    /**
+     * @var \Composer\Composer
+     */
+    private $composer;
 
-        $installationManager = $composer->getInstallationManager();
-        $composerConfig = $composer->getConfig();
-        $rootPackage = $composer->getPackage();
-        $eventDispatcher = $composer->getEventDispatcher();
+    /**
+     * @var \Composer\IO\IOInterface
+     */
+    private $io;
+
+    /**
+     * @param \Composer\Composer $composer
+     * @param \Composer\IO\IOInterface $io
+     */
+    public function __construct(
+        \Composer\Composer $composer,
+        \Composer\IO\IOInterface $io
+    ) {
+        $this->composer = $composer;
+        $this->io = $io;
+    }
+    
+    public function create($devMode = false)
+    {
+        $includeDevPatches = $devMode;
+
+        $installationManager = $this->composer->getInstallationManager();
+        $composerConfig = $this->composer->getConfig();
+        $rootPackage = $this->composer->getPackage();
+        $eventDispatcher = $this->composer->getEventDispatcher();
         
         $extraInfo = $rootPackage->getExtra();
         $vendorRoot = $composerConfig->get('vendor-dir');
 
         $config = new \Vaimo\ComposerPatches\Config();
         
-        $logger = new \Vaimo\ComposerPatches\Logger($io);
-        $downloader = new \Composer\Util\RemoteFilesystem($io, $composerConfig);
+        $logger = new \Vaimo\ComposerPatches\Logger($this->io);
+        $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
         
         if ($config->shouldExitOnFirstFailure()) {
             $failureHandler = new \Vaimo\ComposerPatches\Patch\FailureHandlers\FatalHandler($logger);    

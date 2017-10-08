@@ -474,8 +474,9 @@ List of generalized changes for each release.
 
 ### 3.9.1
 
-* Feature: environment variable names standardized (old names still supported)
+* Fix: Patches not re-applied when package is upgraded (old 'applied_patches' incorrectly restored instead).
 * Fix: Root package ignored when using COMPOSER_PATCHES_PREFER_OWNER
+* Maintenance: environment variable names standardized (old names still supported)
 * Maintenance: Code re-organized to centralize the access to env flags  
 
 ### 3.9.0

@@ -2,14 +2,18 @@
 namespace Vaimo\ComposerPatches\Managers;
 
 use Composer\Repository\WritableRepositoryInterface;
-use Vaimo\ComposerPatches\Config as PluginConfig;
 
 class AppliedPatchesManager
 {
     /**
-     * @var \Vaimo\ComposerPatches\Patch\PackageUtils
+     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Utils\RepositoryUtils
+     */
+    private $repositoryUtils;
 
     /**
      * @var array
@@ -18,50 +22,31 @@ class AppliedPatchesManager
 
     public function __construct()
     {
-        $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
+        $this->repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
+        $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 
     public function extractAppliedPatchesInfo(WritableRepositoryInterface $repository)
     {
         $this->appliedPatches = array();
-
-        foreach ($repository->getPackages() as $package) {
-            if ($package instanceof \Composer\Package\AliasPackage) {
-                $package = $package->getAliasOf();
-            }
-
-            if (isset($this->appliedPatches[$package->getName()])) {
+        
+        foreach ($this->repositoryUtils->getPackagesByName($repository) as $name => $package) {
+            if (isset($this->appliedPatches[$name])) {
                 continue;
             }
 
-            if (!$patches = $this->packageUtils->resetAppliedPatches($package, true)) {
-                continue;
-            }
-
-            $this->appliedPatches[$package->getName()] = $patches;
+            $this->appliedPatches[$name] = $this->packageUtils->resetAppliedPatches($package, true);
         }
     }
 
     public function restoreAppliedPatchesInfo(WritableRepositoryInterface $repository)
     {
-        foreach ($repository->getPackages() as $package) {
-            $packageName = $package->getName();
-
-            if ($package instanceof \Composer\Package\AliasPackage) {
-                $package = $package->getAliasOf();
-            }
-
-            $extra = $package->getExtra();
-
-            if (!isset($this->appliedPatches[$packageName])) {
+        foreach ($this->repositoryUtils->getPackagesByName($repository) as $name => $package) {
+            if (!isset($this->appliedPatches[$name]) || !$this->appliedPatches[$name]) {
                 continue;
             }
-
-            if (!$extra[PluginConfig::APPLIED_FLAG] = $this->appliedPatches[$packageName]) {
-                continue;
-            }
-
-            $package->setExtra($extra);
+            
+            $this->packageUtils->resetAppliedPatches($package, $this->appliedPatches[$name]);
         }
     }
 }

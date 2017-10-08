@@ -36,7 +36,7 @@ class RepositoryManager
     private $config;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\PackageUtils
+     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
 
@@ -68,7 +68,7 @@ class RepositoryManager
         $this->logger = $logger;
         
         $this->config = new \Vaimo\ComposerPatches\Patch\Config($rootPackage->getExtra());
-        $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
+        $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 
     public function processRepository(\Composer\Repository\WritableRepositoryInterface $repository) 

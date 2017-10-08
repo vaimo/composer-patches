@@ -11,6 +11,11 @@ class Config
     const DEV_FILE = 'patches-file-dev';
     const EXCLUDED_PATCHES = 'excluded-patches';
     const APPLIED_FLAG = 'patches_applied';
+
+    public function shouldPreferOwnerPackageConfig()
+    {
+        return (bool)getenv(Environment::PREFER_OWNER);
+    }
     
     public function shouldResetEverything()
     {
@@ -20,11 +25,6 @@ class Config
     public function shouldExitOnFirstFailure()
     {
         return (bool)getenv(Environment::EXIT_ON_FAIL) || (bool)getenv('COMPOSER_EXIT_ON_PATCH_FAILURE');
-    }
-
-    public function shouldPreferOwnerPackageConfig()
-    {
-        return (bool)getenv(Environment::PREFER_OWNER);
     }
     
     public function getSkippedPackages()

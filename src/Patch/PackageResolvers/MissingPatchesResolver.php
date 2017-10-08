@@ -4,13 +4,13 @@ namespace Vaimo\ComposerPatches\Patch\PackageResolvers;
 class MissingPatchesResolver implements \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface
 {
     /**
-     * @var \Vaimo\ComposerPatches\Patch\PackageUtils
+     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
 
     public function __construct()
     {
-        $this->packageUtils = new \Vaimo\ComposerPatches\Patch\PackageUtils();
+        $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
     
     public function resolve(array $patches, array $packages)
