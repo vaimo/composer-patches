@@ -30,7 +30,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
 
     public function postInstall(\Composer\Script\Event $event)
     {
-        $this->bootstrap->activate(
+        $this->bootstrap->apply(
             $event->isDevMode()
         );
     }

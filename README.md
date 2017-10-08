@@ -453,7 +453,8 @@ and patch list inside the file would still use the key `patches`.
 * COMPOSER_PATCHES_FATAL_FAIL - exit after first patch failure is encountered
 * COMPOSER_PATCHES_SKIP_PACKAGES - comma-separated package names to exclude from patching, useful when 
   maintaining patches on package upgrade. Does not affect bundled patches.
-* COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using installed.json
+* COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using the 
+  information stored in installed.json
 
 ### Deprecated flag names
 
