@@ -475,6 +475,10 @@ and difficult to use.
 
 List of generalized changes for each release.
 
+### 3.10.1
+
+* Maintenance: changes to package metadata.
+
 ### 3.10.0
 
 * Feature: environment variable names standardized (old names still supported).
