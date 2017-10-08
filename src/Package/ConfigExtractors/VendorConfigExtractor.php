@@ -29,7 +29,7 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
     {
         $installPath = !$package instanceof \Composer\Package\RootPackage
             ? $this->installationManager->getInstallPath($package)
-            : '';
+            : '.';
 
         $packageComposerFile = $installPath . '/composer.json';
         

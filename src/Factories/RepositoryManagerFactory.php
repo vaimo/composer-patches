@@ -9,18 +9,19 @@ class RepositoryManagerFactory
     public function createForEvent(\Composer\Script\Event $event)
     {
         $composer = $event->getComposer();
+        $io = $event->getIO();
+        $includeDevPatches = $event->isDevMode();
+
+        $installationManager = $composer->getInstallationManager();
         $composerConfig = $composer->getConfig();
+        $rootPackage = $composer->getPackage();
+        $eventDispatcher = $composer->getEventDispatcher();
+        
+        $extraInfo = $rootPackage->getExtra();
+        $vendorRoot = $composerConfig->get('vendor-dir');
 
         $config = new \Vaimo\ComposerPatches\Config();
         
-        $rootPackage = $composer->getPackage();
-        $installationManager = $composer->getInstallationManager();
-        
-        $vendorRoot = $composerConfig->get('vendor-dir');
-        $extraInfo = $rootPackage->getExtra();
-
-        $io = $event->getIO();
-
         $logger = new \Vaimo\ComposerPatches\Logger($io);
         $downloader = new \Composer\Util\RemoteFilesystem($io, $composerConfig);
         
@@ -31,7 +32,7 @@ class RepositoryManagerFactory
         }
         
         $patchesManager = new \Vaimo\ComposerPatches\Managers\PatchesManager(
-            $composer->getEventDispatcher(),
+            $eventDispatcher,
             $downloader,
             $failureHandler,
             $logger,
@@ -43,7 +44,7 @@ class RepositoryManagerFactory
             PluginConfig::FILE => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
         );
 
-        if ($event->isDevMode()) {
+        if ($includeDevPatches) {
             $loaders = array_replace($loaders, array(
                 PluginConfig::DEV_LIST => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
                 PluginConfig::DEV_FILE => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
