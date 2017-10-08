@@ -449,10 +449,16 @@ and patch list inside the file would still use the key `patches`.
 
 ## Environment variables
 
+* COMPOSER_PATCHES_REAPPLY_ALL - will force all patches to be re-applied
+* COMPOSER_PATCHES_FATAL_FAIL - exit after first patch failure is encountered
+* COMPOSER_PATCHES_SKIP_PACKAGES - comma-separated package names to exclude from patching, useful when maintaining patches on package upgrade. Does not affect bundled patches.
+* COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using installed.json
+
+### Deprecated flag names
+
 * COMPOSER_FORCE_PATCH_REAPPLY - will force all patches to be re-applied
 * COMPOSER_EXIT_ON_PATCH_FAILURE - exit after first patch failure is encountered
 * COMPOSER_SKIP_PATCH_PACKAGES - comma-separated package names to exclude from patching, useful when maintaining patches on package upgrade. Does not affect bundled patches.
-* COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using installed.json
 
 ## Credits
 
@@ -465,6 +471,12 @@ and difficult to use.
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.9.1
+
+* Feature: environment variable names standardized (old names still supported)
+* Fix: Root package ignored when using COMPOSER_PATCHES_PREFER_OWNER
+* Maintenance: Code re-organized to centralize the access to env flags  
 
 ### 3.9.0
 
