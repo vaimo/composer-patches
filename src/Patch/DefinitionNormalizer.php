@@ -29,6 +29,29 @@ class DefinitionNormalizer
             $data[PatchDefinition::SKIP] = true;
         }
         
+        $depends = array();
+        
+        if (isset($data[PatchDefinition::VERSION])) {
+            if (is_array($data[PatchDefinition::VERSION])) {
+                $depends = array_replace(
+                    $depends, 
+                    $data[PatchDefinition::VERSION]
+                );
+            } else {
+                $depends = array_replace(
+                    $depends, 
+                    array($patchTarget => $data[PatchDefinition::VERSION])
+                );
+            }
+        }
+        
+        if (isset($data[PatchDefinition::DEPENDS])) {
+            $depends = array_replace(
+                $depends, 
+                $data[PatchDefinition::DEPENDS]
+            );
+        }
+        
         return array(
             PatchDefinition::SOURCE => $source,
             PatchDefinition::TARGETS => isset($data[PatchDefinition::TARGETS])
@@ -40,15 +63,7 @@ class DefinitionNormalizer
             PatchDefinition::LABEL => isset($data[PatchDefinition::LABEL])
                 ? $data[PatchDefinition::LABEL]
                 : $label,
-            PatchDefinition::DEPENDS => isset($data[PatchDefinition::DEPENDS])
-                ? $data[PatchDefinition::DEPENDS]
-                : (isset($data[PatchDefinition::VERSION])
-                    ? (is_array($data[PatchDefinition::VERSION])
-                        ? $data[PatchDefinition::VERSION]
-                        : array($patchTarget => $data[PatchDefinition::VERSION])
-                    )
-                    : array()
-                )
+            PatchDefinition::DEPENDS => $depends
         );
     }
 }

@@ -47,7 +47,7 @@ class ConstraintsApplier implements \Vaimo\ComposerPatches\Interfaces\PatchDefin
                     $patchConstraintsResults[] = $patchConstraint->matches($packageConstraint);
                 }
 
-                if ($patchConstraints && !array_filter($patchConstraintsResults)) {
+                if (count($patchConstraints) != count(array_filter($patchConstraintsResults))) {
                     $patchData = false;
                 }
             }

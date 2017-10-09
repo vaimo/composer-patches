@@ -475,6 +475,11 @@ and difficult to use.
 
 List of generalized changes for each release.
 
+### 3.10.2
+
+* Fix: declaration of 'depends' was overriding 'version'. Constraints defined on those keys are now merged.
+* Fix: patch applied when single version constraint was matched even when multiple ones defined
+
 ### 3.10.1
 
 * Maintenance: changes to package metadata.
