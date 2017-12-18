@@ -1,6 +1,5 @@
 {
     "name": "vaimo/composer-patches", 
-    "version": "3.10.2", 
     "description": "Provides a way to patch Composer packages with optional version restriction", 
     "keywords": [
         "composer plugin", 
