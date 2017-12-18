@@ -475,6 +475,10 @@ and difficult to use.
 
 List of generalized changes for each release.
 
+### 3.10.4
+
+* Maintenance: changes to package meta-data
+
 ### 3.10.3
 
 * Fix: crash due to "missing array key" that's caused by bad comparison in code when using only 'depends' on certain patch declarations
