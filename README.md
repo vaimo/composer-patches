@@ -14,7 +14,7 @@ Patching is enabled when:
 
 _The latter is only useful if you have no patches defined directly on the root/project level as the default state of the patches enabled/disabled state will be: disabled_
 
-```js
+```json
 {
   "extra": {
     "patches": {},
@@ -38,7 +38,7 @@ When patching is disabled and **composer install** is re-executed, all patched p
 
 Same format is used for both project (root level scope) patches and for package patches.
 
-```js
+```json
 {
   "require": {
     "some/package": "1.2.3",
@@ -58,7 +58,7 @@ Same format is used for both project (root level scope) patches and for package 
 
 Same format is used for both project (root level scope) patches and for package patches.
 
-```js
+```json
 {
   "require": {
     "some/package": "1.2.3",
@@ -72,7 +72,7 @@ Same format is used for both project (root level scope) patches and for package 
 
 In which case the file should contain patches listed in following format:
 
-```js
+```json
 {
   "patches": {
     "some/package": {
@@ -87,7 +87,7 @@ In which case the file should contain patches listed in following format:
 The format of a patch definition has several levers of complexity to cater for usage in context of different
 frameworks.
 
-```js
+```json
 {
   "patches": {
     "some/package": {
@@ -99,7 +99,7 @@ frameworks.
 
 Which is the same as (which allows optional version restrictions) ... 
 
-```js
+```json
 {
   "patches": {
     "some/package": {
@@ -113,7 +113,7 @@ Which is the same as (which allows optional version restrictions) ...
 
 Which is the same as (which allows optional patch sequencing) ... 
 
-```js
+```json
 {
   "patches": {
     "some/package": [
@@ -163,7 +163,7 @@ it when it has changed since last time.
 
 Patches can be stored in remote location and referred to by using the full URL of tha patch.
 
-```js
+```json
 {
   "patches": {
     "vendor/project": {
@@ -180,7 +180,7 @@ under "url" key of the patch definition (instead of "source").
 
 In case it's important to apply the patches in a certain order, use an array wrapper around the patch definitions.
 
-```js
+```json
 {
   "extra": {
     "patches": {
@@ -206,7 +206,7 @@ When defined in the following format, `my/file.patch` will always be applied bef
 
 In case the patch is applied only on certain version of the package, a version restriction can be defined for the patch:
 
-```js
+```json
 {
   "extra": {
     "patches": {
@@ -228,13 +228,13 @@ of Composer.
 In projects that rely on certain framework's base package version (which will always guarantee that the patch
 targeted package is always on certain version) alternative format may be more suitable:
 
-```js
+```json
 {
   "extra": {
     "patches": {
       "magento/module-swatches": {
         "Fix: https://github.com/magento/magento2/issues/7959": {
-          "source": "Magento_Swatches/100.1.2/fix-js-crash-when-all-opts-not-selected.patch",
+          "source": "Magento_Swatches/100.1.2/fix-javascript-crash-when-all-options-not-selected.patch",
           "depends": {
             "magento/magento2-base": ">=2.1.7"
           }
@@ -253,7 +253,7 @@ When there are almost identical patches for different version of some package, t
 under same label like this:
 
 
-```js
+```json
 {
   "extra": {
     "patches": {
@@ -276,7 +276,7 @@ Note that indirect version dependency can be used in this case as well (see the 
 
 Same can be achieved with sequenced patches ...
 
-```js
+```json
 {
   "extra": {
     "patches": {
@@ -286,12 +286,12 @@ Same can be achieved with sequenced patches ...
           "source": "some-source.patch"
         },
         {
-          "label": "Fix: Category tree double-escaped (ExtJs + Magento)",
+          "label": "Fix: Category tree items in admin get double-escaped due to ExtJs and Magento both doing the escaping",
           "source": {
             "Magento_Widget/100.1.5/other-patch.patch": {
               "version": "<=100.1.5"
             },
-            "Magento_Widget/100.1.5/avoid-double-escaping-category-tree-names.patch": {
+            "Magento_Widget/100.1.5/avoid-double-escaping-special-chars-and-quotes-for-extjs-tree-item-names.patch": {
               "version": ">100.1.5"
             }
           }
@@ -304,14 +304,14 @@ Same can be achieved with sequenced patches ...
 
 In both of the above cases, a simplified definition format can be used
 
-```js
+```json
 {
   "extra": {
     "patches": {
       "magento/module-sales": {
         "Fix: Wrong time format for orders in admin grid": {
-          "100.1.* <100.1.7": "Magento_Sales/100.1.6/fix-wrong-time-format-for-order-grid.patch",
-          ">=100.1.7": "Magento_Sales/100.1.7/fix-wrong-time-format-for-order-grid.patch"
+          "100.1.* <100.1.7": "Magento_Sales/100.1.6/fix-wrong-time-format-for-orders-in-admin-grid.patch",
+          ">=100.1.7": "Magento_Sales/100.1.7/fix-wrong-time-format-for-orders-in-admin-grid.patch"
         }
       }
     }
@@ -324,7 +324,7 @@ In both of the above cases, a simplified definition format can be used
 In case there's a need to define a patch that targets multiple packages within a single patch file, 
 alternative patch definition format is recommended:
 
-```js
+```json
 {
   "extra": {
     "patches": {
@@ -354,7 +354,7 @@ that to be triggered).
 
 In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), exclusions records can be defined in the project's composer.json:
 
-```js
+```json
 {
   "extra": {
     "excluded-patches": {
@@ -368,7 +368,7 @@ In case some patches that are defined in packages have to be excluded from the p
 
 Will exclude the a patch that was defined in a package in following (or similar) manner ...
 
-```js
+```json
 {
   "name": "patch/owner",
   "extra": {
@@ -392,7 +392,7 @@ declaration lines.
 
 **NOTE: it's useful to use this in combination with the COMPOSER_PATCHES_PREFER_OWNER env flag**
 
-```js
+```json
 {
   "name": "patch/owner",
   "extra": {
@@ -410,7 +410,7 @@ declaration lines.
 
 Same could be achieved when using the brief format by adding #skip to the end of the patch filename ...
 
-```js
+```json
 {
   "name": "patch/owner",
   "extra": {
@@ -428,12 +428,12 @@ Same could be achieved when using the brief format by adding #skip to the end of
 In case there's a need to include patches just for the sake of development convenience, an alternative
 sub-group can be defined is similar manner to how one would define development packages in project context
  
- ```js
+ ```json
 {
   "extra": {
     "patches-dev": {
       "symfony/console": {
-        "Development: suppress deprecation warnings for classes used by magento": {
+        "Development: suppress deprecation warnings for classes used by magento (needed for latest codeception)": {
           "source": "patches/Symfony_Console/2.7.0/suppress-deprecation-warnings.patch",
           "version": ">=v2.7.0"
         }
@@ -474,6 +474,10 @@ and difficult to use.
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.10.3
+
+* Fix: crash due to "missing array key" that's caused by bad comparison in code when using only 'depends' on certain patch declarations
 
 ### 3.10.2
 
