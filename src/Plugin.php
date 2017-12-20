@@ -19,7 +19,8 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         return array(
             \Composer\Script\ScriptEvents::PRE_UPDATE_CMD => 'extractPatchesFromLock',
             \Composer\Script\ScriptEvents::PRE_INSTALL_CMD => 'extractPatchesFromLock',
-            \Composer\Script\ScriptEvents::PRE_AUTOLOAD_DUMP => 'postInstall'
+            \Composer\Script\ScriptEvents::PRE_AUTOLOAD_DUMP => 'postInstall',
+            \Composer\Installer\PackageEvents::PRE_PACKAGE_UNINSTALL => 'uninstall'
         );
     }
 
@@ -31,6 +32,18 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     public function postInstall(\Composer\Script\Event $event)
     {
         $this->bootstrap->apply(
+            $event->isDevMode()
+        );
+    }
+    
+    public function uninstall(\Composer\Installer\PackageEvent $event)
+    {
+        /** @var \Composer\DependencyResolver\Operation\UninstallOperation $operation */
+        $operation = $event->getOperation();
+        
+        $targetDir = $operation->getPackage()->getTargetDir();
+        
+        $this->bootstrap->unload(
             $event->isDevMode()
         );
     }

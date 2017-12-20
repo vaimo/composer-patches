@@ -49,8 +49,19 @@ class Bootstrap
 
         $this->appliedPatchesManager->restoreAppliedPatchesInfo($repository);
 
-        $repositoryManager = $this->repositoryManagerFactory->create($devMode);
+        if (!$repositoryManager = $this->repositoryManagerFactory->create($devMode)) {
+            return null;
+        }
         
         $repositoryManager->processRepository($repository);
+    }
+    
+    public function unload($devMode = false)
+    {
+//        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
+//
+//        $repositoryManager = $this->repositoryManagerFactory->create($devMode);
+//
+//        $repositoryManager->processRepository($repository);
     }
 }
