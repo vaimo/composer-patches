@@ -456,9 +456,8 @@ and patch list inside the file would still use the key `patches`.
   maintaining patches on package upgrade. Does not affect bundled patches.
 * COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using the 
   information stored in installed.json
-* COMPOSER_PATCHES_NO_CLEANUP - skip cleanup when patcher module is uninstalled. Leave packages in patched 
-  state. Default behaviour of this package is to perform a cleanup when the package that is responsible for 
-  patching is removed.
+* COMPOSER_PATCHES_SKIP_CLEANUP - Will leave packages patched even when vaimo/composer-patches is removed. 
+  By default, patched packages are re-installed to reset the patches. 
 
 ### Deprecated flag names
 
@@ -477,6 +476,13 @@ and difficult to use.
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.11.0
+
+* Feature: Reset all patched packages when vaimo/composer-patches in removed from a project (with an option 
+  of leaving the patches applied).
+* Fix: Avoid crashing the composer operation when vaimo/composer-patches has been removed, but it's plugin
+  class remains loaded and triggers an action after all install/uninstall actions are done.
 
 ### 3.10.4
 

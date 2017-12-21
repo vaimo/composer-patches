@@ -44,9 +44,7 @@ class Plugin implements \Composer\Plugin\PluginInterface, \Composer\EventDispatc
             return;
         }
         
-        $this->bootstrap->apply(
-            $event->isDevMode()
-        );
+        $this->bootstrap->apply($event->isDevMode());
     }
     
     public function resetPackages(\Composer\Installer\PackageEvent $event)
@@ -54,11 +52,11 @@ class Plugin implements \Composer\Plugin\PluginInterface, \Composer\EventDispatc
         if (!$this->operationAnalyser->isPatcherUninstallOperation($event->getOperation())) {
             return;
         }
-        
-        $this->bootstrap->unload(
-            $event->isDevMode()
-        );
 
+        if (!getenv(\Vaimo\ComposerPatches\Environment::SKIP_CLEANUP)) {
+            $this->bootstrap->unload();
+        }
+        
         $this->bootstrap = null;
     }
 }

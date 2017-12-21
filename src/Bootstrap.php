@@ -57,11 +57,11 @@ class Bootstrap
         $repositoryManager->processRepository($repository);
     }
     
-    public function unload($devMode = false)
+    public function unload()
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
         
-        $repositoryManager = $this->repositoryManagerFactory->create($devMode, [
+        $repositoryManager = $this->repositoryManagerFactory->create(false, [
             \Vaimo\ComposerPatches\Patch\Config::ENABLED => false
         ]);
 

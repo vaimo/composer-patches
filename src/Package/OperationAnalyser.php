@@ -13,14 +13,6 @@ class OperationAnalyser
         
         $extra = $operation->getPackage()->getExtra();
 
-        if (empty($extra[\Vaimo\ComposerPatches\Config::PATCHER_PLUGIN_MARKER])) {
-            return false;
-        }
-
-        if (getenv(\Vaimo\ComposerPatches\Environment::NO_CLEANUP)) {
-            return false;
-        }
-        
-        return true;
+        return !empty($extra[\Vaimo\ComposerPatches\Config::PATCHER_PLUGIN_MARKER]);
     }
 }
