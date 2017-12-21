@@ -1,17 +1,22 @@
 <?php
 namespace Vaimo\ComposerPatches;
 
-class Plugin implements \Composer\Plugin\PluginInterface,
-    \Composer\EventDispatcher\EventSubscriberInterface
+class Plugin implements \Composer\Plugin\PluginInterface, \Composer\EventDispatcher\EventSubscriberInterface
 {
     /**
      * @var \Vaimo\ComposerPatches\Bootstrap
      */
     private $bootstrap;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Package\OperationAnalyser
+     */
+    private $operationAnalyser;
     
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io) 
     {
         $this->bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $io);
+        $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
     }
 
     public static function getSubscribedEvents()
@@ -20,39 +25,40 @@ class Plugin implements \Composer\Plugin\PluginInterface,
             \Composer\Script\ScriptEvents::PRE_UPDATE_CMD => 'extractPatchesFromLock',
             \Composer\Script\ScriptEvents::PRE_INSTALL_CMD => 'extractPatchesFromLock',
             \Composer\Script\ScriptEvents::PRE_AUTOLOAD_DUMP => 'postInstall',
-            \Composer\Installer\PackageEvents::PRE_PACKAGE_UNINSTALL => 'uninstall'
+            \Composer\Installer\PackageEvents::PRE_PACKAGE_UNINSTALL => 'resetPackages'
         );
     }
 
     public function extractPatchesFromLock()
     {
+        if (!$this->bootstrap) {
+            return;
+        }
+        
         $this->bootstrap->prepare();
     }
 
     public function postInstall(\Composer\Script\Event $event)
     {
+        if (!$this->bootstrap) {
+            return;
+        }
+        
         $this->bootstrap->apply(
             $event->isDevMode()
         );
     }
     
-    public function uninstall(\Composer\Installer\PackageEvent $event)
+    public function resetPackages(\Composer\Installer\PackageEvent $event)
     {
-        /** @var \Composer\DependencyResolver\Operation\UninstallOperation $operation */
-        $operation = $event->getOperation();
-        
-        $extra = $operation->getPackage()->getExtra();
-        
-        if (empty($extra[\Vaimo\ComposerPatches\Config::PATCHER_PLUGIN_MARKER])) {
-            return;
-        }
-        
-        if (getenv(\Vaimo\ComposerPatches\Environment::NO_CLEANUP)) {
+        if (!$this->operationAnalyser->isPatcherUninstallOperation($event->getOperation())) {
             return;
         }
         
         $this->bootstrap->unload(
             $event->isDevMode()
         );
+
+        $this->bootstrap = null;
     }
 }
