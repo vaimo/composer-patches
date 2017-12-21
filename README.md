@@ -5,6 +5,31 @@ Simple patches plugin for Composer. Applies a patch from a local or remote file 
 _The information about applied patches on local installed project will be kept in the installed.json (simple 
 boolean flag for patched packages will be also included when running composer update command)_
 
+Installing the plugin will introduce a new composer command: **composer patch**
+
+```shell
+# Re-apply all patches
+composer patch --redo 
+
+# Re-apply patches for one speicif package
+composer patch --redo my/package 
+
+# Re-apply missing patches (similar to patch apply on 'composer install') 
+composer patch 
+
+# Gather patches information from /vendor instead of install.json
+composer patch --from-source 
+
+# Reset all patched packages
+composer patch --reset 
+
+# Reset one specific patched package
+composer patch --redo my/package 
+```
+
+_Note that the command does expect the project to be set up properly for patching, including the 
+'enable-patching' flag mentioned below_
+
 ## Enabling patching for a project
 
 Patching is enabled when:
@@ -12,7 +37,8 @@ Patching is enabled when:
 * project has "patches" key defined under "extra" 
 * project has "enable-patching" key defined under "extra" 
 
-_The latter is only useful if you have no patches defined directly on the root/project level as the default state of the patches enabled/disabled state will be: disabled_
+_The latter is only useful if you have no patches defined directly on the root/project level as the default 
+state of the patches enabled/disabled state will be: disabled_
 
 ```json
 {
@@ -32,9 +58,7 @@ _The latter is only useful if you have no patches defined directly on the root/p
 When patching is disabled and **composer install** is re-executed, all patched package will be re-installed
 (to wipe the patched in changes).
 
-
-
-## Usage: patch file
+## Defining patches for specific package: patch file
 
 Same format is used for both project (root level scope) patches and for package patches.
 
@@ -54,7 +78,7 @@ Same format is used for both project (root level scope) patches and for package 
 }
 ```
 
-## Usage: patch list file
+## Defining patches for specific package: patch list file
 
 Same format is used for both project (root level scope) patches and for package patches.
 
@@ -448,32 +472,6 @@ These patches will not be applied when installing the project with `--no-dev` op
 Note that same definition pattern can be used for patches-file, where the key would become `patches-file-dev`
 and patch list inside the file would still use the key `patches`.
 
-## Commands
-
-Full list of commands that this plugin introduces:
-
-1. **composer patch** -- Triggers patcher in different execution modes
-
-```shell
-# Re-apply all patches
-composer patch --redo 
-
-# Re-apply patches for one speicif package
-composer patch --redo my/package 
-
-# Re-apply missing patches (similar to patch apply on 'composer install') 
-composer patch 
-
-# Gather patches information from /vendor instead of install.json
-composer patch --from-source 
-
-# Reset all patched packages
-composer patch --reset 
-
-# Reset one specific patched package
-composer patch --redo my/package 
-```
-
 ## Patcher Configuration
 
 In case it's needed for the patcher to apply the patches using some third-party application or to include
@@ -530,7 +528,7 @@ List of generalized changes for each release.
 ### 3.12.0
 
 * Feature: Introduced a new composer command to make it easier to re-apply all patches and give newly defined
-  patches a quick test-run (see: Commands)
+  patches a quick test-run (composer patch).
 
 ### 3.11.0
 
