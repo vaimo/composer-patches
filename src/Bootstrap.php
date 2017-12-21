@@ -43,7 +43,7 @@ class Bootstrap
         $this->appliedPatchesManager->extractAppliedPatchesInfo($repository);
     }
 
-    public function apply($devMode = false)
+    public function apply($devMode = false, array $targets = array())
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
         $configData = $this->composer->getPackage()->getExtra();
@@ -54,17 +54,26 @@ class Bootstrap
             return null;
         }
         
-        $repositoryManager->processRepository($repository);
+        $repositoryManager->processRepository(
+            $repository, 
+            array_fill_keys($targets, true)
+        );
     }
     
-    public function unload()
+    public function unload(array $targets = array())
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-        
-        $repositoryManager = $this->repositoryManagerFactory->create(false, [
-            \Vaimo\ComposerPatches\Patch\Config::ENABLED => false
-        ]);
 
-        $repositoryManager->processRepository($repository);
+        $repositoryManager = $this->repositoryManagerFactory->create(
+            false,
+            $targets 
+                ? $this->composer->getPackage()->getExtra() 
+                : array(\Vaimo\ComposerPatches\Patch\Config::ENABLED => false)
+        );
+
+        $repositoryManager->processRepository(
+            $repository, 
+            array_fill_keys($targets, false)
+        );
     }
 }

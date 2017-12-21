@@ -73,7 +73,7 @@ class RepositoryManager
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 
-    public function processRepository(\Composer\Repository\WritableRepositoryInterface $repository) 
+    public function processRepository(\Composer\Repository\WritableRepositoryInterface $repository, array $targetFlags = []) 
     {
         $patches = array();
 
@@ -100,6 +100,20 @@ class RepositoryManager
             false
         );
 
+        if ($targetFlags) {
+            $targetsToKeep = array_filter($targetFlags);
+            $targetsToReset = array_keys(array_diff_key($targetFlags, $targetsToKeep));
+            
+            $groupedPatches = array_intersect_key($groupedPatches, $targetsToKeep);
+
+            $patches = array_replace($patches, array_fill_keys($targetsToReset, array()));
+            
+            $resetFlags = array_replace(
+                array_intersect_key($resetFlags, $groupedPatches),
+                array_fill_keys($targetsToReset, false)
+            );
+        }
+        
         $packagesUpdated = false;
 
         if ($resetFlags || $patches) {
@@ -120,7 +134,7 @@ class RepositoryManager
             } else {
                 $patchGroupTargets = array($packageName);
             }
-
+            
             foreach ($patchGroupTargets as $target) {
                 if (!isset($resetFlags[$target])) {
                     continue;

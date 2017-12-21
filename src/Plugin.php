@@ -1,7 +1,8 @@
 <?php
 namespace Vaimo\ComposerPatches;
 
-class Plugin implements \Composer\Plugin\PluginInterface, \Composer\EventDispatcher\EventSubscriberInterface
+class Plugin implements \Composer\Plugin\PluginInterface, 
+    \Composer\EventDispatcher\EventSubscriberInterface, \Composer\Plugin\Capable
 {
     /**
      * @var \Vaimo\ComposerPatches\Bootstrap
@@ -19,6 +20,13 @@ class Plugin implements \Composer\Plugin\PluginInterface, \Composer\EventDispatc
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
     }
 
+    public function getCapabilities()
+    {
+        return array(
+            'Composer\Plugin\Capability\CommandProvider' => '\Vaimo\ComposerPatches\Composer\CommandsProvider',
+        );
+    }
+    
     public static function getSubscribedEvents()
     {
         return array(

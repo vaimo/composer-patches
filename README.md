@@ -448,6 +448,32 @@ These patches will not be applied when installing the project with `--no-dev` op
 Note that same definition pattern can be used for patches-file, where the key would become `patches-file-dev`
 and patch list inside the file would still use the key `patches`.
 
+## Commands
+
+Full list of commands that this plugin introduces:
+
+1. **composer patch** -- Triggers patcher in different execution modes
+
+```shell
+# Re-apply all patches
+composer patch --redo 
+
+# Re-apply patches for one speicif package
+composer patch --redo my/package 
+
+# Re-apply missing patches (similar to patch apply on 'composer install') 
+composer patch 
+
+# Gather patches information from /vendor instead of install.json
+composer patch --from-source 
+
+# Reset all patched packages
+composer patch --reset 
+
+# Reset one specific patched package
+composer patch --redo my/package 
+```
+
 ## Patcher Configuration
 
 In case it's needed for the patcher to apply the patches using some third-party application or to include
@@ -500,6 +526,11 @@ Heavily modified version of https://github.com/cweagans/composer-patches
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.12.0
+
+* Feature: Introduced a new composer command to make it easier to re-apply all patches and give newly defined
+  patches a quick test-run (see: Commands)
 
 ### 3.11.0
 
