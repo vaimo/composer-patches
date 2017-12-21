@@ -23,7 +23,7 @@ class Decoder
                 $errorMessage = $jsonErrorMessages[$errorCode];
             }
 
-            throw new \Exception(
+            throw new \Vaimo\ComposerPatches\Exceptions\DecoderException(
                 sprintf('There was an error in the supplied patches file: - %s', $errorMessage)
             );
         }

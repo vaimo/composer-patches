@@ -58,10 +58,10 @@ class Bootstrap
     
     public function unload($devMode = false)
     {
-//        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-//
-//        $repositoryManager = $this->repositoryManagerFactory->create($devMode);
-//
-//        $repositoryManager->processRepository($repository);
+        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
+
+        $repositoryManager = $this->repositoryManagerFactory->create($devMode);
+
+        $repositoryManager->processRepository($repository);
     }
 }

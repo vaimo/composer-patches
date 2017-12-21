@@ -9,11 +9,11 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
      * @var \Composer\Installer\InstallationManager
      */
     private $installationManager;
-
+    
     /**
-     * @var \Vaimo\ComposerPatches\Json\Decoder
+     * @var \Vaimo\ComposerPatches\Package\ConfigReader
      */
-    private $jsonDecoder;
+    private $configLoader;
 
     /**
      * @param \Composer\Installer\InstallationManager $installationManager
@@ -22,7 +22,7 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
         \Composer\Installer\InstallationManager $installationManager
     ) {
         $this->installationManager = $installationManager;
-        $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
+        $this->configLoader = new \Vaimo\ComposerPatches\Package\ConfigReader();
     }
     
     public function getConfig(\Composer\Package\PackageInterface $package)
@@ -31,13 +31,11 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
             ? $this->installationManager->getInstallPath($package)
             : '.';
 
-        $packageComposerFile = $installPath . '/composer.json';
+        $source = $installPath . '/' . Config::PACKAGE_CONFIG_FILE;
         
-        if (file_exists($packageComposerFile)) {
-            $fileContents = $this->jsonDecoder->decode(
-                file_get_contents($packageComposerFile)
-            );
-
+        if (file_exists($source)) {
+            $fileContents = $this->configLoader->readToArray($source);
+            
             if (isset($fileContents[Config::CONFIG_ROOT])) {
                 return $fileContents[Config::CONFIG_ROOT];
             }

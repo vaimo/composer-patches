@@ -6,21 +6,19 @@ use Vaimo\ComposerPatches\Config as PluginConfig;
 class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface
 {
     /**
-     * @var \Vaimo\ComposerPatches\Json\Decoder
+     * @var \Vaimo\ComposerPatches\Package\ConfigReader
      */
-    private $jsonDecoder;
+    private $configLoader;
 
     public function __construct()
     {
-        $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
+        $this->configLoader = new \Vaimo\ComposerPatches\Package\ConfigReader();
     }
 
     public function load($source)
     {
-        $fileContents = $this->jsonDecoder->decode(
-            file_get_contents($source)
-        );
-
+        $fileContents = $this->configLoader->readToArray($source);
+        
         if (isset($fileContents[PluginConfig::LIST])) {
             return $fileContents[PluginConfig::LIST];
         } elseif (!$fileContents) {

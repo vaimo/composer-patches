@@ -31,7 +31,8 @@
     "license": "BSD", 
     "type": "composer-plugin", 
     "extra": {
-        "class": "Vaimo\\ComposerPatches\\Plugin"
+        "class": "Vaimo\\ComposerPatches\\Plugin",
+        "patcher_plugin": true
     }, 
     "authors": [
         {

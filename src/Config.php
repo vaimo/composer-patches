@@ -12,6 +12,8 @@ class Config
     const EXCLUDED_PATCHES = 'excluded-patches';
     const APPLIED_FLAG = 'patches_applied';
 
+    const PACKAGE_CONFIG_FILE = 'composer.json';
+
     public function shouldPreferOwnerPackageConfig()
     {
         return (bool)getenv(Environment::PREFER_OWNER);

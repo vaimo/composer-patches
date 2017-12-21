@@ -40,11 +40,14 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     {
         /** @var \Composer\DependencyResolver\Operation\UninstallOperation $operation */
         $operation = $event->getOperation();
+        $extra = $operation->getPackage()->getExtra();
         
-        $targetDir = $operation->getPackage()->getTargetDir();
+//        if (!isset($extra['patcher_plugin']) || !$extra['patcher_plugin']) {
+//            return;
+//        }
         
-        $this->bootstrap->unload(
-            $event->isDevMode()
-        );
+//        $this->bootstrap->unload(
+//            $event->isDevMode()
+//        );
     }
 }
