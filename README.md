@@ -428,7 +428,7 @@ Same could be achieved when using the brief format by adding #skip to the end of
 In case there's a need to include patches just for the sake of development convenience, an alternative
 sub-group can be defined is similar manner to how one would define development packages in project context
  
- ```json
+```json
 {
   "extra": {
     "patches-dev": {
@@ -448,6 +448,33 @@ These patches will not be applied when installing the project with `--no-dev` op
 Note that same definition pattern can be used for patches-file, where the key would become `patches-file-dev`
 and patch list inside the file would still use the key `patches`.
 
+## Patcher Configuration
+
+In case it's needed for the patcher to apply the patches using some third-party application or to include
+some extra options, it's possible to declare new patcher commands or override the existing ones by adding 
+a new section to the "extra" of the project's composer.json. Note that this example is a direct copy of what
+is built into the plugin. Changes to existing definitions are applied recursively.
+
+```json
+{
+  "extra": {
+    "patcher-config": {
+      "patchers": {
+        "GIT": {
+          "validate": "git apply --check -p%s %s",
+          "patch": "git apply -p%s %s"
+        },
+        "PATCH": {
+          "validate": "patch -p%s --dry-run --no-backup-if-mismatch < %s",
+          "patch": "patch -p%s --no-backup-if-mismatch < %s"
+        }
+      },
+      "levels": [1, 0, 2]
+    }
+  }
+}
+```
+
 ## Environment variables
 
 * COMPOSER_PATCHES_REAPPLY_ALL - will force all patches to be re-applied
@@ -457,7 +484,8 @@ and patch list inside the file would still use the key `patches`.
 * COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using the 
   information stored in installed.json
 * COMPOSER_PATCHES_SKIP_CLEANUP - Will leave packages patched even when vaimo/composer-patches is removed. 
-  By default, patched packages are re-installed to reset the patches. 
+  By default, patched packages are re-installed to reset the patches (useful when creating immutable build 
+  artifacts without any unnecessary modules installed).
 
 ### Deprecated flag names
 
@@ -469,10 +497,6 @@ and patch list inside the file would still use the key `patches`.
 
 Heavily modified version of https://github.com/cweagans/composer-patches
 
-A ton of this code is adapted or taken straight from https://github.com/jpstacey/composer-patcher, which is
-abandoned in favor of https://github.com/netresearch/composer-patches-plugin, which is (IMHO) overly complex
-and difficult to use.
-
 ## Changelog 
 
 List of generalized changes for each release.
@@ -481,8 +505,11 @@ List of generalized changes for each release.
 
 * Feature: Reset all patched packages when vaimo/composer-patches in removed from a project (with an option 
   of leaving the patches applied).
-* Fix: Avoid crashing the composer operation when vaimo/composer-patches has been removed, but it's plugin
-  class remains loaded and triggers an action after all install/uninstall actions are done.
+* Feature: Added the possibility for a project to define custom patch appliers or override the ones that are 
+  built into the package (see: Patcher Configuration)
+* Fix: Avoid crashing at the end of a composer operation when vaimo/composer-patches was removed while it was 
+  executing, but it's plugin class remains loaded and triggers an action after all install/uninstall actions 
+  are done.
 
 ### 3.10.4
 

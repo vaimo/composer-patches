@@ -49,6 +49,7 @@ class PatchesManager
      * @param \Composer\Util\RemoteFilesystem $downloader
      * @param \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler
      * @param \Vaimo\ComposerPatches\Logger $logger
+     * @param \Vaimo\ComposerPatches\Patch\Applier $patchApplier
      * @param string $vendorRoot
      */
     public function __construct(
@@ -56,26 +57,17 @@ class PatchesManager
         \Composer\Util\RemoteFilesystem $downloader,
         \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler,
         \Vaimo\ComposerPatches\Logger $logger,
+        \Vaimo\ComposerPatches\Patch\Applier $patchApplier,
         $vendorRoot
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->downloader = $downloader;
         $this->failureHandler = $failureHandler;
         $this->logger = $logger;
+        $this->patchApplier = $patchApplier;
         $this->vendorRoot = $vendorRoot;
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
-        
-        $this->patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($this->logger, array(
-            'GIT' => array(
-                'validate' => 'git apply --check -p%s %s',
-                'patch' => 'git apply -p%s %s'
-            ),
-            'PATCH' => array(
-                'validate' => 'patch -p%s --dry-run --no-backup-if-mismatch < %s',
-                'patch' => 'patch -p%s --no-backup-if-mismatch < %s'
-            )
-        ));
     }
     
     public function applyPatches(array $patches, PackageInterface $package, $installPath)
@@ -118,7 +110,7 @@ class PatchesManager
                     $this->downloader->copy($hostname, $source, $filename, false);
                 }
 
-                $this->patchApplier->processFile($filename, $installPath);
+                $this->patchApplier->applyFile($filename, $installPath);
 
                 if (isset($hostname)) {
                     unset($hostname);

@@ -49,12 +49,42 @@ class RepositoryManagerFactory
         } else {
             $failureHandler = new \Vaimo\ComposerPatches\Patch\FailureHandlers\GracefulHandler($logger);
         }
+
+        $applierConfig = array(
+            'patchers' => array(
+                'GIT' => array(
+                    'validate' => 'git apply --check -p%s %s',
+                    'patch' => 'git apply -p%s %s'
+                ),
+                'PATCH' => array(
+                    'validate' => 'patch -p%s --dry-run --no-backup-if-mismatch < %s',
+                    'patch' => 'patch -p%s --no-backup-if-mismatch < %s'
+                )
+            ),
+            'levels' => array('1', '0', '2')
+        );
+        
+        if (isset($patcherConfigData[PluginConfig::PATCHER_CONFIG]) 
+            && is_array($patcherConfigData[PluginConfig::PATCHER_CONFIG])
+        ) {
+            $applierConfig = array_replace_recursive(
+                $applierConfig, 
+                $patcherConfigData[PluginConfig::PATCHER_CONFIG]
+            );
+        }
+
+        $patchApplier = new \Vaimo\ComposerPatches\Patch\Applier(
+            $logger,
+            isset($applierConfig['patchers']) ? array_filter($applierConfig['patchers']) : array(),
+            isset($applierConfig['levels']) ? $applierConfig['levels'] : array()
+        );
         
         $patchesManager = new \Vaimo\ComposerPatches\Managers\PatchesManager(
             $eventDispatcher,
             $downloader,
             $failureHandler,
             $logger,
+            $patchApplier,
             $vendorRoot
         );
 

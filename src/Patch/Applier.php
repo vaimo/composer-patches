@@ -4,33 +4,46 @@ namespace Vaimo\ComposerPatches\Patch;
 class Applier
 {
     /**
+     * @var \Vaimo\ComposerPatches\Logger
+     */
+    private $logger;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Shell
      */
     private $shell;
 
     /**
-     * @var \Vaimo\ComposerPatches\Logger
+     * @var array
      */
-    private $logger;
+    private $patchers;
+    
+    /**
+     * @var array
+     */
+    private $patchLevelSequence;
 
     /**
      * @param \Vaimo\ComposerPatches\Logger $logger
      * @param array $patchers
+     * @param array $patchLevelSequence
      */
     public function __construct(
         \Vaimo\ComposerPatches\Logger $logger,
-        array $patchers
+        array $patchers,
+        array $patchLevelSequence
     ) {
         $this->logger = $logger;
+
         $this->patchers = $patchers;
+        $this->patchLevelSequence = $patchLevelSequence;
 
         $this->shell = new \Vaimo\ComposerPatches\Shell($logger);
     }
 
-    public function processFile($filename, $cwd)
+    public function applyFile($filename, $cwd)
     {
         $result = false;
-        $patchLevelSequence = array('1', '0', '2');
 
         $operationSequence = array(
             'validate' => 'Validation',
@@ -40,7 +53,7 @@ class Applier
         list($type, $patchLevel, $operationName) = array_fill(0, 3, 'UNKNOWN');
 
         foreach ($this->patchers as $type => $patcher) {
-            foreach ($patchLevelSequence as $sequenceIndex => $patchLevel) {
+            foreach ($this->patchLevelSequence as $sequenceIndex => $patchLevel) {
                 $result = true;
 
                 foreach ($operationSequence as $operationCode => $operationName) {
@@ -56,14 +69,14 @@ class Applier
                     break 2;
                 }
 
-                if ($sequenceIndex >= count($patchLevelSequence) - 1) {
+                if ($sequenceIndex >= count($this->patchLevelSequence) - 1) {
                     continue;
                 }
 
                 $this->logger->writeVerbose(
                     '%s (type=%s) failed with patch_level=%s. Retrying with patch_level=%s',
                     'warning',
-                    array($operationName, $type, $patchLevel, $patchLevelSequence[$sequenceIndex + 1])
+                    array($operationName, $type, $patchLevel, $this->patchLevelSequence[$sequenceIndex + 1])
                 );
             }
         }
