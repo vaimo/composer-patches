@@ -39,14 +39,6 @@ class RepositoryManagerFactory
         
         $extraInfo = $rootPackage->getExtra();
         $vendorRoot = $composerConfig->get('vendor-dir');
-
-        if (!class_exists('\Vaimo\ComposerPatches\Managers\RepositoryManager')) {
-            return null;
-        }
-
-        if (!class_exists('\Vaimo\ComposerPatches\Patch\Definition')) {
-            return null;
-        }
         
         $config = new \Vaimo\ComposerPatches\Config();
         
