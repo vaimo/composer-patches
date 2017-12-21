@@ -28,7 +28,7 @@ composer patch --redo my/package
 ```
 
 _Note that the command does expect the project to be set up properly for patching, including the 
-'enable-patching' flag mentioned below_
+'enable-patching' flag mentioned "Enabling patching for a project" section._
 
 ## Enabling patching for a project
 
