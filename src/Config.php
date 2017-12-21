@@ -11,6 +11,8 @@ class Config
     const DEV_FILE = 'patches-file-dev';
     const EXCLUDED_PATCHES = 'excluded-patches';
     const APPLIED_FLAG = 'patches_applied';
+    
+    const PATCHER_PLUGIN_MARKER = 'patcher_plugin';
 
     const PACKAGE_CONFIG_FILE = 'composer.json';
 

@@ -40,14 +40,19 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     {
         /** @var \Composer\DependencyResolver\Operation\UninstallOperation $operation */
         $operation = $event->getOperation();
+        
         $extra = $operation->getPackage()->getExtra();
         
-//        if (!isset($extra['patcher_plugin']) || !$extra['patcher_plugin']) {
-//            return;
-//        }
+        if (empty($extra[\Vaimo\ComposerPatches\Config::PATCHER_PLUGIN_MARKER])) {
+            return;
+        }
         
-//        $this->bootstrap->unload(
-//            $event->isDevMode()
-//        );
+        if (getenv(\Vaimo\ComposerPatches\Environment::NO_CLEANUP)) {
+            return;
+        }
+        
+        $this->bootstrap->unload(
+            $event->isDevMode()
+        );
     }
 }

@@ -46,10 +46,11 @@ class Bootstrap
     public function apply($devMode = false)
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
+        $configData = $this->composer->getPackage()->getExtra();
 
         $this->appliedPatchesManager->restoreAppliedPatchesInfo($repository);
-
-        if (!$repositoryManager = $this->repositoryManagerFactory->create($devMode)) {
+        
+        if (!$repositoryManager = $this->repositoryManagerFactory->create($devMode, $configData)) {
             return null;
         }
         
@@ -59,8 +60,10 @@ class Bootstrap
     public function unload($devMode = false)
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-
-        $repositoryManager = $this->repositoryManagerFactory->create($devMode);
+        
+        $repositoryManager = $this->repositoryManagerFactory->create($devMode, [
+            \Vaimo\ComposerPatches\Patch\Config::ENABLED => false
+        ]);
 
         $repositoryManager->processRepository($repository);
     }

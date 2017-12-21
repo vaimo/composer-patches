@@ -50,11 +50,13 @@ class RepositoryManager
      * @param \Composer\Package\RootPackageInterface $rootPackage
      * @param \Vaimo\ComposerPatches\Managers\PatchesManager $patchesManager
      * @param \Vaimo\ComposerPatches\Managers\PackagesManager $packagesManager
+     * @param \Vaimo\ComposerPatches\Patch\Config $patchConfig
      * @param \Vaimo\ComposerPatches\Logger $logger
      */
     public function __construct(
         \Composer\Installer\InstallationManager $installationManager,
         \Composer\Package\RootPackageInterface $rootPackage,
+        \Vaimo\ComposerPatches\Patch\Config $patchConfig,
         \Vaimo\ComposerPatches\Managers\PatchesManager $patchesManager,
         \Vaimo\ComposerPatches\Managers\PackagesManager $packagesManager,
         \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface $packagesResolver,
@@ -67,7 +69,7 @@ class RepositoryManager
         $this->packagesResolver = $packagesResolver;
         $this->logger = $logger;
         
-        $this->config = new \Vaimo\ComposerPatches\Patch\Config($rootPackage->getExtra());
+        $this->config = $patchConfig;
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 

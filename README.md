@@ -456,6 +456,9 @@ and patch list inside the file would still use the key `patches`.
   maintaining patches on package upgrade. Does not affect bundled patches.
 * COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using the 
   information stored in installed.json
+* COMPOSER_PATCHES_NO_CLEANUP - skip cleanup when patcher module is uninstalled. Leave packages in patched 
+  state. Default behaviour of this package is to perform a cleanup when the package that is responsible for 
+  patching is removed.
 
 ### Deprecated flag names
 

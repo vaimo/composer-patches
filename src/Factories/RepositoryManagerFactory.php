@@ -28,7 +28,7 @@ class RepositoryManagerFactory
         $this->io = $io;
     }
     
-    public function create($devMode = false)
+    public function create($devMode = false, array $patcherConfigData = [])
     {
         $includeDevPatches = $devMode;
 
@@ -37,7 +37,6 @@ class RepositoryManagerFactory
         $rootPackage = $this->composer->getPackage();
         $eventDispatcher = $this->composer->getEventDispatcher();
         
-        $extraInfo = $rootPackage->getExtra();
         $vendorRoot = $composerConfig->get('vendor-dir');
         
         $config = new \Vaimo\ComposerPatches\Config();
@@ -88,11 +87,11 @@ class RepositoryManagerFactory
         }
         
         $patchProcessors = array(
-            new DefinitionProcessors\GlobalExcluder($extraInfo),
+            new DefinitionProcessors\GlobalExcluder($patcherConfigData),
             new DefinitionProcessors\LocalExcluder(),
             new DefinitionProcessors\CustomExcluder($config->getSkippedPackages()),
             new DefinitionProcessors\PathNormalizer($installationManager),
-            new DefinitionProcessors\ConstraintsApplier($extraInfo),
+            new DefinitionProcessors\ConstraintsApplier($patcherConfigData),
             new DefinitionProcessors\Validator(),
             new DefinitionProcessors\Simplifier(),
         );
@@ -104,9 +103,12 @@ class RepositoryManagerFactory
             $vendorRoot
         );
         
+        $patcherConfig = new \Vaimo\ComposerPatches\Patch\Config($patcherConfigData);
+        
         return new \Vaimo\ComposerPatches\Managers\RepositoryManager(
             $installationManager,
             $rootPackage,
+            $patcherConfig,
             $patchesManager,
             $packagesManager,
             $packagesResolver,
