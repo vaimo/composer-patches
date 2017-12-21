@@ -8,23 +8,26 @@ boolean flag for patched packages will be also included when running composer up
 Installing the plugin will introduce a new composer command: **composer patch**
 
 ```shell
+# Re-apply new patches (similar to patch apply on 'composer install') 
+composer patch 
+
 # Re-apply all patches
 composer patch --redo 
 
 # Re-apply patches for one speicif package
 composer patch --redo my/package 
 
-# Re-apply missing patches (similar to patch apply on 'composer install') 
-composer patch 
-
-# Gather patches information from /vendor instead of install.json
-composer patch --from-source 
-
 # Reset all patched packages
-composer patch --reset 
+composer patch --undo 
 
 # Reset one specific patched package
-composer patch --redo my/package 
+composer patch --undo my/package 
+
+# Gather patches information from /vendor instead of install.json
+composer patch --from-source
+
+# Ideal for testing out a newly added patch against my/package
+composer patch --from-source --redo my/package 
 ```
 
 _Note that the command does expect the project to be set up properly for patching, including the 
@@ -524,6 +527,12 @@ Heavily modified version of https://github.com/cweagans/composer-patches
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.12.1
+
+* Feature: Renamed 'reset' to 'redo' to make the command argument's purpose easier to understand when 
+  compared with 'redo'
+* Fix: Properly re-apply all patches when using 'from-source' nad 'redo' arguments together
 
 ### 3.12.0
 

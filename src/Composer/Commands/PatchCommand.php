@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 use Vaimo\ComposerPatches\Environment;
 
-class PatchesReApply extends \Composer\Command\BaseCommand
+class PatchCommand extends \Composer\Command\BaseCommand
 {
     protected function configure()
     {
@@ -17,17 +17,17 @@ class PatchesReApply extends \Composer\Command\BaseCommand
         $this->addArgument(
             'targets', \Symfony\Component\Console\Input\InputArgument::IS_ARRAY, 'Packages for the patcher to target', array()
         );
+
+        $this->addOption(
+            '--redo', null, InputOption::VALUE_NONE, 'Re-patch all packages or a specific package when targets defined'
+        );
+
+        $this->addOption(
+            '--undo', null, InputOption::VALUE_NONE, 'Remove all patches or a specific patch when targets defined'
+        );
         
         $this->addOption(
             '--no-dev', null, InputOption::VALUE_NONE, 'Disables installation of require-dev packages'
-        );
-
-        $this->addOption(
-            '--redo', null, InputOption::VALUE_NONE, 'Re-patch every package that has patches defined against it'
-        );
-
-        $this->addOption(
-            '--reset', null, InputOption::VALUE_NONE, 'Remove all patches.'
         );
         
         $this->addOption(
@@ -44,7 +44,7 @@ class PatchesReApply extends \Composer\Command\BaseCommand
 
         $targets = $input->getArgument('targets');
         
-        if ($input->getOption('reset')) {
+        if ($input->getOption('undo')) {
             $bootstrap->unload($targets);
             
             return;
