@@ -540,6 +540,10 @@ Heavily modified version of https://github.com/cweagans/composer-patches
 
 List of generalized changes for each release.
 
+### 3.13.2
+
+* Maintenance: updated lock to latest due to composer validate error
+
 ### 3.13.1
 
 * Fix: roll-back with 'undo' to reset package when used with specific targets.

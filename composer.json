@@ -31,7 +31,7 @@
         "issues": "https://github.com/vaimo/composer-patches/issues"
     }, 
     "minimum-stability": "dev", 
-    "license": "BSD", 
+    "license": "proprietary", 
     "type": "composer-plugin", 
     "extra": {
         "class": "Vaimo\\ComposerPatches\\Plugin",
