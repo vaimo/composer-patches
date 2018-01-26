@@ -540,48 +540,56 @@ Heavily modified version of https://github.com/cweagans/composer-patches
 
 List of generalized changes for each release.
 
+### 3.13.1
+
+* Fix: roll-back with 'undo' to reset package when used with specific targets.
+
 ### 3.13.0
 
-* Feature: Option to apply only some of the patches based on text-based file name filter
-* Feature: Added an option for the user to have control over the sequence of the patchers 
-* Fix: patch path strip levels re-ordered to go sequentially from 0 to 4 to allow first run to be with 'as is' path
-* Fix: changed patch applier logic to test different patchers with same level rather than going through all patches with levels in sequence
-* Fix: preferring standard patcher instead of starting with GIT
-* Fix: patches not being reset when removing all patches from patch provider in vendor folder and running '--from-source --redo my/package'
+* Feature: Option to apply only some of the patches based on text-based file name filter.
+* Feature: Added an option for the user to have control over the sequence of the patchers.
+* Fix: patch path strip levels re-ordered to go sequentially from 0 to 4 to allow first run to be 
+  with 'as is' path.
+* Fix: changed patch applier logic to test different patchers with same level rather than going 
+  through all patches with levels in sequence.
+* Fix: preferring standard patcher instead of starting with GIT.
+* Fix: patches not being reset when removing all patches from patch provider in vendor folder and 
+  running '--from-source --redo my/package'.
 
 ### 3.12.1
 
 * Feature: Renamed 'reset' to 'redo' to make the command argument's purpose easier to understand when 
-  compared with 'redo'
-* Fix: Properly re-apply all patches when using 'from-source' nad 'redo' arguments together
+  compared with 'redo'.
+* Fix: Properly re-apply all patches when using 'from-source' nad 'redo' arguments together.
 
 ### 3.12.0
 
-* Feature: Introduced a new composer command to make it easier to re-apply all patches and give newly defined
-  patches a quick test-run (composer patch).
+* Feature: Introduced a new composer command to make it easier to re-apply all patches and give 
+  newly defined patches a quick test-run (composer patch).
 
 ### 3.11.0
 
-* Feature: Reset all patched packages when vaimo/composer-patches in removed from a project (with an option 
-  of leaving the patches applied).
-* Feature: Added the possibility for a project to define custom patch appliers or override the ones that are 
-  built into the package (see: Patcher Configuration)
-* Fix: Avoid crashing at the end of a composer operation when vaimo/composer-patches was removed while it was 
-  executing, but it's plugin class remains loaded and triggers an action after all install/uninstall actions 
-  are done.
+* Feature: Reset all patched packages when vaimo/composer-patches in removed from a project (with an 
+  option of leaving the patches applied).
+* Feature: Added the possibility for a project to define custom patch appliers or override the ones 
+  that are built into the package (see: Patcher Configuration).
+* Fix: Avoid crashing at the end of a composer operation when vaimo/composer-patches was removed while 
+  it was executing, but it's plugin class remains loaded and triggers an action after all 
+  install/uninstall actions are done.
 
 ### 3.10.4
 
-* Maintenance: changes to package meta-data
+* Maintenance: changes to package meta-data.
 
 ### 3.10.3
 
-* Fix: crash due to "missing array key" that's caused by bad comparison in code when using only 'depends' on certain patch declarations
+* Fix: crash due to "missing array key" that's caused by bad comparison in code when using only 'depends' 
+  on certain patch declarations.
 
 ### 3.10.2
 
 * Fix: declaration of 'depends' was overriding 'version'. Constraints defined on those keys are now merged.
-* Fix: patch applied when single version constraint was matched even when multiple ones defined
+* Fix: patch applied when single version constraint was matched even when multiple ones defined.
 
 ### 3.10.1
 

@@ -109,11 +109,11 @@ class RepositoryManager
             $this->packagesResolver->resolve($groupedPatches, $packagesByName), 
             false
         );
-        
+
         if ($targetFlags) {
             $targetsToKeep = array_filter($targetFlags);
             $targetsToReset = array_keys(
-                array_diff_key($targetsToKeep, $targetsToKeep)
+                array_diff_key($targetFlags, $targetsToKeep)
             );
             
             $groupedPatches = array_intersect_key($groupedPatches, $targetsToKeep);
@@ -123,7 +123,10 @@ class RepositoryManager
                 array_fill_keys($targetsToReset, array())
             );
             
-            $resetFlags = array_intersect_key($resetFlags, $targetsToKeep);
+            $resetFlags = array_replace(
+                array_intersect_key($resetFlags, $targetFlags),
+                array_fill_keys($targetsToReset, false) 
+            );
         }
         
         $packagesUpdated = false;
