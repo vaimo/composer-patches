@@ -29,6 +29,10 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $this->addOption(
             '--no-dev', null, InputOption::VALUE_NONE, 'Disables installation of require-dev packages'
         );
+
+        $this->addOption(
+            '--filter', null, InputOption::VALUE_OPTIONAL, 'Apply only those patch files that match with provided filter'
+        );
         
         $this->addOption(
             '--from-source', null, InputOption::VALUE_NONE, 'Apply patches based on information directly from packages in vendor folder'
@@ -43,6 +47,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
 
         $targets = $input->getArgument('targets');
+        $filter = $input->getOption('filter');
         
         if ($input->getOption('undo')) {
             $bootstrap->unload($targets);
@@ -55,6 +60,6 @@ class PatchCommand extends \Composer\Command\BaseCommand
         putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
         putenv(Environment::FORCE_REAPPLY . "=" . $input->getOption('redo'));
 
-        $bootstrap->apply($isDevMode, $targets);
+        $bootstrap->apply($isDevMode, $targets, $filter);
     }
 }

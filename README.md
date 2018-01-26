@@ -17,6 +17,9 @@ composer patch --redo
 # Re-apply patches for one speicif package
 composer patch --redo my/package 
 
+# Re-apply patches for one speicif package with patch name filter 
+composer patch --filter wrong-time-format --redo my/package 
+
 # Reset all patched packages
 composer patch --undo 
 
@@ -27,7 +30,7 @@ composer patch --undo my/package
 composer patch --from-source
 
 # Ideal for testing out a newly added patch against my/package
-composer patch --from-source --redo my/package 
+composer patch --from-source --redo my/package
 ```
 
 _Note that the command does expect the project to be set up properly for patching, including the 
@@ -496,11 +499,20 @@ is built into the plugin. Changes to existing definitions are applied recursivel
           "patch": "patch -p%s --no-backup-if-mismatch < %s"
         }
       },
-      "levels": [1, 0, 2]
+      "sequence": ["PATCH", "GIT"],
+      "levels": [0, 1, 2]
     }
   }
 }
 ```
+
+Patchers executed in the sequence dictated by sequence where several path levels are used with validation
+until validation success is hit.
+
+Note that patchers are processed per level, meaning that the config above will make the patchers being 
+applied in a sequence of:
+
+    PATCH:0 GIT:0 PATCH:1 GIT:1 ...
 
 ## Environment variables
 
@@ -527,6 +539,15 @@ Heavily modified version of https://github.com/cweagans/composer-patches
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.13.0
+
+* Feature: Option to apply only some of the patches based on text-based file name filter
+* Feature: Added an option for the user to have control over the sequence of the patchers 
+* Fix: patch path strip levels re-ordered to go sequentially from 0 to 4 to allow first run to be with 'as is' path
+* Fix: changed patch applier logic to test different patchers with same level rather than going through all patches with levels in sequence
+* Fix: preferring standard patcher instead of starting with GIT
+* Fix: patches not being reset when removing all patches from patch provider in vendor folder and running '--from-source --redo my/package'
 
 ### 3.12.1
 

@@ -58,7 +58,7 @@ class Collector
                 $patchesByTarget = $this->definitionsProcessor->normalizeDefinitions(
                     $loader->load($packageConfig[$key])
                 );
-
+                
                 if ($loader instanceof \Vaimo\ComposerPatches\Interfaces\PatchListUpdaterInterface) {
                     $patchesByTarget = $loader->update($patchesByTarget);
                 }

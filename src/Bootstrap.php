@@ -43,7 +43,7 @@ class Bootstrap
         $this->appliedPatchesManager->extractAppliedPatchesInfo($repository);
     }
 
-    public function apply($devMode = false, array $targets = array())
+    public function apply($devMode = false, array $targets = array(), $nameFilter = '')
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
         $configData = $this->composer->getPackage()->getExtra();
@@ -56,7 +56,8 @@ class Bootstrap
         
         $repositoryManager->processRepository(
             $repository, 
-            array_fill_keys($targets, true)
+            array_fill_keys($targets, true),
+            $nameFilter
         );
     }
     

@@ -61,7 +61,8 @@ class RepositoryManagerFactory
                     'patch' => 'patch -p%s --no-backup-if-mismatch < %s'
                 )
             ),
-            'levels' => array('1', '0', '2')
+            'sequence' => array('PATCH', 'GIT'),
+            'levels' => array('0', '1', '2')
         );
         
         if (isset($patcherConfigData[PluginConfig::PATCHER_CONFIG]) 
@@ -73,6 +74,13 @@ class RepositoryManagerFactory
             );
         }
 
+        $patcherSequence = array_flip($applierConfig['sequence']);
+
+        $applierConfig['patchers'] = array_replace(
+            $patcherSequence, 
+            array_intersect_key($applierConfig['patchers'], $patcherSequence)
+        );
+        
         $patchApplier = new \Vaimo\ComposerPatches\Patch\Applier(
             $logger,
             isset($applierConfig['patchers']) ? array_filter($applierConfig['patchers']) : array(),

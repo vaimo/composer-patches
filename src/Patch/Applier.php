@@ -52,12 +52,12 @@ class Applier
 
         list($type, $patchLevel, $operationName) = array_fill(0, 3, 'UNKNOWN');
 
-        foreach ($this->patchers as $type => $patcher) {
-            foreach ($this->patchLevelSequence as $sequenceIndex => $patchLevel) {
+        foreach ($this->patchLevelSequence as $sequenceIndex => $patchLevel) {
+            foreach ($this->patchers as $type => $patcher) {
                 $result = true;
 
                 foreach ($operationSequence as $operationCode => $operationName) {
-                    $result = $this->shell->execute($patcher[$operationCode], [$patchLevel, $filename], $cwd)
+                    $result = $this->shell->execute($patcher[$operationCode], [$patchLevel, $filename], $cwd) 
                         && $result;
 
                     if (!$result) {
@@ -74,7 +74,7 @@ class Applier
                 }
 
                 $this->logger->writeVerbose(
-                    '%s (type=%s) failed with patch_level=%s. Retrying with patch_level=%s',
+                    '%s (type=%s) failed with p=%s. Retrying with p=%s',
                     'warning',
                     array($operationName, $type, $patchLevel, $this->patchLevelSequence[$sequenceIndex + 1])
                 );
@@ -82,7 +82,7 @@ class Applier
         }
 
         if ($result) {
-            $this->logger->writeVerbose('SUCCESS with %s patch_level=%s', 'info', array($type, $patchLevel));
+            $this->logger->writeVerbose('SUCCESS with type=%s (p=%s)', 'info', array($type, $patchLevel));
         } else {
             $this->logger->writeVerbose('FAILURE', 'error');
         }

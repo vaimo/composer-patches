@@ -4,7 +4,7 @@ namespace Vaimo\ComposerPatches\Managers;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Vaimo\ComposerPatches\Composer\ResetOperation;
-use Vaimo\ComposerPatches\Environment;
+use Composer\Repository\WritableRepositoryInterface;
 
 use Vaimo\ComposerPatches\Composer\OutputUtils;
 
@@ -73,13 +73,13 @@ class RepositoryManager
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 
-    public function processRepository(\Composer\Repository\WritableRepositoryInterface $repository, array $targetFlags = []) 
+    public function processRepository(WritableRepositoryInterface $repository, array $targetFlags = [], $nameFilter = '') 
     {
-        $patches = array();
-
         $packagesByName = $this->packagesManager->getPackagesByName(
             $repository->getPackages()
         );
+
+        $patches = array();
         
         if ($this->config->isPatchingEnabled()) {
             $sourcePackages = $packagesByName;
@@ -93,25 +93,37 @@ class RepositoryManager
             $patches = $this->packagesManager->getPatches($sourcePackages);
         }
         
+        if ($nameFilter) {
+            $patches = array_map(function ($group) use ($nameFilter) {
+                $keys = array_filter(array_keys($group), function ($path) use ($nameFilter) {
+                    return strstr($path, $nameFilter) !== false;
+                });
+
+                return array_intersect_key($group, array_flip($keys));
+            }, $patches);
+        }
+        
         $groupedPatches = $this->packageUtils->groupPatchesByTarget($patches);
         
         $resetFlags = array_fill_keys(
             $this->packagesResolver->resolve($groupedPatches, $packagesByName), 
             false
         );
-
+        
         if ($targetFlags) {
             $targetsToKeep = array_filter($targetFlags);
-            $targetsToReset = array_keys(array_diff_key($targetFlags, $targetsToKeep));
+            $targetsToReset = array_keys(
+                array_diff_key($targetsToKeep, $targetsToKeep)
+            );
             
             $groupedPatches = array_intersect_key($groupedPatches, $targetsToKeep);
-
-            $patches = array_replace($patches, array_fill_keys($targetsToReset, array()));
             
-            $resetFlags = array_replace(
-                array_intersect_key($resetFlags, $groupedPatches),
-                array_fill_keys($targetsToReset, false)
+            $patches = array_replace(
+                $patches, 
+                array_fill_keys($targetsToReset, array())
             );
+            
+            $resetFlags = array_intersect_key($resetFlags, $targetsToKeep);
         }
         
         $packagesUpdated = false;
@@ -170,19 +182,19 @@ class RepositoryManager
                 $packagesUpdated = $this->packageUtils->resetAppliedPatches($package);
                 $resetFlags[$target] = true;
             }
-
+            
             if (!$hasPatches) {
                 continue;
             }
-
+            
             $patchesForPackage = $patches[$packageName];
 
             $hasPatchChanges = false;
             foreach ($patchGroupTargets as $target) {
-                $hasPatchChanges = $hasPatchChanges || $this->packageUtils->hasPatchChanges(
-                        $packagesByName[$target],
-                        isset($groupedPatches[$target]) ? $groupedPatches[$target] : array() 
-                    );
+                $patchesForTarget = isset($groupedPatches[$target]) ? $groupedPatches[$target] : array();
+
+                $hasPatchChanges = $hasPatchChanges 
+                    || $this->packageUtils->hasPatchChanges($packagesByName[$target], $patchesForTarget);
             }
 
             if (!$hasPatchChanges) {
