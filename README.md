@@ -46,7 +46,7 @@ Patching is enabled when:
 _The latter is only useful if you have no patches defined directly on the root/project level as the default 
 state of the patches enabled/disabled state will be: disabled_
 
-```javascript
+```json
 {
   "extra": {
     "patches": {},
@@ -68,7 +68,7 @@ When patching is disabled and **composer install** is re-executed, all patched p
 
 Same format is used for both project (root level scope) patches and for package patches.
 
-```javascript
+```json
 {
   "require": {
     "some/package": "1.2.3",
@@ -88,7 +88,7 @@ Same format is used for both project (root level scope) patches and for package 
 
 Same format is used for both project (root level scope) patches and for package patches.
 
-```javascript
+```json
 {
   "require": {
     "some/package": "1.2.3",
@@ -102,7 +102,7 @@ Same format is used for both project (root level scope) patches and for package 
 
 In which case the file should contain patches listed in following format:
 
-```javascript
+```json
 {
   "patches": {
     "some/package": {
@@ -117,7 +117,7 @@ In which case the file should contain patches listed in following format:
 The format of a patch definition has several levers of complexity to cater for usage in context of different
 frameworks.
 
-```javascript
+```json
 {
   "patches": {
     "some/package": {
@@ -129,7 +129,7 @@ frameworks.
 
 Which is the same as (which allows optional version restrictions) ... 
 
-```javascript
+```json
 {
   "patches": {
     "some/package": {
@@ -143,7 +143,7 @@ Which is the same as (which allows optional version restrictions) ...
 
 Which is the same as (which allows optional patch sequencing) ... 
 
-```javascript
+```json
 {
   "patches": {
     "some/package": [
@@ -193,7 +193,7 @@ it when it has changed since last time.
 
 Patches can be stored in remote location and referred to by using the full URL of tha patch.
 
-```javascript
+```json
 {
   "patches": {
     "vendor/project": {
@@ -210,7 +210,7 @@ under "url" key of the patch definition (instead of "source").
 
 In case it's important to apply the patches in a certain order, use an array wrapper around the patch definitions.
 
-```javascript
+```json
 {
   "extra": {
     "patches": {
@@ -236,7 +236,7 @@ When defined in the following format, `my/file.patch` will always be applied bef
 
 In case the patch is applied only on certain version of the package, a version restriction can be defined for the patch:
 
-```javascript
+```json
 {
   "extra": {
     "patches": {
@@ -258,7 +258,7 @@ of Composer.
 In projects that rely on certain framework's base package version (which will always guarantee that the patch
 targeted package is always on certain version) alternative format may be more suitable:
 
-```javascript
+```json
 {
   "extra": {
     "patches": {
@@ -283,7 +283,7 @@ When there are almost identical patches for different version of some package, t
 under same label like this:
 
 
-```javascript
+```json
 {
   "extra": {
     "patches": {
@@ -306,7 +306,7 @@ Note that indirect version dependency can be used in this case as well (see the 
 
 Same can be achieved with sequenced patches ...
 
-```javascript
+```json
 {
   "extra": {
     "patches": {
@@ -334,7 +334,7 @@ Same can be achieved with sequenced patches ...
 
 In both of the above cases, a simplified definition format can be used
 
-```javascript
+```json
 {
   "extra": {
     "patches": {
@@ -354,7 +354,7 @@ In both of the above cases, a simplified definition format can be used
 In case there's a need to define a patch that targets multiple packages within a single patch file, 
 alternative patch definition format is recommended:
 
-```javascript
+```json
 {
   "extra": {
     "patches": {
@@ -384,7 +384,7 @@ that to be triggered).
 
 In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), exclusions records can be defined in the project's composer.json:
 
-```javascript
+```json
 {
   "extra": {
     "excluded-patches": {
@@ -398,7 +398,7 @@ In case some patches that are defined in packages have to be excluded from the p
 
 Will exclude the a patch that was defined in a package in following (or similar) manner ...
 
-```javascript
+```json
 {
   "name": "patch/owner",
   "extra": {
@@ -446,7 +446,7 @@ declaration lines.
 
 **NOTE: it's useful to use this in combination with the COMPOSER_PATCHES_PREFER_OWNER env flag**
 
-```javascript
+```json
 {
   "name": "patch/owner",
   "extra": {
@@ -464,7 +464,7 @@ declaration lines.
 
 Same could be achieved when using the brief format by adding #skip to the end of the patch filename ...
 
-```javascript
+```json
 {
   "name": "patch/owner",
   "extra": {
@@ -482,7 +482,7 @@ Same could be achieved when using the brief format by adding #skip to the end of
 In case there's a need to include patches just for the sake of development convenience, an alternative
 sub-group can be defined is similar manner to how one would define development packages in project context
  
-```javascript
+```json
 {
   "extra": {
     "patches-dev": {
