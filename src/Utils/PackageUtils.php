@@ -2,11 +2,17 @@
 namespace Vaimo\ComposerPatches\Utils;
 
 use Composer\Package\PackageInterface;
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Vaimo\ComposerPatches\Config as PluginConfig;
 
 class PackageUtils
 {
+    public function getRealPackage(PackageInterface $package)
+    {
+        return $package instanceof \Composer\Package\AliasPackage
+            ? $package->getAliasOf()
+            : $package;
+    }
+    
     public function shouldReinstall(PackageInterface $package, array $patches)
     {
         $extra = $package->getExtra();
@@ -64,56 +70,5 @@ class PackageUtils
         $package->setExtra($extra);
 
         return $patchesApplied;
-    }
-
-    public function registerPatch(PackageInterface $package, $path, $description)
-    {
-        $extra = $package->getExtra();
-
-        if (!isset($extra[PluginConfig::APPLIED_FLAG]) || !is_array($extra[PluginConfig::APPLIED_FLAG])) {
-            $extra[PluginConfig::APPLIED_FLAG] = array();
-        }
-
-        $extra[PluginConfig::APPLIED_FLAG][$path] = $description;
-
-        $package->setExtra($extra);
-    }
-
-    public function sortPatches(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-
-        if (isset($extra[PluginConfig::APPLIED_FLAG])) {
-            ksort($extra[PluginConfig::APPLIED_FLAG]);
-        }
-
-        $package->setExtra($extra);
-    }
-
-    public function groupPatchesByTarget(array $patches)
-    {
-        $patchesByTarget = array();
-
-        foreach ($patches as $patchGroup) {
-            foreach ($patchGroup as $patchPath => $patchInfo) {
-                foreach ($patchInfo[PatchDefinition::TARGETS] as $target) {
-                    if (!isset($patchesByTarget[$target])) {
-                        $patchesByTarget[$target] = array();
-                    }
-
-                    $patchesByTarget[$target][$patchPath] = $patchInfo[PatchDefinition::LABEL];
-                }
-            }
-        }
-
-        return $patchesByTarget;
-    }
-    
-    public function extractPackageFromVendorPath($path)
-    {
-        $package = implode('/', array_slice(explode('/', $path), 0, 2));
-        $path = trim(substr($path, strlen($package)), '/');
-
-        return array($package, $path);
     }
 }

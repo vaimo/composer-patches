@@ -26,6 +26,11 @@ class PackagesManager
     private $vendorRoot;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
+     */
+    private $packageUtils;
+
+    /**
      * @param \Composer\Package\RootPackageInterface $rootPackage
      * @param \Vaimo\ComposerPatches\Patch\Collector $patchesCollector
      * @param \Vaimo\ComposerPatches\Interfaces\PatchDefinitionProcessorInterface[] $processors
@@ -41,23 +46,19 @@ class PackagesManager
         $this->rootPackage = $rootPackage;
         $this->processors = $processors;
         $this->vendorRoot = $vendorRoot;
+
+        $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
     
     public function getPackagesByName(array $packages)
     {
         $packagesByName = array();
-
-        $rootName = $this->rootPackage->getName();
-
+        
         foreach ($packages as $package) {
-            if ($package instanceof \Composer\Package\AliasPackage) {
-                $package = $package->getAliasOf();
-            }
-
-            $packagesByName[$package->getName()] = $package;
+            $packagesByName[$package->getName()] = $this->packageUtils->getRealPackage($package);
         }
 
-        $packagesByName[$rootName] = $this->rootPackage;
+        $packagesByName[$this->rootPackage->getName()] = $this->rootPackage;
         
         return $packagesByName;
     }

@@ -30,6 +30,7 @@ class Validator implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitionProc
                     file_exists($patchPath) ? md5_file($patchPath) : md5($patchPath),
                     serialize($patch[PatchDefinition::DEPENDS]),
                     serialize($patch[PatchDefinition::TARGETS]),
+                    serialize($patch[PatchDefinition::CONFIG])
                 )));
 
                 $validItems[] = $patch;

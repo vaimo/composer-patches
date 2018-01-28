@@ -31,6 +31,13 @@ class DefinitionNormalizer
         
         $depends = array();
         
+        $config = array_replace(
+            array('sequence' => array(), 'levels' => array()),
+            isset($config[PatchDefinition::CONFIG])
+                ? $config[PatchDefinition::CONFIG]
+                : array()
+        );
+        
         if (isset($data[PatchDefinition::VERSION])) {
             if (is_array($data[PatchDefinition::VERSION])) {
                 $depends = array_replace(
@@ -51,6 +58,17 @@ class DefinitionNormalizer
                 $data[PatchDefinition::DEPENDS]
             );
         }
+
+        if (isset($data[PatchDefinition::LEVEL])) {
+            $config = array_replace(
+                $config,
+                array('levels' => array($data[PatchDefinition::LEVEL]))
+            );
+        }
+
+        if (isset($data[PatchDefinition::PATCHER])) {
+            $config['sequence']['patchers'] = array($data[PatchDefinition::PATCHER]);
+        }
         
         return array(
             PatchDefinition::SOURCE => $source,
@@ -63,7 +81,8 @@ class DefinitionNormalizer
             PatchDefinition::LABEL => isset($data[PatchDefinition::LABEL])
                 ? $data[PatchDefinition::LABEL]
                 : $label,
-            PatchDefinition::DEPENDS => $depends
+            PatchDefinition::DEPENDS => $depends,
+            PatchDefinition::CONFIG => $config
         );
     }
 }

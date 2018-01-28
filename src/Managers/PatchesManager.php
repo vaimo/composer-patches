@@ -4,8 +4,8 @@ namespace Vaimo\ComposerPatches\Managers;
 use Composer\Package\PackageInterface;
 
 use Vaimo\ComposerPatches\Patch\Event;
-use Vaimo\ComposerPatches\Environment;
 use Vaimo\ComposerPatches\Events;
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class PatchesManager
 {
@@ -53,6 +53,7 @@ class PatchesManager
      * @param string $vendorRoot
      */
     public function __construct(
+        \Composer\Installer\InstallationManager $installationManager,
         \Composer\EventDispatcher\EventDispatcher $eventDispatcher,
         \Composer\Util\RemoteFilesystem $downloader,
         \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler,
@@ -60,6 +61,7 @@ class PatchesManager
         \Vaimo\ComposerPatches\Patch\Applier $patchApplier,
         $vendorRoot
     ) {
+        $this->installationManager = $installationManager;
         $this->eventDispatcher = $eventDispatcher;
         $this->downloader = $downloader;
         $this->failureHandler = $failureHandler;
@@ -70,23 +72,31 @@ class PatchesManager
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
     
-    public function applyPatches(array $patches, PackageInterface $package, $installPath)
+    public function applyPatches(PackageInterface $package, array $patches)
     {
+        $installPath = !$package instanceof \Composer\Package\RootPackage
+            ? $this->installationManager->getInstallPath($package)
+            : '';
+        
         $appliedPatches = array();
-
+        
         foreach ($patches as $source => $patchInfo) {
             $absolutePatchPath = $this->vendorRoot . '/' . $source;
             $relativePath = $source;
 
-            $description = $patchInfo['label'];
-
-            $patchSourceLabel = sprintf('<info>%s</info>', $source);
+            $description = $patchInfo[PatchDefinition::LABEL];
+            $config = $patchInfo[PatchDefinition::CONFIG];
+            
+            $patchSourceLabel = sprintf('<info>project</info>: %s', $source);
             $patchComment = strtok($description, ',');
 
             if (file_exists($absolutePatchPath)) {
                 $patchSourceLabel = vsprintf(
-                    '<info>%s: %s</info>',
-                    $this->packageUtils->extractPackageFromVendorPath($source)
+                    '<info>%s</info>: %s',
+                    array(
+                        $ownerName = implode('/', array_slice(explode('/', $source), 0, 2)),
+                        trim(substr($source, strlen($ownerName)), '/')
+                    )
                 );
 
                 $source = $absolutePatchPath;
@@ -94,7 +104,7 @@ class PatchesManager
 
             $this->logger->writeRaw('    ~ %s', array($patchSourceLabel));
             $this->logger->writeRaw('      <comment>%s</comment>', array($patchComment));
-
+            
             try {
                 $this->eventDispatcher->dispatch(
                     Events::PRE_APPLY,
@@ -109,8 +119,8 @@ class PatchesManager
 
                     $this->downloader->copy($hostname, $source, $filename, false);
                 }
-
-                $this->patchApplier->applyFile($filename, $installPath);
+                
+                $this->patchApplier->applyFile($filename, $installPath, $config);
 
                 if (isset($hostname)) {
                     unset($hostname);
@@ -134,24 +144,22 @@ class PatchesManager
         return $appliedPatches;
     }
 
-    public function registerAppliedPatches(array $patches, array $packages)
+    public function groupPatches(array $patches)
     {
-        $affectedPackages = array();
-        
-        foreach ($patches as $source => $patchInfo) {
-            foreach ($patchInfo['targets'] as $target) {
-                $affectedPackages[] = $packages[$target];
+        $patchesByTarget = array();
 
-                $this->packageUtils->registerPatch(
-                    $packages[$target],
-                    $source,
-                    $patchInfo['label']
-                );
+        foreach ($patches as $patchGroup) {
+            foreach ($patchGroup as $patchPath => $patchInfo) {
+                foreach ($patchInfo[PatchDefinition::TARGETS] as $target) {
+                    if (!isset($patchesByTarget[$target])) {
+                        $patchesByTarget[$target] = array();
+                    }
+
+                    $patchesByTarget[$target][$patchPath] = $patchInfo[PatchDefinition::LABEL];
+                }
             }
         }
 
-        foreach ($affectedPackages as $targetPackage) {
-            $this->packageUtils->sortPatches($targetPackage);
-        }
+        return $patchesByTarget;
     }
 }

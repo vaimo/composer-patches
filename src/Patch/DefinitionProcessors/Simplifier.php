@@ -25,7 +25,8 @@ class Simplifier implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitionPro
                         isset($info[PatchDefinition::HASH])
                             ? sprintf(', %s:%s', PatchDefinition::HASH, $info[PatchDefinition::HASH])
                             : ''
-                        )
+                        ),
+                    PatchDefinition::CONFIG => $info[PatchDefinition::CONFIG]
                 );
             }
         }

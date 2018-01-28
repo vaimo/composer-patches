@@ -17,6 +17,11 @@ class RepositoryManagerFactory
     private $io;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\ApplierUtils
+     */
+    private $applierUtils;
+
+    /**
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
      */
@@ -26,6 +31,8 @@ class RepositoryManagerFactory
     ) {
         $this->composer = $composer;
         $this->io = $io;
+
+        $this->applierUtils = new \Vaimo\ComposerPatches\Utils\ApplierUtils();
     }
     
     public function create($devMode = false, array $patcherConfigData = [])
@@ -53,41 +60,40 @@ class RepositoryManagerFactory
         $applierConfig = array(
             'patchers' => array(
                 'GIT' => array(
-                    'validate' => 'git apply --check -p%s %s',
-                    'patch' => 'git apply -p%s %s'
+                    'check' => 'git apply -p{{level}} --check {{file}}',
+                    'patch' => 'git apply -p{{level}} {{file}}'
                 ),
                 'PATCH' => array(
-                    'validate' => 'patch -p%s --dry-run --no-backup-if-mismatch < %s',
-                    'patch' => 'patch -p%s --no-backup-if-mismatch < %s'
+                    'check' => 'patch -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
+                    'patch' => 'patch -p{{level}} --no-backup-if-mismatch < {{file}}'
                 )
             ),
-            'sequence' => array('PATCH', 'GIT'),
+            'operations' => array(
+                'check' => 'Validation', 
+                'patch' => 'Patching'
+            ),
+            'sequence' => array(
+                'patchers' => array('PATCH', 'GIT'),
+                'operations' => array('check', 'patch')
+            ),
             'levels' => array('0', '1', '2')
         );
         
         if (isset($patcherConfigData[PluginConfig::PATCHER_CONFIG]) 
             && is_array($patcherConfigData[PluginConfig::PATCHER_CONFIG])
         ) {
-            $applierConfig = array_replace_recursive(
+            $applierConfig = $this->applierUtils->mergeConfig(
                 $applierConfig, 
                 $patcherConfigData[PluginConfig::PATCHER_CONFIG]
             );
         }
 
-        $patcherSequence = array_flip($applierConfig['sequence']);
+        $applierConfig = $this->applierUtils->sortConfig($applierConfig);
 
-        $applierConfig['patchers'] = array_replace(
-            $patcherSequence, 
-            array_intersect_key($applierConfig['patchers'], $patcherSequence)
-        );
-        
-        $patchApplier = new \Vaimo\ComposerPatches\Patch\Applier(
-            $logger,
-            isset($applierConfig['patchers']) ? array_filter($applierConfig['patchers']) : array(),
-            isset($applierConfig['levels']) ? $applierConfig['levels'] : array()
-        );
+        $patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($logger, $applierConfig);
         
         $patchesManager = new \Vaimo\ComposerPatches\Managers\PatchesManager(
+            $installationManager,
             $eventDispatcher,
             $downloader,
             $failureHandler,
@@ -142,12 +148,15 @@ class RepositoryManagerFactory
         );
         
         $patcherConfig = new \Vaimo\ComposerPatches\Patch\Config($patcherConfigData);
+
+        $appliedPatchesManager = new \Vaimo\ComposerPatches\Managers\AppliedPatchesManager();
         
         return new \Vaimo\ComposerPatches\Managers\RepositoryManager(
             $installationManager,
             $rootPackage,
             $patcherConfig,
             $patchesManager,
+            $appliedPatchesManager,
             $packagesManager,
             $packagesResolver,
             $logger

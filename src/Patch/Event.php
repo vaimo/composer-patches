@@ -21,7 +21,7 @@ class Event extends \Composer\EventDispatcher\Event
     /**
      * @param string $eventName
      * @param \Composer\Package\PackageInterface $package
-     * @param array $url
+     * @param string $url
      * @param string $description
      */
     public function __construct(

@@ -11,7 +11,7 @@ class Shell
     /**
      * @var \Composer\Util\ProcessExecutor
      */
-    protected $executor;
+    protected $processExecutor;
 
     /**
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -20,20 +20,27 @@ class Shell
         \Vaimo\ComposerPatches\Logger $logger
     ) {
         $this->logger = $logger;
-
-        $this->executor =  new \Composer\Util\ProcessExecutor($logger->getOutputInstance());
+        
+        $this->processExecutor =  new \Composer\Util\ProcessExecutor($logger->getOutputInstance());
     }
 
-    public function execute($commandTemplate, array $arguments, $cwd = null)
+    public function execute($command, array $arguments, $cwd = null)
     {
         $logger = $this->logger;
 
         $outputHandler = function ($type, $data) use ($logger) {
             $logger->writeVerbose(trim($data), 'comment');
         };
-
-        $result = $this->executor->execute(
-            vsprintf($commandTemplate, array_map('escapeshellarg', $arguments)),
+        
+        $arguments = array_combine(
+            array_map(function ($item) {
+                return sprintf('{{%s}}', $item);
+            }, array_keys($arguments)),
+            array_map('escapeshellarg', $arguments)
+        );
+        
+        $result = $this->processExecutor->execute(
+            str_replace(array_keys($arguments), $arguments, $command),
             $outputHandler,
             $cwd
         );

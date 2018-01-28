@@ -12,12 +12,17 @@ class Bootstrap
      * @var \Vaimo\ComposerPatches\Managers\AppliedPatchesManager
      */
     private $appliedPatchesManager;
-
+    
     /**
      * @var \Vaimo\ComposerPatches\Factories\RepositoryManagerFactory
      */
     private $repositoryManagerFactory;
 
+    /**
+     * @var \Vaimo\ComposerPatches\Managers\RepositoryStateManager
+     */
+    private $repositoryStateManager;
+    
     /**
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
@@ -34,13 +39,15 @@ class Bootstrap
             $composer,
             $io
         );
+
+        $this->repositoryStateManager = new \Vaimo\ComposerPatches\Managers\RepositoryStateManager();
     }
 
     public function prepare()
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-        
-        $this->appliedPatchesManager->extractAppliedPatchesInfo($repository);
+
+        $this->repositoryStateManager->extractAppliedPatchesInfo($repository);
     }
 
     public function apply($devMode = false, array $targets = array(), $nameFilter = '')
@@ -48,7 +55,7 @@ class Bootstrap
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
         $configData = $this->composer->getPackage()->getExtra();
 
-        $this->appliedPatchesManager->restoreAppliedPatchesInfo($repository);
+        $this->repositoryStateManager->restoreAppliedPatchesInfo($repository);
         
         if (!$repositoryManager = $this->repositoryManagerFactory->create($devMode, $configData)) {
             return null;

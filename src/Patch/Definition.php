@@ -13,4 +13,8 @@ class Definition
     const HASH = 'md5';
     const TARGETS = 'targets';
     const SKIP = 'skip';
+
+    const CONFIG = 'config';
+    const PATCHER = 'patcher';
+    const LEVEL = 'level';
 }

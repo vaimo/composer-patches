@@ -31,6 +31,11 @@ class RepositoryManager
     private $patchesManager;
 
     /**
+     * @var \Vaimo\ComposerPatches\Managers\AppliedPatchesManager
+     */
+    private $appliedPatchesManager;
+
+    /**
      * @var \Vaimo\ComposerPatches\Patch\Config
      */
     private $config;
@@ -49,6 +54,7 @@ class RepositoryManager
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param \Composer\Package\RootPackageInterface $rootPackage
      * @param \Vaimo\ComposerPatches\Managers\PatchesManager $patchesManager
+     * @param \Vaimo\ComposerPatches\Managers\AppliedPatchesManager $appliedPatchesManager
      * @param \Vaimo\ComposerPatches\Managers\PackagesManager $packagesManager
      * @param \Vaimo\ComposerPatches\Patch\Config $patchConfig
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -58,6 +64,7 @@ class RepositoryManager
         \Composer\Package\RootPackageInterface $rootPackage,
         \Vaimo\ComposerPatches\Patch\Config $patchConfig,
         \Vaimo\ComposerPatches\Managers\PatchesManager $patchesManager,
+        \Vaimo\ComposerPatches\Managers\AppliedPatchesManager $appliedPatchesManager,
         \Vaimo\ComposerPatches\Managers\PackagesManager $packagesManager,
         \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface $packagesResolver,
         \Vaimo\ComposerPatches\Logger $logger
@@ -65,11 +72,13 @@ class RepositoryManager
         $this->installationManager = $installationManager;
         $this->rootPackage = $rootPackage;
         $this->patchesManager = $patchesManager;
+        $this->appliedPatchesManager = $appliedPatchesManager;
         $this->packagesManager = $packagesManager;
         $this->packagesResolver = $packagesResolver;
         $this->logger = $logger;
         
         $this->config = $patchConfig;
+        
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 
@@ -102,8 +111,8 @@ class RepositoryManager
                 return array_intersect_key($group, array_flip($keys));
             }, $patches);
         }
-        
-        $groupedPatches = $this->packageUtils->groupPatchesByTarget($patches);
+
+        $groupedPatches = $this->patchesManager->groupPatches($patches);
         
         $resetFlags = array_fill_keys(
             $this->packagesResolver->resolve($groupedPatches, $packagesByName), 
@@ -165,8 +174,9 @@ class RepositoryManager
                     );
                 }
 
+                /** @var \Composer\IO\ConsoleIO $output */
                 $output = $this->logger->getOutputInstance();
-
+                
                 $verbosityLevel = OutputUtils::resetVerbosity($output, OutputInterface::VERBOSITY_QUIET);
 
                 try {
@@ -210,21 +220,11 @@ class RepositoryManager
                 '  - Applying patches for <info>%s</info> (%s)', 
                 array($packageName, count($patchesForPackage))
             );
-
-            $installPath = !$package instanceof \Composer\Package\RootPackage
-                ? $this->installationManager->getInstallPath($package)
-                : '';
             
             try {
-                $appliedPatches = $this->patchesManager->applyPatches(
-                    $patchesForPackage,
-                    $package,
-                    $installPath
-                );
-
-                $this->patchesManager->registerAppliedPatches(
-                    $appliedPatches, 
-                    $packagesByName
+                $this->appliedPatchesManager->registerAppliedPatches(
+                    $repository, 
+                    $this->patchesManager->applyPatches($package, $patchesForPackage)
                 );
             } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $e) {
                 $repository->write();

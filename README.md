@@ -414,6 +414,30 @@ Will exclude the a patch that was defined in a package in following (or similar)
 The important part to note here is to remember that exclusion ignores patch target and focuses on the owner
 instead. Description is also not part of the exclusion logic.
 
+## Defining patches with strict path restrictions
+
+By default, the patcher will try to apply the patch with several path stripping options - in some cases 
+this is not something that one wants to allow - for example: if the patch is in full extent just creating 
+new files, it might end up creating them to wrong directories. In some cases, some patches might have 
+unconventional path definitions that derive from other project patches. Rather than changing the global
+settings, it's possible to define custom ones for just one patch.
+
+```json
+{
+  "name": "patch/owner",
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "Some patch description": {
+          "source": "path/to/file.patch",
+          "level": "0"
+        }
+      }
+    }
+  }
+}
+```
+
 ## Skipping patches
 
 In case there's a need to temporarily fast-exclude patches which is usually the case when going through
@@ -491,15 +515,22 @@ is built into the plugin. Changes to existing definitions are applied recursivel
     "patcher-config": {
       "patchers": {
         "GIT": {
-          "validate": "git apply --check -p%s %s",
-          "patch": "git apply -p%s %s"
+          "check": "git apply -p{{level}} --check {{file}}",
+          "patch": "git apply -p{{level}} {{file}}"
         },
         "PATCH": {
-          "validate": "patch -p%s --dry-run --no-backup-if-mismatch < %s",
-          "patch": "patch -p%s --no-backup-if-mismatch < %s"
+          "check": "patch -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
+          "patch": "patch -p{{level}} --no-backup-if-mismatch < {{file}}"
         }
       },
-      "sequence": ["PATCH", "GIT"],
+      "operations": {
+        "check": "Validation",
+        "patch": "Patching"
+      },
+      "sequence": {
+        "operations": ["check", "patch"],
+        "patchers": ["PATCH", "GIT"]
+      },
       "levels": [0, 1, 2]
     }
   }
@@ -540,9 +571,18 @@ Heavily modified version of https://github.com/cweagans/composer-patches
 
 List of generalized changes for each release.
 
+### 3.14.0
+
+* Feature: Allow certain patches to be processed only with very strict path strip options and patcher type.
+* Feature: Changed patcher definition template to use variable markup rather than relying on sprintf 
+  patterns which dictates the variables in the template to be defined in certain order.
+* Feature: Allow extra operations to be defined or the sequence of existing ones to be changed.
+* Fix: made sure that no compact array markup is used within the plugin.
+* Maintenance: changed the 'validate' in patcher configuration key to 'check'. Support for 'validate' kept.
+
 ### 3.13.2
 
-* Maintenance: updated lock to latest due to composer validate error
+* Maintenance: updated lock to latest due to composer validate error.
 
 ### 3.13.1
 
@@ -552,7 +592,7 @@ List of generalized changes for each release.
 
 * Feature: Option to apply only some of the patches based on text-based file name filter.
 * Feature: Added an option for the user to have control over the sequence of the patchers.
-* Fix: patch path strip levels re-ordered to go sequentially from 0 to 4 to allow first run to be 
+* Fix: patch path strip levels re-ordered to go sequentially from 0 to 2 to allow first run to be 
   with 'as is' path.
 * Fix: changed patch applier logic to test different patchers with same level rather than going 
   through all patches with levels in sequence.
