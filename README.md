@@ -438,6 +438,28 @@ settings, it's possible to define custom ones for just one patch.
 }
 ```
 
+Note that same can be done in case the patch has been split between multiple target versions, but using 
+the following format:
+
+```json
+{
+  "name": "patch/owner",
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "Some patch description": {
+          "level": "0",
+          "source": {
+            "<=1.2.3": "path/to/1.2.3/file.patch",
+            ">1.2.3": "path/to/1.2.4/file.patch"
+          } 
+        }
+      }
+    }
+  }
+}
+```
+
 ## Skipping patches
 
 In case there's a need to temporarily fast-exclude patches which is usually the case when going through
@@ -571,12 +593,16 @@ Heavily modified version of https://github.com/cweagans/composer-patches
 
 List of generalized changes for each release.
 
+### 3.14.1
+
+* Fix: crash when trying to declare path stripping level for version-branched sources 
+
 ### 3.14.0
 
-* Feature: Allow certain patches to be processed only with very strict path strip options and patcher type.
-* Feature: Changed patcher definition template to use variable markup rather than relying on sprintf 
+* Feature: allow certain patches to be processed only with very strict path strip options and patcher type.
+* Feature: changed patcher definition template to use variable markup rather than relying on sprintf 
   patterns which dictates the variables in the template to be defined in certain order.
-* Feature: Allow extra operations to be defined or the sequence of existing ones to be changed.
+* Feature: allow extra operations to be defined or the sequence of existing ones to be changed.
 * Fix: made sure that no compact array markup is used within the plugin.
 * Maintenance: changed the 'validate' in patcher configuration key to 'check'. Support for 'validate' kept.
 
@@ -590,8 +616,8 @@ List of generalized changes for each release.
 
 ### 3.13.0
 
-* Feature: Option to apply only some of the patches based on text-based file name filter.
-* Feature: Added an option for the user to have control over the sequence of the patchers.
+* Feature: option to apply only some of the patches based on text-based file name filter.
+* Feature: added an option for the user to have control over the sequence of the patchers.
 * Fix: patch path strip levels re-ordered to go sequentially from 0 to 2 to allow first run to be 
   with 'as is' path.
 * Fix: changed patch applier logic to test different patchers with same level rather than going 
@@ -602,22 +628,22 @@ List of generalized changes for each release.
 
 ### 3.12.1
 
-* Feature: Renamed 'reset' to 'redo' to make the command argument's purpose easier to understand when 
+* Feature: renamed 'reset' to 'redo' to make the command argument's purpose easier to understand when 
   compared with 'redo'.
-* Fix: Properly re-apply all patches when using 'from-source' nad 'redo' arguments together.
+* Fix: properly re-apply all patches when using 'from-source' nad 'redo' arguments together.
 
 ### 3.12.0
 
-* Feature: Introduced a new composer command to make it easier to re-apply all patches and give 
+* Feature: introduced a new composer command to make it easier to re-apply all patches and give 
   newly defined patches a quick test-run (composer patch).
 
 ### 3.11.0
 
-* Feature: Reset all patched packages when vaimo/composer-patches in removed from a project (with an 
+* Feature: reset all patched packages when vaimo/composer-patches in removed from a project (with an 
   option of leaving the patches applied).
-* Feature: Added the possibility for a project to define custom patch appliers or override the ones 
+* Feature: added the possibility for a project to define custom patch appliers or override the ones 
   that are built into the package (see: Patcher Configuration).
-* Fix: Avoid crashing at the end of a composer operation when vaimo/composer-patches was removed while 
+* Fix: avoid crashing at the end of a composer operation when vaimo/composer-patches was removed while 
   it was executing, but it's plugin class remains loaded and triggers an action after all 
   install/uninstall actions are done.
 
@@ -642,13 +668,13 @@ List of generalized changes for each release.
 ### 3.10.0
 
 * Feature: environment variable names standardized (old names still supported).
-* Fix: Patches not re-applied when package is upgraded (old 'applied_patches' incorrectly restored instead).
-* Fix: Root package ignored when using COMPOSER_PATCHES_PREFER_OWNER.
+* Fix: patches not re-applied when package is upgraded (old 'applied_patches' incorrectly restored instead).
+* Fix: root package ignored when using COMPOSER_PATCHES_PREFER_OWNER.
 * Maintenance: Code re-organized to centralize the access to env flags.
 
 ### 3.9.0
 
-* Feature: Added new environment flag to force patcher to extract the patch info from vendor folder instead 
+* Feature: added new environment flag to force patcher to extract the patch info from vendor folder instead 
   of using the information from installed.json (mainly for patch maintenance). 
 
 ### 3.8.1
@@ -657,39 +683,39 @@ List of generalized changes for each release.
 
 ### 3.8.0
 
-* Feature: Allow patches to be skipped by adding 'skip' flag in it's definition (good as maintenance flags 
+* Feature: allow patches to be skipped by adding 'skip' flag in it's definition (good as maintenance flags 
   when doing major base-framework upgrades).
 * Fix: excluded patches required develop to specify patch owner vendor path instead of just the path that 
   was relative to the patch owner folder.
 
 ### 3.7.1
 
-* Maintenance: Code cleanup (some debugging code removed).
+* Maintenance: code cleanup (some debugging code removed).
 
 ### 3.7.0
 
-* Feature: Added version branching for sequenced items.
-* Feature: Added simplified version branching format where json object key is constraint and value the source.
+* Feature: added version branching for sequenced items.
+* Feature: added simplified version branching format where json object key is constraint and value the source.
 
 ### 3.6.0
 
-* Feature: Allow multiple patch files to be declared under same label (see: Version branching).
-* Feature: Allow certain patches for packages to be excluded (see: Environment variables).
-* Fix: Restored backwards compatibility with PHP versions that do not support new new array markup.
+* Feature: allow multiple patch files to be declared under same label (see: Version branching).
+* Feature: allow certain patches for packages to be excluded (see: Environment variables).
+* Fix: restored backwards compatibility with PHP versions that do not support new new array markup.
 
 ### 3.5.2
 
-* Fix: Make sure that path normalizer does not touch root-level patch declarations.
+* Fix: make sure that path normalizer does not touch root-level patch declarations.
 
 ### 3.5.1
 
-* Fix\Cosmetic: Make sure that 'resetting patched package' is not shown when package is indirectly targeted.
+* Fix\Cosmetic: make sure that 'resetting patched package' is not shown when package is indirectly targeted.
 
 ### 3.5.0
 
-* Feature: Allow bundled patches (that target multiple packages) to be declared, tracked, reverted correctly 
+* Feature: allow bundled patches (that target multiple packages) to be declared, tracked, reverted correctly 
   when changed or removed (see: Bundled patches).
 
 ### 3.4.0
 
-* Feature: Allow dev-only patches to be declared (see: Development patches).
+* Feature: allow dev-only patches to be declared (see: Development patches).

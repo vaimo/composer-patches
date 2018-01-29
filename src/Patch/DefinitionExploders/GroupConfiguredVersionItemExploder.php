@@ -3,7 +3,7 @@ namespace Vaimo\ComposerPatches\Patch\DefinitionExploders;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
-class VersionItemExploder implements \Vaimo\ComposerPatches\Interfaces\DefinitionExploderProcessorInterface
+class GroupConfiguredVersionItemExploder implements \Vaimo\ComposerPatches\Interfaces\DefinitionExploderProcessorInterface
 {
     /**
      * @var \Composer\Semver\VersionParser
@@ -20,28 +20,49 @@ class VersionItemExploder implements \Vaimo\ComposerPatches\Interfaces\Definitio
         if (!is_array($data)) {
             return false;
         }
+        
+        if (!isset($data[PatchDefinition::SOURCE])) {
+            return false;
+        }
 
-        $key = key($data);
-        $value = reset($data);
+        $source = $data[PatchDefinition::SOURCE];
+
+        if (!is_array($source)) {
+            return false;
+        }
+        
+        $key = key($source);
+        $value = reset($source);
 
         return $this->isConstraint($key) 
-            && !isset($value[PatchDefinition::VERSION], $value[PatchDefinition::DEPENDS]);
+            && !isset($data[PatchDefinition::DEPENDS], $data[PatchDefinition::VERSION]) 
+            && (
+                !is_array($value) 
+                || !isset($value[PatchDefinition::VERSION], $value[PatchDefinition::DEPENDS])
+            );
     }
     
     public function explode($label, $data)
     {
         $items = array();
+
+        $sources = $data[PatchDefinition::SOURCE];
         
-        foreach ($data as $constraint => $source) {
+        unset($data[PatchDefinition::SOURCE]);
+        
+        foreach ($sources as $constraint => $source) {
             if (!$this->isConstraint($constraint)) {
                 continue;
             }
             
             $items[] = array(
                 $label,
-                array(
-                    PatchDefinition::VERSION => $constraint,
-                    PatchDefinition::SOURCE => $source
+                array_replace(
+                    $data,
+                    array(
+                        PatchDefinition::VERSION => $constraint,
+                        PatchDefinition::SOURCE => $source
+                    )
                 )
             );
         }

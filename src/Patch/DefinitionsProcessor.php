@@ -19,7 +19,8 @@ class DefinitionsProcessor
             new \Vaimo\ComposerPatches\Patch\DefinitionExploders\VersionItemExploder(),
             new \Vaimo\ComposerPatches\Patch\DefinitionExploders\ComplexItemExploder(),
             new \Vaimo\ComposerPatches\Patch\DefinitionExploders\SequenceVersionItemExploder(),
-            new \Vaimo\ComposerPatches\Patch\DefinitionExploders\SequenceItemExploder()
+            new \Vaimo\ComposerPatches\Patch\DefinitionExploders\SequenceItemExploder(),
+            new  \Vaimo\ComposerPatches\Patch\DefinitionExploders\GroupConfiguredVersionItemExploder()
         );
         
         $this->definitionExploder = new \Vaimo\ComposerPatches\Patch\DefinitionExploder($processors);
