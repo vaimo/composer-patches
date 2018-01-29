@@ -103,14 +103,18 @@ class RepositoryManagerFactory
         );
 
         $loaders = array(
-            PluginConfig::LIST => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
-            PluginConfig::FILE => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
+            PluginConfig::LIST => 
+                new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
+            PluginConfig::FILE => 
+                new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile($installationManager)
         );
 
         if ($includeDevPatches) {
             $loaders = array_replace($loaders, array(
-                PluginConfig::DEV_LIST => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
-                PluginConfig::DEV_FILE => new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile()
+                PluginConfig::DEV_LIST => 
+                    new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
+                PluginConfig::DEV_FILE => 
+                    new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile($installationManager)
             ));
         }
         
@@ -122,7 +126,10 @@ class RepositoryManagerFactory
             $infoExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\InstalledConfigExtractor();
         }
 
-        $patchCollector = new \Vaimo\ComposerPatches\Patch\Collector($infoExtractor, $loaders);
+        $patchCollector = new \Vaimo\ComposerPatches\Patch\Collector(
+            $infoExtractor, 
+            $loaders
+        );
         
         if ($config->shouldResetEverything()) {
             $packagesResolver = new \Vaimo\ComposerPatches\Patch\PackageResolvers\FullResetResolver();

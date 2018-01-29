@@ -86,7 +86,8 @@ Same format is used for both project (root level scope) patches and for package 
 
 ## Defining patches for specific package: patch list file
 
-Same format is used for both project (root level scope) patches and for package patches.
+Same format is used for both project (root level scope) patches and for package patches. Paths are relative
+to the owner of the composer.json that introduces a certain file path.
 
 ```json
 {
@@ -100,17 +101,46 @@ Same format is used for both project (root level scope) patches and for package 
 }
 ```
 
-In which case the file should contain patches listed in following format:
+In which case the file should contain patches listed in either of listed formats:
 
 ```json
 {
   "patches": {
     "some/package": {
-      "desription about my patch": "my/file.patch"
+      "description about my patch": "my/file.patch"
     }
   }
 }
 ```
+The 'patches' key nesting is not enforced. The following will also load just fine:
+
+```json
+{
+  "some/package": {
+    "description about my patch": "my/file.patch"
+  } 
+}
+```
+
+Note that to enable the developer to perform occasional cleanup and sub-grouping on the patches 
+declaration, multiple patches files can be defined:
+
+```json
+
+{
+  "require": {
+    "some/package": "1.2.3",
+    "vaimo/composer-patches": "^3.0.0"
+  },
+  "extra": {
+    "patches-file": ["patches.json", "legacy.json"]
+  }
+}
+```
+
+The files are processed sequentially and merged in a way where all the patches in all the files are 
+processed (meaning: even if the declaration in both files is exactly the same, both will be processed and 
+the merging will be done in very late state based on the absolute path of the patch file path).
 
 ## Patch definition in composer.json
 
@@ -521,8 +551,8 @@ sub-group can be defined is similar manner to how one would define development p
 
 These patches will not be applied when installing the project with `--no-dev` option.
  
-Note that same definition pattern can be used for patches-file, where the key would become `patches-file-dev`
-and patch list inside the file would still use the key `patches`.
+Note that same definition pattern can be used for patches-file, where the key would just 
+become `patches-file-dev`.
 
 ## Patcher Configuration
 
@@ -592,6 +622,13 @@ Heavily modified version of https://github.com/cweagans/composer-patches
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.15.0
+
+* Feature: allow multiple patch files to be defined to enable high-level patch grouping (or to allow 
+  occasional cleanup where really old legacy patches could be moved elsewhere).
+* Fix: patch files not loaded from relative path even when they belong to a package rather than being 
+  referred directly from the project.
 
 ### 3.14.1
 

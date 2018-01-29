@@ -15,6 +15,13 @@ class ConfigReader
     
     public function readToArray($source)
     {
+        if (!file_exists($source)) {
+            throw new \Vaimo\ComposerPatches\Exceptions\ReadException(
+                sprintf('File not found: %s', $source)
+            );
+
+        } 
+        
         $sourceData = file_get_contents($source);
 
         try {

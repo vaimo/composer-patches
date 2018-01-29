@@ -6,25 +6,46 @@ use Vaimo\ComposerPatches\Config as PluginConfig;
 class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface
 {
     /**
+     * @var \Composer\Installer\InstallationManager
+     */
+    private $installationManager;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Package\ConfigReader
      */
     private $configLoader;
 
-    public function __construct()
-    {
+    /**
+     * @param \Composer\Installer\InstallationManager $installationManager
+     */
+    public function __construct(
+        \Composer\Installer\InstallationManager $installationManager
+    ) {
+        $this->installationManager = $installationManager;
+        
         $this->configLoader = new \Vaimo\ComposerPatches\Package\ConfigReader();
     }
 
-    public function load($source)
+    public function load(\Composer\Package\PackageInterface $package, $source)
     {
-        $fileContents = $this->configLoader->readToArray($source);
-        
-        if (isset($fileContents[PluginConfig::LIST])) {
-            return $fileContents[PluginConfig::LIST];
-        } elseif (!$fileContents) {
-            throw new \Exception('There was an error in the supplied patch file');
+        if (!is_array($source)) {
+            $source = array($source);
         }
 
-        return array();
+        $basePath = $this->installationManager->getInstallPath($package);
+        
+        $groups = array();
+        
+        foreach ($source as $item) {
+            $fileContents = $this->configLoader->readToArray($basePath . '/' . $item);
+            
+            if (isset($fileContents[PluginConfig::LIST])) {
+                $fileContents = $fileContents[PluginConfig::LIST];
+            }
+
+            $groups[] = $fileContents;
+        }
+
+        return $groups;
     }
 }

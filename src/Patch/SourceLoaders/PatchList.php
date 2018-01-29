@@ -3,8 +3,8 @@ namespace Vaimo\ComposerPatches\Patch\SourceLoaders;
 
 class PatchList implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface
 {
-    public function load($source)
+    public function load(\Composer\Package\PackageInterface $package, $source)
     {
-        return $source;
+        return array($source);
     }
 }
