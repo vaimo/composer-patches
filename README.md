@@ -648,8 +648,8 @@ Note that most of these flags have a 'composer patch' call flag alternative.
 
 ## Credits
 
-Inspired from https://github.com/cweagans/composer-patches, but rewritten to support simple patch 
-declarations as well as version-restricted complex ones.   
+Inspired by https://github.com/cweagans/composer-patches, but completely re-created to support a variety 
+levels of complexity when defining patches.
 
 ## Changelog 
 
