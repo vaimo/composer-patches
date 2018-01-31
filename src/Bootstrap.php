@@ -50,7 +50,7 @@ class Bootstrap
         $this->repositoryStateManager->extractAppliedPatchesInfo($repository);
     }
 
-    public function apply($devMode = false, array $targets = array(), $nameFilter = '')
+    public function apply($devMode = false, array $targets = array(), $filters = array())
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
         $configData = $this->composer->getPackage()->getExtra();
@@ -64,7 +64,7 @@ class Bootstrap
         $repositoryManager->processRepository(
             $repository, 
             array_fill_keys($targets, true),
-            $nameFilter
+            $filters
         );
     }
     
@@ -72,12 +72,10 @@ class Bootstrap
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
 
-        $repositoryManager = $this->repositoryManagerFactory->create(
-            false,
-            $targets 
-                ? $this->composer->getPackage()->getExtra() 
-                : array(\Vaimo\ComposerPatches\Patch\Config::ENABLED => false)
-        );
+        $rootConfig = $this->composer->getPackage()->getExtra();
+        $config = $targets ? $rootConfig : array(\Vaimo\ComposerPatches\Patch\Config::ENABLED => false);
+        
+        $repositoryManager = $this->repositoryManagerFactory->create(false, $config);
 
         $repositoryManager->processRepository(
             $repository, 

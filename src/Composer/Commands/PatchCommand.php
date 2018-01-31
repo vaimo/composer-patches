@@ -31,7 +31,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
 
         $this->addOption(
-            '--filter', null, InputOption::VALUE_OPTIONAL, 'Apply only those patch files that match with provided filter'
+            '--filter', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Apply only those patch files/sources that match with provided filter'
         );
         
         $this->addOption(
@@ -47,7 +47,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
 
         $targets = $input->getArgument('targets');
-        $filter = $input->getOption('filter');
+        $filters = $input->getOption('filter');
         
         if ($input->getOption('undo')) {
             $bootstrap->unload($targets);
@@ -60,6 +60,6 @@ class PatchCommand extends \Composer\Command\BaseCommand
         putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
         putenv(Environment::FORCE_REAPPLY . "=" . $input->getOption('redo'));
 
-        $bootstrap->apply($isDevMode, $targets, $filter);
+        $bootstrap->apply($isDevMode, $targets, $filters);
     }
 }

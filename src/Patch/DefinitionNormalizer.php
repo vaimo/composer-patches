@@ -1,88 +1,86 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
 class DefinitionNormalizer
 {
-    public function process($patchTarget, $label, $data)
+    public function process($target, $label, $data)
     {
         if (!is_array($data)) {
             $data = array(
-                PatchDefinition::SOURCE => (string)$data
+                Definition::SOURCE => (string)$data
             );
         }
 
-        if (!isset($data[PatchDefinition::URL]) && !isset($data[PatchDefinition::SOURCE])) {
+        if (!isset($data[Definition::URL]) && !isset($data[Definition::SOURCE])) {
             return false;
         }
 
-        $source = isset($data[PatchDefinition::URL])
-            ? $data[PatchDefinition::URL]
-            : $data[PatchDefinition::SOURCE];
+        $source = isset($data[Definition::URL])
+            ? $data[Definition::URL]
+            : $data[Definition::SOURCE];
 
         $sourceSegments = explode('#', $source);
         $lastSegment = array_pop($sourceSegments);
 
-        if ($lastSegment === PatchDefinition::SKIP) {
+        if ($lastSegment === Definition::SKIP) {
             $source = implode('#', $sourceSegments);
-            $data[PatchDefinition::SKIP] = true;
+            $data[Definition::SKIP] = true;
         }
         
         $depends = array();
         
         $config = array_replace(
             array('sequence' => array(), 'levels' => array()),
-            isset($config[PatchDefinition::CONFIG])
-                ? $config[PatchDefinition::CONFIG]
+            isset($config[Definition::CONFIG])
+                ? $config[Definition::CONFIG]
                 : array()
         );
         
-        if (isset($data[PatchDefinition::VERSION])) {
-            if (is_array($data[PatchDefinition::VERSION])) {
+        if (isset($data[Definition::VERSION])) {
+            if (is_array($data[Definition::VERSION])) {
                 $depends = array_replace(
                     $depends, 
-                    $data[PatchDefinition::VERSION]
+                    $data[Definition::VERSION]
                 );
             } else {
                 $depends = array_replace(
                     $depends, 
-                    array($patchTarget => $data[PatchDefinition::VERSION])
+                    array($target => $data[Definition::VERSION])
                 );
             }
         }
         
-        if (isset($data[PatchDefinition::DEPENDS])) {
+        if (isset($data[Definition::DEPENDS])) {
             $depends = array_replace(
                 $depends, 
-                $data[PatchDefinition::DEPENDS]
+                $data[Definition::DEPENDS]
             );
         }
 
-        if (isset($data[PatchDefinition::LEVEL])) {
+        if (isset($data[Definition::LEVEL])) {
             $config = array_replace(
                 $config,
-                array('levels' => array($data[PatchDefinition::LEVEL]))
+                array('levels' => array($data[Definition::LEVEL]))
             );
         }
 
-        if (isset($data[PatchDefinition::PATCHER])) {
-            $config['sequence']['patchers'] = array($data[PatchDefinition::PATCHER]);
+        if (isset($data[Definition::PATCHER])) {
+            $config['sequence']['patchers'] = array($data[Definition::PATCHER]);
         }
         
         return array(
-            PatchDefinition::SOURCE => $source,
-            PatchDefinition::TARGETS => isset($data[PatchDefinition::TARGETS])
-                ? $data[PatchDefinition::TARGETS]
-                : array($patchTarget),
-            PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP])
-                ? $data[PatchDefinition::SKIP]
+            Definition::SOURCE => $source,
+            Definition::TARGETS => isset($data[Definition::TARGETS]) && $target === Config::BUNDLE_TARGET
+                ? $data[Definition::TARGETS]
+                : array($target),
+            Definition::SKIP => isset($data[Definition::SKIP])
+                ? $data[Definition::SKIP]
                 : false,
-            PatchDefinition::LABEL => isset($data[PatchDefinition::LABEL])
-                ? $data[PatchDefinition::LABEL]
+            Definition::LABEL => isset($data[Definition::LABEL])
+                ? $data[Definition::LABEL]
                 : $label,
-            PatchDefinition::DEPENDS => $depends,
-            PatchDefinition::CONFIG => $config
+            Definition::DEPENDS => $depends,
+            Definition::CONFIG => $config
         );
     }
 }

@@ -1,8 +1,6 @@
 <?php
 namespace Vaimo\ComposerPatches\Patch;
 
-use Vaimo\ComposerPatches\Config as PluginConfig;
-
 class Config
 {
     const BUNDLE_TARGET = '*';
@@ -16,21 +14,32 @@ class Config
     private $config;
 
     /**
+     * @var array
+     */
+    private $sourceKeys;
+
+    /**
      * @param array $config
+     * @param array $sourceKeys
      */
     public function __construct(
-        array $config
+        array $config,
+        array $sourceKeys = array()
     ) {
         $this->config = $config;
+        $this->sourceKeys = $sourceKeys;
     }
 
     public function isPatchingEnabled()
     {
-        if (empty($this->config[PluginConfig::LIST]) && !isset($this->config[self::ENABLED])) {
-            return false;
+        if (!isset($this->config[self::ENABLED])) {
+            return array_intersect_key(
+                $this->config,
+                array_flip($this->sourceKeys)
+            );
         }
-
-        return !isset($this->config[self::ENABLED]) || $this->config[self::ENABLED];
+        
+        return $this->config[self::ENABLED];
     }
 
     public function isPackageScopeEnabled()

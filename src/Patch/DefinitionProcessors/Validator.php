@@ -21,7 +21,7 @@ class Validator implements \Vaimo\ComposerPatches\Interfaces\PatchDefinitionProc
             foreach ($packagePatches as $patch) {
                 $relativePath = $patch[PatchDefinition::SOURCE];
                 $absolutePatchPath = $vendorRoot . '/' . $relativePath;
-
+                
                 $patchPath = file_exists($absolutePatchPath)
                     ? $absolutePatchPath
                     : $relativePath;

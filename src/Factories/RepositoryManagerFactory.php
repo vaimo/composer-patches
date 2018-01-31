@@ -51,6 +51,8 @@ class RepositoryManagerFactory
         $logger = new \Vaimo\ComposerPatches\Logger($this->io);
         $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
         
+        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
+        
         if ($config->shouldExitOnFirstFailure()) {
             $failureHandler = new \Vaimo\ComposerPatches\Patch\FailureHandlers\FatalHandler($logger);    
         } else {
@@ -93,7 +95,7 @@ class RepositoryManagerFactory
         $patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($logger, $applierConfig);
         
         $patchesManager = new \Vaimo\ComposerPatches\Managers\PatchesManager(
-            $installationManager,
+            $packageInfoResolver,
             $eventDispatcher,
             $downloader,
             $failureHandler,
@@ -120,7 +122,7 @@ class RepositoryManagerFactory
         
         if ($config->shouldPreferOwnerPackageConfig()) {
             $infoExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\VendorConfigExtractor(
-                $installationManager
+                $packageInfoResolver
             );
         } else {
             $infoExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\InstalledConfigExtractor();
@@ -145,6 +147,7 @@ class RepositoryManagerFactory
             new DefinitionProcessors\ConstraintsApplier($patcherConfigData),
             new DefinitionProcessors\Validator(),
             new DefinitionProcessors\Simplifier(),
+            new DefinitionProcessors\TargetsResolver($packageInfoResolver)
         );
         
         $packagesManager = new \Vaimo\ComposerPatches\Managers\PackagesManager(
@@ -154,7 +157,10 @@ class RepositoryManagerFactory
             $vendorRoot
         );
         
-        $patcherConfig = new \Vaimo\ComposerPatches\Patch\Config($patcherConfigData);
+        $patcherConfig = new \Vaimo\ComposerPatches\Patch\Config(
+            $patcherConfigData, 
+            array_keys($loaders)
+        );
 
         $appliedPatchesManager = new \Vaimo\ComposerPatches\Managers\AppliedPatchesManager();
         

@@ -41,14 +41,19 @@ class RepositoryManager
     private $config;
 
     /**
+     * @var \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface
+     */
+    private $packagesResolver;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
 
     /**
-     * @var \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface
+     * @var \Vaimo\ComposerPatches\Utils\FilterUtils
      */
-    private $packagesResolver;
+    private $filterUtils;
 
     /**
      * @param \Composer\Installer\InstallationManager $installationManager
@@ -80,14 +85,16 @@ class RepositoryManager
         $this->config = $patchConfig;
         
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
+        $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
     }
 
-    public function processRepository(WritableRepositoryInterface $repository, array $targetFlags = [], $nameFilter = '') 
+    public function processRepository(WritableRepositoryInterface $repository, array $targetFlags = [], $filters = array()) 
     {
         $packagesByName = $this->packagesManager->getPackagesByName(
             $repository->getPackages()
         );
 
+        $filter = $filters ? $this->filterUtils->composeRegex($filters, '/') : false;
         $patches = array();
         
         if ($this->config->isPatchingEnabled()) {
@@ -99,19 +106,13 @@ class RepositoryManager
                 );
             }
             
-            $patches = $this->packagesManager->getPatches($sourcePackages);
+            $patches = $this->packagesManager->getPatches($sourcePackages, $packagesByName);
         }
         
-        if ($nameFilter) {
-            $patches = array_map(function ($group) use ($nameFilter) {
-                $keys = array_filter(array_keys($group), function ($path) use ($nameFilter) {
-                    return strstr($path, $nameFilter) !== false;
-                });
-
-                return array_intersect_key($group, array_flip($keys));
-            }, $patches);
+        if ($filter) {
+            $patches = $this->filterUtils->filterBySubItemKeys($patches, $filter);
         }
-
+        
         $groupedPatches = $this->patchesManager->groupPatches($patches);
         
         $resetFlags = array_fill_keys(
@@ -205,7 +206,17 @@ class RepositoryManager
             $hasPatchChanges = false;
             foreach ($patchGroupTargets as $target) {
                 $patchesForTarget = isset($groupedPatches[$target]) ? $groupedPatches[$target] : array();
-
+                 
+                if (!isset($packagesByName[$target])) {
+                    throw new \Vaimo\ComposerPatches\Exceptions\PackageNotFound(
+                        sprintf(
+                            'Unknown target "%s" encountered when checking patch changes for: %s', 
+                            $target, 
+                            implode(',', array_keys($patchesForTarget))
+                        )
+                    );
+                }
+                
                 $hasPatchChanges = $hasPatchChanges 
                     || $this->packageUtils->hasPatchChanges($packagesByName[$target], $patchesForTarget);
             }
@@ -239,8 +250,10 @@ class RepositoryManager
             $this->logger->writeRaw('Nothing to patch');
         }
 
-        $this->logger->write('Writing patch info to install file', 'info');
+        if ($packagesUpdated) {
+            $this->logger->write('Writing patch info to install file', 'info');
 
-        $repository->write();
+            $repository->write();
+        }
     }
 }

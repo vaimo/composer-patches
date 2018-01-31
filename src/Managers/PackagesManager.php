@@ -63,9 +63,10 @@ class PackagesManager
         return $packagesByName;
     }
     
-    public function getPatches(array $packages)
+    public function getPatches(array $packages, array $packagesByName)
     {
         $patches = $this->patchesCollector->collect($packages);
+        
         $rootName = $this->rootPackage->getName();
 
         if (isset($patches[PatchConfig::BUNDLE_TARGET])) {
@@ -74,15 +75,15 @@ class PackagesManager
             }
 
             $patches[$rootName] = array_merge(
-                $patches[$rootName], 
+                $patches[$rootName],
                 $patches[PatchConfig::BUNDLE_TARGET]
             );
             
             unset($patches[PatchConfig::BUNDLE_TARGET]);
         }
-
+        
         foreach ($this->processors as $processor) {
-            $patches = $processor->process($patches, $packages, $this->vendorRoot);
+            $patches = $processor->process($patches, $packagesByName, $this->vendorRoot);
         }
         
         return $patches;

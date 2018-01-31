@@ -18,7 +18,10 @@ composer patch --redo
 composer patch --redo my/package 
 
 # Re-apply patches for one speicif package with patch name filter 
-composer patch --filter wrong-time-format --redo my/package 
+composer patch --filter wrong-time-format --filter other-file --redo my/package 
+
+# Re-apply patches and skip filenames that contain 'wrong<anything>format'  
+composer patch --filter '!wrong*format' --redo my/package 
 
 # Reset all patched packages
 composer patch --undo 
@@ -403,12 +406,16 @@ alternative patch definition format is recommended:
 }
 ```
 
-Patches defined like this will be applied relative to the project root instead of being relative to the
-targeted package (which in this case is not really known).
+Patches defined like this will be applied relative to the project vendor root instead of being relative 
+to the targeted package (which in this case is not really known).
 
 Note that it's important still to have all the targeted packages listed as they'd need to be re-installed 
 in case the patch changes or patch-reapply is called (see below for the environment variable that allows
-that to be triggered).
+that to be triggered). 
+
+In case targets for bundled patch are not defined, the code will peek into the patch file and try to 
+resolve the targets from the contents of the patch. Note that this feature is somewhat experimental and 
+developer is still strongly encouraged to have the patch targets defined explicitly.
 
 ## Excluding patches
 
@@ -444,7 +451,7 @@ Will exclude the a patch that was defined in a package in following (or similar)
 The important part to note here is to remember that exclusion ignores patch target and focuses on the owner
 instead. Description is also not part of the exclusion logic.
 
-## Defining patches with strict path restrictions
+## Defining patches with strict path strip level
 
 By default, the patcher will try to apply the patch with several path stripping options - in some cases 
 this is not something that one wants to allow - for example: if the patch is in full extent just creating 
@@ -478,17 +485,39 @@ the following format:
     "patches": {
       "targeted/package": {
         "Some patch description": {
-          "level": "0",
           "source": {
             "<=1.2.3": "path/to/1.2.3/file.patch",
             ">1.2.3": "path/to/1.2.4/file.patch"
-          } 
+          },
+          "level": "0"
         }
       }
     }
   }
 }
 ```
+
+Note that in case most of the patches that you apply use same level, which is not covered by the default
+configuration, you can change the setting globally by overriding the patcher configuration:
+
+```json
+{
+  "name": "patch/owner",
+  "extra": {
+    "patcher-config": {
+      "levels": [5]
+    },
+    "patches": {
+      "targeted/package": {
+        "Some patch description": {
+          "source": "path/to/1.2.3/file.patch"
+        }
+      }
+    }
+  }
+}
+```
+
 
 ## Skipping patches
 
@@ -561,7 +590,7 @@ some extra options, it's possible to declare new patcher commands or override th
 a new section to the "extra" of the project's composer.json. Note that this example is a direct copy of what
 is built into the plugin. Changes to existing definitions are applied recursively.
 
-```javascript 
+```json
 {
   "extra": {
     "patcher-config": {
@@ -609,6 +638,8 @@ applied in a sequence of:
   By default, patched packages are re-installed to reset the patches (useful when creating immutable build 
   artifacts without any unnecessary modules installed).
 
+Note that most of these flags have a 'composer patch' call flag alternative.
+
 ### Deprecated flag names
 
 * COMPOSER_FORCE_PATCH_REAPPLY => COMPOSER_PATCHES_REAPPLY_ALL.
@@ -617,11 +648,23 @@ applied in a sequence of:
 
 ## Credits
 
-Heavily modified version of https://github.com/cweagans/composer-patches
+Inspired from https://github.com/cweagans/composer-patches, but rewritten to support simple patch 
+declarations as well as version-restricted complex ones.   
 
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.16.0
+
+* Feature: auto-resolve bundle patch targets when 'targets' not defined.
+* Feature: multiple filters for patch command.
+* Feature: allow patch command path filter to have wildcards and negation. 
+* Fix: ignore custom 'targets' config for non-bundled patches.
+* Fix: bundled patch was not registering/resetting target packages when performing redo/undo.
+* Fix: patches-dev and patches-file not enabling patching by default when defined on project level.
+* Fix: having patcher enabled only on project level did not compile patch queue correctly when disabling 
+  the option of including patches from packages.
 
 ### 3.15.0
 

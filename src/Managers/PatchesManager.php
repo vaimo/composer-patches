@@ -10,6 +10,11 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class PatchesManager
 {
     /**
+     * @var \Vaimo\ComposerPatches\Package\InfoResolver
+     */
+    private $packageInfoResolver;
+    
+    /**
      * @var \Composer\EventDispatcher\EventDispatcher
      */
     private $eventDispatcher;
@@ -45,7 +50,7 @@ class PatchesManager
     private $vendorRoot;
 
     /**
-     * @param \Composer\EventDispatcher\EventDispatcher $eventDispatcher
+     * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
      * @param \Composer\Util\RemoteFilesystem $downloader
      * @param \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -53,7 +58,7 @@ class PatchesManager
      * @param string $vendorRoot
      */
     public function __construct(
-        \Composer\Installer\InstallationManager $installationManager,
+        \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver,
         \Composer\EventDispatcher\EventDispatcher $eventDispatcher,
         \Composer\Util\RemoteFilesystem $downloader,
         \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler,
@@ -61,7 +66,7 @@ class PatchesManager
         \Vaimo\ComposerPatches\Patch\Applier $patchApplier,
         $vendorRoot
     ) {
-        $this->installationManager = $installationManager;
+        $this->packageInfoResolver = $packageInfoResolver;
         $this->eventDispatcher = $eventDispatcher;
         $this->downloader = $downloader;
         $this->failureHandler = $failureHandler;
@@ -74,9 +79,7 @@ class PatchesManager
     
     public function applyPatches(PackageInterface $package, array $patches)
     {
-        $installPath = !$package instanceof \Composer\Package\RootPackage
-            ? $this->installationManager->getInstallPath($package)
-            : '';
+        $installPath = $this->packageInfoResolver->getSourcePath($package);
         
         $appliedPatches = array();
         

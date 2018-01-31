@@ -6,9 +6,9 @@ use Vaimo\ComposerPatches\Config;
 class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
 {
     /**
-     * @var \Composer\Installer\InstallationManager
+     * @var \Vaimo\ComposerPatches\Package\InfoResolver
      */
-    private $installationManager;
+    private $packageInfoResolver;
     
     /**
      * @var \Vaimo\ComposerPatches\Package\ConfigReader
@@ -16,22 +16,19 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
     private $configLoader;
 
     /**
-     * @param \Composer\Installer\InstallationManager $installationManager
+     * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
      */
     public function __construct(
-        \Composer\Installer\InstallationManager $installationManager
+        \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
     ) {
-        $this->installationManager = $installationManager;
+        $this->packageInfoResolver = $packageInfoResolver;
+        
         $this->configLoader = new \Vaimo\ComposerPatches\Package\ConfigReader();
     }
     
     public function getConfig(\Composer\Package\PackageInterface $package)
     {
-        $installPath = !$package instanceof \Composer\Package\RootPackage
-            ? $this->installationManager->getInstallPath($package)
-            : '.';
-
-        $source = $installPath . '/' . Config::PACKAGE_CONFIG_FILE;
+        $source = $this->packageInfoResolver->getSourcePath($package) . '/' . Config::PACKAGE_CONFIG_FILE;
         
         if (file_exists($source)) {
             $fileContents = $this->configLoader->readToArray($source);
