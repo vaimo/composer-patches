@@ -1,5 +1,12 @@
 <?php
+/**
+ * Copyright © Vaimo Group. All rights reserved.
+ * See LICENSE_VAIMO.txt for license details.
+ */
 namespace Vaimo\ComposerPatches;
+
+use Vaimo\ComposerPatches\Factories\PatchesApplierFactory;
+use Vaimo\ComposerPatches\Factories\PatchesRepositoryFactory;
 
 class Bootstrap
 {
@@ -9,19 +16,19 @@ class Bootstrap
     private $composer;
     
     /**
-     * @var \Vaimo\ComposerPatches\Managers\AppliedPatchesManager
+     * @var PatchesApplierFactory
      */
-    private $appliedPatchesManager;
-    
-    /**
-     * @var \Vaimo\ComposerPatches\Factories\RepositoryManagerFactory
-     */
-    private $repositoryManagerFactory;
+    private $applierFactory;
 
     /**
-     * @var \Vaimo\ComposerPatches\Managers\RepositoryStateManager
+     * @var PatchesRepositoryFactory
      */
-    private $repositoryStateManager;
+    private $repositoryFactory;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Managers\PatcherStateManager
+     */
+    private $patcherStateManager;
     
     /**
      * @param \Composer\Composer $composer
@@ -33,53 +40,51 @@ class Bootstrap
     ) {
         $this->composer = $composer;
         
-        $this->appliedPatchesManager = new \Vaimo\ComposerPatches\Managers\AppliedPatchesManager();
-        
-        $this->repositoryManagerFactory = new \Vaimo\ComposerPatches\Factories\RepositoryManagerFactory(
-            $composer,
-            $io
-        );
+        $this->applierFactory = new PatchesApplierFactory($io);
+        $this->repositoryFactory = new PatchesRepositoryFactory();
 
-        $this->repositoryStateManager = new \Vaimo\ComposerPatches\Managers\RepositoryStateManager();
+        $this->patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
     }
 
     public function prepare()
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-
-        $this->repositoryStateManager->extractAppliedPatchesInfo($repository);
+        $this->patcherStateManager->extractAppliedPatchesInfo($repository);
     }
 
-    public function apply($devMode = false, array $targets = array(), $filters = array())
+    public function apply($devMode = false, array $targets = array(), array $filters = array())
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-        $configData = $this->composer->getPackage()->getExtra();
-
-        $this->repositoryStateManager->restoreAppliedPatchesInfo($repository);
         
-        if (!$repositoryManager = $this->repositoryManagerFactory->create($devMode, $configData)) {
+        $this->patcherStateManager->restoreAppliedPatchesInfo($repository);
+
+        $patchesApplier = $this->applierFactory->create(
+            $this->composer, 
+            $this->patcherStateManager
+        );
+        
+        if (!$patchesApplier) {
             return null;
         }
         
-        $repositoryManager->processRepository(
-            $repository, 
-            array_fill_keys($targets, true),
-            $filters
-        );
+        $repository = $this->repositoryFactory->create($this->composer, $devMode);
+        
+        $patchesApplier->apply($repository, $targets, $filters);
     }
     
     public function unload(array $targets = array())
     {
-        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-
-        $rootConfig = $this->composer->getPackage()->getExtra();
-        $config = $targets ? $rootConfig : array(\Vaimo\ComposerPatches\Patch\Config::ENABLED => false);
-        
-        $repositoryManager = $this->repositoryManagerFactory->create(false, $config);
-
-        $repositoryManager->processRepository(
-            $repository, 
-            array_fill_keys($targets, false)
+        $patchesApplier = $this->applierFactory->create(
+            $this->composer, 
+            $this->patcherStateManager
         );
+
+        $config = $targets
+            ? $this->composer->getPackage()->getExtra()
+            : array(\Vaimo\ComposerPatches\Patch\Config::ENABLED => false);
+        
+        $repository = $this->repositoryFactory->create($this->composer, false, $config);
+
+        $patchesApplier->apply($repository, $targets);
     }
 }

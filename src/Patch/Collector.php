@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © Vaimo Group. All rights reserved.
+ * See LICENSE_VAIMO.txt for license details.
+ */
 namespace Vaimo\ComposerPatches\Patch;
 
 use Composer\Package\RootPackage;
@@ -8,6 +12,11 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class Collector
 {
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\ListNormalizer
+     */
+    private $listNormalizer;
+    
     /**
      * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
      */
@@ -19,22 +28,18 @@ class Collector
     private $sourceLoaders;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionsProcessor
-     */
-    private $definitionsProcessor;
-
-    /**
+     * @param \Vaimo\ComposerPatches\Patch\ListNormalizer $listNormalizer
      * @param \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor
      * @param PatchSourceLoaderInterface[] $sourceLoaders
      */
     public function __construct(
+        \Vaimo\ComposerPatches\Patch\ListNormalizer $listNormalizer,
         \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor,
         array $sourceLoaders
     ) {
-        $this->sourceLoaders = $sourceLoaders;
+        $this->listNormalizer = $listNormalizer;
         $this->infoExtractor = $infoExtractor;
-
-        $this->definitionsProcessor = new \Vaimo\ComposerPatches\Patch\DefinitionsProcessor();
+        $this->sourceLoaders = $sourceLoaders;
     }
 
     /**
@@ -57,8 +62,8 @@ class Collector
             foreach ($sourceLoaders as $key => $loader) {
                 $groups = $loader->load($owner, $packageConfig[$key]);
                 
-                foreach ($groups as $group) {
-                    $patchesByTarget = $this->definitionsProcessor->normalizeDefinitions($group);
+                foreach ($groups as $list) {
+                    $patchesByTarget = $this->listNormalizer->normalize($list);
 
                     if ($loader instanceof \Vaimo\ComposerPatches\Interfaces\PatchListUpdaterInterface) {
                         $patchesByTarget = $loader->update($patchesByTarget);

@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © Vaimo Group. All rights reserved.
+ * See LICENSE_VAIMO.txt for license details.
+ */
 namespace Vaimo\ComposerPatches\Composer\Commands;
 
 use Symfony\Component\Console\Input\InputInterface;
@@ -48,17 +52,17 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $targets = $input->getArgument('targets');
         $filters = $input->getOption('filter');
-        
+
+        putenv(Environment::FORCE_REAPPLY . "=" . ($input->getOption('redo') || $input->getOption('undo')));
+
         if ($input->getOption('undo')) {
             $bootstrap->unload($targets);
-            
             return;
         }
         
         $isDevMode = !$input->getOption('no-dev');
 
         putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
-        putenv(Environment::FORCE_REAPPLY . "=" . $input->getOption('redo'));
 
         $bootstrap->apply($isDevMode, $targets, $filters);
     }

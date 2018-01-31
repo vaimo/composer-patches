@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © Vaimo Group. All rights reserved.
+ * See LICENSE_VAIMO.txt for license details.
+ */
 namespace Vaimo\ComposerPatches\Patch;
 
 class Applier
@@ -19,7 +23,7 @@ class Applier
     private $config;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\ApplierUtils
+     * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
      */
     private $applierUtils;
 
@@ -35,7 +39,7 @@ class Applier
         $this->config = $config;
 
         $this->shell = new \Vaimo\ComposerPatches\Shell($logger);
-        $this->applierUtils = new \Vaimo\ComposerPatches\Utils\ApplierUtils();
+        $this->applierUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
     }
 
     public function applyFile($filename, $cwd, $config = array())
@@ -44,12 +48,12 @@ class Applier
 
         list($type, $patchLevel, $operationName) = array_fill(0, 3, 'UNKNOWN');
 
-        $applierConfig = $this->applierUtils->mergeConfig(
+        $applierConfig = $this->applierUtils->mergeApplierConfig(
             $this->config, 
             array_filter($config)
         );
 
-        $applierConfig = $this->applierUtils->sortConfig($applierConfig);
+        $applierConfig = $this->applierUtils->sortApplierConfig($applierConfig);
         
         $patchers = isset($applierConfig['patchers']) 
             ? array_filter($applierConfig['patchers']) 

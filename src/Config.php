@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © Vaimo Group. All rights reserved.
+ * See LICENSE_VAIMO.txt for license details.
+ */
 namespace Vaimo\ComposerPatches;
 
 class Config
@@ -17,6 +21,16 @@ class Config
 
     const PACKAGE_CONFIG_FILE = 'composer.json';
 
+    /**
+     * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
+     */
+    private $configUtils;
+    
+    public function __construct() 
+    {
+        $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
+    }
+    
     public function shouldPreferOwnerPackageConfig()
     {
         return (bool)getenv(Environment::PREFER_OWNER);
@@ -41,5 +55,34 @@ class Config
         return array_filter(
             explode(',', $skipList)
         );
+    }
+    
+    public function getApplierConfig(array $overrides = array())
+    {
+        $config = array(
+            'patchers' => array(
+                'GIT' => array(
+                    'check' => 'git apply -p{{level}} --check {{file}}',
+                    'patch' => 'git apply -p{{level}} {{file}}'
+                ),
+                'PATCH' => array(
+                    'check' => 'patch -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
+                    'patch' => 'patch -p{{level}} --no-backup-if-mismatch < {{file}}'
+                )
+            ),
+            'operations' => array(
+                'check' => 'Validation',
+                'patch' => 'Patching'
+            ),
+            'sequence' => array(
+                'patchers' => array('PATCH', 'GIT'),
+                'operations' => array('check', 'patch')
+            ),
+            'levels' => array('0', '1', '2')
+        );
+
+        $config = $this->configUtils->mergeApplierConfig($config, $overrides);
+        
+        return $this->configUtils->sortApplierConfig($config);
     }
 }

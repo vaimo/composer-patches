@@ -1,6 +1,23 @@
 {
-    "name": "vaimo/composer-patches", 
-    "description": "Provides a way to patch Composer packages with optional version restriction. Includes new 'patch' command for composer.", 
+    "name": "vaimo/composer-patches",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "description": "Provides a way to patch Composer packages with optional version restriction and support for applying bundled patches (patches that patch more than one package). Includes new 'patch' command for composer",
+    "authors": [
+        {
+            "name": "Allan Paiste",
+            "email": "allan.paiste@vaimo.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "composer-plugin-api": "^1.0"
+    },
+    "support": {
+        "source": "https://github.com/vaimo/composer-patches",
+        "docs": "https://github.com/vaimo/composer-patches",
+        "issues": "https://github.com/vaimo/composer-patches/issues"
+    }, 
     "keywords": [
         "composer plugin", 
         "patching", 
@@ -24,48 +41,15 @@
         "bundled patches",
         "patch command",
         "patch from vendor"
-    ], 
-    "support": {
-        "source": "https://github.com/vaimo/composer-patches", 
-        "docs": "https://github.com/vaimo/composer-patches", 
-        "issues": "https://github.com/vaimo/composer-patches/issues"
-    }, 
-    "minimum-stability": "dev", 
-    "license": "proprietary", 
-    "type": "composer-plugin", 
+    ],
+    "minimum-stability": "dev",      
     "extra": {
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true
-    }, 
-    "authors": [
-        {
-            "name": "Cameron Eagans", 
-            "email": "me@cweagans.net"
-        }, 
-        {
-            "name": "Allan Paiste", 
-            "email": "allan.paiste@vaimo.com"
-        }
-    ], 
-    "require": {
-        "php": ">=5.3.0", 
-        "composer-plugin-api": "^1.0"
-    }, 
-    "require-dev": {
-        "composer/composer": "~1.0", 
-        "phpunit/phpunit": "~4.6"
-    }, 
-    "conflict": {
-        "cweagans/composer-patches": "*"
-    }, 
+    },
     "autoload": {
         "psr-4": {
             "Vaimo\\ComposerPatches\\": "src"
-        }
-    }, 
-    "autoload-dev": {
-        "psr-4": {
-            "Vaimo\\ComposerPatches\\Tests\\": "tests"
         }
     }
 }

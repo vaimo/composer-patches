@@ -655,6 +655,15 @@ declarations as well as version-restricted complex ones.
 
 List of generalized changes for each release.
 
+### 3.17.0
+
+* Fix: don't force bundle patches to have 'vendor' in their paths as it's a customizable value
+* Fix: patch information not correctly restored to installed.json when there were no patch updates while 
+  running 'composer update'.
+* Maintenance: code split into smaller classes where applicable to move towards single-responsibility 
+  entities in design.
+* Maintenance: reduced the mess around re-using same terminology in too many different contexts.
+
 ### 3.16.0
 
 * Feature: auto-resolve bundle patch targets when 'targets' not defined.
