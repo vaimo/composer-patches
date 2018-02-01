@@ -8,7 +8,6 @@ namespace Vaimo\ComposerPatches\Patch;
 class Config
 {
     const BUNDLE_TARGET = '*';
-    
     const ENABLED = 'enable-patching';
     const ENABLED_FOR_PACKAGES = 'enable-patching-from-packages';
 

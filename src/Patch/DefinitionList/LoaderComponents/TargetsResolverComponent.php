@@ -50,7 +50,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                 }
                 
                 $path = $this->packageInfoResolver->getSourcePath($packagesByName[$patchTarget]) 
-                    . '/' . $patch;
+                    . DIRECTORY_SEPARATOR . $patch;
                 
                 if (!file_exists($path)) {
                     continue;

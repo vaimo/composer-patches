@@ -48,12 +48,12 @@ class PathNormalizerComponent implements \Vaimo\ComposerPatches\Interfaces\Defin
                 $packageInstaller = $this->installationManager->getInstaller($patchOwnerPackage->getType());
                 $patchOwnerPath = $packageInstaller->getInstallPath($patchOwnerPackage);
 
-                $absolutePatchPath = $patchOwnerPath . '/' . $patchData[PatchDefinition::SOURCE];
+                $absolutePatchPath = $patchOwnerPath . DIRECTORY_SEPARATOR . $patchData[PatchDefinition::SOURCE];
 
                 if (strpos($absolutePatchPath, $vendorRoot) === 0) {
                     $patchData[PatchDefinition::SOURCE] = trim(
                         substr($absolutePatchPath, strlen($vendorRoot)),
-                        '/'
+                        DIRECTORY_SEPARATOR
                     );
                 }
             }

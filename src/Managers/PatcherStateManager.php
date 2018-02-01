@@ -7,6 +7,8 @@ namespace Vaimo\ComposerPatches\Managers;
 
 use Composer\Repository\WritableRepositoryInterface;
 use Vaimo\ComposerPatches\Config as PluginConfig;
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Composer\Constraint;
 
 class PatcherStateManager
 {
@@ -59,16 +61,17 @@ class PatcherStateManager
         $packages = array();
 
         foreach ($patches as $source => $patchInfo) {
-            foreach ($patchInfo['targets'] as $target) {
-                if (!$package = $repository->findPackage($target, '*')) {
+            foreach ($patchInfo[PatchDefinition::TARGETS] as $target) {
+                if (!$package = $repository->findPackage($target, Constraint::ANY)) {
                     continue;
                 }
                 
+                /** @var \Composer\Package\CompletePackage $package */
                 $package = $this->packageUtils->getRealPackage($package);
-
+                
                 $info = array_replace_recursive($package->getExtra(), array(
                     PluginConfig::APPLIED_FLAG => array(
-                        $source => $patchInfo['label']
+                        $source => $patchInfo[PatchDefinition::LABEL]
                     )
                 ));
                 

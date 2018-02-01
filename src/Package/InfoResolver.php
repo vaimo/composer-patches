@@ -7,6 +7,8 @@ namespace Vaimo\ComposerPatches\Package;
 
 class InfoResolver
 {
+    const DEFAULT_PATH = '.';
+    
     /**
      * @var \Composer\Installer\InstallationManager
      */
@@ -25,7 +27,7 @@ class InfoResolver
     {
         return !$package instanceof \Composer\Package\RootPackage
             ? $this->installationManager->getInstallPath($package)
-            : '.';
+            : self::DEFAULT_PATH;
     }
     
     public function resolveNamesFromPaths(array $packagesByName, array $paths)
@@ -37,12 +39,12 @@ class InfoResolver
         $names = array();
         
         foreach ($paths as $path) {
-            $segments = explode('/', $path);
+            $segments = explode(DIRECTORY_SEPARATOR, $path);
 
             while ($chunk = array_slice($segments, 0, 2)) {
                 array_shift($segments);
 
-                $name = implode('/', $chunk);
+                $name = implode(DIRECTORY_SEPARATOR, $chunk);
 
                 if (!isset($packagesByName[$name])) {
                     continue;

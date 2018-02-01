@@ -45,22 +45,20 @@ class Bootstrap
         
         $this->applierFactory = new PatchesApplierFactory($io);
         $this->repositoryFactory = new PatchesRepositoryFactory();
-
-        $this->patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
     }
 
     public function applyPatches($devMode = false, array $targets = array(), array $filters = array())
     {
-        $patchesApplier = $this->applierFactory->create($this->composer, $this->patcherStateManager);
-        
-        if (!$patchesApplier) {
-            return null;
-        }
-
         $config = array_replace(
             $this->composer->getPackage()->getExtra(),
             $this->config
         );
+        
+        $patchesApplier = $this->applierFactory->create($this->composer, $config);
+        
+        if (!$patchesApplier) {
+            return null;
+        }
         
         $repository = $this->repositoryFactory->create($this->composer, $config, $devMode);
         
@@ -69,16 +67,13 @@ class Bootstrap
     
     public function stripPatches(array $targets = array())
     {
-        $patchesApplier = $this->applierFactory->create(
-            $this->composer, 
-            $this->patcherStateManager
-        );
-
         $config = array_replace(
             $this->composer->getPackage()->getExtra(),
             $this->config,
             array(\Vaimo\ComposerPatches\Patch\Config::ENABLED => false)
         );
+        
+        $patchesApplier = $this->applierFactory->create($this->composer, $config);
         
         $repository = $this->repositoryFactory->create($this->composer, $config);
 

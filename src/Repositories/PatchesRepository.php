@@ -77,7 +77,7 @@ class PatchesRepository
     
     public function getPatches($filters = array())
     {
-        $filter = $filters ? $this->filterUtils->composeRegex($filters, '/') : false;
+        $filter = $filters ? $this->filterUtils->composeRegex($filters, DIRECTORY_SEPARATOR) : false;
         $patches = array();
 
         if ($this->patchConfig->isPatchingEnabled()) {

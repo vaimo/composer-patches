@@ -20,6 +20,14 @@ class Config
     const PATCHER_PLUGIN_MARKER = 'patcher_plugin';
 
     const PACKAGE_CONFIG_FILE = 'composer.json';
+    
+    const PATCHER_PROVIDERS = 'patchers';
+    const PATCHER_OPERATIONS = 'operations';
+    const PATCHER_SEQUENCE = 'sequence';
+    const PATCHER_LEVELS = 'levels';
+    
+    const PATCHER_ARG_LEVEL = 'level';
+    const PATCHER_ARG_FILE = 'file';
 
     /**
      * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
@@ -60,7 +68,7 @@ class Config
     public function getApplierConfig(array $overrides = array())
     {
         $config = array(
-            'patchers' => array(
+            self::PATCHER_PROVIDERS => array(
                 'GIT' => array(
                     'check' => 'git apply -p{{level}} --check {{file}}',
                     'patch' => 'git apply -p{{level}} {{file}}'
@@ -70,15 +78,15 @@ class Config
                     'patch' => 'patch -p{{level}} --no-backup-if-mismatch < {{file}}'
                 )
             ),
-            'operations' => array(
+            self::PATCHER_OPERATIONS => array(
                 'check' => 'Validation',
                 'patch' => 'Patching'
             ),
-            'sequence' => array(
+            self::PATCHER_SEQUENCE => array(
                 'patchers' => array('PATCH', 'GIT'),
                 'operations' => array('check', 'patch')
             ),
-            'levels' => array('0', '1', '2')
+            self::PATCHER_LEVELS => array('0', '1', '2')
         );
 
         $config = $this->configUtils->mergeApplierConfig($config, $overrides);

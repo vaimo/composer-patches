@@ -41,7 +41,7 @@ class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoader
         $groups = array();
         
         foreach ($source as $item) {
-            $fileContents = $this->configLoader->readToArray($basePath . '/' . $item);
+            $fileContents = $this->configLoader->readToArray($basePath . DIRECTORY_SEPARATOR . $item);
             
             if (isset($fileContents[PluginConfig::LIST])) {
                 $fileContents = $fileContents[PluginConfig::LIST];

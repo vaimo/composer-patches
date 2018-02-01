@@ -8,7 +8,6 @@ namespace Vaimo\ComposerPatches\Composer\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-
 use Vaimo\ComposerPatches\Environment;
 
 class PatchCommand extends \Composer\Command\BaseCommand
@@ -19,27 +18,45 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $this->setDescription('Apply registered patches to current project');
 
         $this->addArgument(
-            'targets', \Symfony\Component\Console\Input\InputArgument::IS_ARRAY, 'Packages for the patcher to target', array()
+            'targets', 
+            \Symfony\Component\Console\Input\InputArgument::IS_ARRAY, 
+            'Packages for the patcher to target', 
+            array()
         );
 
         $this->addOption(
-            '--redo', null, InputOption::VALUE_NONE, 'Re-patch all packages or a specific package when targets defined'
+            '--redo', 
+            null, 
+            InputOption::VALUE_NONE, 
+            'Re-patch all packages or a specific package when targets defined'
         );
 
         $this->addOption(
-            '--undo', null, InputOption::VALUE_NONE, 'Remove all patches or a specific patch when targets defined'
+            '--undo', 
+            null, 
+            InputOption::VALUE_NONE, 
+            'Remove all patches or a specific patch when targets defined'
         );
         
         $this->addOption(
-            '--no-dev', null, InputOption::VALUE_NONE, 'Disables installation of require-dev packages'
+            '--no-dev', 
+            null, 
+            InputOption::VALUE_NONE, 
+            'Disables installation of require-dev packages'
         );
 
         $this->addOption(
-            '--filter', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Apply only those patch files/sources that match with provided filter'
+            '--filter', 
+            null, 
+            InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 
+            'Apply only those patch files/sources that match with provided filter'
         );
         
         $this->addOption(
-            '--from-source', null, InputOption::VALUE_NONE, 'Apply patches based on information directly from packages in vendor folder'
+            '--from-source', 
+            null, 
+            InputOption::VALUE_NONE, 
+            'Apply patches based on information directly from packages in vendor folder'
         );
     }
 

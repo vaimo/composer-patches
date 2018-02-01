@@ -663,6 +663,13 @@ levels of complexity when defining patches.
 
 List of generalized changes for each release.
 
+### 3.17.3
+
+* Fix: switched to using PHP constants for OS-related values like newline and path separator.
+* Maintenance: switched to using constants for each free-text array key value + reduced code repetition.
+* Maintenance: logger indentation reworked not to be hardcoded in log messages in text form to open up the 
+  chance to switch to different logging methods/formats in the future. 
+
 ### 3.17.2
 
 * Fix: patches not registered for patch target packages when 'COMPOSER_PATCHES_FATAL_FAIL' enabled and 

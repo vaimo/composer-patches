@@ -6,7 +6,6 @@
 namespace Vaimo\ComposerPatches\Package;
 
 use Composer\Package\PackageInterface;
-
 use Vaimo\ComposerPatches\Patch\Event;
 use Vaimo\ComposerPatches\Events;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
@@ -86,14 +85,14 @@ class PatchApplier
     {
         $installPath = $this->packageInfoResolver->getSourcePath($package);
         
-        if ($installPath == '.') {
+        if ($installPath == \Vaimo\ComposerPatches\Package\InfoResolver::DEFAULT_PATH) {
             $installPath = $this->vendorRoot;
         }
-
+        
         $appliedPatches = array();
 
         foreach ($patchesQueue as $source => $patchInfo) {
-            $absolutePatchPath = $this->vendorRoot . '/' . $source;
+            $absolutePatchPath = $this->vendorRoot . DIRECTORY_SEPARATOR . $source;
             $relativePath = $source;
 
             $description = $patchInfo[PatchDefinition::LABEL];
@@ -106,16 +105,25 @@ class PatchApplier
                 $patchSourceLabel = vsprintf(
                     '<info>%s</info>: %s',
                     array(
-                        $ownerName = implode('/', array_slice(explode('/', $source), 0, 2)),
-                        trim(substr($source, strlen($ownerName)), '/')
+                        $ownerName = implode(
+                            DIRECTORY_SEPARATOR, 
+                            array_slice(explode(DIRECTORY_SEPARATOR, $source), 0, 2)
+                        ),
+                        trim(
+                            substr($source, strlen($ownerName)), 
+                            DIRECTORY_SEPARATOR
+                        )
                     )
                 );
 
                 $source = $absolutePatchPath;
             }
+            
+            $this->logger->writeRaw('%s', array($patchSourceLabel));
 
-            $this->logger->writeRaw('    ~ %s', array($patchSourceLabel));
-            $this->logger->writeRaw('      <comment>%s</comment>', array($patchComment));
+            $loggerIndentation = $this->logger->push();
+
+            $this->logger->writeRaw('<comment>%s</comment>', array($patchComment));
 
             try {
                 $this->eventDispatcher->dispatch(
@@ -145,13 +153,15 @@ class PatchApplier
                 );
 
                 $appliedPatches[$relativePath] = $patchInfo;
-            } catch (\Exception $e) {
-                $this->logger->writeException($e);
+            } catch (\Exception $exception) {
+                $this->logger->writeException($exception);
                 
                 $this->failureHandler->execute(
-                    sprintf('Failed to apply %s (%s)!', $relativePath, $patchComment),
+                    $exception->getMessage(),
                     $relativePath
                 );
+            } finally {
+                $this->logger->reset($loggerIndentation);
             }
         }
 

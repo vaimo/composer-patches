@@ -6,7 +6,6 @@
 namespace Vaimo\ComposerPatches\Patch;
 
 use Composer\Package\RootPackage;
-
 use Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 

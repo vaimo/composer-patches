@@ -6,7 +6,8 @@
 namespace Vaimo\ComposerPatches\Factories;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
-use Vaimo\ComposerPatches\Managers\PatcherStateManager;
+use Vaimo\ComposerPatches\Patch\FailureHandlers;
+use Vaimo\ComposerPatches\Patch\PackageResolvers;
 
 class PatchesApplierFactory
 {
@@ -24,18 +25,18 @@ class PatchesApplierFactory
         $this->io = $io;
     }
     
-    public function create(\Composer\Composer $composer, PatcherStateManager $patcherStateManager)
+    public function create(\Composer\Composer $composer, array $config)
     {
-        $patcherConfigData = $composer->getPackage()->getExtra();
-        
+        $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
+            
         $installationManager = $composer->getInstallationManager();
-        $composerConfig = $composer->getConfig();
         $eventDispatcher = $composer->getEventDispatcher();
-        
-        $vendorRoot = $composerConfig->get('vendor-dir');
-        
-        $pluginConfig = new \Vaimo\ComposerPatches\Config();
         $rootPackage = $composer->getPackage();
+        $composerConfig = $composer->getConfig();
+
+        $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
+        
+        $pluginConfig = new PluginConfig();
 
         $logger = new \Vaimo\ComposerPatches\Logger($this->io);
         $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
@@ -43,15 +44,15 @@ class PatchesApplierFactory
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
         
         if ($pluginConfig->shouldExitOnFirstFailure()) {
-            $failureHandler = new \Vaimo\ComposerPatches\Patch\FailureHandlers\FatalHandler($logger);    
+            $failureHandler = new FailureHandlers\FatalHandler($logger);    
         } else {
-            $failureHandler = new \Vaimo\ComposerPatches\Patch\FailureHandlers\GracefulHandler($logger);
+            $failureHandler = new FailureHandlers\GracefulHandler($logger);
         }
 
         $applierConfig = $pluginConfig->getApplierConfig(
-            isset($patcherConfigData[PluginConfig::PATCHER_CONFIG])
-            && is_array($patcherConfigData[PluginConfig::PATCHER_CONFIG]) ?
-                $patcherConfigData[PluginConfig::PATCHER_CONFIG]
+            isset($config[PluginConfig::PATCHER_CONFIG])
+            && is_array($config[PluginConfig::PATCHER_CONFIG]) ?
+                $config[PluginConfig::PATCHER_CONFIG]
                 : array()
         );
         
@@ -70,9 +71,9 @@ class PatchesApplierFactory
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector($rootPackage);
 
         if ($pluginConfig->shouldResetEverything()) {
-            $packagesResolver = new \Vaimo\ComposerPatches\Patch\PackageResolvers\FullResetResolver();
+            $packagesResolver = new PackageResolvers\FullResetResolver();
         } else {
-            $packagesResolver = new \Vaimo\ComposerPatches\Patch\PackageResolvers\MissingPatchesResolver();
+            $packagesResolver = new PackageResolvers\MissingPatchesResolver();
         }
         
         $repositoryAnalyser = new \Vaimo\ComposerPatches\Repository\Analyser(

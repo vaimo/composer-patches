@@ -21,7 +21,8 @@ class ComplexItemComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
         $versionKeySet = false;
         
         if (is_array($value)) {
-            $versionKeySet = isset($value[PatchDefinition::VERSION]) || isset($value[PatchDefinition::DEPENDS]);
+            $versionKeySet = isset($value[PatchDefinition::VERSION]) 
+                || isset($value[PatchDefinition::DEPENDS]);
         }   
         
         return !is_numeric($key) && is_array($value) && $versionKeySet;

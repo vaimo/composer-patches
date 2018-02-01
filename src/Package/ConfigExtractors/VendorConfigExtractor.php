@@ -32,7 +32,9 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
     
     public function getConfig(\Composer\Package\PackageInterface $package)
     {
-        $source = $this->packageInfoResolver->getSourcePath($package) . '/' . Config::PACKAGE_CONFIG_FILE;
+        $source = $this->packageInfoResolver->getSourcePath($package) 
+            . DIRECTORY_SEPARATOR 
+            . Config::PACKAGE_CONFIG_FILE;
         
         if (file_exists($source)) {
             $fileContents = $this->configLoader->readToArray($source);

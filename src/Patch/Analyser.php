@@ -10,8 +10,9 @@ class Analyser
     public function getAllPaths($contents)
     {
         $paths = array();
+
         
-        $lines = explode("\n", $contents);
+        $lines = explode(PHP_EOL, $contents);
         
         foreach ($lines as $line) {
             $prefix = substr($line, 0, 4);

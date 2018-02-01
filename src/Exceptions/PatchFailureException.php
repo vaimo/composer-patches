@@ -9,7 +9,7 @@ class PatchFailureException extends \Exception
 {
     private $failedPatchPath;
     
-    public function __construct($failedPatchPath, $message = "", \Throwable $previous = null) 
+    public function __construct($failedPatchPath, $message = '', \Throwable $previous = null) 
     { 
         parent::__construct($message, 0, $previous);
 

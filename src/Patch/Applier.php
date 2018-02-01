@@ -5,6 +5,8 @@
  */
 namespace Vaimo\ComposerPatches\Patch;
 
+use Vaimo\ComposerPatches\Config as PluginConfig;
+
 class Applier
 {
     /**
@@ -55,25 +57,27 @@ class Applier
 
         $applierConfig = $this->applierUtils->sortApplierConfig($applierConfig);
         
-        $patchers = isset($applierConfig['patchers']) 
-            ? array_filter($applierConfig['patchers']) 
+        $patchers = isset($applierConfig[PluginConfig::PATCHER_PROVIDERS]) 
+            ? array_filter($applierConfig[PluginConfig::PATCHER_PROVIDERS]) 
             : array();
         
-        $operations = isset($applierConfig['operations']) 
-            ? array_filter($applierConfig['operations']) 
+        $operations = isset($applierConfig[PluginConfig::PATCHER_OPERATIONS]) 
+            ? array_filter($applierConfig[PluginConfig::PATCHER_OPERATIONS]) 
             : array();
         
-        $levels = isset($applierConfig['levels']) 
-            ? $applierConfig['levels'] 
+        $levels = isset($applierConfig[PluginConfig::PATCHER_LEVELS]) 
+            ? $applierConfig[PluginConfig::PATCHER_LEVELS] 
             : array();
+
+        $patcherSequence = $applierConfig[PluginConfig::PATCHER_SEQUENCE][PluginConfig::PATCHER_PROVIDERS];
 
         if (!$patchers) {
             $this->logger->writeVerbose(
+                'error',
                 sprintf(
                     'No valid patchers found with sequence: %s', 
-                    implode(',', $applierConfig['sequence']['patchers'])
-                ), 
-                'error'
+                    implode(',', $patcherSequence)
+                )
             );
         }
         
@@ -83,8 +87,8 @@ class Applier
                 
                 foreach ($operations as $operationCode => $operationName) {
                     $args = array(
-                        'level' => $patchLevel, 
-                        'file' => $filename
+                        PluginConfig::PATCHER_ARG_LEVEL => $patchLevel,
+                        PluginConfig::PATCHER_ARG_FILE => $filename
                     );
                     
                     $result = $this->shell->execute($patcher[$operationCode], $args, $cwd) && $result;
@@ -97,23 +101,17 @@ class Applier
                 if ($result) {
                     break 2;
                 }
-
-                if ($sequenceIndex >= count($levels) - 1) {
-                    continue;
-                }
-
+                
                 $this->logger->writeVerbose(
-                    '%s (type=%s) failed with p=%s. Retrying with p=%s',
                     'warning',
-                    array($operationName, $type, $patchLevel, $levels[$sequenceIndex + 1])
+                    '%s (type=%s) failed with p=%s',
+                    array($operationName, $type, $patchLevel)
                 );
             }
         }
 
         if ($result) {
-            $this->logger->writeVerbose('SUCCESS with type=%s (p=%s)', 'info', array($type, $patchLevel));
-        } else {
-            $this->logger->writeVerbose('FAILURE', 'error');
+            $this->logger->writeVerbose('info', 'SUCCESS with type=%s (p=%s)', array($type, $patchLevel));
         }
 
         if (!$result) {

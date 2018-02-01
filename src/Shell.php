@@ -33,7 +33,7 @@ class Shell
         $logger = $this->logger;
 
         $outputHandler = function ($type, $data) use ($logger) {
-            $logger->writeVerbose(trim($data), 'comment');
+            $logger->writeVerbose('comment', trim($data));
         };
         
         $arguments = array_combine(
@@ -42,6 +42,10 @@ class Shell
             }, array_keys($arguments)),
             array_map('escapeshellarg', $arguments)
         );
+
+        if ($this->logger->getOutputInstance()->isVerbose()) {
+            $this->logger->writeIndentation();
+        }
         
         $result = $this->processExecutor->execute(
             str_replace(array_keys($arguments), $arguments, $command),

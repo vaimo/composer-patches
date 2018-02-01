@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches\Patch\Definition;
 
 use Vaimo\ComposerPatches\Patch\Definition;
 use Vaimo\ComposerPatches\Patch\Config;
+use Vaimo\ComposerPatches\Config as PluginConfig;
 
 class Normalizer
 {
@@ -37,7 +38,7 @@ class Normalizer
         $depends = array();
         
         $config = array_replace(
-            array('sequence' => array(), 'levels' => array()),
+            array(PluginConfig::PATCHER_SEQUENCE => array(), PluginConfig::PATCHER_LEVELS => array()),
             isset($config[Definition::CONFIG])
                 ? $config[Definition::CONFIG]
                 : array()
@@ -67,12 +68,12 @@ class Normalizer
         if (isset($data[Definition::LEVEL])) {
             $config = array_replace(
                 $config,
-                array('levels' => array($data[Definition::LEVEL]))
+                array(PluginConfig::PATCHER_LEVELS => array($data[Definition::LEVEL]))
             );
         }
 
         if (isset($data[Definition::PATCHER])) {
-            $config['sequence']['patchers'] = array($data[Definition::PATCHER]);
+            $config[PluginConfig::PATCHER_SEQUENCE ][PluginConfig::PATCHER_PROVIDERS] = array($data[Definition::PATCHER]);
         }
         
         return array(

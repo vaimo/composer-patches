@@ -8,43 +8,40 @@ namespace Vaimo\ComposerPatches\Factories;
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition\ExploderComponents;
+use Vaimo\ComposerPatches\Patch\SourceLoaders;
+use Vaimo\ComposerPatches\Package\ConfigExtractors;
+use Vaimo\ComposerPatches\Patch;
 
 class PatchesRepositoryFactory
 {
     public function create(\Composer\Composer $composer, array $config, $devMode = false) 
     {
         $packagesRepository = $composer->getRepositoryManager()->getLocalRepository();
-        
         $installationManager = $composer->getInstallationManager();
-        $pluginConfig = new \Vaimo\ComposerPatches\Config();
-        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
         $rootPackage = $composer->getPackage();
-
         $composerConfig = $composer->getConfig();
-        $vendorRoot = $composerConfig->get('vendor-dir');
+        
+        $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
+        
+        $pluginConfig = new PluginConfig();
+        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
         
         $loaders = array(
-            PluginConfig::LIST =>
-                new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
-            PluginConfig::FILE =>
-                new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile($installationManager)
+            PluginConfig::LIST => new SourceLoaders\PatchList(),
+            PluginConfig::FILE => new SourceLoaders\PatchesFile($installationManager)
         );
 
         if ($devMode) {
             $loaders = array_replace($loaders, array(
-                PluginConfig::DEV_LIST =>
-                    new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchList(),
-                PluginConfig::DEV_FILE =>
-                    new \Vaimo\ComposerPatches\Patch\SourceLoaders\PatchesFile($installationManager)
+                PluginConfig::DEV_LIST => new SourceLoaders\PatchList(),
+                PluginConfig::DEV_FILE => new SourceLoaders\PatchesFile($installationManager)
             ));
         }
         
         if ($pluginConfig->shouldPreferOwnerPackageConfig()) {
-            $infoExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\VendorConfigExtractor(
-                $packageInfoResolver
-            );
+            $infoExtractor = new ConfigExtractors\VendorConfigExtractor($packageInfoResolver);
         } else {
-            $infoExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\InstalledConfigExtractor();
+            $infoExtractor = new ConfigExtractors\InstalledConfigExtractor();
         }
 
         $exploderComponents = array(
@@ -55,15 +52,15 @@ class PatchesRepositoryFactory
             new ExploderComponents\GroupVersionConfigComponent()
         );
 
-        $definitionExploder = new \Vaimo\ComposerPatches\Patch\Definition\Exploder($exploderComponents);
-        $definitionNormalizer = new \Vaimo\ComposerPatches\Patch\Definition\Normalizer();
+        $definitionExploder = new Patch\Definition\Exploder($exploderComponents);
+        $definitionNormalizer = new Patch\Definition\Normalizer();
         
-        $listNormalizer = new \Vaimo\ComposerPatches\Patch\ListNormalizer(
+        $listNormalizer = new Patch\ListNormalizer(
             $definitionExploder,
             $definitionNormalizer
         );
         
-        $patchesCollector = new \Vaimo\ComposerPatches\Patch\Collector(
+        $patchesCollector = new Patch\Collector(
             $listNormalizer,
             $infoExtractor,
             $loaders
@@ -83,14 +80,14 @@ class PatchesRepositoryFactory
 
         $packagesCollector = new \Vaimo\ComposerPatches\Package\Collector($rootPackage);
 
-        $definitionListLoader = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader(
+        $definitionListLoader = new Patch\DefinitionList\Loader(
             $packagesCollector,
             $patchesCollector,
             $loaderComponents,
             $vendorRoot
         );
         
-        $patcherConfig = new \Vaimo\ComposerPatches\Patch\Config(
+        $patcherConfig = new Patch\Config(
             $config,
             array_keys($loaders)
         );

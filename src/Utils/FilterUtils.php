@@ -11,16 +11,18 @@ class FilterUtils
     {
         $negations = array();
         $affirmations = array();
+
+        $escapeChar = chr('27');
         
-        array_map(function ($filter) use ($delimiter, &$negations, &$affirmations) {
+        array_map(function ($filter) use ($delimiter, &$negations, &$affirmations, $escapeChar) {
             $isNegation = substr($filter, 0, 1) == '!';
 
             $escapedFilter = trim(
                 str_replace(
-                    chr('27'),
+                    $escapeChar,
                     '.*',
                     preg_quote(
-                        str_replace('*', chr('27'), ltrim($filter,'!')),
+                        str_replace('*', $escapeChar, ltrim($filter,'!')),
                         $delimiter
                     )
                 )

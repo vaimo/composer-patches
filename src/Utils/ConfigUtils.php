@@ -5,43 +5,52 @@
  */
 namespace Vaimo\ComposerPatches\Utils;
 
+use Vaimo\ComposerPatches\Config;
+
 class ConfigUtils
 {
     public function mergeApplierConfig(array $config, array $updates)
     {
-        $config['patchers'] = array_replace_recursive(
-            $config['patchers'],
-            isset($updates['patchers']) ? $updates['patchers'] : array()
+        $config[Config::PATCHER_PROVIDERS] = array_replace_recursive(
+            $config[Config::PATCHER_PROVIDERS],
+            isset($updates[Config::PATCHER_PROVIDERS]) ? $updates[Config::PATCHER_PROVIDERS] : array()
         );
 
-        $config['sequence'] = array_replace(
-            $config['sequence'],
-            isset($updates['sequence']) ? $updates['sequence'] : array()
+        $config[Config::PATCHER_SEQUENCE] = array_replace(
+            $config[Config::PATCHER_SEQUENCE],
+            isset($updates[Config::PATCHER_SEQUENCE]) ? $updates[Config::PATCHER_SEQUENCE] : array()
         );
 
-        $config['operations'] = array_replace(
-            $config['operations'],
-            isset($updates['operations']) ? $updates['operations'] : array()
+        $config[Config::PATCHER_OPERATIONS] = array_replace(
+            $config[Config::PATCHER_OPERATIONS],
+            isset($updates[Config::PATCHER_OPERATIONS]) ? $updates[Config::PATCHER_OPERATIONS] : array()
         );
 
-        $config['levels'] = isset($updates['levels'])
-            ? $updates['levels']
-            : $config['levels'];
+        $config[Config::PATCHER_LEVELS] = isset($updates[Config::PATCHER_LEVELS])
+            ? $updates[Config::PATCHER_LEVELS]
+            : $config[Config::PATCHER_LEVELS];
         
         return $config;
     }
     
     public function sortApplierConfig(array $config)
     {
-        $config['patchers'] = array_replace(
-            array_flip($config['sequence']['patchers']),
-            array_intersect_key($config['patchers'], array_flip($config['sequence']['patchers']))
-        );
+        $sequences = $config[Config::PATCHER_SEQUENCE];
+        $sequencedConfigItems = array_keys($sequences);
         
-        $config['operations'] = array_replace(
-            array_flip($config['sequence']['operations']),
-            array_intersect_key($config['operations'], array_flip($config['sequence']['operations']))
-        );
+        foreach ($sequencedConfigItems as $item) {
+            if (!isset($config[$item])) {
+                continue;
+            }
+            
+            $config[$item] = array_replace(
+                array_flip($sequences[$item]),
+                array_intersect_key(
+                    $config[$item],
+                    array_flip($sequences[$item])
+                )
+            );
+        }
         
         return $config;
     }
