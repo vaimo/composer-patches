@@ -646,6 +646,14 @@ Note that most of these flags have a 'composer patch' call flag alternative.
 * COMPOSER_EXIT_ON_PATCH_FAILURE => COMPOSER_PATCHES_FATAL_FAIL.
 * COMPOSER_SKIP_PATCH_PACKAGES => COMPOSER_PATCHES_SKIP_PACKAGES.
 
+## Upgrading the module
+
+When upgrading the module, one might encounter odd crashes about classes not being found or class contstructor arguments being wrong. 
+
+This usually means that the class structure or constructor footprint in some of the classes have changed after the upgrade which means that the plugin might be running with some classes from the old and some classes from the new version. 
+
+Due to the fact that the patcher kicks in very late in the process of installing a project (before autoloader generation), developers are advised to re-execute 'composer install'.
+
 ## Credits
 
 Inspired by https://github.com/cweagans/composer-patches, but completely re-created to support a variety 
