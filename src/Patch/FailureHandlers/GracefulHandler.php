@@ -21,7 +21,7 @@ class GracefulHandler implements \Vaimo\ComposerPatches\Interfaces\PatchFailureH
         $this->logger = $logger;
     }
     
-    public function execute($message)
+    public function execute($message, $path)
     {
         $this->logger->writeRaw('      <error>Could not apply patch! Skipping.</error>');
     }

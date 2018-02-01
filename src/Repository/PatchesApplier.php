@@ -170,14 +170,22 @@ class PatchesApplier
                 array($packageName, count($patches[$packageName]))
             );
 
+            $packagePatchesQueue = $patches[$packageName];
+            $packageRepository = $repository->getSource();
+            
             try {
-                $appliedPatches = $this->patchApplier->applyPatches($package, $patches[$packageName]);
+                $appliedPatches = $this->patchApplier->applyPatches($package, $packagePatchesQueue);
 
-                $this->patcherStateManager->registerAppliedPatches(
-                    $repository->getSource(),
-                    $appliedPatches
-                );
+                $this->patcherStateManager->registerAppliedPatches($packageRepository, $appliedPatches);
             } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
+                $failedPath = $exception->getFailedPatchPath();
+
+                $paths = array_keys($packagePatchesQueue);
+                $appliedPaths = array_slice($paths, 0, array_search($failedPath, $paths));
+                $appliedPatches = array_intersect_key($packagePatchesQueue, array_flip($appliedPaths));
+                
+                $this->patcherStateManager->registerAppliedPatches($packageRepository, $appliedPatches);
+                
                 $repository->write();
 
                 throw $exception;

@@ -8,8 +8,8 @@ namespace Vaimo\ComposerPatches\Interfaces;
 interface PatchFailureHandlerInterface
 {
     /**
-     * @param $message
-     * @return mixed
+     * @param string $message
+     * @param string $path
      */
-    public function execute($message);
+    public function execute($message, $path);
 }

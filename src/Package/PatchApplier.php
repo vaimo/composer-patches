@@ -82,7 +82,7 @@ class PatchApplier
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 
-    public function applyPatches(PackageInterface $package, array $patches)
+    public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
         $installPath = $this->packageInfoResolver->getSourcePath($package);
         
@@ -92,7 +92,7 @@ class PatchApplier
 
         $appliedPatches = array();
 
-        foreach ($patches as $source => $patchInfo) {
+        foreach ($patchesQueue as $source => $patchInfo) {
             $absolutePatchPath = $this->vendorRoot . '/' . $source;
             $relativePath = $source;
 
@@ -147,8 +147,10 @@ class PatchApplier
                 $appliedPatches[$relativePath] = $patchInfo;
             } catch (\Exception $e) {
                 $this->logger->writeException($e);
+                
                 $this->failureHandler->execute(
-                    sprintf('Failed to apply %s (%s)!', $relativePath, $patchComment)
+                    sprintf('Failed to apply %s (%s)!', $relativePath, $patchComment),
+                    $relativePath
                 );
             }
         }

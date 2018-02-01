@@ -663,12 +663,17 @@ levels of complexity when defining patches.
 
 List of generalized changes for each release.
 
+### 3.17.2
+
+* Fix: patches not registered for patch target packages when 'COMPOSER_PATCHES_FATAL_FAIL' enabled and 
+  error is encountered.
+
 ### 3.17.1
 
 * Fix: composer patch command option 'undo' not working correctly when patching explicitly set to be 
-  enabled in project's composer.json
+  enabled in composer.json of the project.
 * Fix: composer patch command option 'redo' not working correctly when patching explicitly set to be 
-    disabled in project's composer.json
+  enabled in composer.json of the project.
 * Fix: using 'undo' and 'redo' together still triggers 'undo' functionality.
 
 ### 3.17.0
