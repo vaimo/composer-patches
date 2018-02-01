@@ -11,12 +11,8 @@ use Vaimo\ComposerPatches\Patch\Definition\ExploderComponents;
 
 class PatchesRepositoryFactory
 {
-    public function create(\Composer\Composer $composer, $devMode = false, array $patcherConfigData = array()) 
+    public function create(\Composer\Composer $composer, array $config, $devMode = false) 
     {
-        if (!$patcherConfigData) {
-            $patcherConfigData = $composer->getPackage()->getExtra();
-        }
-        
         $packagesRepository = $composer->getRepositoryManager()->getLocalRepository();
         
         $installationManager = $composer->getInstallationManager();
@@ -75,11 +71,11 @@ class PatchesRepositoryFactory
         
         $loaderComponents = array(
             new LoaderComponents\BundleComponent($rootPackage),
-            new LoaderComponents\GlobalExcludeComponent($patcherConfigData),
+            new LoaderComponents\GlobalExcludeComponent($config),
             new LoaderComponents\LocalExcludeComponent(),
             new LoaderComponents\CustomExcludeComponent($pluginConfig->getSkippedPackages()),
             new LoaderComponents\PathNormalizerComponent($installationManager),
-            new LoaderComponents\ConstraintsComponent($patcherConfigData),
+            new LoaderComponents\ConstraintsComponent($config),
             new LoaderComponents\ValidatorComponent(),
             new LoaderComponents\SimplifierComponent(),
             new LoaderComponents\TargetsResolverComponent($packageInfoResolver)
@@ -95,7 +91,7 @@ class PatchesRepositoryFactory
         );
         
         $patcherConfig = new \Vaimo\ComposerPatches\Patch\Config(
-            $patcherConfigData,
+            $config,
             array_keys($loaders)
         );
         

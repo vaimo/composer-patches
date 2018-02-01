@@ -60,17 +60,19 @@ class PatcherStateManager
 
         foreach ($patches as $source => $patchInfo) {
             foreach ($patchInfo['targets'] as $target) {
-                $package = $this->packageUtils->getRealPackage(
-                    $repository->findPackage($target, '*')
-                );
+                if (!$package = $repository->findPackage($target, '*')) {
+                    continue;
+                }
+                
+                $package = $this->packageUtils->getRealPackage($package);
 
-                $package->setExtra(
-                    array_replace_recursive($package->getExtra(), array(
-                        PluginConfig::APPLIED_FLAG => array(
-                            $source => $patchInfo['label']
-                        )
-                    ))
-                );
+                $info = array_replace_recursive($package->getExtra(), array(
+                    PluginConfig::APPLIED_FLAG => array(
+                        $source => $patchInfo['label']
+                    )
+                ));
+                
+                $package->setExtra($info);
 
                 $packages[] = $package;
             }

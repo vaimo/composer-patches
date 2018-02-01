@@ -9,19 +9,26 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     \Composer\EventDispatcher\EventSubscriberInterface, \Composer\Plugin\Capable
 {
     /**
-     * @var \Vaimo\ComposerPatches\Bootstrap
-     */
-    private $bootstrap;
-
-    /**
      * @var \Vaimo\ComposerPatches\Package\OperationAnalyser
      */
     private $operationAnalyser;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Managers\PatcherStateManager
+     */
+    private $patcherStateManager;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Bootstrap
+     */
+    private $bootstrap;
     
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io) 
     {
-        $this->bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $io);
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
+        $this->patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
+        
+        $this->bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $io);
     }
 
     public function getCapabilities()
@@ -41,13 +48,15 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         );
     }
 
-    public function extractPatchesFromLock()
+    public function extractPatchesFromLock(\Composer\Script\Event $event)
     {
         if (!$this->bootstrap) {
             return;
         }
+
+        $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
         
-        $this->bootstrap->prepare();
+        $this->patcherStateManager->extractAppliedPatchesInfo($repository);
     }
 
     public function postInstall(\Composer\Script\Event $event)
@@ -55,8 +64,12 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         if (!$this->bootstrap) {
             return;
         }
+
+        $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
         
-        $this->bootstrap->apply($event->isDevMode());
+        $this->patcherStateManager->restoreAppliedPatchesInfo($repository);
+        
+        $this->bootstrap->applyPatches($event->isDevMode());
     }
     
     public function resetPackages(\Composer\Installer\PackageEvent $event)
@@ -66,7 +79,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         }
 
         if (!getenv(\Vaimo\ComposerPatches\Environment::SKIP_CLEANUP)) {
-            $this->bootstrap->unload();
+            $this->bootstrap->stripPatches();
         }
         
         $this->bootstrap = null;

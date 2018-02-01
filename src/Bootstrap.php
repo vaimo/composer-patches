@@ -26,19 +26,22 @@ class Bootstrap
     private $repositoryFactory;
 
     /**
-     * @var \Vaimo\ComposerPatches\Managers\PatcherStateManager
+     * @var array
      */
-    private $patcherStateManager;
+    private $config;
     
     /**
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
+     * @param array $config
      */
     public function __construct(
         \Composer\Composer $composer, 
-        \Composer\IO\IOInterface $io
+        \Composer\IO\IOInterface $io,
+        $config = array()
     ) {
         $this->composer = $composer;
+        $this->config = $config;
         
         $this->applierFactory = new PatchesApplierFactory($io);
         $this->repositoryFactory = new PatchesRepositoryFactory();
@@ -46,44 +49,38 @@ class Bootstrap
         $this->patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
     }
 
-    public function prepare()
+    public function applyPatches($devMode = false, array $targets = array(), array $filters = array())
     {
-        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-        $this->patcherStateManager->extractAppliedPatchesInfo($repository);
-    }
-
-    public function apply($devMode = false, array $targets = array(), array $filters = array())
-    {
-        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-        
-        $this->patcherStateManager->restoreAppliedPatchesInfo($repository);
-
-        $patchesApplier = $this->applierFactory->create(
-            $this->composer, 
-            $this->patcherStateManager
-        );
+        $patchesApplier = $this->applierFactory->create($this->composer, $this->patcherStateManager);
         
         if (!$patchesApplier) {
             return null;
         }
+
+        $config = array_replace(
+            $this->composer->getPackage()->getExtra(),
+            $this->config
+        );
         
-        $repository = $this->repositoryFactory->create($this->composer, $devMode);
+        $repository = $this->repositoryFactory->create($this->composer, $config, $devMode);
         
         $patchesApplier->apply($repository, $targets, $filters);
     }
     
-    public function unload(array $targets = array())
+    public function stripPatches(array $targets = array())
     {
         $patchesApplier = $this->applierFactory->create(
             $this->composer, 
             $this->patcherStateManager
         );
 
-        $config = $targets
-            ? $this->composer->getPackage()->getExtra()
-            : array(\Vaimo\ComposerPatches\Patch\Config::ENABLED => false);
+        $config = array_replace(
+            $this->composer->getPackage()->getExtra(),
+            $this->config,
+            array(\Vaimo\ComposerPatches\Patch\Config::ENABLED => false)
+        );
         
-        $repository = $this->repositoryFactory->create($this->composer, false, $config);
+        $repository = $this->repositoryFactory->create($this->composer, $config);
 
         $patchesApplier->apply($repository, $targets);
     }

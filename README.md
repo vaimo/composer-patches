@@ -655,6 +655,14 @@ levels of complexity when defining patches.
 
 List of generalized changes for each release.
 
+### 3.17.1
+
+* Fix: composer patch command option 'undo' not working correctly when patching explicitly set to be 
+  enabled in project's composer.json
+* Fix: composer patch command option 'redo' not working correctly when patching explicitly set to be 
+    disabled in project's composer.json
+* Fix: using 'undo' and 'redo' together still triggers 'undo' functionality.
+
 ### 3.17.0
 
 * Fix: don't force bundle patches to have 'vendor' in their paths as it's a customizable value

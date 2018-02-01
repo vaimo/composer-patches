@@ -47,23 +47,26 @@ class PatchCommand extends \Composer\Command\BaseCommand
     {
         $bootstrap = new \Vaimo\ComposerPatches\Bootstrap(
             $this->getComposer(),
-            $this->getIO()
+            $this->getIO(),
+            array(
+                \Vaimo\ComposerPatches\Patch\Config::ENABLED => true,
+                \Vaimo\ComposerPatches\Patch\Config::ENABLED_FOR_PACKAGES => true
+            )
         );
 
         $targets = $input->getArgument('targets');
         $filters = $input->getOption('filter');
-
-        putenv(Environment::FORCE_REAPPLY . "=" . ($input->getOption('redo') || $input->getOption('undo')));
-
-        if ($input->getOption('undo')) {
-            $bootstrap->unload($targets);
+        
+        if ($input->getOption('undo') && !$input->getOption('redo')) {
+            $bootstrap->stripPatches($targets);
             return;
         }
         
         $isDevMode = !$input->getOption('no-dev');
 
         putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
+        putenv(Environment::FORCE_REAPPLY . "=" . $input->getOption('redo'));
 
-        $bootstrap->apply($isDevMode, $targets, $filters);
+        $bootstrap->applyPatches($isDevMode, $targets, $filters);
     }
 }
