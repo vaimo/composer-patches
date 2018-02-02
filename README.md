@@ -3,6 +3,9 @@
 Applies a patch from a local or remote file to any package that is part of a given composer 
 project. Packages can be defined both on project and on package level.
 
+The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable from 
+the composer.json of the project. 
+
 ## Quick start: explicit patch definitions
 
 Same format is used for both project (root level scope) patches and for package patches.
@@ -605,6 +608,10 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.19.3
+
+* Maintenance: minor readme and package description updates.
 
 ### 3.19.2
 

@@ -2,7 +2,7 @@
     "name": "vaimo/composer-patches",
     "type": "composer-plugin",
     "license": "MIT",
-    "description": "Applies a patch from a local or remote file to any package that is part of a given composer project. Packages can be defined both on project and on package level.",
+    "description": "Applies a patch from a local or remote file to any package that is part of a given composer project. Packages can be defined both on project and on package level. Includes the possibility of re-configuring the commands that are used to apply the patches.",
     "authors": [
         {
             "name": "Allan Paiste",
