@@ -2,7 +2,7 @@
     "name": "vaimo/composer-patches",
     "type": "composer-plugin",
     "license": "MIT",
-    "description": "Provides a way to patch Composer packages with optional version restriction and support for applying bundled patches (patches that patch more than one package). Includes new 'patch' command for composer",
+    "description": "Applies a patch from a local or remote file to any package that is part of a given composer project. Packages can be defined both on project and on package level.",
     "authors": [
         {
             "name": "Allan Paiste",
