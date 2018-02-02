@@ -1,6 +1,7 @@
 # composer-patches
 
-Applies a patch from a local or remote file to any package that is part of a given composer project. Packages can be defined both on project and on package level.
+Applies a patch from a local or remote file to any package that is part of a given composer 
+project. Packages can be defined both on project and on package level.
 
 ## Quick start: explicit patch definitions
 
@@ -23,12 +24,14 @@ Same format is used for both project (root level scope) patches and for package 
 }
 ```
 
-_This is basically the bare minimum to get your patch to apply. The rest of this README deals with extra levels of complexity that can be introduced to patch definition when a need arises: patch sequencing, verison branching, bundled patches, locked path strip level and so on..._
+_This is basically the bare minimum to get your patch to apply. The rest of this README deals with 
+extra levels of complexity that can be introduced to patch definition when a need arises: patch 
+sequencing, version branching, bundled patches, locked path strip level and so on..._
 
 ## Quick start: patch list definition
 
-Same format is used for both project (root level scope) patches and for package patches. Paths are relative
-to the owner of the composer.json that introduces a certain file path.
+Same format is used for both project (root level scope) patches and for package patches. Paths are 
+relative to the owner of the composer.json that introduces a certain file path.
 
 ```json
 {
@@ -54,8 +57,10 @@ Where **path/to/patches.json** contains:
 
 ## Patch file format
 
-The targeted file format in the patch should be relative to the patched package - or - in other words: relative
-to the context it was defined for:
+_This example will make the patch apply with patch stripping level of '0'._
+
+The targeted file format in the patch should be relative to the patched package - or - in other 
+words: relative to the context it was defined for.
 
 So it the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
 the patch would target it with
@@ -78,8 +83,6 @@ the patch would target it with
 Note that you don't have to change the patch name or description when you change it after it has already
 been used in some context by someone as the module will be aware of the patch contents and will re-apply
 it when it has changed since last time.
-
-_This example will make the patch apply with patch stripping level of '0'._
 
 ## Development patches
 
@@ -322,9 +325,8 @@ alternative patch definition format is recommended:
         "Some bundle patch": {
           "source": "path/to/bundle/patch.patch",
           "targets": [
-            "vendor1/module1",
-            "vendor1/module2",
-            "vendor2/module3"
+            "my/some-module",
+            "my/other-module"
           ]
         }
       }
@@ -336,6 +338,33 @@ alternative patch definition format is recommended:
 Patches defined like this will be applied relative to the project vendor root instead of being relative 
 to the targeted package (which in this case is not really known).
 
+```diff
+--- my/some-module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
++++ my/some-module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+--- my/other-module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
++++ my/other-module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+```
+
 Note that it's important still to have all the targeted packages listed as they'd need to be re-installed 
 in case the patch changes or patch-reapply is called (see below for the environment variable that allows
 that to be triggered). 
@@ -344,9 +373,27 @@ _In case targets for bundled patch are not defined, the code will peek into the 
 resolve the targets from the contents of the patch. Note that this feature is somewhat experimental and 
 developer is still strongly encouraged to have the patch targets defined explicitly._
 
+```json
+{
+  "extra": {
+    "patches": {
+      "*": {
+        "Some bundle patch": {
+          "source": "path/to/bundle/patch.patch"
+        }
+      }
+    }
+  }
+}
+```
+
+_This is somewhat experimental, so you're definitely better off having targets explicitly declared._
+
 ## Excluding patches
 
-In case some patches that are defined in packages have to be excluded from the project (project has custom verisons of the files, conflicts with other patches, etc), exclusions records can be defined in the project's composer.json:
+In case some patches that are defined in packages have to be excluded from the project (project has 
+custom versions of the files, conflicts with other patches, etc), exclusions records can be defined 
+in the project's composer.json:
 
 ```json
 {
@@ -450,8 +497,6 @@ In case there's a need to temporarily fast-exclude patches which is usually the 
 maintenance or upgrade of the underlying project's framework, a skip flag can be used to pass over certain 
 declaration lines.
 
-**NOTE: it's useful to use this in combination with the COMPOSER_PATCHES_PREFER_OWNER env flag**
-
 ```json
 {
   "name": "patch/owner",
@@ -471,6 +516,8 @@ In case it's needed for the patcher to apply the patches using some third-party 
 some extra options, it's possible to declare new patcher commands or override the existing ones by adding 
 a new section to the "extra" of the project's composer.json. Note that this example is a direct copy of what
 is built into the plugin. Changes to existing definitions are applied recursively.
+
+_Note that by default, user does not really have to declare any of this, but everything can be overridden._ 
 
 ```json
 {
@@ -510,19 +557,20 @@ is built into the plugin. Changes to existing definitions are applied recursivel
 }
 ```
 
-_Multiple alternative commands can be defined for each operation. Operation itself is considered to be 
-success when at least one command call results in a SUCCESS return code_ 
+Some things to point out on patcher configuration:
 
-_Patch is considered to be applied when all operations can be completed with SUCCESS return code_
- 
-_Exclamation mark in the beginning of an operation will be translated as 'failure is expected'_
-
-_The values of 'level', 'file' and 'cwd' variables are populated by the plugin, rest of the variables 
-get their value from the response of the operations that have already been processed. This means that 
-'bin' value will be the result of 'bin' operation. Note that if sequence places 'bin' after 'check' or 
-'patch', then the former will be just removed from the template_
-
-_The [[]] will indicate the value is used as-is, {{}} will make the value be shell-escaped_
+1. Sequence dictates everything. If applier code or operation is not mentioned in sequence configuration, 
+   it's not going to be taken into account. This means that users can easily override the whole standard
+   configuration.
+2. Multiple alternative commands can be defined for each operation. Operation itself is considered to be 
+   success when at least one command call results in a SUCCESS return code 
+3. Patch is considered to be applied when all operations can be completed with SUCCESS return code.
+4. Exclamation mark in the beginning of an operation will be translated as 'failure is expected'.
+5. The values of 'level', 'file' and 'cwd' variables are populated by the plugin, rest of the variables 
+   get their value from the response of the operations that have already been processed. This means 
+   that 'bin' value will be the result of 'bin' operation. Note that if sequence places 'bin' after 'check' 
+   or 'patch', then the former will be just removed from the template.
+6. The [[]] will indicate the value is used as-is, {{}} will make the value be shell-escaped.
 
 Appliers are executed in the sequence dictated by sequence where several path levels are used with 
 validation until validation success is hit. Note that each applier will be visited before moving on to 
@@ -557,6 +605,10 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.19.2
+
+* Maintenance: documentation changes. Some explanations re-written. Added example for bundle-patch.
 
 ### 3.19.1
 
