@@ -5,6 +5,93 @@ Simple patches plugin for Composer. Applies a patch from a local or remote file 
 _The information about applied patches on local installed project will be kept in the installed.json (simple 
 boolean flag for patched packages will be also included when running composer update command)_
 
+## Quick start: explicit patch definitions
+
+Same format is used for both project (root level scope) patches and for package patches.
+
+```json
+{
+  "require": {
+    "some/package": "1.2.3",
+    "vaimo/composer-patches": "^3.0.0"
+  },
+  "extra": {
+    "patches": {
+      "some/package": {
+        "desription about my patch": "my/file.patch",
+        "other patch": "http://example.com/url/to/patch.patch"
+      }
+    }
+  }
+}
+```
+
+_This is basically the bare minimum to get your patch to apply. The rest of this README deals with extra levels of complexity that can be introduced to patch definition when a need arises: patch sequencing, verison branching, bundled patches, locked path strip level and so on..._
+
+## Quick start: patch list definition
+
+Same format is used for both project (root level scope) patches and for package patches. Paths are relative
+to the owner of the composer.json that introduces a certain file path.
+
+```json
+{
+  "require": {
+    "some/package": "1.2.3",
+    "vaimo/composer-patches": "^3.0.0"
+  },
+  "extra": {
+    "patches-file": "path/to/patches.json"
+  }
+}
+```
+
+Where **path/to/patches.json** contains:
+
+```json
+{
+  "some/package": {
+    "description about my patch": "my/file.patch"
+  } 
+}
+```
+
+## Patch file format
+
+The targeted file format in the patch should be relative to the patched package - or - in other words: relative
+to the context it was defined for:
+
+So it the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
+the patch would target it with
+
+```diff
+--- Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
++++ Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+```
+
+Note that you don't have to change the patch name or description when you change it after it has already
+been used in some context by someone as the module will be aware of the patch contents and will re-apply
+it when it has changed since last time.
+
+_This example will make the patch apply with patch stripping level of '0'._
+
+## Development patches
+
+The patches module mimics the way composer separates development packages from normal requirements by introducing two extra keys, where exact same rules apply as for normal patch declarations: `patches-dev`, `patches-file-dev`
+
+The patches declared under those keys will not be applied when installing the project with `--no-dev` option.
+
+## Patch composer command
+
 Installing the plugin will introduce a new composer command: **composer patch**
 
 ```shell
@@ -36,19 +123,9 @@ composer patch --from-source
 composer patch --from-source --redo my/package
 ```
 
-## Enabling patching for a project
+The main purpose of this command is to make the maintenance of already created patches and adding new ones as easy as possible by allowing user to test out a patch directly right after defining it without having to trigger 'composer update' or 'composer install'.
 
-* project has "patches" key defined under "extra" 
-
-```json
-{
-  "extra": {
-    "patches": {}
-  }
-}
-```
-
-## Controlling the module patch collection scope
+## Patcher sources
 
 These flags allow developer to have more control over the patch collector and omit certain sources when
 needed. All the sources are included by default.
@@ -107,79 +184,11 @@ to "false".
 }
 ```
 
-... or set sources to nothing.
-
-```json
-{
-  "extra": {
-    "patcher": {
-      "sources": {}    
-    }
-  }
-}
-```
-
 _These flags do not affect the way 'patch' command works, which will apply patches even when patching has
 been said to be disabled in composer.json; These flags indicate whether the patches will be applied on 
 'install' and 'update' calls_ 
 
-## Defining patches for specific package: patch file
-
-Same format is used for both project (root level scope) patches and for package patches.
-
-```json
-{
-  "require": {
-    "some/package": "1.2.3",
-    "vaimo/composer-patches": "^3.0.0"
-  },
-  "extra": {
-    "patches": {
-      "some/package": {
-        "desription about my patch": "my/file.patch"
-      }
-    }
-  }
-}
-```
-
-## Defining patches for specific package: patch list file
-
-Same format is used for both project (root level scope) patches and for package patches. Paths are relative
-to the owner of the composer.json that introduces a certain file path.
-
-```json
-{
-  "require": {
-    "some/package": "1.2.3",
-    "vaimo/composer-patches": "^3.0.0"
-  },
-  "extra": {
-    "patches-file": "path/to/composer.patches.json"
-  }
-}
-```
-
-In which case the file should contain patches listed in either of listed formats:
-
-```json
-{
-  "patches": {
-    "some/package": {
-      "description about my patch": "my/file.patch"
-    }
-  }
-}
-```
-The 'patches' key nesting is not enforced. The following will also load just fine:
-
-```json
-{
-  "some/package": {
-    "description about my patch": "my/file.patch"
-  } 
-}
-```
+## Multiple patch list files
 
 Note that to enable the developer to perform occasional cleanup and sub-grouping on the patches 
 declaration, multiple patches files can be defined:
@@ -200,100 +209,6 @@ declaration, multiple patches files can be defined:
 The files are processed sequentially and merged in a way where all the patches in all the files are 
 processed (meaning: even if the declaration in both files is exactly the same, both will be processed and 
 the merging will be done in very late state based on the absolute path of the patch file path).
-
-## Patch definition in composer.json
-
-The format of a patch definition has several levers of complexity to cater for usage in context of different
-frameworks.
-
-```json
-{
-  "patches": {
-    "some/package": {
-      "desription about my patch": "my/file.patch"
-    }
-  }
-}
-```
-
-Which is the same as (which allows optional version restrictions) ... 
-
-```json
-{
-  "patches": {
-    "some/package": {
-      "desription about my patch": {
-        "source": "my/file.patch"
-      }
-    }
-  }
-}
-```
-
-Which is the same as (which allows optional patch sequencing) ... 
-
-```json
-{
-  "patches": {
-    "some/package": [
-      {
-        "label": "Fix: will be applied first",
-        "source": "my/file.patch"
-      },
-      {
-        "label": "Fix: will be applied after the first",
-        "source": "my/other-file.patch"
-      }
-    ]
-  }
-}
-```
-
-In case there's no need to add version restrictions or sequence patches, the simple format use is recommended.
-
-## Patch file format
-
-The targeted file format in the patch should be relative to the patched package - or - in other words: relative
-to the context it was defined for:
-
-So it the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
-the patch would target it with
-
-```diff
---- Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ Models/Example.php	2017-05-24 14:14:06.640560761 +0200
-
-@@ -31,7 +31,7 @@
-      */
-     protected function someFunction($someArg)
-     {
--        $var1 = 123;
-+        $var1 = 456;
-         /**
-          * rest of the logic of the function
-          */
-```
-
-Note that you don't have to change the patch name or description when you change it after it has already
-been used in some context by someone as the module will be aware of the patch contents and will re-apply
-it when it has changed since last time.
-
-## Patch URL
-
-Patches can be stored in remote location and referred to by using the full URL of tha patch.
-
-```json
-{
-  "patches": {
-    "vendor/project": {
-      "Patch title": "http://example.com/url/to/patch.patch"
-    }
-  }
-}
-```
-
-Note that in case of other patch definition formats, the url of the patch file should be defined 
-under "url" key of the patch definition (instead of "source").
 
 ## Sequenced patches
 
@@ -330,60 +245,46 @@ In case the patch is applied only on certain version of the package, a version r
   "extra": {
     "patches": {
       "targeted/package": {
-        "description for my patch": {
-          "source": "my/file.patch",
-          "version": "~1.2.3"
-        }
-      }
-    }
-  }
-}
-
-```
-
-The version version constraint defintion supports all version definition patterns supported by the version
-of Composer.
-
-In projects that rely on certain framework's base package version (which will always guarantee that the patch
-targeted package is always on certain version) alternative format may be more suitable:
-
-```json
-{
-  "extra": {
-    "patches": {
-      "magento/module-swatches": {
-        "Fix: https://github.com/magento/magento2/issues/7959": {
-          "source": "Magento_Swatches/100.1.2/fix-javascript-crash-when-all-options-not-selected.patch",
+        "description for first patch": {
+          "source": "my/first-fix.patch",
+          "version": "<1.2.3"
+        },
+        "second patch": {
+          "source": "my/other-fix.patch",
           "depends": {
-            "magento/magento2-base": ">=2.1.7"
+            "other/package": ">=2.1.7"
           }
+        },
+        "description for third patch": {
+          "<1.2.3": "my/first-fix-simplified-format.patch"
         }
       }
     }
   }
 }
+
 ```
 
-The patch will be applied if at least ONE indirect dependency ends up being a version constrain match.
+The first patch in this example, expects 'targeted/package' to have version that's smaller than 1.2.3; otherwise the patch will be omitted. The second patch has a indirect dependency where it does not care what version the targeted/package is, and is checking the verison of **other/package** instead.
+
+The third patch is just a simplified version of the first patch. It makes the declaration easier to read with the sacrifice 
+of not being able to define anything else about the patch (can't define dependencies, specific patch strip level, etc).
+
+_Version constraints are parsed by composer's own version constraint parser. All same rules apply._
 
 ## Version branching
 
 When there are almost identical patches for different version of some package, then they can be declared
 under same label like this:
 
-
 ```json
 {
   "extra": {
     "patches": {
-      "magento/module-sales": {
-        "Fix: Wrong time format for orders in admin grid": {
-          "Magento_Sales/100.1.6/fix-wrong-time-format-for-orders-in-admin-grid.patch": {
-            "version": "100.1.* <100.1.7"
-          },
-          "Magento_Sales/100.1.7/fix-wrong-time-format-for-orders-in-admin-grid.patch": {
-            "version": ">=100.1.7"
-          }
+      "some/package": {
+        "More detailed description on what the patch does": {
+          "1.0.* <1.2.0": "patches/somepackage/1.0.0/important-fix.patch",
+          ">=1.2.0": "patches/somepackage/1.2.0/important-fix.patch"
         }
       }
     }
@@ -391,9 +292,7 @@ under same label like this:
 }
 ```
 
-Note that indirect version dependency can be used in this case as well (see the "depends" example above).
-
-Same can be achieved with sequenced patches ...
+Same can be used while using sequenced patches ...
 
 ```json
 {
@@ -401,38 +300,13 @@ Same can be achieved with sequenced patches ...
     "patches": {
       "magento/module-widget": [
         {
-          "label": "Fix: Some description",
-          "source": "some-source.patch"
-        },
-        {
           "label": "Fix: Category tree items in admin get double-escaped due to ExtJs and Magento both doing the escaping",
           "source": {
-            "Magento_Widget/100.1.5/other-patch.patch": {
-              "version": "<=100.1.5"
-            },
-            "Magento_Widget/100.1.5/avoid-double-escaping-special-chars-and-quotes-for-extjs-tree-item-names.patch": {
-              "version": ">100.1.5"
-            }
+            "<=100.1.5": "Magento_Widget/100.1.5/some-patch.patch",
+            ">100.1.5": "Magento_Widget/100.1.5/some-other-patch.patch"
           }
         }      
       ]
-    }
-  }
-}
-```
-
-In both of the above cases, a simplified definition format can be used
-
-```json
-{
-  "extra": {
-    "patches": {
-      "magento/module-sales": {
-        "Fix: Wrong time format for orders in admin grid": {
-          "100.1.* <100.1.7": "Magento_Sales/100.1.6/fix-wrong-time-format-for-orders-in-admin-grid.patch",
-          ">=100.1.7": "Magento_Sales/100.1.7/fix-wrong-time-format-for-orders-in-admin-grid.patch"
-        }
-      }
     }
   }
 }
@@ -469,9 +343,9 @@ Note that it's important still to have all the targeted packages listed as they'
 in case the patch changes or patch-reapply is called (see below for the environment variable that allows
 that to be triggered). 
 
-In case targets for bundled patch are not defined, the code will peek into the patch file and try to 
+_In case targets for bundled patch are not defined, the code will peek into the patch file and try to 
 resolve the targets from the contents of the patch. Note that this feature is somewhat experimental and 
-developer is still strongly encouraged to have the patch targets defined explicitly.
+developer is still strongly encouraged to have the patch targets defined explicitly._
 
 ## Excluding patches
 
@@ -558,9 +432,8 @@ configuration, you can change the setting globally by overriding the patcher con
 
 ```json
 {
-  "name": "patch/owner",
   "extra": {
-    "patcher-config": {
+    "patcher": {
       "levels": [5]
     },
     "patches": {
@@ -573,7 +446,6 @@ configuration, you can change the setting globally by overriding the patcher con
   }
 }
 ```
-
 
 ## Skipping patches
 
@@ -589,55 +461,12 @@ declaration lines.
   "extra": {
     "patches": {
       "targeted/package": {
-        "Some patch description": {
-          "source": "path/to/file.patch",
-          "skip": true
-        }
-      }
-    }
-  }
-}
-```
-
-Same could be achieved when using the brief format by adding #skip to the end of the patch filename ...
-
-```json
-{
-  "name": "patch/owner",
-  "extra": {
-    "patches": {
-      "targeted/package": {
         "Some patch description": "path/to/file.patch#skip"
       }
     }
   }
 }
 ```
-
-## Development patches
-
-In case there's a need to include patches just for the sake of development convenience, an alternative
-sub-group can be defined is similar manner to how one would define development packages in project context
- 
-```json
-{
-  "extra": {
-    "patches-dev": {
-      "symfony/console": {
-        "Development: suppress deprecation warnings for classes used by magento (needed for latest codeception)": {
-          "source": "patches/Symfony_Console/2.7.0/suppress-deprecation-warnings.patch",
-          "version": ">=v2.7.0"
-        }
-      }
-    }
-  }
-}
-```
-
-These patches will not be applied when installing the project with `--no-dev` option.
- 
-Note that same definition pattern can be used for patches-file, where the key would just 
-become `patches-file-dev`.
 
 ## Patcher Configuration
 
@@ -715,14 +544,6 @@ next path strip level, which result in sequence similar to this:
 * COMPOSER_PATCHES_SKIP_CLEANUP - Will leave packages patched even when vaimo/composer-patches is removed. 
   By default, patched packages are re-installed to reset the patches (useful when creating immutable build 
   artifacts without any unnecessary modules installed).
-
-Note that most of these flags have a 'composer patch' call flag alternative.
-
-### Deprecated flag names
-
-* COMPOSER_FORCE_PATCH_REAPPLY => COMPOSER_PATCHES_REAPPLY_ALL.
-* COMPOSER_EXIT_ON_PATCH_FAILURE => COMPOSER_PATCHES_FATAL_FAIL.
-* COMPOSER_SKIP_PATCH_PACKAGES => COMPOSER_PATCHES_SKIP_PACKAGES.
 
 ## Upgrading the module
 
