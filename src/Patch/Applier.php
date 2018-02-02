@@ -50,7 +50,7 @@ class Applier
         $this->templateUtils = new \Vaimo\ComposerPatches\Utils\TemplateUtils();
     }
 
-    public function applyFile($filename, $cwd, $config = array())
+    public function applyFile($filename, $cwd, array $config = array())
     {
         $result = false;
 
@@ -167,11 +167,17 @@ class Applier
         }
 
         if ($result) {
-            $this->logger->writeVerbose('info', 'SUCCESS with type=%s (p=%s)', array($type, $patchLevel));
+            $this->logger->writeVerbose(
+                'info', 
+                'SUCCESS with type=%s (p=%s)', 
+                array($type, $patchLevel)
+            );
         }
 
         if (!$result) {
-            throw new \Exception(sprintf('Cannot apply patch %s', $filename));
+            throw new \Exception(
+                sprintf('Cannot apply patch %s', $filename)
+            );
         }
     }
 }

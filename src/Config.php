@@ -40,7 +40,10 @@ class Config
      * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
      */
     private $configUtils;
-    
+
+    /**
+     * @param array $config
+     */
     public function __construct(
         array $config
     ) {

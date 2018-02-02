@@ -20,6 +20,11 @@ class Analyser
     private $packagesResolver;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
+     */
+    private $patchListUtils;
+
+    /**
      * @param \Vaimo\ComposerPatches\Package\Collector $packageCollector
      * @param \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface $packagesResolver
      */

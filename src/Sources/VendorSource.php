@@ -5,7 +5,7 @@
  */
 namespace Vaimo\ComposerPatches\Sources;
 
-use \Composer\Repository\WritableRepositoryInterface;
+use Composer\Repository\WritableRepositoryInterface;
 use Composer\Package\PackageInterface;
 
 class VendorSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceListInterface

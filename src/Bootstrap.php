@@ -15,6 +15,11 @@ class Bootstrap
      * @var \Composer\Composer
      */
     private $composer;
+
+    /**
+     * @var array
+     */
+    private $config;
     
     /**
      * @var PatchesApplierFactory
@@ -30,16 +35,6 @@ class Bootstrap
      * @var Factories\ConfigFactory
      */
     private $configFactory;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
-     */
-    private $configUtils;
-
-    /**
-     * @var array
-     */
-    private $config;
     
     /**
      * @param \Composer\Composer $composer

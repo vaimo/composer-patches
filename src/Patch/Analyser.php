@@ -10,7 +10,6 @@ class Analyser
     public function getAllPaths($contents)
     {
         $paths = array();
-
         
         $lines = explode(PHP_EOL, $contents);
         

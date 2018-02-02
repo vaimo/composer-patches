@@ -7,6 +7,9 @@ namespace Vaimo\ComposerPatches\Exceptions;
 
 class PatchFailureException extends \Exception
 {
+    /**
+     * @var string
+     */
     private $failedPatchPath;
     
     public function __construct($failedPatchPath, $message = '', \Throwable $previous = null) 

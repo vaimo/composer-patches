@@ -54,9 +54,9 @@ class Plugin implements \Composer\Plugin\PluginInterface,
             return;
         }
 
-        $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
-        
-        $this->patcherStateManager->extractAppliedPatchesInfo($repository);
+        $this->patcherStateManager->extractAppliedPatchesInfo(
+            $event->getComposer()->getRepositoryManager()->getLocalRepository()
+        );
     }
 
     public function postInstall(\Composer\Script\Event $event)
@@ -64,10 +64,10 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         if (!$this->bootstrap) {
             return;
         }
-
-        $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
         
-        $this->patcherStateManager->restoreAppliedPatchesInfo($repository);
+        $this->patcherStateManager->restoreAppliedPatchesInfo(
+            $event->getComposer()->getRepositoryManager()->getLocalRepository()
+        );
         
         $this->bootstrap->applyPatches($event->isDevMode());
     }

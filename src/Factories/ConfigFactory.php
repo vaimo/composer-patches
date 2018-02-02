@@ -9,6 +9,16 @@ use Vaimo\ComposerPatches\Config as PluginConfig;
 
 class ConfigFactory
 {
+    /**
+     * @var \Vaimo\ComposerPatches\Config\Defaults
+     */
+    private $defaults;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
+     */
+    private $configUtils;
+    
     public function __construct() 
     {
         $this->defaults = new \Vaimo\ComposerPatches\Config\Defaults();
