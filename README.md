@@ -537,21 +537,25 @@ next path strip level, which result in sequence similar to this:
 
 * COMPOSER_PATCHES_REAPPLY_ALL - will force all patches to be re-applied
 * COMPOSER_PATCHES_FATAL_FAIL - exit after first patch failure is encountered
-* COMPOSER_PATCHES_SKIP_PACKAGES - comma-separated package names to exclude from patching, useful when 
-  maintaining patches on package upgrade. Does not affect bundled patches.
-* COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than using the 
-  information stored in installed.json
-* COMPOSER_PATCHES_SKIP_CLEANUP - Will leave packages patched even when vaimo/composer-patches is removed. 
-  By default, patched packages are re-installed to reset the patches (useful when creating immutable build 
-  artifacts without any unnecessary modules installed).
+* COMPOSER_PATCHES_SKIP_PACKAGES - comma-separated package names to exclude from patching, useful 
+  when maintaining patches on package upgrade. Does not affect bundled patches.
+* COMPOSER_PATCHES_PREFER_OWNER - always use data directly from owner's composer.json rather than 
+  using the information stored in installed.json
+* COMPOSER_PATCHES_SKIP_CLEANUP - Will leave packages patched even when vaimo/composer-patches is 
+  removed. By default, patched packages are re-installed to reset the patches (useful when creating 
+  immutable build artifacts without any unnecessary modules installed).
 
 ## Upgrading the module
 
-When upgrading the module, one might encounter odd crashes about classes not being found or class contstructor arguments being wrong. 
+When upgrading the module, one might encounter odd crashes about classes not being found or class 
+constructor arguments being wrong. 
 
-This usually means that the class structure or constructor footprint in some of the classes have changed after the upgrade which means that the plugin might be running with some classes from the old and some classes from the new version. 
+This usually means that the class structure or constructor footprint in some of the classes have changed 
+after the upgrade which means that the plugin might be running with some classes from the old and some 
+classes from the new version. 
 
-Due to the fact that the patcher kicks in very late in the process of installing a project (before autoloader generation), developers are advised to re-execute 'composer install'.
+Due to the fact that the patcher kicks in very late in the process of installing a project (before 
+auto-loader generation), developers are advised to re-execute 'composer install'.
 
 ## Credits
 
@@ -562,21 +566,31 @@ levels of complexity when defining patches.
 
 List of generalized changes for each release.
 
+### 3.19.1
+
+* Maintenance: documentation re-organized to prioritize quick comprehension on the basics of the 
+  module's functionality.
+* Maintenance: minor code restyle changes.
+
 ### 3.19.0
 
-* Feature: added new operation to check if applier is available (can be used to exclude certain appliers on certain systems).
-* Feature: added new operation to find applier's executable and use it in the operations that come afterwards.
+* Feature: added new operation to check if applier is available (can be used to exclude certain 
+  appliers on certain systems).
+* Feature: added new operation to find applier's executable and use it in the operations that 
+  come afterwards.
 * Feature: allow multiple commands per operation.
-* Feature: introduced the possibility to define an operation that is considered a success when the command does not succeed. 
+* Feature: introduced the possibility to define an operation that is considered a success when 
+  the command does not succeed. 
 * Fix: removed references to $this within closures (as it's not supported in 5.3.X). 
 
 ### 3.18.0
 
 * Feature: several config keys renamed (patchers => appliers, patcher-config => patcher). Backwards compatible.
-* Feature: patch enabling moved under patcher/sources (project:bool, packages:bool|array, vendors:bool|array). Backwards compatible.
+* Feature: patch enabling moved under patcher/sources (project:bool, packages:bool|array, 
+  vendors:bool|array). Backwards compatible.
 * Feature: allow granular patch sources inclusion (so that only some vendors would be included).
-* Feature: allow some providers to have special extra operations (before this change, every applier was 
-  expected to have every listed operation declared).
+* Feature: allow some providers to have special extra operations (before this change, every 
+  applier was expected to have every listed operation declared).
 
 ### 3.17.3
 
