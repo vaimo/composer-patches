@@ -1,9 +1,6 @@
 # composer-patches
 
-Simple patches plugin for Composer. Applies a patch from a local or remote file to any package required with composer.
-
-_The information about applied patches on local installed project will be kept in the installed.json (simple 
-boolean flag for patched packages will be also included when running composer update command)_
+Applies a patch from a local or remote file to any package that is part of a given composer project. Packages can be defined both on project and on package level.
 
 ## Quick start: explicit patch definitions
 
@@ -556,11 +553,6 @@ classes from the new version.
 
 Due to the fact that the patcher kicks in very late in the process of installing a project (before 
 auto-loader generation), developers are advised to re-execute 'composer install'.
-
-## Credits
-
-Inspired by https://github.com/cweagans/composer-patches, but completely re-created to support a variety 
-levels of complexity when defining patches.
 
 ## Changelog 
 
