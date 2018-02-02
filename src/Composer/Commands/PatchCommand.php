@@ -66,8 +66,11 @@ class PatchCommand extends \Composer\Command\BaseCommand
             $this->getComposer(),
             $this->getIO(),
             array(
-                \Vaimo\ComposerPatches\Patch\Config::ENABLED => true,
-                \Vaimo\ComposerPatches\Patch\Config::ENABLED_FOR_PACKAGES => true
+                \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
+                    'project' => true,
+                    'packages' => true,
+                    'vendors' => true
+                )
             )
         );
 

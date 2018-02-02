@@ -7,6 +7,8 @@ namespace Vaimo\ComposerPatches\Patch;
 
 class Definition
 {
+    const BUNDLE_TARGET = '*';
+    
     const SOURCE = 'source';
     const URL = 'url';
     const LABEL = 'label';

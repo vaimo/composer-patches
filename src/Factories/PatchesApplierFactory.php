@@ -25,7 +25,7 @@ class PatchesApplierFactory
         $this->io = $io;
     }
     
-    public function create(\Composer\Composer $composer, array $config)
+    public function create(\Composer\Composer $composer, PluginConfig $pluginConfig)
     {
         $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
             
@@ -35,8 +35,6 @@ class PatchesApplierFactory
         $composerConfig = $composer->getConfig();
 
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
-        
-        $pluginConfig = new PluginConfig();
 
         $logger = new \Vaimo\ComposerPatches\Logger($this->io);
         $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
@@ -48,15 +46,11 @@ class PatchesApplierFactory
         } else {
             $failureHandler = new FailureHandlers\GracefulHandler($logger);
         }
-
-        $applierConfig = $pluginConfig->getApplierConfig(
-            isset($config[PluginConfig::PATCHER_CONFIG])
-            && is_array($config[PluginConfig::PATCHER_CONFIG]) ?
-                $config[PluginConfig::PATCHER_CONFIG]
-                : array()
-        );
         
-        $patchApplier = new \Vaimo\ComposerPatches\Patch\Applier($logger, $applierConfig);
+        $patchApplier = new \Vaimo\ComposerPatches\Patch\Applier(
+            $logger, 
+            $pluginConfig->getPatcherConfig()
+        );
         
         $packagePatchApplier = new \Vaimo\ComposerPatches\Package\PatchApplier(
             $packageInfoResolver,

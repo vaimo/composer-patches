@@ -57,8 +57,8 @@ class Applier
 
         $applierConfig = $this->applierUtils->sortApplierConfig($applierConfig);
         
-        $patchers = isset($applierConfig[PluginConfig::PATCHER_PROVIDERS]) 
-            ? array_filter($applierConfig[PluginConfig::PATCHER_PROVIDERS]) 
+        $patchers = isset($applierConfig[PluginConfig::PATCHER_APPLIERS ]) 
+            ? array_filter($applierConfig[PluginConfig::PATCHER_APPLIERS ]) 
             : array();
         
         $operations = isset($applierConfig[PluginConfig::PATCHER_OPERATIONS]) 
@@ -69,7 +69,7 @@ class Applier
             ? $applierConfig[PluginConfig::PATCHER_LEVELS] 
             : array();
 
-        $patcherSequence = $applierConfig[PluginConfig::PATCHER_SEQUENCE][PluginConfig::PATCHER_PROVIDERS];
+        $patcherSequence = $applierConfig[PluginConfig::PATCHER_SEQUENCE][PluginConfig::PATCHER_APPLIERS];
 
         if (!$patchers) {
             $this->logger->writeVerbose(
@@ -86,6 +86,10 @@ class Applier
                 $result = true;
                 
                 foreach ($operations as $operationCode => $operationName) {
+                    if (!isset($patcher[$operationCode])) {
+                        continue;
+                    }
+                    
                     $args = array(
                         PluginConfig::PATCHER_ARG_LEVEL => $patchLevel,
                         PluginConfig::PATCHER_ARG_FILE => $filename

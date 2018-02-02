@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches;
 
 use Vaimo\ComposerPatches\Factories\PatchesApplierFactory;
 use Vaimo\ComposerPatches\Factories\PatchesRepositoryFactory;
+use Vaimo\ComposerPatches\Factories\ConfigFactory;
 
 class Bootstrap
 {
@@ -24,6 +25,16 @@ class Bootstrap
      * @var PatchesRepositoryFactory
      */
     private $repositoryFactory;
+
+    /**
+     * @var Factories\ConfigFactory
+     */
+    private $configFactory;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
+     */
+    private $configUtils;
 
     /**
      * @var array
@@ -45,14 +56,12 @@ class Bootstrap
         
         $this->applierFactory = new PatchesApplierFactory($io);
         $this->repositoryFactory = new PatchesRepositoryFactory();
+        $this->configFactory = new ConfigFactory();
     }
 
     public function applyPatches($devMode = false, array $targets = array(), array $filters = array())
     {
-        $config = array_replace(
-            $this->composer->getPackage()->getExtra(),
-            $this->config
-        );
+        $config = $this->configFactory->create($this->composer, array($this->config));
         
         $patchesApplier = $this->applierFactory->create($this->composer, $config);
         
@@ -67,14 +76,12 @@ class Bootstrap
     
     public function stripPatches(array $targets = array())
     {
-        $config = array_replace(
-            $this->composer->getPackage()->getExtra(),
-            $this->config,
-            array(\Vaimo\ComposerPatches\Patch\Config::ENABLED => false)
+        $config = $this->configFactory->create(
+            $this->composer,
+            array($this->config, array(\Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array()))
         );
         
         $patchesApplier = $this->applierFactory->create($this->composer, $config);
-        
         $repository = $this->repositoryFactory->create($this->composer, $config);
 
         $patchesApplier->apply($repository, $targets);

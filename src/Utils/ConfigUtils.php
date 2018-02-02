@@ -11,9 +11,9 @@ class ConfigUtils
 {
     public function mergeApplierConfig(array $config, array $updates)
     {
-        $config[Config::PATCHER_PROVIDERS] = array_replace_recursive(
-            $config[Config::PATCHER_PROVIDERS],
-            isset($updates[Config::PATCHER_PROVIDERS]) ? $updates[Config::PATCHER_PROVIDERS] : array()
+        $config[Config::PATCHER_APPLIERS] = array_replace_recursive(
+            $config[Config::PATCHER_APPLIERS],
+            isset($updates[Config::PATCHER_APPLIERS]) ? $updates[Config::PATCHER_APPLIERS] : array()
         );
 
         $config[Config::PATCHER_SEQUENCE] = array_replace(
@@ -21,6 +21,17 @@ class ConfigUtils
             isset($updates[Config::PATCHER_SEQUENCE]) ? $updates[Config::PATCHER_SEQUENCE] : array()
         );
 
+        if (isset($updates[Config::PATCHER_SOURCES])) {
+            if ($updates[Config::PATCHER_SOURCES]) {
+                $config[Config::PATCHER_SOURCES] = array_replace(
+                    $config[Config::PATCHER_SOURCES],
+                    $updates[Config::PATCHER_SOURCES]
+                );
+            } else {
+                $config[Config::PATCHER_SOURCES] = array();
+            }
+        }
+        
         $config[Config::PATCHER_OPERATIONS] = array_replace(
             $config[Config::PATCHER_OPERATIONS],
             isset($updates[Config::PATCHER_OPERATIONS]) ? $updates[Config::PATCHER_OPERATIONS] : array()

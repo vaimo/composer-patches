@@ -8,20 +8,10 @@ namespace Vaimo\ComposerPatches\Repositories;
 class PatchesRepository
 {
     /**
-     * @var \Composer\Package\RootPackageInterface
-     */
-    private $rootPackage;
-    
-    /**
      * @var \Composer\Repository\WritableRepositoryInterface
      */
     private $packagesRepository;
     
-    /**
-     * @var \Vaimo\ComposerPatches\Patch\Config
-     */
-    private $patchConfig;
-
     /**
      * @var \Vaimo\ComposerPatches\Package\Collector
      */
@@ -38,22 +28,16 @@ class PatchesRepository
     private $filterUtils;
 
     /**
-     * @param \Composer\Package\RootPackageInterface $rootPackage
      * @param \Composer\Repository\WritableRepositoryInterface $packagesRepository
-     * @param \Vaimo\ComposerPatches\Patch\Config $patchConfig
      * @param \Vaimo\ComposerPatches\Package\Collector $packagesCollector
      * @param \Vaimo\ComposerPatches\Patch\DefinitionList\Loader $definitionListLoader
      */
     public function __construct(
-        \Composer\Package\RootPackageInterface $rootPackage,
         \Composer\Repository\WritableRepositoryInterface $packagesRepository,
-        \Vaimo\ComposerPatches\Patch\Config $patchConfig,
         \Vaimo\ComposerPatches\Package\Collector $packagesCollector,
         \Vaimo\ComposerPatches\Patch\DefinitionList\Loader $definitionListLoader
     ) {
-        $this->rootPackage = $rootPackage;
         $this->packagesRepository = $packagesRepository;
-        $this->patchConfig = $patchConfig;
         $this->packagesCollector = $packagesCollector;
         $this->definitionListLoader = $definitionListLoader;
         
@@ -77,22 +61,14 @@ class PatchesRepository
     
     public function getPatches($filters = array())
     {
-        $filter = $filters ? $this->filterUtils->composeRegex($filters, DIRECTORY_SEPARATOR) : false;
-        $patches = array();
-
-        if ($this->patchConfig->isPatchingEnabled()) {
-            $patches = $this->definitionListLoader->loadFromPackagesRepository(
-                $this->packagesRepository,
-                !$this->patchConfig->isPackageScopeEnabled() 
-                    ? array($this->rootPackage->getName()) 
-                    : array()
-            );
+        $patches = $this->definitionListLoader->loadFromPackagesRepository($this->packagesRepository);
+        
+        if (!$filters) {
+            return $patches;
         }
 
-        if ($filter) {
-            $patches = $this->filterUtils->filterBySubItemKeys($patches, $filter);
-        }
-
-        return $patches;
+        $composedFilter = $this->filterUtils->composeRegex($filters, '/');
+        
+        return $this->filterUtils->filterBySubItemKeys($patches, $composedFilter);
     }
 }

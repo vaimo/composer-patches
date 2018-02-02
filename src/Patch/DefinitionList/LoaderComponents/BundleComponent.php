@@ -5,7 +5,7 @@
  */
 namespace Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 
-use Vaimo\ComposerPatches\Patch\Config as PatchConfig;
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class BundleComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
@@ -27,17 +27,17 @@ class BundleComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
     {
         $rootName = $this->rootPackage->getName();
         
-        if (isset($patches[PatchConfig::BUNDLE_TARGET])) {
+        if (isset($patches[PatchDefinition::BUNDLE_TARGET])) {
             if (!isset($patches[$rootName])) {
                 $patches[$rootName] = array();
             }
 
             $patches[$rootName] = array_merge(
                 $patches[$rootName],
-                $patches[PatchConfig::BUNDLE_TARGET]
+                $patches[PatchDefinition::BUNDLE_TARGET]
             );
 
-            unset($patches[PatchConfig::BUNDLE_TARGET]);
+            unset($patches[PatchDefinition::BUNDLE_TARGET]);
         }
         
         return $patches;

@@ -6,7 +6,6 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-use Vaimo\ComposerPatches\Patch\Config as PatchConfig;
 
 class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
@@ -45,7 +44,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                     ? $info[PatchDefinition::TARGETS] 
                     : array();
                 
-                if (count($targets) > 1 || reset($targets) != PatchConfig::BUNDLE_TARGET) {
+                if (count($targets) > 1 || reset($targets) != PatchDefinition::BUNDLE_TARGET) {
                     continue;
                 }
                 

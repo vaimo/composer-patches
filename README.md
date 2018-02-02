@@ -36,36 +36,92 @@ composer patch --from-source
 composer patch --from-source --redo my/package
 ```
 
-_Note that the command does expect the project to be set up properly for patching, including the 
-'enable-patching' flag mentioned "Enabling patching for a project" section._
-
 ## Enabling patching for a project
 
-Patching is enabled when:
-
 * project has "patches" key defined under "extra" 
-* project has "enable-patching" key defined under "extra" 
-
-_The latter is only useful if you have no patches defined directly on the root/project level as the default 
-state of the patches enabled/disabled state will be: disabled_
 
 ```json
 {
   "extra": {
-    "patches": {},
-    "enable-patching": true,
-    "enable-patching-from-packages": false
+    "patches": {}
   }
 }
 ```
 
-* **enable-patching** - In case you have patches defined on root/project level, it's not required to
-  have **enable-patching** key to be defined unless you want to explicitly disable the functionality.
-* **enable-patching-from-packages** - Enabled by default (when not defined), can be used to omit all patches
-  from packages. For more granular exclusion, see "Excluding patches" sub-secion.
+## Controlling the module patch collection scope
 
-When patching is disabled and **composer install** is re-executed, all patched package will be re-installed
-(to wipe the patched in changes).
+These flags allow developer to have more control over the patch collector and omit certain sources when
+needed. All the sources are included by default.
+
+```json
+{
+  "extra": {
+    "patcher": {
+      "sources": {
+        "project": true,
+        "vendors": true,
+        "packages": true
+      }    
+    }
+  }
+}
+```
+
+Note that packages source definition can be configured to be more granular by listing all the vendors
+that should be included.
+
+```json
+{
+  "extra": {
+    "patcher": {
+      "sources": {
+        "vendors": ["vaimo", "magento"]
+      }    
+    }
+  }
+}
+```
+
+For packages, wildcards can be used to source form a wider range of packages. 
+
+```json
+{
+  "extra": {
+    "patcher": {
+      "sources": {
+        "packages": ["vaimo/patches-*"]
+      }    
+    }
+  }
+}
+```
+
+In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
+to "false".
+
+```json
+{
+  "extra": {
+    "patcher": false
+  }
+}
+```
+
+... or set sources to nothing.
+
+```json
+{
+  "extra": {
+    "patcher": {
+      "sources": {}    
+    }
+  }
+}
+```
+
+_These flags do not affect the way 'patch' command works, which will apply patches even when patching has
+been said to be disabled in composer.json; These flags indicate whether the patches will be applied on 
+'install' and 'update' calls_ 
 
 ## Defining patches for specific package: patch file
 
@@ -593,8 +649,13 @@ is built into the plugin. Changes to existing definitions are applied recursivel
 ```json
 {
   "extra": {
-    "patcher-config": {
-      "patchers": {
+    "patcher": {
+      "sources": {
+        "project": true,
+        "packages": true,
+        "vendors": true
+      },
+      "appliers": {
         "GIT": {
           "check": "git apply -p{{level}} --check {{file}}",
           "patch": "git apply -p{{level}} {{file}}"
@@ -609,8 +670,8 @@ is built into the plugin. Changes to existing definitions are applied recursivel
         "patch": "Patching"
       },
       "sequence": {
-        "operations": ["check", "patch"],
-        "patchers": ["PATCH", "GIT"]
+        "appliers": ["PATCH", "GIT"],
+        "operations": ["check", "patch"]
       },
       "levels": [0, 1, 2]
     }
@@ -662,6 +723,14 @@ levels of complexity when defining patches.
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.18.0
+
+* Feature: several config keys renamed (patchers => appliers, patcher-config => patcher). Backwards compatible.
+* Feature: patch enabling moved under patcher/sources (project:bool, packages:bool|array, vendors:bool|array). Backwards compatible.
+* Feature: allow granular patch sources inclusion (so that only some vendors would be included).
+* Feature: allow some providers to have special extra operations (before this change, every applier was 
+  expected to have every listed operation declared).
 
 ### 3.17.3
 

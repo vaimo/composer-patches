@@ -7,35 +7,43 @@ namespace Vaimo\ComposerPatches;
 
 class Config
 {
+    const PACKAGE_CONFIG_FILE = 'composer.json';
     const CONFIG_ROOT = 'extra';
     
     const LIST = 'patches';
     const DEV_LIST = 'patches-dev';
     const FILE = 'patches-file';
     const DEV_FILE = 'patches-file-dev';
+    
     const EXCLUDED_PATCHES = 'excluded-patches';
+    
     const APPLIED_FLAG = 'patches_applied';
-    const PATCHER_CONFIG = 'patcher-config';
-
     const PATCHER_PLUGIN_MARKER = 'patcher_plugin';
 
-    const PACKAGE_CONFIG_FILE = 'composer.json';
-    
-    const PATCHER_PROVIDERS = 'patchers';
+    const PATCHER_CONFIG_ROOT = 'patcher';
+    const PATCHER_APPLIERS = 'appliers';
     const PATCHER_OPERATIONS = 'operations';
     const PATCHER_SEQUENCE = 'sequence';
     const PATCHER_LEVELS = 'levels';
-    
+    const PATCHER_SOURCES = 'sources';
     const PATCHER_ARG_LEVEL = 'level';
     const PATCHER_ARG_FILE = 'file';
 
+    /**
+     * @var array
+     */
+    private $config;
+    
     /**
      * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
      */
     private $configUtils;
     
-    public function __construct() 
-    {
+    public function __construct(
+        array $config
+    ) {
+        $this->config = $config;
+        
         $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
     }
     
@@ -65,31 +73,9 @@ class Config
         );
     }
     
-    public function getApplierConfig(array $overrides = array())
+    public function getPatcherConfig(array $overrides = array())
     {
-        $config = array(
-            self::PATCHER_PROVIDERS => array(
-                'GIT' => array(
-                    'check' => 'git apply -p{{level}} --check {{file}}',
-                    'patch' => 'git apply -p{{level}} {{file}}'
-                ),
-                'PATCH' => array(
-                    'check' => 'patch -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
-                    'patch' => 'patch -p{{level}} --no-backup-if-mismatch < {{file}}'
-                )
-            ),
-            self::PATCHER_OPERATIONS => array(
-                'check' => 'Validation',
-                'patch' => 'Patching'
-            ),
-            self::PATCHER_SEQUENCE => array(
-                'patchers' => array('PATCH', 'GIT'),
-                'operations' => array('check', 'patch')
-            ),
-            self::PATCHER_LEVELS => array('0', '1', '2')
-        );
-
-        $config = $this->configUtils->mergeApplierConfig($config, $overrides);
+        $config = $this->configUtils->mergeApplierConfig($this->config, $overrides);
         
         return $this->configUtils->sortApplierConfig($config);
     }

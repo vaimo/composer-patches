@@ -6,7 +6,6 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-use Vaimo\ComposerPatches\Patch\Config as PatchConfig;
 
 class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
@@ -30,7 +29,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
     {
         foreach ($patches as $target => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
-                if ($target != PatchConfig::BUNDLE_TARGET && !isset($packagesByName[$target])) {
+                if ($target != PatchDefinition::BUNDLE_TARGET && !isset($packagesByName[$target])) {
                     $patchData = false;
                     continue;
                 }
