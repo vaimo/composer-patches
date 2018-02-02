@@ -11,11 +11,17 @@ class ConfigUtils
 {
     public function mergeApplierConfig(array $config, array $updates)
     {
-        $config[Config::PATCHER_APPLIERS] = array_replace_recursive(
-            $config[Config::PATCHER_APPLIERS],
-            isset($updates[Config::PATCHER_APPLIERS]) ? $updates[Config::PATCHER_APPLIERS] : array()
-        );
+        foreach ($config[Config::PATCHER_APPLIERS] as $code => $applier) {
+            if (!isset($updates[Config::PATCHER_APPLIERS][$code])) {
+                continue;
+            }
 
+            $config[Config::PATCHER_APPLIERS][$code] = array_replace(
+                $config[Config::PATCHER_APPLIERS][$code], 
+                $updates[Config::PATCHER_APPLIERS][$code]
+            );
+        }
+        
         $config[Config::PATCHER_SEQUENCE] = array_replace(
             $config[Config::PATCHER_SEQUENCE],
             isset($updates[Config::PATCHER_SEQUENCE]) ? $updates[Config::PATCHER_SEQUENCE] : array()

@@ -7,6 +7,8 @@ namespace Vaimo\ComposerPatches;
 
 class Logger
 {
+    const TYPE_NONE = 'none';
+    
     /**
      * @var \Composer\IO\IOInterface $io
      */
@@ -75,7 +77,7 @@ class Logger
     
     private function createTag($type, $contents)
     {
-        if (!$type) {
+        if (!$type || $type == \Vaimo\ComposerPatches\Logger::TYPE_NONE) {
             return $contents;
         }
         

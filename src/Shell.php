@@ -10,12 +10,12 @@ class Shell
     /**
      * @var \Vaimo\ComposerPatches\Logger
      */
-    protected $logger;
+    private $logger;
 
     /**
      * @var \Composer\Util\ProcessExecutor
      */
-    protected $processExecutor;
+    private $processExecutor;
 
     /**
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -24,35 +24,26 @@ class Shell
         \Vaimo\ComposerPatches\Logger $logger
     ) {
         $this->logger = $logger;
-        
+
         $this->processExecutor =  new \Composer\Util\ProcessExecutor($logger->getOutputInstance());
     }
 
-    public function execute($command, array $arguments, $cwd = null)
+    public function execute($command, $cwd = null)
     {
         $logger = $this->logger;
 
-        $outputHandler = function ($type, $data) use ($logger) {
+        $output = '';
+        $outputHandler = function ($type, $data) use ($logger, &$output) {
+            $output = $output . trim($data);
             $logger->writeVerbose('comment', trim($data));
         };
         
-        $arguments = array_combine(
-            array_map(function ($item) {
-                return sprintf('{{%s}}', $item);
-            }, array_keys($arguments)),
-            array_map('escapeshellarg', $arguments)
-        );
-
         if ($this->logger->getOutputInstance()->isVerbose()) {
             $this->logger->writeIndentation();
         }
         
-        $result = $this->processExecutor->execute(
-            str_replace(array_keys($arguments), $arguments, $command),
-            $outputHandler,
-            $cwd
-        );
+        $result = $this->processExecutor->execute($command, $outputHandler, $cwd);
 
-        return $result == 0;
+        return array($result == 0, $output);
     }
 }

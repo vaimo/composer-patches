@@ -26,8 +26,10 @@ class Config
     const PATCHER_SEQUENCE = 'sequence';
     const PATCHER_LEVELS = 'levels';
     const PATCHER_SOURCES = 'sources';
+    
     const PATCHER_ARG_LEVEL = 'level';
     const PATCHER_ARG_FILE = 'file';
+    const PATCHER_ARG_CWD = 'cwd';
 
     /**
      * @var array

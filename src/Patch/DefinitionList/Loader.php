@@ -6,7 +6,7 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionList;
 
 use Composer\Repository\WritableRepositoryInterface as PackageRepository;
-use Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface;
+use Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface as ListLoader;
 use Vaimo\ComposerPatches\Interfaces\PatchSourceListInterface;
 
 class Loader
@@ -22,7 +22,7 @@ class Loader
     private $patchesCollector;
     
     /**
-     * @var DefinitionListLoaderComponentInterface[]
+     * @var ListLoader[]
      */
     private $processors;
 
@@ -39,7 +39,7 @@ class Loader
     /**
      * @param \Vaimo\ComposerPatches\Package\Collector $packagesCollector
      * @param \Vaimo\ComposerPatches\Patch\Collector $patchesCollector
-     * @param DefinitionListLoaderComponentInterface[] $processors
+     * @param ListLoader[] $processors
      * @param PatchSourceListInterface[] $listSources
      * @param string $vendorRoot
      */
@@ -68,11 +68,13 @@ class Loader
             },
             array()
         );
+
+        $vendorRoot = $this->vendorRoot;
         
         return array_reduce(
             $this->processors,
-            function (array $patches, DefinitionListLoaderComponentInterface $processor) use ($packages) {
-                return $processor->process($patches, $packages, $this->vendorRoot);
+            function (array $patches, ListLoader $listLoader) use ($packages, $vendorRoot) {
+                return $listLoader->process($patches, $packages, $vendorRoot);
             },
             $this->patchesCollector->collect(array_unique($sources))
         );

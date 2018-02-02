@@ -657,21 +657,26 @@ is built into the plugin. Changes to existing definitions are applied recursivel
       },
       "appliers": {
         "GIT": {
-          "check": "git apply -p{{level}} --check {{file}}",
-          "patch": "git apply -p{{level}} {{file}}"
+          "bin": "which git",
+          "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
+          "check": "[[bin]] apply -p{{level}} --check {{file}}",
+          "patch": "[[bin]] apply -p{{level}} {{file}}"
         },
         "PATCH": {
-          "check": "patch -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
-          "patch": "patch -p{{level}} --no-backup-if-mismatch < {{file}}"
+          "bin": ["which custom-patcher", "which patch"],
+          "check": "[[bin]] -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
+          "patch": "[[bin]] -p{{level}} --no-backup-if-mismatch < {{file}}"
         }
       },
       "operations": {
-        "check": "Validation",
+        "ping": "Usability test",
+        "bin": "Availability test",
+        "check": "Patch validation",
         "patch": "Patching"
       },
       "sequence": {
         "appliers": ["PATCH", "GIT"],
-        "operations": ["check", "patch"]
+        "operations": ["ping", "bin", "check", "patch"]
       },
       "levels": [0, 1, 2]
     }
@@ -679,11 +684,23 @@ is built into the plugin. Changes to existing definitions are applied recursivel
 }
 ```
 
-Patchers executed in the sequence dictated by sequence where several path levels are used with validation
-until validation success is hit.
+_Multiple alternative commands can be defined for each operation. Operation itself is considered to be 
+success when at least one command call results in a SUCCESS return code_ 
 
-Note that patchers are processed per level, meaning that the config above will make the patchers being 
-applied in a sequence of:
+_Patch is considered to be applied when all operations can be completed with SUCCESS return code_
+ 
+_Exclamation mark in the beginning of an operation will be translated as 'failure is expected'_
+
+_The values of 'level', 'file' and 'cwd' variables are populated by the plugin, rest of the variables 
+get their value from the response of the operations that have already been processed. This means that 
+'bin' value will be the result of 'bin' operation. Note that if sequence places 'bin' after 'check' or 
+'patch', then the former will be just removed from the template_
+
+_The [[]] will indicate the value is used as-is, {{}} will make the value be shell-escaped_
+
+Appliers are executed in the sequence dictated by sequence where several path levels are used with 
+validation until validation success is hit. Note that each applier will be visited before moving on to 
+next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 ...
 
@@ -723,6 +740,14 @@ levels of complexity when defining patches.
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.19.0
+
+* Feature: added new operation to check if applier is available (can be used to exclude certain appliers on certain systems).
+* Feature: added new operation to find applier's executable and use it in the operations that come afterwards.
+* Feature: allow multiple commands per operation.
+* Feature: introduced the possibility to define an operation that is considered a success when the command does not succeed. 
+* Fix: removed references to $this within closures (as it's not supported in 5.3.X). 
 
 ### 3.18.0
 

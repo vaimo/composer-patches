@@ -30,6 +30,11 @@ class Applier
     private $applierUtils;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\TemplateUtils
+     */
+    private $templateUtils;
+    
+    /**
      * @param \Vaimo\ComposerPatches\Logger $logger
      * @param array $config
      */
@@ -42,6 +47,7 @@ class Applier
 
         $this->shell = new \Vaimo\ComposerPatches\Shell($logger);
         $this->applierUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
+        $this->templateUtils = new \Vaimo\ComposerPatches\Utils\TemplateUtils();
     }
 
     public function applyFile($filename, $cwd, $config = array())
@@ -81,21 +87,67 @@ class Applier
             );
         }
         
+        $patters = array(
+            '{{%s}}' => 'escapeshellarg',
+            '[[%s]]' => false
+        );
+
+        $resultCache = array();
+        
         foreach ($levels as $sequenceIndex => $patchLevel) {
             foreach ($patchers as $type => $patcher) {
                 $result = true;
+                
+                $operationResults[$type] = array_fill_keys(array_keys($operations), '');
                 
                 foreach ($operations as $operationCode => $operationName) {
                     if (!isset($patcher[$operationCode])) {
                         continue;
                     }
                     
-                    $args = array(
+                    $arguments = array_replace($operationResults[$type], array(
                         PluginConfig::PATCHER_ARG_LEVEL => $patchLevel,
-                        PluginConfig::PATCHER_ARG_FILE => $filename
-                    );
+                        PluginConfig::PATCHER_ARG_FILE => $filename,
+                        PluginConfig::PATCHER_ARG_CWD => $cwd
+                    ));
+
+                    $applierOperations = is_array($patcher[$operationCode]) 
+                        ? $patcher[$operationCode] 
+                        : array($patcher[$operationCode]);
                     
-                    $result = $this->shell->execute($patcher[$operationCode], $args, $cwd) && $result;
+                    foreach ($applierOperations as $applierOperation) {
+                        $passOnFailure = substr($applierOperation, 0, 1) === '!';
+                        $applierOperation = ltrim($applierOperation, '!');
+                        
+                        $command = $this->templateUtils->compose($applierOperation, $arguments, $patters);
+
+                        $resultKey = $cwd . '|' . $command;
+
+                        if ($passOnFailure) {
+                            $this->logger->writeVerbose(
+                                \Vaimo\ComposerPatches\Logger::TYPE_NONE, 
+                                '<comment>***</comment> The expected result to execution is a failure <comment>***</comment>'
+                            );
+                        }
+
+                        if (!isset($resultCache[$command])) {
+                            $resultCache[$resultKey] = $this->shell->execute($command, $cwd);
+                        }
+
+                        list($result, $output) = $resultCache[$resultKey];
+                        
+                        if ($passOnFailure) {
+                            $result = !$result;
+                        }
+                        
+                        if (!$result) {
+                            continue;
+                        }
+
+                        $operationResults[$type][$operationCode] = $output;
+                        
+                        break;
+                    }
 
                     if (!$result) {
                         break;
