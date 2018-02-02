@@ -657,8 +657,8 @@ is built into the plugin. Changes to existing definitions are applied recursivel
       },
       "appliers": {
         "GIT": {
-          "bin": "which git",
           "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
+          "bin": "which git",
           "check": "[[bin]] apply -p{{level}} --check {{file}}",
           "patch": "[[bin]] apply -p{{level}} {{file}}"
         },
@@ -676,7 +676,7 @@ is built into the plugin. Changes to existing definitions are applied recursivel
       },
       "sequence": {
         "appliers": ["PATCH", "GIT"],
-        "operations": ["ping", "bin", "check", "patch"]
+        "operations": ["bin", "ping", "check", "patch"]
       },
       "levels": [0, 1, 2]
     }
