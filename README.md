@@ -157,7 +157,7 @@ There are several ways a version restriction for a patch can be defined, the cho
   "targeted/package": {
     "applies when targeted/package version is less than 1.2.3)": {
       "<1.2.3": "my/first-fix.patch"
-    }
+    },
     "same as first definition, but enabled more configuration options": {
       "source": "my/first-fix.patch",
       "version": "<1.2.3"
