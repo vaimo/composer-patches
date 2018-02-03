@@ -42,16 +42,12 @@ Same format is used for both project (root level scope) patches and for package 
     "patches": {
       "some/package": {
         "example local patch": "my/file.patch",
-        "example remote patch": "http://example.com/url/to/patch.patch"
+        "example remote patch": "http://www.example.com/patch.patch"
       }
     }
   }
 }
 ```
-
-_This is basically the bare minimum to get your patch to apply. The rest of this README deals with 
-extra levels of complexity that can be introduced to patch definition when a need arises: patch 
-sequencing, version branching, bundled patches, locked path strip level and so on..._
 
 ## Basic Usage: configuring a patches file
 
@@ -60,9 +56,6 @@ relative to the owner of the composer.json that introduces a certain file path.
 
 ```json
 {
-  "require": {
-    "some/package": "1.2.3"
-  },
   "extra": {
     "patches-file": "path/to/patches.json"
   }
@@ -100,8 +93,7 @@ the merging will be done in very late state based on the absolute path of the pa
 ## Basic Usage: patch file format
 
 Patches are applied relative to the root of the composer package that the patch is targeting: the file 
-paths in the patch should reflect that. Path stripping levels can be defined/modifier/added to allow patches 
-with different relative paths for targeted files to also apply.
+paths in the patch should reflect that.
 
 So if the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
 the patch would target it with
@@ -120,6 +112,8 @@ the patch would target it with
           * rest of the logic of the function
           */
 ```
+
+_Path stripping levels can be defined/modifier/added to allow patches with different relative paths for targeted files to also apply._
 
 ## Basic Usage: disabling patching
 
@@ -142,11 +136,11 @@ In case it's important to apply the patches in a certain order, use an array wra
 {
   "targeted/package": [
     {
-      "label": "my patch description",
+      "label": "will be applied before other/file.patch",
       "source": "my/file.patch"
     },
     {
-      "label": "other patch (depends on my/file.patch being applied)",
+      "label": "will be applied after my/file.patch",
       "source": "other/file.patch"
     }
   ]
@@ -154,39 +148,30 @@ In case it's important to apply the patches in a certain order, use an array wra
 
 ```
 
-When defined in the following format, `my/file.patch` will always be applied before `other/file.patch`.
-
 ## Patches: version restriction
 
-In case the patch is applied only on certain version of the package, a version restriction can be defined for the patch:
+There are several ways a version restriction for a patch can be defined, the choice on which one to use usually depends on a situation and how much extra information needs to be configured for the patch to apply correctly. 
 
 ```json
 {
   "targeted/package": {
-    "description for first patch": {
+    "applies when targeted/package version is less than 1.2.3)": {
+      "<1.2.3": "my/first-fix.patch"
+    }
+    "same as first definition, but enabled more configuration options": {
       "source": "my/first-fix.patch",
       "version": "<1.2.3"
     },
-    "second patch": {
+    "applies when other/package's version is >=2.1.7": {
       "source": "my/other-fix.patch",
       "depends": {
         "other/package": ">=2.1.7"
       }
-    },
-    "description for third patch": {
-      "<1.2.3": "my/first-fix-simplified-format.patch"
     }
   }
 }
 
 ```
-
-The first patch in this example, expects 'targeted/package' to have version that's smaller than 1.2.3; otherwise the patch will be omitted. The second patch has a indirect dependency where it does not care what version the targeted/package is, and is checking the verison of **other/package** instead.
-
-The third patch is just a simplified version of the first patch. It makes the declaration easier to read with the sacrifice 
-of not being able to define anything else about the patch (can't define dependencies, specific patch strip level, etc).
-
-_Version constraints are parsed by composer's own version constraint parser. All same rules apply._
 
 ## Patches: version branching
 
@@ -196,27 +181,19 @@ under same label like this:
 ```json
 {
   "some/package": {
-    "More detailed description on what the patch does": {
-      "1.0.* <1.2.0": "patches/somepackage/1.0.0/important-fix.patch",
-      ">=1.2.0": "patches/somepackage/1.2.0/important-fix.patch"
+    "having two patches for same fix": {
+      "1.0.* <1.2.0": "legacy.patch",
+      ">=1.2.0": "current.patch"
+    }
+  },
+  "some/package": {
+    "same done for extended patch declaration format": {
+      "source": {
+        "1.0.* <1.2.0": "legacy.patch",
+        ">=1.2.0": "current.patch"
+      }
     }
   }
-}
-```
-
-Same can be used while using sequenced patches ...
-
-```json
-{
-  "magento/module-widget": [
-    {
-      "label": "Fix: Category tree items in admin get double-escaped due to ExtJs and Magento both doing the escaping",
-      "source": {
-        "<=100.1.5": "Magento_Widget/100.1.5/some-patch.patch",
-        ">100.1.5": "Magento_Widget/100.1.5/some-other-patch.patch"
-      }
-    }      
-  ]
 }
 ```
 
@@ -228,23 +205,25 @@ alternative patch definition format is recommended:
 ```json
 {
   "*": {
-    "Some bundle patch": {
-      "source": "path/to/bundle/patch.patch",
+    "fix for multiple modules": {
+      "source": "bundle/patch.patch",
       "targets": [
-        "my/some-module",
-        "my/other-module"
+        "some/module",
+        "other/module"
       ]
+    },
+    "same as above, but targets are autoresolved from file": {
+      "source": "bundle/patch.patch"
     }
   }
 }
 ```
 
-Patches defined like this will be applied relative to the project's vendor folder instead of being relative 
-to the targeted package (which in this case is not really known).
+Where the bundle/patch.patch content would have file paths defined in following manner:
 
 ```diff
---- my/some-module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ my/some-module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+--- some/module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
++++ other/module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
 
 @@ -31,7 +31,7 @@
       */
@@ -255,8 +234,8 @@ to the targeted package (which in this case is not really known).
          /**
           * rest of the logic of the function
           */
---- my/other-module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ my/other-module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+--- some/module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
++++ other/module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
 
 @@ -31,7 +31,7 @@
       */
@@ -268,26 +247,6 @@ to the targeted package (which in this case is not really known).
           * rest of the logic of the function
           */
 ```
-
-Note that it's important still to have all the targeted packages listed as they'd need to be re-installed 
-in case the patch changes or patch-reapply is called (see below for the environment variable that allows
-that to be triggered). 
-
-_In case targets for bundled patch are not defined, the code will peek into the patch file and try to 
-resolve the targets from the contents of the patch. Note that this feature is somewhat experimental and 
-developer is still strongly encouraged to have the patch targets defined explicitly._
-
-```json
-{
-  "*": {
-    "Some bundle patch": {
-      "source": "path/to/bundle/patch.patch"
-    }
-  }
-}
-```
-
-_This is somewhat experimental, so you're definitely better off having targets explicitly declared._
 
 ## Patches: defining patches with strict path strip level
 
@@ -302,23 +261,6 @@ settings, it's possible to define custom ones for just one patch.
   "targeted/package": {
     "Some patch description": {
       "source": "path/to/file.patch",
-      "level": "0"
-    }
-  }
-}
-```
-
-Note that same can be done in case the patch has been split between multiple target versions, but using 
-the following format:
-
-```json
-{
-  "targeted/package": {
-    "Some patch description": {
-      "source": {
-        "<=1.2.3": "path/to/1.2.3/file.patch",
-        ">1.2.3": "path/to/1.2.4/file.patch"
-      },
       "level": "0"
     }
   }
@@ -350,7 +292,7 @@ in the project's composer.json:
   "extra": {
     "excluded-patches": {
       "patch/owner": [
-        "path/to/file.patch"
+        "some-fix.patch"
       ]
     }
   }
@@ -365,7 +307,7 @@ Will exclude the a patch that was defined in a package in following (or similar)
   "extra": {
     "patches": {
       "targeted/package": {
-        "Some patch description": "path/to/file.patch"
+        "example description": "some-fix.patch"
       }
     }
   }
@@ -541,6 +483,11 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.20.0
+
+* Feature: allow root path declarations to indicate from where the patches should be taken.
+* Maintenance: documentation simplified. Using comments in examples to explain what certain declaration does.
 
 ### 3.19.4
 
