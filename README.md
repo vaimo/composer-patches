@@ -4,17 +4,34 @@ Applies a patch from a local or remote file to any package that is part of a giv
 project. Packages can be defined both on project and on package level.
 
 The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable from 
-the composer.json of the project. 
+the composer.json of the project.
 
-## Quick start: explicit patch definitions
+## Configuration hardpoints
+
+All the configuration of the plugin's configuration is stored in the following keys in composer.json of either a project or a package.
+
+```json
+{
+  "extra": {
+    "patcher": {}
+    "patches": {}
+    "patches-file": {}
+  }
+}
+```
+
+The patches module mimics the way composer separates development packages from normal requirements by introducing two extra keys, where exact same rules apply as for normal patch declarations: `patches-dev`, `patches-file-dev`
+
+The patches declared under those keys will not be applied when installing the project with `--no-dev` option.
+
+## Patches: configuring a patch
 
 Same format is used for both project (root level scope) patches and for package patches.
 
 ```json
 {
   "require": {
-    "some/package": "1.2.3",
-    "vaimo/composer-patches": "^3.0.0"
+    "some/package": "1.2.3"
   },
   "extra": {
     "patches": {
@@ -31,7 +48,7 @@ _This is basically the bare minimum to get your patch to apply. The rest of this
 extra levels of complexity that can be introduced to patch definition when a need arises: patch 
 sequencing, version branching, bundled patches, locked path strip level and so on..._
 
-## Quick start: patch list definition
+## Patches: configuring a patches file
 
 Same format is used for both project (root level scope) patches and for package patches. Paths are 
 relative to the owner of the composer.json that introduces a certain file path.
@@ -39,8 +56,7 @@ relative to the owner of the composer.json that introduces a certain file path.
 ```json
 {
   "require": {
-    "some/package": "1.2.3",
-    "vaimo/composer-patches": "^3.0.0"
+    "some/package": "1.2.3"
   },
   "extra": {
     "patches-file": "path/to/patches.json"
@@ -58,140 +74,7 @@ Where **path/to/patches.json** contains:
 }
 ```
 
-## Patch file format
-
-_This example will make the patch apply with patch stripping level of '0'._
-
-The targeted file format in the patch should be relative to the patched package - or - in other 
-words: relative to the context it was defined for.
-
-So it the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
-the patch would target it with
-
-```diff
---- Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ Models/Example.php	2017-05-24 14:14:06.640560761 +0200
-
-@@ -31,7 +31,7 @@
-      */
-     protected function someFunction($someArg)
-     {
--        $var1 = 123;
-+        $var1 = 456;
-         /**
-          * rest of the logic of the function
-          */
-```
-
-Note that you don't have to change the patch name or description when you change it after it has already
-been used in some context by someone as the module will be aware of the patch contents and will re-apply
-it when it has changed since last time.
-
-## Development patches
-
-The patches module mimics the way composer separates development packages from normal requirements by introducing two extra keys, where exact same rules apply as for normal patch declarations: `patches-dev`, `patches-file-dev`
-
-The patches declared under those keys will not be applied when installing the project with `--no-dev` option.
-
-## Patch composer command
-
-Installing the plugin will introduce a new composer command: **composer patch**
-
-```shell
-# Re-apply new patches (similar to patch apply on 'composer install') 
-composer patch 
-
-# Re-apply all patches
-composer patch --redo 
-
-# Re-apply patches for one speicif package
-composer patch --redo my/package 
-
-# Re-apply patches for one speicif package with patch name filter 
-composer patch --filter wrong-time-format --filter other-file --redo my/package 
-
-# Re-apply patches and skip filenames that contain 'wrong<anything>format'  
-composer patch --filter '!wrong*format' --redo my/package 
-
-# Reset all patched packages
-composer patch --undo 
-
-# Reset one specific patched package
-composer patch --undo my/package 
-
-# Gather patches information from /vendor instead of install.json
-composer patch --from-source
-
-# Ideal for testing out a newly added patch against my/package
-composer patch --from-source --redo my/package
-```
-
-The main purpose of this command is to make the maintenance of already created patches and adding new ones as easy as possible by allowing user to test out a patch directly right after defining it without having to trigger 'composer update' or 'composer install'.
-
-## Patcher sources
-
-These flags allow developer to have more control over the patch collector and omit certain sources when
-needed. All the sources are included by default.
-
-```json
-{
-  "extra": {
-    "patcher": {
-      "sources": {
-        "project": true,
-        "vendors": true,
-        "packages": true
-      }    
-    }
-  }
-}
-```
-
-Note that packages source definition can be configured to be more granular by listing all the vendors
-that should be included.
-
-```json
-{
-  "extra": {
-    "patcher": {
-      "sources": {
-        "vendors": ["vaimo", "magento"]
-      }    
-    }
-  }
-}
-```
-
-For packages, wildcards can be used to source form a wider range of packages. 
-
-```json
-{
-  "extra": {
-    "patcher": {
-      "sources": {
-        "packages": ["vaimo/patches-*"]
-      }    
-    }
-  }
-}
-```
-
-In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
-to "false".
-
-```json
-{
-  "extra": {
-    "patcher": false
-  }
-}
-```
-
-_These flags do not affect the way 'patch' command works, which will apply patches even when patching has
-been said to be disabled in composer.json; These flags indicate whether the patches will be applied on 
-'install' and 'update' calls_ 
-
-## Multiple patch list files
+## Patches: multiple patch list files
 
 Note that to enable the developer to perform occasional cleanup and sub-grouping on the patches 
 declaration, multiple patches files can be defined:
@@ -199,10 +82,6 @@ declaration, multiple patches files can be defined:
 ```json
 
 {
-  "require": {
-    "some/package": "1.2.3",
-    "vaimo/composer-patches": "^3.0.0"
-  },
   "extra": {
     "patches-file": ["patches.json", "legacy.json"]
   }
@@ -213,33 +92,29 @@ The files are processed sequentially and merged in a way where all the patches i
 processed (meaning: even if the declaration in both files is exactly the same, both will be processed and 
 the merging will be done in very late state based on the absolute path of the patch file path).
 
-## Sequenced patches
+## Patches: sequenced patches
 
 In case it's important to apply the patches in a certain order, use an array wrapper around the patch definitions.
 
 ```json
 {
-  "extra": {
-    "patches": {
-      "targeted/package": [
-        {
-          "label": "my patch description",
-          "source": "my/file.patch"
-        },
-        {
-          "label": "other patch (depends on my/file.patch being applied)",
-          "source": "other/file.patch"
-        }
-      ]
+  "targeted/package": [
+    {
+      "label": "my patch description",
+      "source": "my/file.patch"
+    },
+    {
+      "label": "other patch (depends on my/file.patch being applied)",
+      "source": "other/file.patch"
     }
-  }
+  ]
 }
 
 ```
 
 When defined in the following format, `my/file.patch` will always be applied before `other/file.patch`.
 
-## Version restriction
+## Patches: version restriction
 
 In case the patch is applied only on certain version of the package, a version restriction can be defined for the patch:
 
@@ -275,7 +150,7 @@ of not being able to define anything else about the patch (can't define dependen
 
 _Version constraints are parsed by composer's own version constraint parser. All same rules apply._
 
-## Version branching
+## Patches: version branching
 
 When there are almost identical patches for different version of some package, then they can be declared
 under same label like this:
@@ -474,26 +349,6 @@ the following format:
 }
 ```
 
-Note that in case most of the patches that you apply use same level, which is not covered by the default
-configuration, you can change the setting globally by overriding the patcher configuration:
-
-```json
-{
-  "extra": {
-    "patcher": {
-      "levels": [5]
-    },
-    "patches": {
-      "targeted/package": {
-        "Some patch description": {
-          "source": "path/to/1.2.3/file.patch"
-        }
-      }
-    }
-  }
-}
-```
-
 ## Skipping patches
 
 In case there's a need to temporarily fast-exclude patches which is usually the case when going through
@@ -511,6 +366,28 @@ declaration lines.
     }
   }
 }
+```
+
+## Patch File Format
+
+Patches are applied relative to the root of the composer package that the patch is targeting: the file paths in the patch should reflect that. Path stripping levels can be defined/modifier/added to allow patches with different relative paths for targeted files to also apply.
+
+So if the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
+the patch would target it with
+
+```diff
+--- Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
++++ Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
 ```
 
 ## Patcher Configuration
@@ -579,7 +456,107 @@ Appliers are executed in the sequence dictated by sequence where several path le
 validation until validation success is hit. Note that each applier will be visited before moving on to 
 next path strip level, which result in sequence similar to this:
 
-    PATCH:0 GIT:0 PATCH:1 GIT:1 ...
+    PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
+
+## Patcher Configuration: Sources
+
+These flags allow developer to have more control over the patch collector and omit certain sources when
+needed. All the sources are included by default.
+
+```json
+{
+  "extra": {
+    "patcher": {
+      "sources": {
+        "project": true,
+        "vendors": true,
+        "packages": true
+      }    
+    }
+  }
+}
+```
+
+Note that packages source definition can be configured to be more granular by listing all the vendors
+that should be included.
+
+```json
+{
+  "extra": {
+    "patcher": {
+      "sources": {
+        "vendors": ["vaimo", "magento"]
+      }    
+    }
+  }
+}
+```
+
+For packages, wildcards can be used to source form a wider range of packages. 
+
+```json
+{
+  "extra": {
+    "patcher": {
+      "sources": {
+        "packages": ["vaimo/patches-*"]
+      }    
+    }
+  }
+}
+```
+
+_These flags do not affect the way 'patch' command works, which will apply patches even when patching has
+been said to be disabled in composer.json; These flags indicate whether the patches will be applied on 
+'install' and 'update' calls_ 
+
+## Patcher Configuration: Disabling patching
+
+In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
+to "false".
+
+```json
+{
+  "extra": {
+    "patcher": false
+  }
+}
+```
+
+## Patch composer command
+
+Installing the plugin will introduce a new composer command: **composer patch**
+
+```shell
+# Re-apply new patches (similar to patch apply on 'composer install') 
+composer patch 
+
+# Re-apply all patches
+composer patch --redo 
+
+# Re-apply patches for one speicif package
+composer patch --redo my/package 
+
+# Re-apply patches for one speicif package with patch name filter 
+composer patch --filter wrong-time-format --filter other-file --redo my/package 
+
+# Re-apply patches and skip filenames that contain 'wrong<anything>format'  
+composer patch --filter '!wrong*format' --redo my/package 
+
+# Reset all patched packages
+composer patch --undo 
+
+# Reset one specific patched package
+composer patch --undo my/package 
+
+# Gather patches information from /vendor instead of install.json
+composer patch --from-source
+
+# Ideal for testing out a newly added patch against my/package
+composer patch --from-source --redo my/package
+```
+
+The main purpose of this command is to make the maintenance of already created patches and adding new ones as easy as possible by allowing user to test out a patch directly right after defining it without having to trigger 'composer update' or 'composer install'.
 
 ## Environment variables
 
