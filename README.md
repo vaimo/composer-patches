@@ -6,7 +6,7 @@ project. Packages can be defined both on project and on package level.
 The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable from 
 the composer.json of the project.
 
-## Configuration hard-points
+## Configuration: hard-points
 
 All the configuration of the plugin's configuration is stored in the following keys in composer.json of 
 either a project or a package.
@@ -14,10 +14,10 @@ either a project or a package.
 ```json
 {
   "extra": {
-    "patcher": {},
     "patches": {},
     "patches-file": {},
-    "excluded-patches": {}
+    "excluded-patches": {},
+    "patcher": {}
   }
 }
 ```
@@ -26,6 +26,8 @@ The patches module mimics the way composer separates development packages from n
 introducing two extra keys, where exact same rules apply as for normal patch declarations: `patches-dev`, `patches-file-dev`.
 
 The patches declared under those keys will not be applied when installing the project with `--no-dev` option.
+
+The examples in the topics of this readme are mostly given in the context of those hardpoints.
 
 ## Basic Usage: configuring a patch
 
@@ -39,8 +41,8 @@ Same format is used for both project (root level scope) patches and for package 
   "extra": {
     "patches": {
       "some/package": {
-        "desription about my patch": "my/file.patch",
-        "other patch": "http://example.com/url/to/patch.patch"
+        "example local patch": "my/file.patch",
+        "example remote patch": "http://example.com/url/to/patch.patch"
       }
     }
   }
