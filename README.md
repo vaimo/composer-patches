@@ -6,25 +6,28 @@ project. Packages can be defined both on project and on package level.
 The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable from 
 the composer.json of the project.
 
-## Configuration hardpoints
+## Configuration hard-points
 
-All the configuration of the plugin's configuration is stored in the following keys in composer.json of either a project or a package.
+All the configuration of the plugin's configuration is stored in the following keys in composer.json of 
+either a project or a package.
 
 ```json
 {
   "extra": {
-    "patcher": {}
-    "patches": {}
-    "patches-file": {}
+    "patcher": {},
+    "patches": {},
+    "patches-file": {},
+    "excluded-patches": {}
   }
 }
 ```
 
-The patches module mimics the way composer separates development packages from normal requirements by introducing two extra keys, where exact same rules apply as for normal patch declarations: `patches-dev`, `patches-file-dev`
+The patches module mimics the way composer separates development packages from normal requirements by 
+introducing two extra keys, where exact same rules apply as for normal patch declarations: `patches-dev`, `patches-file-dev`.
 
 The patches declared under those keys will not be applied when installing the project with `--no-dev` option.
 
-## Patches: configuring a patch
+## Basic Usage: configuring a patch
 
 Same format is used for both project (root level scope) patches and for package patches.
 
@@ -48,7 +51,7 @@ _This is basically the bare minimum to get your patch to apply. The rest of this
 extra levels of complexity that can be introduced to patch definition when a need arises: patch 
 sequencing, version branching, bundled patches, locked path strip level and so on..._
 
-## Patches: configuring a patches file
+## Basic Usage: configuring a patches file
 
 Same format is used for both project (root level scope) patches and for package patches. Paths are 
 relative to the owner of the composer.json that introduces a certain file path.
@@ -74,7 +77,7 @@ Where **path/to/patches.json** contains:
 }
 ```
 
-## Patches: multiple patch list files
+## Basic Usage: multiple patch list files
 
 Note that to enable the developer to perform occasional cleanup and sub-grouping on the patches 
 declaration, multiple patches files can be defined:
@@ -91,6 +94,43 @@ declaration, multiple patches files can be defined:
 The files are processed sequentially and merged in a way where all the patches in all the files are 
 processed (meaning: even if the declaration in both files is exactly the same, both will be processed and 
 the merging will be done in very late state based on the absolute path of the patch file path).
+
+## Basic Usage: patch file format
+
+Patches are applied relative to the root of the composer package that the patch is targeting: the file 
+paths in the patch should reflect that. Path stripping levels can be defined/modifier/added to allow patches 
+with different relative paths for targeted files to also apply.
+
+So if the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
+the patch would target it with
+
+```diff
+--- Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
++++ Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+```
+
+## Basic Usage: disabling patching
+
+In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
+to "false".
+
+```json
+{
+  "extra": {
+    "patcher": false
+  }
+}
+```
 
 ## Patches: sequenced patches
 
@@ -120,23 +160,19 @@ In case the patch is applied only on certain version of the package, a version r
 
 ```json
 {
-  "extra": {
-    "patches": {
-      "targeted/package": {
-        "description for first patch": {
-          "source": "my/first-fix.patch",
-          "version": "<1.2.3"
-        },
-        "second patch": {
-          "source": "my/other-fix.patch",
-          "depends": {
-            "other/package": ">=2.1.7"
-          }
-        },
-        "description for third patch": {
-          "<1.2.3": "my/first-fix-simplified-format.patch"
-        }
+  "targeted/package": {
+    "description for first patch": {
+      "source": "my/first-fix.patch",
+      "version": "<1.2.3"
+    },
+    "second patch": {
+      "source": "my/other-fix.patch",
+      "depends": {
+        "other/package": ">=2.1.7"
       }
+    },
+    "description for third patch": {
+      "<1.2.3": "my/first-fix-simplified-format.patch"
     }
   }
 }
@@ -157,14 +193,10 @@ under same label like this:
 
 ```json
 {
-  "extra": {
-    "patches": {
-      "some/package": {
-        "More detailed description on what the patch does": {
-          "1.0.* <1.2.0": "patches/somepackage/1.0.0/important-fix.patch",
-          ">=1.2.0": "patches/somepackage/1.2.0/important-fix.patch"
-        }
-      }
+  "some/package": {
+    "More detailed description on what the patch does": {
+      "1.0.* <1.2.0": "patches/somepackage/1.0.0/important-fix.patch",
+      ">=1.2.0": "patches/somepackage/1.2.0/important-fix.patch"
     }
   }
 }
@@ -174,46 +206,38 @@ Same can be used while using sequenced patches ...
 
 ```json
 {
-  "extra": {
-    "patches": {
-      "magento/module-widget": [
-        {
-          "label": "Fix: Category tree items in admin get double-escaped due to ExtJs and Magento both doing the escaping",
-          "source": {
-            "<=100.1.5": "Magento_Widget/100.1.5/some-patch.patch",
-            ">100.1.5": "Magento_Widget/100.1.5/some-other-patch.patch"
-          }
-        }      
-      ]
-    }
-  }
+  "magento/module-widget": [
+    {
+      "label": "Fix: Category tree items in admin get double-escaped due to ExtJs and Magento both doing the escaping",
+      "source": {
+        "<=100.1.5": "Magento_Widget/100.1.5/some-patch.patch",
+        ">100.1.5": "Magento_Widget/100.1.5/some-other-patch.patch"
+      }
+    }      
+  ]
 }
 ```
 
-## Bundled patches
+## Patches: Bundled patches
 
 In case there's a need to define a patch that targets multiple packages within a single patch file, 
 alternative patch definition format is recommended:
 
 ```json
 {
-  "extra": {
-    "patches": {
-      "*": {
-        "Some bundle patch": {
-          "source": "path/to/bundle/patch.patch",
-          "targets": [
-            "my/some-module",
-            "my/other-module"
-          ]
-        }
-      }
+  "*": {
+    "Some bundle patch": {
+      "source": "path/to/bundle/patch.patch",
+      "targets": [
+        "my/some-module",
+        "my/other-module"
+      ]
     }
   }
 }
 ```
 
-Patches defined like this will be applied relative to the project vendor root instead of being relative 
+Patches defined like this will be applied relative to the project's vendor folder instead of being relative 
 to the targeted package (which in this case is not really known).
 
 ```diff
@@ -253,13 +277,9 @@ developer is still strongly encouraged to have the patch targets defined explici
 
 ```json
 {
-  "extra": {
-    "patches": {
-      "*": {
-        "Some bundle patch": {
-          "source": "path/to/bundle/patch.patch"
-        }
-      }
+  "*": {
+    "Some bundle patch": {
+      "source": "path/to/bundle/patch.patch"
     }
   }
 }
@@ -267,7 +287,57 @@ developer is still strongly encouraged to have the patch targets defined explici
 
 _This is somewhat experimental, so you're definitely better off having targets explicitly declared._
 
-## Excluding patches
+## Patches: defining patches with strict path strip level
+
+By default, the patcher will try to apply the patch with several path stripping options - in some cases 
+this is not something that one wants to allow - for example: if the patch is in full extent just creating 
+new files, it might end up creating them to wrong directories. In some cases, some patches might have 
+unconventional path definitions that derive from other project patches. Rather than changing the global
+settings, it's possible to define custom ones for just one patch.
+
+```json
+{
+  "targeted/package": {
+    "Some patch description": {
+      "source": "path/to/file.patch",
+      "level": "0"
+    }
+  }
+}
+```
+
+Note that same can be done in case the patch has been split between multiple target versions, but using 
+the following format:
+
+```json
+{
+  "targeted/package": {
+    "Some patch description": {
+      "source": {
+        "<=1.2.3": "path/to/1.2.3/file.patch",
+        ">1.2.3": "path/to/1.2.4/file.patch"
+      },
+      "level": "0"
+    }
+  }
+}
+```
+
+## Patches: skipping patches
+
+In case there's a need to temporarily fast-exclude patches which is usually the case when going through
+maintenance or upgrade of the underlying project's framework, a skip flag can be used to pass over certain 
+declaration lines.
+
+```json
+{
+  "targeted/package": {
+    "Some patch description": "path/to/file.patch#skip"
+  }
+}
+```
+
+## Excluded Patches: configuration
 
 In case some patches that are defined in packages have to be excluded from the project (project has 
 custom versions of the files, conflicts with other patches, etc), exclusions records can be defined 
@@ -303,94 +373,7 @@ Will exclude the a patch that was defined in a package in following (or similar)
 The important part to note here is to remember that exclusion ignores patch target and focuses on the owner
 instead. Description is also not part of the exclusion logic.
 
-## Defining patches with strict path strip level
-
-By default, the patcher will try to apply the patch with several path stripping options - in some cases 
-this is not something that one wants to allow - for example: if the patch is in full extent just creating 
-new files, it might end up creating them to wrong directories. In some cases, some patches might have 
-unconventional path definitions that derive from other project patches. Rather than changing the global
-settings, it's possible to define custom ones for just one patch.
-
-```json
-{
-  "name": "patch/owner",
-  "extra": {
-    "patches": {
-      "targeted/package": {
-        "Some patch description": {
-          "source": "path/to/file.patch",
-          "level": "0"
-        }
-      }
-    }
-  }
-}
-```
-
-Note that same can be done in case the patch has been split between multiple target versions, but using 
-the following format:
-
-```json
-{
-  "name": "patch/owner",
-  "extra": {
-    "patches": {
-      "targeted/package": {
-        "Some patch description": {
-          "source": {
-            "<=1.2.3": "path/to/1.2.3/file.patch",
-            ">1.2.3": "path/to/1.2.4/file.patch"
-          },
-          "level": "0"
-        }
-      }
-    }
-  }
-}
-```
-
-## Skipping patches
-
-In case there's a need to temporarily fast-exclude patches which is usually the case when going through
-maintenance or upgrade of the underlying project's framework, a skip flag can be used to pass over certain 
-declaration lines.
-
-```json
-{
-  "name": "patch/owner",
-  "extra": {
-    "patches": {
-      "targeted/package": {
-        "Some patch description": "path/to/file.patch#skip"
-      }
-    }
-  }
-}
-```
-
-## Patch File Format
-
-Patches are applied relative to the root of the composer package that the patch is targeting: the file paths in the patch should reflect that. Path stripping levels can be defined/modifier/added to allow patches with different relative paths for targeted files to also apply.
-
-So if the patch is defined for my/package and my/package has a file vendor/my/package/Models/Example.php,
-the patch would target it with
-
-```diff
---- Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ Models/Example.php	2017-05-24 14:14:06.640560761 +0200
-
-@@ -31,7 +31,7 @@
-      */
-     protected function someFunction($someArg)
-     {
--        $var1 = 123;
-+        $var1 = 456;
-         /**
-          * rest of the logic of the function
-          */
-```
-
-## Patcher Configuration
+## Patcher: configuration
 
 In case it's needed for the patcher to apply the patches using some third-party application or to include
 some extra options, it's possible to declare new patcher commands or override the existing ones by adding 
@@ -401,39 +384,35 @@ _Note that by default, user does not really have to declare any of this, but eve
 
 ```json
 {
-  "extra": {
-    "patcher": {
-      "sources": {
-        "project": true,
-        "packages": true,
-        "vendors": true
-      },
-      "appliers": {
-        "GIT": {
-          "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
-          "bin": "which git",
-          "check": "[[bin]] apply -p{{level}} --check {{file}}",
-          "patch": "[[bin]] apply -p{{level}} {{file}}"
-        },
-        "PATCH": {
-          "bin": ["which custom-patcher", "which patch"],
-          "check": "[[bin]] -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
-          "patch": "[[bin]] -p{{level}} --no-backup-if-mismatch < {{file}}"
-        }
-      },
-      "operations": {
-        "ping": "Usability test",
-        "bin": "Availability test",
-        "check": "Patch validation",
-        "patch": "Patching"
-      },
-      "sequence": {
-        "appliers": ["PATCH", "GIT"],
-        "operations": ["bin", "ping", "check", "patch"]
-      },
-      "levels": [0, 1, 2]
+  "sources": {
+    "project": true,
+    "packages": true,
+    "vendors": true
+  },
+  "appliers": {
+    "GIT": {
+      "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
+      "bin": "which git",
+      "check": "[[bin]] apply -p{{level}} --check {{file}}",
+      "patch": "[[bin]] apply -p{{level}} {{file}}"
+    },
+    "PATCH": {
+      "bin": ["which custom-patcher", "which patch"],
+      "check": "[[bin]] -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
+      "patch": "[[bin]] -p{{level}} --no-backup-if-mismatch < {{file}}"
     }
-  }
+  },
+  "operations": {
+    "ping": "Usability test",
+    "bin": "Availability test",
+    "check": "Patch validation",
+    "patch": "Patching"
+  },
+  "sequence": {
+    "appliers": ["PATCH", "GIT"],
+    "operations": ["bin", "ping", "check", "patch"]
+  },
+  "levels": [0, 1, 2]
 }
 ```
 
@@ -458,22 +437,18 @@ next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
 
-## Patcher Configuration: Sources
+## Patcher: sources
 
 These flags allow developer to have more control over the patch collector and omit certain sources when
 needed. All the sources are included by default.
 
 ```json
 {
-  "extra": {
-    "patcher": {
-      "sources": {
-        "project": true,
-        "vendors": true,
-        "packages": true
-      }    
-    }
-  }
+  "sources": {
+    "project": true,
+    "vendors": true,
+    "packages": true
+  }    
 }
 ```
 
@@ -482,13 +457,9 @@ that should be included.
 
 ```json
 {
-  "extra": {
-    "patcher": {
-      "sources": {
-        "vendors": ["vaimo", "magento"]
-      }    
-    }
-  }
+  "sources": {
+    "vendors": ["vaimo", "magento"]
+  }    
 }
 ```
 
@@ -496,13 +467,9 @@ For packages, wildcards can be used to source form a wider range of packages.
 
 ```json
 {
-  "extra": {
-    "patcher": {
-      "sources": {
-        "packages": ["vaimo/patches-*"]
-      }    
-    }
-  }
+  "sources": {
+    "packages": ["vaimo/patches-*"]
+  }    
 }
 ```
 
@@ -510,20 +477,7 @@ _These flags do not affect the way 'patch' command works, which will apply patch
 been said to be disabled in composer.json; These flags indicate whether the patches will be applied on 
 'install' and 'update' calls_ 
 
-## Patcher Configuration: Disabling patching
-
-In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
-to "false".
-
-```json
-{
-  "extra": {
-    "patcher": false
-  }
-}
-```
-
-## Patch composer command
+## Patch Command
 
 Installing the plugin will introduce a new composer command: **composer patch**
 
@@ -558,7 +512,7 @@ composer patch --from-source --redo my/package
 
 The main purpose of this command is to make the maintenance of already created patches and adding new ones as easy as possible by allowing user to test out a patch directly right after defining it without having to trigger 'composer update' or 'composer install'.
 
-## Environment variables
+## Environment Variables
 
 * COMPOSER_PATCHES_REAPPLY_ALL - will force all patches to be re-applied
 * COMPOSER_PATCHES_FATAL_FAIL - exit after first patch failure is encountered
@@ -570,7 +524,7 @@ The main purpose of this command is to make the maintenance of already created p
   removed. By default, patched packages are re-installed to reset the patches (useful when creating 
   immutable build artifacts without any unnecessary modules installed).
 
-## Upgrading the module
+## Upgrading The Module
 
 When upgrading the module, one might encounter odd crashes about classes not being found or class 
 constructor arguments being wrong. 
@@ -585,6 +539,10 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.19.4
+
+* Maintenance: documentation re-organized and simplified.
 
 ### 3.19.3
 
