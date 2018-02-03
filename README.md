@@ -156,21 +156,20 @@ There are several ways a version restriction for a patch can be defined, the cho
 {
   "targeted/package": {
     "applies when targeted/package version is less than 1.2.3)": {
-      "<1.2.3": "my/first-fix.patch"
+      "<1.2.3": "example/some-fix.patch"
     },
     "same as first definition, but enabled more configuration options": {
-      "source": "my/first-fix.patch",
+      "source": "example/some-fix.patch",
       "version": "<1.2.3"
     },
     "applies when other/package's version is >=2.1.7": {
-      "source": "my/other-fix.patch",
+      "source": "example/other-fix.patch",
       "depends": {
         "other/package": ">=2.1.7"
       }
     }
   }
 }
-
 ```
 
 ## Patches: version branching
@@ -206,20 +205,20 @@ alternative patch definition format is recommended:
 {
   "*": {
     "fix for multiple modules": {
-      "source": "bundle/patch.patch",
+      "source": "example/bundle.patch",
       "targets": [
         "some/module",
         "other/module"
       ]
     },
     "same as above, but targets are autoresolved from file": {
-      "source": "bundle/patch.patch"
+      "source": "example/bundle.patch"
     }
   }
 }
 ```
 
-Where the bundle/patch.patch content would have file paths defined in following manner:
+Where the `example/bundle.patch` content would have file paths defined in following manner:
 
 ```diff
 --- some/module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
@@ -260,7 +259,7 @@ settings, it's possible to define custom ones for just one patch.
 {
   "targeted/package": {
     "Some patch description": {
-      "source": "path/to/file.patch",
+      "source": "example.patch",
       "level": "0"
     }
   }
@@ -276,7 +275,7 @@ declaration lines.
 ```json
 {
   "targeted/package": {
-    "Some patch description": "path/to/file.patch#skip"
+    "This patch will be ignored": "example.patch#skip"
   }
 }
 ```
@@ -292,7 +291,7 @@ in the project's composer.json:
   "extra": {
     "excluded-patches": {
       "patch/owner": [
-        "some-fix.patch"
+        "example.patch"
       ]
     }
   }
@@ -307,7 +306,7 @@ Will exclude the a patch that was defined in a package in following (or similar)
   "extra": {
     "patches": {
       "targeted/package": {
-        "example description": "some-fix.patch"
+        "fix description": "example.patch"
       }
     }
   }
@@ -402,7 +401,10 @@ that should be included.
 ```json
 {
   "sources": {
-    "vendors": ["vaimo", "magento"]
+    "vendors": [
+      "vaimo", 
+      "magento"
+    ]
   }    
 }
 ```
@@ -412,7 +414,10 @@ For packages, wildcards can be used to source form a wider range of packages.
 ```json
 {
   "sources": {
-    "packages": ["vaimo/patches-*"]
+    "packages": [
+      "vaimo/patches-*", 
+      "!some/ignored-package"
+    ]
   }    
 }
 ```
@@ -484,9 +489,15 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 
 List of generalized changes for each release.
 
-### 3.20.0
+### 3.20.0 (upcoming)
 
+* Feature: allow patches-file to be defined under patches key.
 * Feature: allow root path declarations to indicate from where the patches should be taken.
+* Feature: allow downloading of patch files even when 'secure-http' is enabled.
+* Feature: display the patch applying for only those patches that were either changed or were freshly 
+  introduced (currently showing everything due to package being reset before patch applier targets it).
+* Feature: support for md5 validation of a patch file.
+* Feature: support for OS specific configuration overrides.
 * Maintenance: documentation simplified. Using comments in examples to explain what certain declaration does.
 
 ### 3.19.4
