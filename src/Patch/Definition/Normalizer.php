@@ -21,17 +21,25 @@ class Normalizer
         if (!isset($data[Definition::URL]) && !isset($data[Definition::SOURCE])) {
             return false;
         }
-
+        
         $source = isset($data[Definition::URL])
             ? $data[Definition::URL]
             : $data[Definition::SOURCE];
 
         $sourceSegments = explode('#', $source);
         $lastSegment = array_pop($sourceSegments);
-
+        
         if ($lastSegment === Definition::SKIP) {
             $source = implode('#', $sourceSegments);
             $data[Definition::SKIP] = true;
+        }
+
+        $patchPathInfo = parse_url($source);
+
+        if (isset($patchPathInfo['scheme']) && $patchPathInfo['scheme']) {
+            $data[Definition::URL] = $source;
+        } else {
+            $data[Definition::URL] = false;
         }
         
         $depends = array();
@@ -76,6 +84,8 @@ class Normalizer
         }
         
         return array(
+            Definition::PATH => '',
+            Definition::URL => $data[Definition::URL],
             Definition::SOURCE => $source,
             Definition::TARGETS => isset($data[Definition::TARGETS]) && $target === Definition::BUNDLE_TARGET
                 ? $data[Definition::TARGETS]

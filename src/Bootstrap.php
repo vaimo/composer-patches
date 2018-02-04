@@ -50,7 +50,7 @@ class Bootstrap
         $this->config = $config;
         
         $this->applierFactory = new PatchesApplierFactory($io);
-        $this->repositoryFactory = new PatchesRepositoryFactory();
+        $this->repositoryFactory = new PatchesRepositoryFactory($io);
         $this->configFactory = new ConfigFactory();
     }
 

@@ -29,7 +29,7 @@ class ValidatorComponent implements \Vaimo\ComposerPatches\Interfaces\Definition
                 $patchPath = file_exists($absolutePatchPath)
                     ? $absolutePatchPath
                     : $relativePath;
-
+                
                 $patch[PatchDefinition::HASH] = md5(implode('|', array(
                     file_exists($patchPath) ? md5_file($patchPath) : md5($patchPath),
                     serialize($patch[PatchDefinition::DEPENDS]),

@@ -23,11 +23,6 @@ class PatchApplier
     private $eventDispatcher;
 
     /**
-     * @var \Composer\Util\RemoteFilesystem
-     */
-    private $downloader;
-
-    /**
      * @var
      */
     private $failureHandler;
@@ -55,7 +50,6 @@ class PatchApplier
     /**
      * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
      * @param \Composer\EventDispatcher\EventDispatcher $eventDispatcher
-     * @param \Composer\Util\RemoteFilesystem $downloader
      * @param \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler
      * @param \Vaimo\ComposerPatches\Logger $logger
      * @param \Vaimo\ComposerPatches\Patch\Applier $patchApplier
@@ -64,7 +58,6 @@ class PatchApplier
     public function __construct(
         \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver,
         \Composer\EventDispatcher\EventDispatcher $eventDispatcher,
-        \Composer\Util\RemoteFilesystem $downloader,
         \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler,
         \Vaimo\ComposerPatches\Logger $logger,
         \Vaimo\ComposerPatches\Patch\Applier $patchApplier,
@@ -72,7 +65,6 @@ class PatchApplier
     ) {
         $this->packageInfoResolver = $packageInfoResolver;
         $this->eventDispatcher = $eventDispatcher;
-        $this->downloader = $downloader;
         $this->failureHandler = $failureHandler;
         $this->logger = $logger;
         $this->patchApplier = $patchApplier;
@@ -83,84 +75,58 @@ class PatchApplier
 
     public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
-        $installPath = $this->packageInfoResolver->getSourcePath($package);
-        
-        if ($installPath == \Vaimo\ComposerPatches\Package\InfoResolver::DEFAULT_PATH) {
+        if ($package instanceof \Composer\Package\RootPackage) {
             $installPath = $this->vendorRoot;
+        } else {
+            $installPath = $this->packageInfoResolver->getSourcePath($package);
         }
         
         $appliedPatches = array();
 
         foreach ($patchesQueue as $source => $patchInfo) {
-            $absolutePatchPath = $this->vendorRoot . DIRECTORY_SEPARATOR . $source;
-            $relativePath = $source;
-
-            $description = $patchInfo[PatchDefinition::LABEL];
+            $isRemotePatch = (bool)$patchInfo[PatchDefinition::URL];
+            $path = $patchInfo[PatchDefinition::PATH];
+            $label = $patchInfo[PatchDefinition::LABEL];
             $config = $patchInfo[PatchDefinition::CONFIG];
 
-            $patchSourceLabel = sprintf('<info>project</info>: %s', $source);
-            $patchComment = strtok($description, ',');
-
-            if (file_exists($absolutePatchPath)) {
-                $patchSourceLabel = vsprintf(
-                    '<info>%s</info>: %s',
-                    array(
-                        $ownerName = implode(
-                            DIRECTORY_SEPARATOR, 
-                            array_slice(explode(DIRECTORY_SEPARATOR, $source), 0, 2)
-                        ),
-                        trim(
-                            substr($source, strlen($ownerName)), 
-                            DIRECTORY_SEPARATOR
-                        )
-                    )
-                );
-
-                $source = $absolutePatchPath;
-            }
+            $patchSourceLabel = sprintf(
+                '<info>%s</info>: %s', 
+                $patchInfo[PatchDefinition::OWNER], 
+                $source
+            );
             
             $this->logger->writeRaw('%s', array($patchSourceLabel));
 
             $loggerIndentation = $this->logger->push();
 
-            $this->logger->writeRaw('<comment>%s</comment>', array($patchComment));
-
+            $this->logger->writeRaw('<comment>%s</comment>', array($label));
+            
             try {
                 $this->eventDispatcher->dispatch(
                     Events::PRE_APPLY,
-                    new Event(Events::PRE_APPLY, $package, $source, $description)
+                    new Event(Events::PRE_APPLY, $package, $source, $label)
                 );
+                
+                $this->patchApplier->applyFile($path, $installPath, $config);
 
-                if (file_exists($source)) {
-                    $filename = realpath($source);
-                } else {
-                    $filename = uniqid('/tmp/') . '.patch';
-                    $hostname = parse_url($source, PHP_URL_HOST);
-
-                    $this->downloader->copy($hostname, $source, $filename, false);
-                }
-
-                $this->patchApplier->applyFile($filename, $installPath, $config);
-
-                if (isset($hostname)) {
-                    unset($hostname);
-                    unlink($filename);
-                }
+                $appliedPatches[$source] = $patchInfo;
 
                 $this->eventDispatcher->dispatch(
                     Events::POST_APPLY,
-                    new Event(Events::POST_APPLY, $package, $source, $description)
+                    new Event(Events::POST_APPLY, $package, $source, $label)
                 );
-
-                $appliedPatches[$relativePath] = $patchInfo;
             } catch (\Exception $exception) {
                 $this->logger->writeException($exception);
                 
                 $this->failureHandler->execute(
                     $exception->getMessage(),
-                    $relativePath
+                    $source
                 );
             } finally {
+                if ($isRemotePatch) {
+                    unlink($path);
+                }
+                
                 $this->logger->reset($loggerIndentation);
             }
         }

@@ -489,16 +489,20 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 
 List of generalized changes for each release.
 
-### 3.20.0 (upcoming)
+### 3.20.0 (upcoming release)
 
-* Feature: allow patches-file to be defined under patches key.
-* Feature: allow root path declarations to indicate from where the patches should be taken.
-* Feature: allow downloading of patch files even when 'secure-http' is enabled.
 * Feature: display the patch applying for only those patches that were either changed or were freshly 
   introduced (currently showing everything due to package being reset before patch applier targets it).
 * Feature: support for md5 validation of a patch file.
-* Feature: support for OS specific configuration overrides.
-* Maintenance: documentation simplified. Using comments in examples to explain what certain declaration does.
+
+* Feature: support for OS-specific configuration overrides.
+* Feature: allow patches root folders to be configured.
+* Feature: allow download folder for remote patches to be configured.
+* Feature: allow patches-file to be defined under patches key.
+
+* Fix: remote patches treated as if they're local patch files.
+* Maintenance: moved patch downloading to be done before any patches are applied.
+* Maintenance: documentation simplified. Using comments in examples to explain what certain config does.
 
 ### 3.19.4
 

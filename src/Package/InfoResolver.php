@@ -22,12 +22,12 @@ class InfoResolver
     ) {
         $this->installationManager = $installationManager;
     }
-
+    
     public function getSourcePath(\Composer\Package\PackageInterface $package)
     {
         return !$package instanceof \Composer\Package\RootPackage
             ? $this->installationManager->getInstallPath($package)
-            : self::DEFAULT_PATH;
+            : realpath(dirname(\Composer\Factory::getComposerFile()));
     }
     
     public function resolveNamesFromPaths(array $packagesByName, array $paths)

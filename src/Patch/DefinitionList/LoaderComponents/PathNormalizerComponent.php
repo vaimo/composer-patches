@@ -10,17 +10,17 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class PathNormalizerComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
     /**
-     * @var \Composer\Installer\InstallationManager
+     * @var \Vaimo\ComposerPatches\Package\InfoResolver
      */
-    private $installationManager;
+    private $packageInfoResolver;
 
     /**
-     * @param \Composer\Installer\InstallationManager $installationManager
+     * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
      */
     public function __construct(
-        \Composer\Installer\InstallationManager $installationManager
+        \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
     ) {
-        $this->installationManager = $installationManager;
+        $this->packageInfoResolver = $packageInfoResolver;
     }
 
     /**
@@ -32,30 +32,29 @@ class PathNormalizerComponent implements \Vaimo\ComposerPatches\Interfaces\Defin
     public function process(array $patches, array $packagesByName, $vendorRoot)
     {
         foreach ($patches as $targetPackage => &$packagePatches) {
-            foreach ($packagePatches as &$patchData) {
-                if ($patchData[PatchDefinition::OWNER_IS_ROOT]) {
+            foreach ($packagePatches as &$data) {
+                if ($data[PatchDefinition::URL]) {
                     continue;
                 }
-
-                $patchOwner = $patchData[PatchDefinition::OWNER];
+                
+                $patchOwner = $data[PatchDefinition::OWNER];
 
                 if (!isset($packagesByName[$patchOwner])) {
                     continue;
                 }
 
-                $patchOwnerPackage = $packagesByName[$patchOwner];
+                $path = $data[PatchDefinition::SOURCE];
+                
+                $ownerPath = $this->packageInfoResolver->getSourcePath($packagesByName[$patchOwner]);
 
-                $packageInstaller = $this->installationManager->getInstaller($patchOwnerPackage->getType());
-                $patchOwnerPath = $packageInstaller->getInstallPath($patchOwnerPackage);
-
-                $absolutePatchPath = $patchOwnerPath . DIRECTORY_SEPARATOR . $patchData[PatchDefinition::SOURCE];
-
-                if (strpos($absolutePatchPath, $vendorRoot) === 0) {
-                    $patchData[PatchDefinition::SOURCE] = trim(
-                        substr($absolutePatchPath, strlen($vendorRoot)),
+                if (strpos($path, $vendorRoot) === 0) {
+                    $path = trim(
+                        substr($path, strlen($vendorRoot)),
                         DIRECTORY_SEPARATOR
                     );
                 }
+                
+                $data[PatchDefinition::PATH] = $ownerPath . DIRECTORY_SEPARATOR . $path;
             }
         }
 

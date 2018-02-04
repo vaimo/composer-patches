@@ -20,7 +20,14 @@ class PatchListUtils
                         $patchesByTarget[$target] = array();
                     }
 
-                    $patchesByTarget[$target][$patchPath] = $patchInfo[PatchDefinition::LABEL];
+                    $path = $patchInfo['url'] ? $patchInfo['url'] : $patchPath;
+                    
+                    $patchesByTarget[$target][$path] = sprintf(
+                        '%s, %s:%s', 
+                        $patchInfo[PatchDefinition::LABEL], 
+                        PatchDefinition::HASH, 
+                        $patchInfo[PatchDefinition::HASH]
+                    );
                 }
             }
         }

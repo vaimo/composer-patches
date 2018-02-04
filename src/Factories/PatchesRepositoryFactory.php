@@ -14,6 +14,20 @@ use Vaimo\ComposerPatches\Patch;
 
 class PatchesRepositoryFactory
 {
+    /**
+     * @var \Composer\IO\IOInterface
+     */
+    private $io;
+
+    /**
+     * @param \Composer\IO\IOInterface $io
+     */
+    public function __construct(
+        \Composer\IO\IOInterface $io
+    ) {
+        $this->io = $io;
+    }
+
     public function create(\Composer\Composer $composer, PluginConfig $pluginConfig, $devMode = false) 
     {
         $packagesRepository = $composer->getRepositoryManager()->getLocalRepository();
@@ -24,6 +38,8 @@ class PatchesRepositoryFactory
         $extra = $composer->getPackage()->getExtra();
         
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
+
+        $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
         
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
         
@@ -78,8 +94,9 @@ class PatchesRepositoryFactory
                 : false,
             new LoaderComponents\LocalExcludeComponent(),
             new LoaderComponents\CustomExcludeComponent($pluginConfig->getSkippedPackages()),
-            new LoaderComponents\PathNormalizerComponent($installationManager),
+            new LoaderComponents\PathNormalizerComponent($packageInfoResolver),
             new LoaderComponents\ConstraintsComponent(),
+            new LoaderComponents\DownloaderComponent($downloader),
             new LoaderComponents\ValidatorComponent(),
             new LoaderComponents\SimplifierComponent(),
             new LoaderComponents\TargetsResolverComponent($packageInfoResolver)

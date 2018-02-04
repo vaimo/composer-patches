@@ -176,6 +176,7 @@ class PatchesApplier
 
             try {
                 $appliedPatches = $this->patchApplier->applyPatches($package, $packagePatchesQueue);
+                
                 $this->patcherStateManager->registerAppliedPatches($packageRepository, $appliedPatches);
                 
                 $this->logger->reset($subProcessIndentation);

@@ -24,12 +24,12 @@ class SimplifierComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
 
             foreach ($packagePatches as $info) {
                 $allPatches[$patchTarget][$info[PatchDefinition::SOURCE]] = array(
+                    PatchDefinition::URL => $info[PatchDefinition::URL],
+                    PatchDefinition::PATH => $info[PatchDefinition::PATH],
+                    PatchDefinition::OWNER => $info[PatchDefinition::OWNER],
                     PatchDefinition::TARGETS => $info[PatchDefinition::TARGETS],
-                    PatchDefinition::LABEL => $info[PatchDefinition::LABEL] . (
-                        isset($info[PatchDefinition::HASH])
-                            ? sprintf(', %s:%s', PatchDefinition::HASH, $info[PatchDefinition::HASH])
-                            : ''
-                        ),
+                    PatchDefinition::HASH => isset($info[PatchDefinition::HASH]) ? $info[PatchDefinition::HASH] : '',
+                    PatchDefinition::LABEL => $info[PatchDefinition::LABEL],
                     PatchDefinition::CONFIG => $info[PatchDefinition::CONFIG]
                 );
             }

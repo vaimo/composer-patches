@@ -37,7 +37,6 @@ class PatchesApplierFactory
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
 
         $logger = new \Vaimo\ComposerPatches\Logger($this->io);
-        $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
         
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
         
@@ -55,7 +54,6 @@ class PatchesApplierFactory
         $packagePatchApplier = new \Vaimo\ComposerPatches\Package\PatchApplier(
             $packageInfoResolver,
             $eventDispatcher,
-            $downloader,
             $failureHandler,
             $logger,
             $patchApplier,

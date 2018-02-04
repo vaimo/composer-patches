@@ -16,6 +16,11 @@ class PatcherStateManager
      * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
+     */
+    private $patchListUtils;
     
     /**
      * @var array
@@ -25,6 +30,7 @@ class PatcherStateManager
     public function __construct()
     {
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
+        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
     
     public function extractAppliedPatchesInfo(WritableRepositoryInterface $repository)
@@ -60,25 +66,26 @@ class PatcherStateManager
     {
         $packages = array();
 
-        foreach ($patches as $source => $patchInfo) {
-            foreach ($patchInfo[PatchDefinition::TARGETS] as $target) {
-                if (!$package = $repository->findPackage($target, Constraint::ANY)) {
-                    continue;
-                }
-                
-                /** @var \Composer\Package\CompletePackage $package */
-                $package = $this->packageUtils->getRealPackage($package);
-                
-                $info = array_replace_recursive($package->getExtra(), array(
-                    PluginConfig::APPLIED_FLAG => array(
-                        $source => $patchInfo[PatchDefinition::LABEL]
-                    )
-                ));
-                
-                $package->setExtra($info);
-
-                $packages[] = $package;
+        $patchQueue = $this->patchListUtils->createSimplifiedList(
+            array($patches)
+        );
+        
+        foreach ($patchQueue as $target => $patches) {
+            if (!$package = $repository->findPackage($target, Constraint::ANY)) {
+                continue;
             }
+
+            /** @var \Composer\Package\CompletePackage $package */
+            $package = $this->packageUtils->getRealPackage($package);
+
+            $info = array_replace_recursive(
+                $package->getExtra(),
+                array(PluginConfig::APPLIED_FLAG => $patches)
+            );
+
+            $package->setExtra($info);
+
+            $packages[] = $package;
         }
 
         foreach ($packages as $package) {

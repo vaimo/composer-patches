@@ -53,7 +53,7 @@ class Applier
     public function applyFile($filename, $cwd, array $config = array())
     {
         $result = false;
-
+        
         list($type, $patchLevel, $operationName) = array_fill(0, 3, 'UNKNOWN');
 
         $applierConfig = $this->applierUtils->mergeApplierConfig(

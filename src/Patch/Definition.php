@@ -10,6 +10,7 @@ class Definition
     const BUNDLE_TARGET = '*';
     
     const SOURCE = 'source';
+    const PATH = 'path';
     const URL = 'url';
     const LABEL = 'label';
     const DEPENDS = 'depends';
