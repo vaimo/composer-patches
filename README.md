@@ -500,6 +500,8 @@ List of generalized changes for each release.
 * Feature: allow download folder for remote patches to be configured.
 * Feature: allow patches-file to be defined under patches key.
 
+### 3.19.5
+
 * Fix: remote patches treated as if they're local patch files.
 * Maintenance: moved patch downloading to be done before any patches are applied.
 * Maintenance: documentation simplified. Using comments in examples to explain what certain config does.

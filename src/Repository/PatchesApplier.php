@@ -72,8 +72,10 @@ class PatchesApplier
     {
         $packagesUpdated = false;
 
-        $patches = $repository->getPatches($filters);
+        $this->logger->write('info', 'Processing patches configuration');
 
+        $patches = $repository->getPatches($filters);
+        
         $resetQueue = $this->repositoryAnalyser->determinePackageResets(
             $repository->getSource(),
             $patches,
@@ -82,10 +84,6 @@ class PatchesApplier
 
         $patchQueue = $this->patchListUtils->createSimplifiedList($patches, $targets);
         
-        if ($resetQueue || $patches) {
-            $this->logger->write('info', 'Processing patches configuration');
-        }
-
         $packages = $repository->getTargets();
 
         $loggerIndentation = $this->logger->push('-');
