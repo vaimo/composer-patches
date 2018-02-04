@@ -9,7 +9,12 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class LocalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
-    public function process(array $patches, array $packagesByName, $vendorRoot)
+    /**
+     * @param array $patches
+     * @param \Composer\Package\PackageInterface[] $packagesByName
+     * @return array
+     */
+    public function process(array $patches, array $packagesByName)
     {
         foreach ($patches as $targetPackageName => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {

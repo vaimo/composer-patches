@@ -32,29 +32,21 @@ class Loader
     private $listSources;
 
     /**
-     * @var string
-     */
-    private $vendorRoot;
-
-    /**
      * @param \Vaimo\ComposerPatches\Package\Collector $packagesCollector
      * @param \Vaimo\ComposerPatches\Patch\Collector $patchesCollector
      * @param ListLoader[] $processors
      * @param PatchSourceListInterface[] $listSources
-     * @param string $vendorRoot
      */
     public function __construct(
         \Vaimo\ComposerPatches\Package\Collector $packagesCollector,
         \Vaimo\ComposerPatches\Patch\Collector $patchesCollector,
         array $processors,
-        array $listSources,
-        $vendorRoot
+        array $listSources
     ) {
         $this->packagesCollector = $packagesCollector;
         $this->patchesCollector = $patchesCollector;
         $this->processors = $processors;
         $this->listSources = $listSources;
-        $this->vendorRoot = $vendorRoot;
     }
     
     public function loadFromPackagesRepository(PackageRepository $repository)
@@ -68,13 +60,11 @@ class Loader
             },
             array()
         );
-
-        $vendorRoot = $this->vendorRoot;
         
         return array_reduce(
             $this->processors,
-            function (array $patches, ListLoader $listLoader) use ($packages, $vendorRoot) {
-                return $listLoader->process($patches, $packages, $vendorRoot);
+            function (array $patches, ListLoader $listLoader) use ($packages) {
+                return $listLoader->process($patches, $packages);
             },
             $this->patchesCollector->collect(array_unique($sources))
         );

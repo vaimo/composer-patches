@@ -12,32 +12,29 @@ class ValidatorComponent implements \Vaimo\ComposerPatches\Interfaces\Definition
     /**
      * @param array $patches
      * @param \Composer\Package\PackageInterface[] $packagesByName
-     * @param string $vendorRoot
      * @return array
      */
-    public function process(array $patches, array $packagesByName, $vendorRoot)
+    public function process(array $patches, array $packagesByName)
     {
         $validatedPatches = array();
 
         foreach ($patches as $patchTarget => $packagePatches) {
             $validItems = array();
 
-            foreach ($packagePatches as $patch) {
-                $relativePath = $patch[PatchDefinition::SOURCE];
-                $absolutePatchPath = $vendorRoot . DIRECTORY_SEPARATOR . $relativePath;
-                
-                $patchPath = file_exists($absolutePatchPath)
-                    ? $absolutePatchPath
-                    : $relativePath;
-                
-                $patch[PatchDefinition::HASH] = md5(implode('|', array(
-                    file_exists($patchPath) ? md5_file($patchPath) : md5($patchPath),
-                    serialize($patch[PatchDefinition::DEPENDS]),
-                    serialize($patch[PatchDefinition::TARGETS]),
-                    serialize($patch[PatchDefinition::CONFIG])
-                )));
+            foreach ($packagePatches as $data) {
+                $path = $data[PatchDefinition::PATH];
 
-                $validItems[] = $patch;
+                $uidSources = array(
+                    file_exists($path) ? md5_file($path) : '',
+                    md5($data['source']),
+                    serialize($data[PatchDefinition::DEPENDS]),
+                    serialize($data[PatchDefinition::TARGETS]),
+                    serialize($data[PatchDefinition::CONFIG])
+                );
+                
+                $data[PatchDefinition::HASH] = md5(implode('|', $uidSources));
+
+                $validItems[] = $data;
             }
 
             if (!$validItems) {

@@ -22,8 +22,13 @@ class BundleComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
     ) {
         $this->rootPackage = $rootPackage;
     }
-    
-    public function process(array $patches, array $packagesByName, $vendorRoot)
+
+    /**
+     * @param array $patches
+     * @param \Composer\Package\PackageInterface[] $packagesByName
+     * @return array
+     */
+    public function process(array $patches, array $packagesByName)
     {
         $rootName = $this->rootPackage->getName();
         

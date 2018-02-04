@@ -37,8 +37,6 @@ class PatchesRepositoryFactory
 
         $extra = $composer->getPackage()->getExtra();
         
-        $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
-
         $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
         
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
@@ -137,8 +135,7 @@ class PatchesRepositoryFactory
             $packagesCollector,
             $patchesCollector,
             array_filter($loaderComponents),
-            array_intersect_key($listSources, array_filter($sourceConfig)),
-            $vendorRoot
+            array_intersect_key($listSources, array_filter($sourceConfig))
         );
         
         return new \Vaimo\ComposerPatches\Repositories\PatchesRepository(

@@ -10,8 +10,7 @@ interface DefinitionListLoaderComponentInterface
     /**
      * @param array $patches
      * @param \Composer\Package\PackageInterface[] $packagesByName
-     * @param string $vendorRoot
      * @return array
      */
-    public function process(array $patches, array $packagesByName, $vendorRoot);
+    public function process(array $patches, array $packagesByName);
 }

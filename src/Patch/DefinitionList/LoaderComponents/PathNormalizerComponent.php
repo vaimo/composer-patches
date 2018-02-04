@@ -26,10 +26,9 @@ class PathNormalizerComponent implements \Vaimo\ComposerPatches\Interfaces\Defin
     /**
      * @param array $patches
      * @param \Composer\Package\PackageInterface[] $packagesByName
-     * @param string $vendorRoot
      * @return array
      */
-    public function process(array $patches, array $packagesByName, $vendorRoot)
+    public function process(array $patches, array $packagesByName)
     {
         foreach ($patches as $targetPackage => &$packagePatches) {
             foreach ($packagePatches as &$data) {
@@ -43,16 +42,8 @@ class PathNormalizerComponent implements \Vaimo\ComposerPatches\Interfaces\Defin
                     continue;
                 }
 
-                $path = $data[PatchDefinition::SOURCE];
-                
                 $ownerPath = $this->packageInfoResolver->getSourcePath($packagesByName[$patchOwner]);
-
-                if (strpos($path, $vendorRoot) === 0) {
-                    $path = trim(
-                        substr($path, strlen($vendorRoot)),
-                        DIRECTORY_SEPARATOR
-                    );
-                }
+                $path = $data[PatchDefinition::SOURCE];
                 
                 $data[PatchDefinition::PATH] = $ownerPath . DIRECTORY_SEPARATOR . $path;
             }

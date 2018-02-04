@@ -21,7 +21,12 @@ class CustomExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
         $this->skippedPackageFlags = array_flip($skippedPackageFlags);
     }
 
-    public function process(array $patches, array $packagesByName, $vendorRoot)
+    /**
+     * @param array $patches
+     * @param \Composer\Package\PackageInterface[] $packagesByName
+     * @return array
+     */
+    public function process(array $patches, array $packagesByName)
     {
         foreach ($patches as $targetPackageName => &$packagePatches) {
             if (!isset($this->skippedPackageFlags[$targetPackageName])) {

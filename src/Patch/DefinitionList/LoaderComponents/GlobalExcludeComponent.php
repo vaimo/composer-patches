@@ -23,8 +23,13 @@ class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
     ) {
         $this->config = $config;
     }
-    
-    public function process(array $patches, array $packagesByName, $vendorRoot)
+
+    /**
+     * @param array $patches
+     * @param \Composer\Package\PackageInterface[] $packagesByName
+     * @return array
+     */
+    public function process(array $patches, array $packagesByName)
     {
         $excludedPatches = array();
         

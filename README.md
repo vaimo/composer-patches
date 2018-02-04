@@ -494,7 +494,6 @@ List of generalized changes for each release.
 * Feature: display the patch applying for only those patches that were either changed or were freshly 
   introduced (currently showing everything due to package being reset before patch applier targets it).
 * Feature: support for md5 validation of a patch file.
-
 * Feature: support for OS-specific configuration overrides.
 * Feature: allow patches root folders to be configured.
 * Feature: allow download folder for remote patches to be configured.
