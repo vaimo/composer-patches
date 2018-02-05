@@ -177,7 +177,7 @@ There are several ways a version restriction for a patch can be defined, the cho
 ## Patches: version branching
 
 When there are almost identical patches for different version of some package, then they can be declared
-under same label like this:
+under same `label` or under `source` key depending on how complex rest of the declaration is.
 
 ```json
 {
@@ -187,7 +187,7 @@ under same label like this:
       ">=1.2.0": "current.patch"
     }
   },
-  "some/package": {
+  "some/other-package": {
     "same done for extended patch declaration format": {
       "source": {
         "1.0.* <1.2.0": "legacy.patch",
