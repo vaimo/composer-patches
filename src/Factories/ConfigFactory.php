@@ -29,7 +29,7 @@ class ConfigFactory
     {
         $defaults = $this->defaults->getPatcherConfig();
         $extra = $composer->getPackage()->getExtra();
-
+        
         if (isset($extra['patcher-config']) && !isset($extra[PluginConfig::PATCHER_CONFIG_ROOT])) {
             $extra[PluginConfig::PATCHER_CONFIG_ROOT] = $extra['patcher-config'];
         }

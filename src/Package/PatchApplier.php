@@ -23,7 +23,7 @@ class PatchApplier
     private $eventDispatcher;
 
     /**
-     * @var
+     * @var \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface
      */
     private $failureHandler;
 
@@ -84,22 +84,21 @@ class PatchApplier
         $appliedPatches = array();
 
         foreach ($patchesQueue as $source => $patchInfo) {
-            $isRemotePatch = (bool)$patchInfo[PatchDefinition::URL];
             $path = $patchInfo[PatchDefinition::PATH];
             $label = $patchInfo[PatchDefinition::LABEL];
             $config = $patchInfo[PatchDefinition::CONFIG];
-
-            $patchSourceLabel = sprintf(
-                '<info>%s</info>: %s', 
-                $patchInfo[PatchDefinition::OWNER], 
-                $source
-            );
             
-            $this->logger->writeRaw('%s', array($patchSourceLabel));
+            $this->logger->writeRaw(
+                '%s', 
+                array(sprintf('<info>%s</info>: %s', $patchInfo[PatchDefinition::OWNER], $source))
+            );
 
             $loggerIndentation = $this->logger->push();
 
-            $this->logger->writeRaw('<comment>%s</comment>', array($label));
+            $this->logger->writeRaw(
+                '<comment>%s</comment>', 
+                array($label)
+            );
             
             try {
                 $this->eventDispatcher->dispatch(
@@ -123,10 +122,6 @@ class PatchApplier
                     $source
                 );
             } finally {
-                if ($isRemotePatch) {
-                    unlink($path);
-                }
-                
                 $this->logger->reset($loggerIndentation);
             }
         }

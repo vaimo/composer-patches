@@ -179,8 +179,6 @@ class PatchesApplier
                 
                 $this->logger->reset($subProcessIndentation);
             } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
-                $this->logger->reset($loggerIndentation);
-
                 $failedPath = $exception->getFailedPatchPath();
 
                 $paths = array_keys($packagePatchesQueue);
@@ -188,7 +186,11 @@ class PatchesApplier
                 $appliedPatches = array_intersect_key($packagePatchesQueue, array_flip($appliedPaths));
                 
                 $this->patcherStateManager->registerAppliedPatches($packageRepository, $appliedPatches);
-                
+
+                $this->patchListUtils->sanitizeFileSystem($patches);
+
+                $this->logger->reset($loggerIndentation);
+
                 $repository->write();
 
                 throw $exception;
@@ -198,6 +200,8 @@ class PatchesApplier
         }
 
         $this->logger->reset($loggerIndentation);
+
+        $this->patchListUtils->sanitizeFileSystem($patches);
         
         if (!$packagesUpdated) {
             $this->logger->writeRaw('Nothing to patch');

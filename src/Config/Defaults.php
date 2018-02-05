@@ -12,6 +12,7 @@ class Defaults
     public function getPatcherConfig()
     {
         return array(
+            Config::PATCHER_SECURE_HTTP => true,
             Config::PATCHER_SOURCES => array(
                 'project' => true,
                 'packages' => true,

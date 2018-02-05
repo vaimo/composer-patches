@@ -40,5 +40,18 @@ class PatchListUtils
             $patchesByTarget,
             array_flip($targets)
         );
-    }    
+    } 
+    
+    public function sanitizeFileSystem(array $patches)
+    {
+        foreach ($patches as $patchGroup) {
+            foreach ($patchGroup as $patchPath => $patchInfo) {
+                if (!isset($patchInfo[PatchDefinition::TMP]) || !$patchInfo[PatchDefinition::TMP]) {
+                    continue;
+                }
+
+                unlink($patchInfo[PatchDefinition::PATH]);
+            }
+        }
+    }
 }

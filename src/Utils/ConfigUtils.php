@@ -11,6 +11,10 @@ class ConfigUtils
 {
     public function mergeApplierConfig(array $config, array $updates)
     {
+        if (isset($updates[Config::PATCHER_SECURE_HTTP])) {
+            $config[Config::PATCHER_SECURE_HTTP] = $updates[Config::PATCHER_SECURE_HTTP];
+        }
+        
         foreach ($config[Config::PATCHER_APPLIERS] as $code => $applier) {
             if (!isset($updates[Config::PATCHER_APPLIERS][$code])) {
                 continue;

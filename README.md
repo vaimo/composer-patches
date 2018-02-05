@@ -27,7 +27,9 @@ introducing two extra keys, where exact same rules apply as for normal patch dec
 
 The patches declared under those keys will not be applied when installing the project with `--no-dev` option.
 
-The examples in the topics of this readme are mostly given in the context of those hardpoints.
+The examples in the topics of this readme are mostly given in the context of those hard-points, 
+where the topic's first part (example: "Patches: sequenced patches") refers to configuration 
+options under `{"extra": {"patches": {}}}`.
 
 ## Basic Usage: configuring a patch
 
@@ -320,13 +322,14 @@ instead. Description is also not part of the exclusion logic.
 
 In case it's needed for the patcher to apply the patches using some third-party application or to include
 some extra options, it's possible to declare new patcher commands or override the existing ones by adding 
-a new section to the "extra" of the project's composer.json. Note that this example is a direct copy of what
-is built into the plugin. Changes to existing definitions are applied recursively.
+a new section to the "extra" of the composer.json of the project. Note that this example is a direct copy 
+of what is built into the plugin. Changes to existing definitions are applied recursively.
 
 _Note that by default, user does not really have to declare any of this, but everything can be overridden._ 
 
 ```json
 {
+  "secure-http": true,
   "sources": {
     "project": true,
     "packages": true,
@@ -360,7 +363,7 @@ _Note that by default, user does not really have to declare any of this, but eve
 ```
 
 Some things to point out on patcher configuration:
-
+ 
 1. Sequence dictates everything. If applier code or operation is not mentioned in sequence configuration, 
    it's not going to be taken into account. This means that users can easily override the whole standard
    configuration.
@@ -373,6 +376,9 @@ Some things to point out on patcher configuration:
    that 'bin' value will be the result of 'bin' operation. Note that if sequence places 'bin' after 'check' 
    or 'patch', then the former will be just removed from the template.
 6. The [[]] will indicate the value is used as-is, {{}} will make the value be shell-escaped.
+7. The remote patches are downloaded with same configuration as Composer packages, in case some patches are 
+   served over HTTP, developer can change the 'secure-http' key under patcher configuration to false. This
+   will NOT affect the configuration of the package downloader.
 
 Appliers are executed in the sequence dictated by sequence where several path levels are used with 
 validation until validation success is hit. Note that each applier will be visited before moving on to 
@@ -489,18 +495,16 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 
 List of generalized changes for each release.
 
-### 3.20.0 (upcoming release)
+### 3.20.0
 
-* Feature: display the patch applying for only those patches that were either changed or were freshly 
-  introduced (currently showing everything due to package being reset before patch applier targets it).
-* Feature: support for md5 validation of a patch file.
-* Feature: support for OS-specific configuration overrides.
-* Feature: allow patches root folders to be configured.
-* Feature: allow download folder for remote patches to be configured.
-* Feature: allow patches-file to be defined under patches key.
+* Feature: make it possible to allow patch download from HTTP (separate config from allowing this for packages).
+* Fix: fail early when some of the remote patches fail to download (only for patches that are actually required).
+* Fix: make sure that same patch file is not downloaded twice (might happen with bundled patches)
 
 ### 3.19.5
 
+* Fix: re-apply remote patch when it's contents have changed (download remote patches beforehand and make 
+  the decision based on the contents of the patch).
 * Fix: remote patches treated as if they're local patch files.
 * Maintenance: moved patch downloading to be done before any patches are applied.
 * Maintenance: documentation simplified. Using comments in examples to explain what certain config does.

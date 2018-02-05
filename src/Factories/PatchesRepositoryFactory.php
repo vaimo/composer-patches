@@ -33,10 +33,15 @@ class PatchesRepositoryFactory
         $packagesRepository = $composer->getRepositoryManager()->getLocalRepository();
         $installationManager = $composer->getInstallationManager();
         $rootPackage = $composer->getPackage();
-        $composerConfig = $composer->getConfig();
+        $composerConfig = clone $composer->getConfig();
 
         $extra = $composer->getPackage()->getExtra();
-        
+        $patcherConfig = $pluginConfig->getPatcherConfig();
+
+        $composerConfig->merge(array(
+            'config' => array('secure-http' => $patcherConfig[PluginConfig::PATCHER_SECURE_HTTP])
+        ));
+
         $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
         
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
@@ -94,14 +99,12 @@ class PatchesRepositoryFactory
             new LoaderComponents\CustomExcludeComponent($pluginConfig->getSkippedPackages()),
             new LoaderComponents\PathNormalizerComponent($packageInfoResolver),
             new LoaderComponents\ConstraintsComponent(),
-            new LoaderComponents\DownloaderComponent($downloader),
+            new LoaderComponents\DownloaderComponent($rootPackage, $downloader),
             new LoaderComponents\ValidatorComponent(),
-            new LoaderComponents\SimplifierComponent(),
-            new LoaderComponents\TargetsResolverComponent($packageInfoResolver)
+            new LoaderComponents\TargetsResolverComponent($packageInfoResolver),
+            new LoaderComponents\MergerComponent()
         );
-
-        $patcherConfig = $pluginConfig->getPatcherConfig();
-
+        
         $sourceConfig = $patcherConfig[PluginConfig::PATCHER_SOURCES];
 
         if (isset($sourceConfig['packages']) && isset($sourceConfig['vendors'])) {

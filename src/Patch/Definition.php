@@ -11,6 +11,7 @@ class Definition
     
     const SOURCE = 'source';
     const PATH = 'path';
+    const TMP = 'is_temporary';
     const URL = 'url';
     const LABEL = 'label';
     const DEPENDS = 'depends';
