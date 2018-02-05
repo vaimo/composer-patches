@@ -206,15 +206,15 @@ alternative patch definition format is recommended:
 ```json
 {
   "*": {
-    "fix for multiple modules": {
-      "source": "example/bundle.patch",
+    "fixes for multiple packages (packages explicitly mentioned)": {
+      "source": "example/bundled-fixes.patch",
       "targets": [
         "some/module",
         "other/module"
       ]
     },
-    "same as above, but targets are autoresolved from file": {
-      "source": "example/bundle.patch"
+    "same as above, but targets are auto-resolved from file contents": {
+      "source": "example/bundled-fixes.patch"
     }
   }
 }
@@ -224,7 +224,7 @@ Where the `example/bundle.patch` content would have file paths defined in follow
 
 ```diff
 --- some/module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ other/module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
++++ some/module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
 
 @@ -31,7 +31,7 @@
       */
@@ -235,12 +235,12 @@ Where the `example/bundle.patch` content would have file paths defined in follow
          /**
           * rest of the logic of the function
           */
---- some/module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ other/module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+--- other/module/Logic.php.org	2017-05-24 14:13:36.449522497 +0200
++++ other/module/Logic.php	2017-05-24 14:14:06.640560761 +0200
 
 @@ -31,7 +31,7 @@
       */
-     protected function someFunction($someArg)
+     protected function otherFunction($someArg)
      {
 -        $var1 = 123;
 +        $var1 = 456;
