@@ -27,9 +27,11 @@ introducing two extra keys, where exact same rules apply as for normal patch dec
 
 The patches declared under those keys will not be applied when installing the project with `--no-dev` option.
 
-The examples in the topics of this readme are mostly given in the context of those hard-points, 
-where the topic's first part (example: "Patches: sequenced patches") refers to configuration 
-options under `{"extra": {"patches": {}}}`.
+The examples (except in "Basic Usage") in this README are mostly given in the context of the hard-points, 
+where the first part of the topic refers to a specific hard-point under where the gives example belongs to. Some examples:
+
+  * "Patches: sequenced patches" => `{"extra": {"patches": {}}}`
+  * "Patcher: sources" => `{"extra": {"patcher": {}}}`
 
 ## Basic Usage: configuring a patch
 
