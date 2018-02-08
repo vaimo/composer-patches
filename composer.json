@@ -53,6 +53,11 @@
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true,
         "changelog": {
+            "3.22.4": {
+                "maintenance": [
+                    "package meta-data fixes. syntax error in composer.json"
+                ]
+            },
             "3.22.3": {
                 "fix": [
                     "incorrect re-applying of bundle patch after 'patch' command had been used to exclude it or when single bundle patch was explicitly targeted",
@@ -143,7 +148,7 @@
             "3.18.0": {
                 "feature": [
                     "several config keys renamed (patchers => appliers, patcher-config => patcher). Backwards compatible",
-                    "patch enabling moved under patcher/sources (project:bool, packages:bool|array, vendors:bool|array). Backwards compatible"
+                    "patch enabling moved under patcher/sources (project:bool, packages:bool|array, vendors:bool|array). Backwards compatible",
                     "allow granular patch sources inclusion (so that only some vendors would be included)",
                     "allow some providers to have special extra operations (before this change, every applier was expected to have every listed operation declared)"
                 ]
