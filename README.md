@@ -158,11 +158,11 @@ you can use partial names (instead of using full path) and wildcards to target p
 ```json
 {
   "targeted/package": {
-    "will be applied before my/other-file.patch": {
+    "will be applied after my/other-file.patch": {
       "source": "my/file.patch",
       "after": "other-file"
     },
-    "will be applied before my/file.patch": {
+    "some change to another targeted package": {
       "source": "my/other-file.patch"
     }
   }
@@ -522,6 +522,10 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.22.1
+
+* Fix: minor architecture changes around filtering patch files / packages.
 
 ### 3.22.0
 

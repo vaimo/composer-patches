@@ -83,6 +83,7 @@ class PatchesApplier
         $patches = $repository->getPatches();
         
         $resetQueue = $this->repositoryAnalyser->determinePackageResets($repository->getSource(), $patches);
+        
         $patchQueue = $this->patchListUtils->createSimplifiedList($patches);
 
         if ($filters) {
@@ -106,8 +107,14 @@ class PatchesApplier
             }            
         }
         
-        foreach ($patchQueue as $packageName => $packagePatches) {
-            $patches[$packageName] = array_intersect_key($patches[$packageName], $packagePatches); 
+        if ($filters || $targets) {
+            foreach ($patchQueue as $packageName => $packagePatches) {
+                if (!isset($patches[$packageName])) {
+                    continue;
+                }
+                
+                $patches[$packageName] = array_intersect_key($patches[$packageName], $packagePatches);
+            }   
         }
         
         $packages = $repository->getTargets();
