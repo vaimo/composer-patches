@@ -6,7 +6,7 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-use Vaimo\ComposerPatches\Config as PluginConfig;
+use Vaimo\ComposerPatches\Utils\FilterUtils;
 
 class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
@@ -16,12 +16,19 @@ class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
     private $config;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\FilterUtils
+     */
+    private $filterUtils;
+
+    /**
      * @param array $config
      */
     public function __construct(
         array $config
     ) {
         $this->config = $config;
+        
+        $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
     }
 
     /**
@@ -33,28 +40,36 @@ class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
     {
         $excludedPatches = array();
         
-        if (isset($this->config[PluginConfig::EXCLUDED_PATCHES])) {
-            foreach ($this->config[PluginConfig::EXCLUDED_PATCHES] as $patchOwner => $patchPaths) {
-                if (!isset($excludedPatches[$patchOwner])) {
-                    $excludedPatches[$patchOwner] = array();
-                }
-
-                $excludedPatches[$patchOwner] = array_flip($patchPaths);
+        foreach ($this->config as $patchOwner => $patchPaths) {
+            if (!isset($excludedPatches[$patchOwner])) {
+                $excludedPatches[$patchOwner] = array();
             }
+            
+            if (!$patchPaths) {
+                continue;
+            }
+            
+            $excludedPatches[$patchOwner] = $this->filterUtils->composeRegex($patchPaths, '/');
         }
 
         if (!$excludedPatches) {
             return $patches;
         }
-        
+
         foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
                 $owner = $patchData[PatchDefinition::OWNER];
                 $source = $patchData[PatchDefinition::SOURCE];
-                
-                if (isset($excludedPatches[$owner][$source])) {
-                    $patchData = false;
+
+                if (!isset($excludedPatches[$owner])) {
+                    continue;
                 }
+                
+                if (!preg_match($excludedPatches[$owner], $source)) {
+                    continue;
+                }
+
+                $patchData = false;
             }
 
             $packagePatches = array_filter($packagePatches);

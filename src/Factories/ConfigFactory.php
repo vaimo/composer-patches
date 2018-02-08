@@ -46,7 +46,7 @@ class ConfigFactory
             $this->getOperationSystemFamily(),
             '',
         );
-        
+         
         foreach (array_unique($subConfigKeys) as $key) {
             $configRootKey = PluginConfig::PATCHER_CONFIG_ROOT . ($key ? ('-' . $key) : '');
 

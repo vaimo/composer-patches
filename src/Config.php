@@ -14,8 +14,8 @@ class Config
     const DEV_LIST = 'patches-dev';
     const FILE = 'patches-file';
     const DEV_FILE = 'patches-file-dev';
-    
-    const EXCLUDED_PATCHES = 'excluded-patches';
+ 
+    const EXCLUDED_PATCHES = 'patches-exclude';
     
     const APPLIED_FLAG = 'patches_applied';
     const PATCHER_PLUGIN_MARKER = 'patcher_plugin';

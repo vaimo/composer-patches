@@ -16,7 +16,7 @@ either a project or a package.
   "extra": {
     "patches": {},
     "patches-file": {},
-    "excluded-patches": {},
+    "patches-exclude": {},
     "patcher": {}
   }
 }
@@ -32,7 +32,25 @@ where the first part of the topic refers to a specific hard-point under where th
 
   * _Patches: sequenced patches_ => `{"extra": {"patches": {}}}`
   * _Patcher: sources_ => `{"extra": {"patcher": {}}}`
+  
+## Configuration: OS overrides
 
+Achieved by prefixing the patcher config key with general operation-system name.
+ 
+```json
+{
+   "extra": {
+     "patcher-windows": {},
+     "patcher-bsd": {},
+     "patcher-linux": {}   
+   }
+}
+```
+
+The contents of each of these keys follows the same structure as described in `Patcher: configuration` and
+will be merged into the default configuration (or into configuration overrides that are defined under
+the general `patcher` key).
+  
 ## Basic Usage: configuring a patch
 
 Same format is used for both project (root level scope) patches and for package patches.
@@ -135,14 +153,14 @@ to "false".
 ## Patches: sequenced patches
 
 In case it's important to apply certain patches in a certain order, use before/after directives. Note that 
-you can use partial names and wildcards to target patches. 
+you can use partial names (instead of using full path) and wildcards to target patches. 
 
 ```json
 {
   "targeted/package": {
     "will be applied before my/other-file.patch": {
       "source": "my/file.patch",
-      "after": "other-fil"
+      "after": "other-file"
     },
     "will be applied before my/file.patch": {
       "source": "my/other-file.patch"
@@ -286,7 +304,7 @@ declaration lines.
 }
 ```
 
-## Excluded Patches: configuration
+## Patches Exclude: configuration
 
 In case some patches that are defined in packages have to be excluded from the project (project has 
 custom versions of the files, conflicts with other patches, etc), exclusions records can be defined 
@@ -294,15 +312,16 @@ in the project's composer.json:
 
 ```json
 {
-  "extra": {
-    "excluded-patches": {
-      "patch/owner": [
-        "example.patch"
-      ]
-    }
-  }
+  "patch/owner": [
+    "some/path/example.patch",
+    "example.patch",
+    "example",
+    "ex*ple"
+  ]
 }
 ```
+ 
+Note that all of the exclusion listed above are valid ways of excluding patches.
 
 Will exclude the a patch that was defined in a package in following (or similar) manner ...
 
@@ -312,7 +331,7 @@ Will exclude the a patch that was defined in a package in following (or similar)
   "extra": {
     "patches": {
       "targeted/package": {
-        "fix description": "example.patch"
+        "fix description": "some/path/example.patch"
       }
     }
   }
@@ -320,7 +339,7 @@ Will exclude the a patch that was defined in a package in following (or similar)
 ```
 
 The important part to note here is to remember that exclusion ignores patch target and focuses on the owner
-instead. Description is also not part of the exclusion logic.
+instead.
 
 ## Patcher: configuration
 
@@ -389,23 +408,6 @@ validation until validation success is hit. Note that each applier will be visit
 next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
-
-## Patcher: OS overrides
-
-Achieved by prefixing the patcher config key with general operation-system name.
- 
-```json
-{
-   "extra": true,
-   "patcher-windows": {},
-   "patcher-bsd": {},
-   "patcher-linux": {}
-}
-```
-
-The contents of each of these keys follows the same structure as described in `Patcher: configuration` and
-will be merged into the default configuration (or into configuration overrides that are defined under
-the general `patcher` key).
 
 ## Patcher: sources
 
@@ -517,6 +519,14 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.22.0
+
+* Feature: allow patch exclusions based on partial paths.
+* Feature: renamed 'excluded-patches' to 'patches-exclude' to follow similar naming convention through-out 
+  the configuration for the plugin. Backwards compatible.
+* Fix: patch exclusion failed to kick in due to bad configuration pass-down from factory to the component
+  that is responsible for the exclusion.
 
 ### 3.21.0
 

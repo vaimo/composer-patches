@@ -86,15 +86,17 @@ class PatchesRepositoryFactory
             $loaders
         );
         
+        if (isset($extra['excluded-patches']) && !isset($extra[PluginConfig::EXCLUDED_PATCHES])) {
+            $extra[PluginConfig::EXCLUDED_PATCHES] = $extra['excluded-patches'];
+        }
+            
         $excludes = isset($extra[PluginConfig::EXCLUDED_PATCHES]) 
             ? $extra[PluginConfig::EXCLUDED_PATCHES]
             : array();
         
         $loaderComponents = array(
             new LoaderComponents\BundleComponent($rootPackage),
-            $excludes 
-                ? new LoaderComponents\GlobalExcludeComponent($extra[PluginConfig::EXCLUDED_PATCHES])
-                : false,
+            $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,
             new LoaderComponents\LocalExcludeComponent(),
             new LoaderComponents\CustomExcludeComponent($pluginConfig->getSkippedPackages()),
             new LoaderComponents\PathNormalizerComponent($packageInfoResolver),
