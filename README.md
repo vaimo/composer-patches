@@ -260,14 +260,14 @@ Where the `example/bundle.patch` content would have file paths defined in follow
 --- other/module/Logic.php.org	2017-05-24 14:13:36.449522497 +0200
 +++ other/module/Logic.php	2017-05-24 14:14:06.640560761 +0200
 
-@@ -31,7 +31,7 @@
+@@ -67,7 +67,7 @@
       */
-     protected function otherFunction($someArg)
+     protected function otherFunction()
      {
--        $var1 = 123;
-+        $var1 = 456;
+-        $label = 'old';
++        $label = 'new';
          /**
-          * rest of the logic of the function
+          * some implementation
           */
 ```
 
@@ -497,7 +497,6 @@ having to trigger 'composer update' or 'composer install'.
 
 ## Environment Variables
 
-* COMPOSER_PATCHES_REAPPLY_ALL - will force all patches to be re-applied
 * COMPOSER_PATCHES_FATAL_FAIL - exit after first patch failure is encountered
 * COMPOSER_PATCHES_SKIP_PACKAGES - comma-separated package names to exclude from patching, useful 
   when maintaining patches on package upgrade. Does not affect bundled patches.
