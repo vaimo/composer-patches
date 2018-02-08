@@ -523,6 +523,11 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 
 List of generalized changes for each release.
 
+### 3.22.2
+
+* Fix: bundled patch targets resolver failing due to patch info loaders being re-arranged and certain 
+  array values no longer being available (patch path not available as array keys).
+
 ### 3.22.1
 
 * Fix: minor architecture changes around filtering patch files / packages.

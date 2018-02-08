@@ -29,7 +29,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
 
         $this->patchAnalyser = new \Vaimo\ComposerPatches\Patch\Analyser();
     }
-    
+
     /**
      * @param array $patches
      * @param \Composer\Package\PackageInterface[] $packagesByName
@@ -38,18 +38,17 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
     public function process(array $patches, array $packagesByName)
     {
         foreach ($patches as $patchTarget => $packagePatches) {
-            foreach ($packagePatches as $patch => $info) {
-                $targets = isset($info[PatchDefinition::TARGETS]) 
-                    ? $info[PatchDefinition::TARGETS] 
+            foreach ($packagePatches as $index => $info) {
+                $targets = isset($info[PatchDefinition::TARGETS])
+                    ? $info[PatchDefinition::TARGETS]
                     : array();
-                
+
                 if (count($targets) > 1 || reset($targets) != PatchDefinition::BUNDLE_TARGET) {
                     continue;
                 }
-                
-                $path = $this->packageInfoResolver->getSourcePath($packagesByName[$patchTarget]) 
-                    . DIRECTORY_SEPARATOR . $patch;
-                
+
+                $path = $info['path'];
+
                 if (!file_exists($path)) {
                     continue;
                 }
@@ -57,15 +56,15 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                 $paths = $this->patchAnalyser->getAllPaths(
                     file_get_contents($path)
                 );
-                
+
                 if (!$targets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths)) {
                     continue;
                 }
 
-                $patches[$patchTarget][$patch][PatchDefinition::TARGETS] = $targets;
+                $patches[$patchTarget][$index][PatchDefinition::TARGETS] = array_unique($targets);
             }
         }
-        
+
         return $patches;
     }
 }
