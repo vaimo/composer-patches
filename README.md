@@ -469,6 +469,9 @@ composer patch --redo
 # Re-apply patches for one speicif package
 composer patch --redo my/package 
 
+# Re-apply all patches except patches declared against my/package
+composer patch --redo '!my/package'
+
 # Re-apply patches for one specific package with patch name filter 
 composer patch --filter wrong-time-format --filter other-file --redo my/package 
 
