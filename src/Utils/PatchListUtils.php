@@ -32,14 +32,7 @@ class PatchListUtils
             }
         }
 
-        if (!$targets) {
-            return $patchesByTarget;
-        }
-
-        return array_intersect_key(
-            $patchesByTarget,
-            array_flip($targets)
-        );
+        return $patchesByTarget;
     } 
     
     public function sanitizeFileSystem(array $patches)

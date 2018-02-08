@@ -134,23 +134,25 @@ to "false".
 
 ## Patches: sequenced patches
 
-In case it's important to apply the patches in a certain order, use an array wrapper around the patch definitions.
+In case it's important to apply certain patches in a certain order, use before/after directives. Note that 
+you can use partial names and wildcards to target patches. 
 
 ```json
 {
-  "targeted/package": [
-    {
-      "label": "will be applied before other/file.patch",
-      "source": "my/file.patch"
+  "targeted/package": {
+    "will be applied before my/other-file.patch": {
+      "source": "my/file.patch",
+      "after": "other-fil"
     },
-    {
-      "label": "will be applied after my/file.patch",
-      "source": "other/file.patch"
+    "will be applied before my/file.patch": {
+      "source": "my/other-file.patch"
     }
-  ]
+  }
 }
 
 ```
+
+Multiple dependencies can be defined when after/before value given as an array.
 
 ## Patches: version restriction
 
@@ -388,6 +390,23 @@ next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
 
+## Patcher: OS overrides
+
+Achieved by prefixing the patcher config key with general operation-system name.
+ 
+```json
+{
+   "extra": true,
+   "patcher-windows": {},
+   "patcher-bsd": {},
+   "patcher-linux": {}
+}
+```
+
+The contents of each of these keys follows the same structure as described in `Patcher: configuration` and
+will be merged into the default configuration (or into configuration overrides that are defined under
+the general `patcher` key).
+
 ## Patcher: sources
 
 These flags allow developer to have more control over the patch collector and omit certain sources when
@@ -448,11 +467,11 @@ composer patch --redo
 # Re-apply patches for one speicif package
 composer patch --redo my/package 
 
-# Re-apply patches for one speicif package with patch name filter 
+# Re-apply patches for one specific package with patch name filter 
 composer patch --filter wrong-time-format --filter other-file --redo my/package 
 
-# Re-apply patches and skip filenames that contain 'wrong<anything>format'  
-composer patch --filter '!wrong*format' --redo my/package 
+# Re-apply patches and skip filenames that contain 'some<anything>description'  
+composer patch --filter '!some*description' --redo my/package 
 
 # Reset all patched packages
 composer patch --undo 
@@ -467,7 +486,9 @@ composer patch --from-source
 composer patch --from-source --redo my/package
 ```
 
-The main purpose of this command is to make the maintenance of already created patches and adding new ones as easy as possible by allowing user to test out a patch directly right after defining it without having to trigger 'composer update' or 'composer install'.
+The main purpose of this command is to make the maintenance of already created patches and adding new 
+ones as easy as possible by allowing user to test out a patch directly right after defining it without 
+having to trigger 'composer update' or 'composer install'.
 
 ## Environment Variables
 
@@ -496,6 +517,14 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.21.0
+
+* Feature: patcher configuration overrides that depend on the OS.
+* Feature: topological sorting on patches to allow sequencing even when patches not defined by same owner 
+  or defined in different patch-list files.
+* Feature: allow fuzzy package name targeting with 'patch' command. 
+* Fix: the --filter argument to work similarly to how package filter narrows down on what is being targeted.
 
 ### 3.20.0
 

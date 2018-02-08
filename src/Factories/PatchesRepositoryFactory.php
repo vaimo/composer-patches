@@ -102,7 +102,8 @@ class PatchesRepositoryFactory
             new LoaderComponents\DownloaderComponent($rootPackage, $downloader),
             new LoaderComponents\ValidatorComponent(),
             new LoaderComponents\TargetsResolverComponent($packageInfoResolver),
-            new LoaderComponents\MergerComponent()
+            new LoaderComponents\MergerComponent(),
+            new LoaderComponents\SorterComponent()
         );
         
         $sourceConfig = $patcherConfig[PluginConfig::PATCHER_SOURCES];

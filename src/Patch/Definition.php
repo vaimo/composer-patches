@@ -22,6 +22,9 @@ class Definition
     const TARGETS = 'targets';
     const SKIP = 'skip';
 
+    const BEFORE = 'before';
+    const AFTER = 'after';
+    
     const CONFIG = 'config';
     const PATCHER = 'patcher';
     const LEVEL = 'level';

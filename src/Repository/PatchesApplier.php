@@ -44,6 +44,11 @@ class PatchesApplier
     private $packageUtils;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\FilterUtils
+     */
+    private $filterUtils;
+
+    /**
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param \Vaimo\ComposerPatches\Package\PatchApplier $patchApplier
      * @param \Vaimo\ComposerPatches\Repository\Analyser $repositoryAnalyser
@@ -65,6 +70,7 @@ class PatchesApplier
         $this->logger = $logger;
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
+        $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
@@ -74,15 +80,35 @@ class PatchesApplier
 
         $this->logger->write('info', 'Processing patches configuration');
 
-        $patches = $repository->getPatches($filters);
+        $patches = $repository->getPatches();
         
-        $resetQueue = $this->repositoryAnalyser->determinePackageResets(
-            $repository->getSource(),
-            $patches,
-            $targets
-        );
+        $resetQueue = $this->repositoryAnalyser->determinePackageResets($repository->getSource(), $patches);
+        $patchQueue = $this->patchListUtils->createSimplifiedList($patches);
 
-        $patchQueue = $this->patchListUtils->createSimplifiedList($patches, $targets);
+        if ($filters) {
+            if ($composedFilter = $this->filterUtils->composeRegex($filters, '/')) {
+                $patchQueue = array_filter(
+                    $this->filterUtils->filterBySubItemKeys($patchQueue, $composedFilter)
+                );
+
+                if (!$targets) {
+                    $targets = array_keys($patchQueue);
+                }
+            }
+        }
+        
+        if ($targets) {
+            if ($targetsFilter = $this->filterUtils->composeRegex($targets, '/')) {
+                $resetQueue = preg_grep($targetsFilter, $resetQueue);
+
+                $filterResult = $this->filterUtils->filterBySubItemKeys([$patchQueue], $targetsFilter);
+                $patchQueue = $filterResult[0];
+            }            
+        }
+        
+        foreach ($patchQueue as $packageName => $packagePatches) {
+            $patches[$packageName] = array_intersect_key($patches[$packageName], $packagePatches); 
+        }
         
         $packages = $repository->getTargets();
 
@@ -92,18 +118,18 @@ class PatchesApplier
             $hasPatches = !empty($patches[$packageName]);
             
             if ($hasPatches) {
-                $targets = array();
+                $patchTargets = array();
 
                 foreach ($patches[$packageName] as $patch) {
-                    $targets = array_merge($targets, $patch[PatchDefinition::TARGETS]);
+                    $patchTargets = array_merge($patchTargets, $patch[PatchDefinition::TARGETS]);
                 }
                 
-                $targets = array_unique($targets);
+                $patchTargets = array_unique($patchTargets);
             } else {
-                $targets = array($packageName);
+                $patchTargets = array($packageName);
             }
 
-            $itemsToReset = array_intersect($resetQueue, $targets);
+            $itemsToReset = array_intersect($resetQueue, $patchTargets);
             
             foreach ($itemsToReset as $targetName) {
                 if (!$hasPatches && !isset($patchQueue[$targetName])) {
@@ -127,14 +153,14 @@ class PatchesApplier
                 $packagesUpdated = $this->packageUtils->resetAppliedPatches($package);
             }
 
-            $resetQueue = array_diff($resetQueue, $targets);
+            $resetQueue = array_diff($resetQueue, $patchTargets);
 
             if (!$hasPatches) {
                 continue;
             }
             
             $hasPatchChanges = false;
-            foreach ($targets as $targetName) {
+            foreach ($patchTargets as $targetName) {
                 $targetQueue = isset($patchQueue[$targetName])
                     ? $patchQueue[$targetName]
                     : array();

@@ -7,6 +7,8 @@ namespace Vaimo\ComposerPatches\Utils;
 
 class FilterUtils
 {
+    const NEGATION_PREFIX = '!';
+    
     public function composeRegex(array $filters, $delimiter)
     {
         $negations = array();
@@ -15,14 +17,14 @@ class FilterUtils
         $escapeChar = chr('27');
         
         array_map(function ($filter) use ($delimiter, &$negations, &$affirmations, $escapeChar) {
-            $isNegation = substr($filter, 0, 1) == '!';
+            $isNegation = substr($filter, 0, 1) == self::NEGATION_PREFIX;
 
             $escapedFilter = trim(
                 str_replace(
                     $escapeChar,
                     '.*',
                     preg_quote(
-                        str_replace('*', $escapeChar, ltrim($filter,'!')),
+                        str_replace('*', $escapeChar, ltrim($filter, self::NEGATION_PREFIX)),
                         $delimiter
                     )
                 )
@@ -51,13 +53,11 @@ class FilterUtils
     public function filterBySubItemKeys($groups, $filter)
     {
         return array_map(function ($group) use ($filter) {
-            $keys = array_filter(array_keys($group), function ($path) use ($filter) {
-                return preg_match($filter, $path);
-            });
-
+            $matches = preg_grep($filter, array_keys($group));
+            
             return array_intersect_key(
                 $group,
-                array_flip($keys)
+                array_flip($matches)
             );
         }, $groups);
     }

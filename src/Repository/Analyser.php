@@ -38,23 +38,11 @@ class Analyser
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
     
-    public function determinePackageResets(
-        WritableRepositoryInterface $repository, array $patches, $targets = array()
-    ) {
+    public function determinePackageResets(WritableRepositoryInterface $repository, array $patches) 
+    {
         $packages = $this->packageCollector->collect($repository);
         $patchQueue = $this->patchListUtils->createSimplifiedList($patches);
         
-        $resetFlags = array_fill_keys(
-            $this->packagesResolver->resolve($patchQueue, $packages), 
-            false
-        );
-        
-        if (!$targets) {
-            return array_keys($resetFlags);
-        }
-        
-        return array_keys(
-            array_intersect_key($resetFlags, array_flip($targets))
-        );
+        return $this->packagesResolver->resolve($patchQueue, $packages);
     }
 }

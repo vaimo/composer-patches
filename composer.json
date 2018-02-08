@@ -22,6 +22,8 @@
     }, 
     "keywords": [
         "composer plugin", 
+        "os-specific config",
+        "configurable patch applier",
         "patching", 
         "version restriction", 
         "indirect restrictions", 
@@ -33,6 +35,7 @@
         "patch exclusion", 
         "development patches", 
         "hot-fixes", 
+        "back-ports",
         "environment flags", 
         "skipped packages", 
         "patch skipping", 
@@ -42,7 +45,8 @@
         "multi-version patches",
         "bundled patches",
         "patch command",
-        "patch from vendor"
+        "patch from vendor",
+        "utilities"
     ],
     "minimum-stability": "dev",      
     "extra": {

@@ -5,10 +5,6 @@
  */
 namespace Vaimo\ComposerPatches;
 
-use Vaimo\ComposerPatches\Factories\PatchesApplierFactory;
-use Vaimo\ComposerPatches\Factories\PatchesRepositoryFactory;
-use Vaimo\ComposerPatches\Factories\ConfigFactory;
-
 class Bootstrap
 {
     /**
@@ -20,21 +16,26 @@ class Bootstrap
      * @var array
      */
     private $config;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Factories\ConfigFactory
+     */
+    private $configFactory;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Factories\PatchesRepositoryFactory
+     */
+    private $repositoryFactory;
     
     /**
-     * @var PatchesApplierFactory
+     * @var \Vaimo\ComposerPatches\Factories\PatchesApplierFactory
      */
     private $applierFactory;
 
     /**
-     * @var PatchesRepositoryFactory
+     * @var \Vaimo\ComposerPatches\Utils\FilterUtils
      */
-    private $repositoryFactory;
-
-    /**
-     * @var Factories\ConfigFactory
-     */
-    private $configFactory;
+    private $filterUtils;
     
     /**
      * @param \Composer\Composer $composer
@@ -48,10 +49,12 @@ class Bootstrap
     ) {
         $this->composer = $composer;
         $this->config = $config;
+
+        $this->configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory();
+        $this->repositoryFactory = new \Vaimo\ComposerPatches\Factories\PatchesRepositoryFactory($io);
+        $this->applierFactory = new \Vaimo\ComposerPatches\Factories\PatchesApplierFactory($io);
         
-        $this->applierFactory = new PatchesApplierFactory($io);
-        $this->repositoryFactory = new PatchesRepositoryFactory($io);
-        $this->configFactory = new ConfigFactory();
+        $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
     }
 
     public function applyPatches($devMode = false, array $targets = array(), array $filters = array())
@@ -78,7 +81,7 @@ class Bootstrap
         
         $patchesApplier = $this->applierFactory->create($this->composer, $config);
         $repository = $this->repositoryFactory->create($this->composer, $config);
-
+        
         $patchesApplier->apply($repository, $targets);
     }
 }

@@ -72,6 +72,14 @@ class Normalizer
             );
         }
 
+        if (isset($data[Definition::BEFORE]) && !is_array($data[Definition::BEFORE])) {
+            $data[Definition::BEFORE] = array($data[Definition::BEFORE]);
+        }
+
+        if (isset($data[Definition::AFTER]) && !is_array($data[Definition::AFTER])) {
+            $data[Definition::AFTER] = array($data[Definition::AFTER]);
+        }
+        
         if (isset($data[Definition::LEVEL])) {
             $config = array_replace(
                 $config,
@@ -84,6 +92,8 @@ class Normalizer
         }
         
         return array(
+            Definition::BEFORE => isset($data[Definition::BEFORE]) ? $data[Definition::BEFORE] : array(),
+            Definition::AFTER => isset($data[Definition::AFTER]) ? $data[Definition::AFTER] : array(), 
             Definition::PATH => '',
             Definition::URL => $data[Definition::URL],
             Definition::SOURCE => $source,

@@ -21,11 +21,6 @@ class PatchesRepository
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Loader
      */
     private $definitionListLoader;
-    
-    /**
-     * @var \Vaimo\ComposerPatches\Utils\FilterUtils
-     */
-    private $filterUtils;
 
     /**
      * @param \Composer\Repository\WritableRepositoryInterface $packagesRepository
@@ -40,8 +35,6 @@ class PatchesRepository
         $this->packagesRepository = $packagesRepository;
         $this->packagesCollector = $packagesCollector;
         $this->definitionListLoader = $definitionListLoader;
-        
-        $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
     }
     
     public function getSource()
@@ -59,16 +52,8 @@ class PatchesRepository
         return $this->packagesCollector->collect($this->packagesRepository);
     }
     
-    public function getPatches($filters = array())
+    public function getPatches()
     {
-        $patches = $this->definitionListLoader->loadFromPackagesRepository($this->packagesRepository);
-        
-        if (!$filters) {
-            return $patches;
-        }
-
-        $composedFilter = $this->filterUtils->composeRegex($filters, '/');
-        
-        return $this->filterUtils->filterBySubItemKeys($patches, $composedFilter);
+        return $this->definitionListLoader->loadFromPackagesRepository($this->packagesRepository);
     }
 }

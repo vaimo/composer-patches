@@ -48,7 +48,7 @@ class ConfigFactory
         );
         
         foreach (array_unique($subConfigKeys) as $key) {
-            $configRootKey = PluginConfig::PATCHER_CONFIG_ROOT . $key ? ('-' . $key) : '';
+            $configRootKey = PluginConfig::PATCHER_CONFIG_ROOT . ($key ? ('-' . $key) : '');
 
             $patcherConfig = isset($extra[$configRootKey]) ? $extra[$configRootKey] : array();
 
