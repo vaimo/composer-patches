@@ -33,6 +33,7 @@ class Collector
     {
         $targets = array();
 
+        /** @var \Composer\Package\CompletePackageInterface[] $packages */        
         $packages = $repository->getPackages();
         
         foreach ($packages as $package) {
