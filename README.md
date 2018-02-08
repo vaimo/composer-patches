@@ -220,7 +220,7 @@ under same `label` or under `source` key depending on how complex rest of the de
 }
 ```
 
-## Patches: Bundled patches
+## Patches: bundled patches
 
 In case there's a need to define a patch that targets multiple packages within a single patch file, 
 alternative patch definition format is recommended:
@@ -484,6 +484,12 @@ composer patch --undo
 # Reset one specific patched package
 composer patch --undo my/package 
 
+# Reset one specific patch on package
+composer patch --undo --filter some-fix my/package
+
+# Reset packages that have patch that contains 'some-fix' in it's path definition
+composer patch --undo --filter some-fix
+
 # Gather patches information from /vendor instead of install.json
 composer patch --from-source
 
@@ -522,6 +528,14 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 ## Changelog 
 
 List of generalized changes for each release.
+
+### 3.22.3
+
+* Fix: incorrect re-applying of bundle patch after 'patch' command had been used to exclude it or when 
+  single bundle patch was explicitly targeted.
+* Fix: package not reset when using --filter (without --redo), even when targeted patches were a subset
+  of what was applied.
+* Fix: the --filter flag not properly respected when running 'patch' command with --undo. 
 
 ### 3.22.2
 

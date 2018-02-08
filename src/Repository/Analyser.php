@@ -7,6 +7,8 @@ namespace Vaimo\ComposerPatches\Repository;
 
 use Composer\Repository\WritableRepositoryInterface;
 
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+
 class Analyser
 {
     /**
@@ -44,5 +46,31 @@ class Analyser
         $patchQueue = $this->patchListUtils->createSimplifiedList($patches);
         
         return $this->packagesResolver->resolve($patchQueue, $packages);
+    }
+    
+    public function determineRelatedTargets(array $patches, array $targets)
+    {
+        $result = $targets;
+        
+        do {
+            $resetQueueUpdates = array();
+
+            foreach (array_diff_key($patches, array_flip($result)) as $packagePatches) {
+                foreach ($packagePatches as $patchInfo) {
+                    if (array_intersect($patchInfo[PatchDefinition::TARGETS], $result)) {
+                        $resetQueueUpdates = array_merge(
+                            $resetQueueUpdates,
+                            array_diff($patchInfo[PatchDefinition::TARGETS], $result)
+                        );
+
+                        continue;
+                    }
+                }
+            }
+
+            $result = array_merge($result, array_unique($resetQueueUpdates));
+        } while ($resetQueueUpdates);
+        
+        return array_diff($result, $targets);
     }
 }

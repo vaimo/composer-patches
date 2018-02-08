@@ -76,68 +76,87 @@ class PatchesApplier
 
     public function apply(PatchesRepository $repository, array $targets = array(), array $filters = array())
     {
+        $packages = $repository->getTargets();
+
         $packagesUpdated = false;
 
         $this->logger->write('info', 'Processing patches configuration');
 
         $patches = $repository->getPatches();
-        
-        $resetQueue = $this->repositoryAnalyser->determinePackageResets($repository->getSource(), $patches);
-        
-        $patchQueue = $this->patchListUtils->createSimplifiedList($patches);
 
+        /**
+         * Resolve targets based on file filter, filter down patches list, leave only packages that have
+         * matching file
+         */
         if ($filters) {
             if ($composedFilter = $this->filterUtils->composeRegex($filters, '/')) {
-                $patchQueue = array_filter(
-                    $this->filterUtils->filterBySubItemKeys($patchQueue, $composedFilter)
+                $patches = $this->patchListUtils->applyDefinitionFilter(
+                    $patches,
+                    $composedFilter,
+                    PatchDefinition::SOURCE
                 );
 
                 if (!$targets) {
-                    $targets = array_keys($patchQueue);
+                    $targets = $this->patchListUtils->getAllTargets($patches);
                 }
             }
         }
-        
+
+
+        /**
+         * Determine packages to reset based on applied patches and patches that are defined.
+         */
+        $resetQueue = $this->repositoryAnalyser->determinePackageResets($repository->getSource(), $patches);
+
+        /**
+         * Apply targets filter. Leave only patches that have a match on their targets configuration
+         */
         if ($targets) {
             if ($targetsFilter = $this->filterUtils->composeRegex($targets, '/')) {
-                $resetQueue = preg_grep($targetsFilter, $resetQueue);
+                $patches = $this->patchListUtils->applyDefinitionFilter(
+                    $patches,
+                    $targetsFilter,
+                    PatchDefinition::TARGETS
+                );
 
-                $filterResult = $this->filterUtils->filterBySubItemKeys([$patchQueue], $targetsFilter);
-                $patchQueue = $filterResult[0];
-            }            
+                $subset = array_merge(
+                    !$patches ? array_values(preg_grep($targetsFilter, array_keys($packages))) : array(),
+                    $this->patchListUtils->getAllTargets($patches)
+                );
+
+                $resetQueue = array_intersect($resetQueue, $subset);
+            }
         }
-        
-        if ($filters || $targets) {
-            foreach ($patchQueue as $packageName => $packagePatches) {
-                if (!isset($patches[$packageName])) {
-                    continue;
-                }
-                
-                $patches[$packageName] = array_intersect_key($patches[$packageName], $packagePatches);
-            }   
-        }
-        
-        $packages = $repository->getTargets();
+
+        /**
+         * Apply the patches
+         */
+        $resetQueue = array_merge(
+            $this->repositoryAnalyser->determineRelatedTargets($patches, $resetQueue),
+            $resetQueue
+        );
+
+        $patchQueue = $this->patchListUtils->createSimplifiedList($patches);
 
         $loggerIndentation = $this->logger->push('-');
-        
+
         foreach ($packages as $packageName => $package) {
             $hasPatches = !empty($patches[$packageName]);
-            
+
             if ($hasPatches) {
                 $patchTargets = array();
 
                 foreach ($patches[$packageName] as $patch) {
                     $patchTargets = array_merge($patchTargets, $patch[PatchDefinition::TARGETS]);
                 }
-                
+
                 $patchTargets = array_unique($patchTargets);
             } else {
                 $patchTargets = array($packageName);
             }
 
             $itemsToReset = array_intersect($resetQueue, $patchTargets);
-            
+
             foreach ($itemsToReset as $targetName) {
                 if (!$hasPatches && !isset($patchQueue[$targetName])) {
                     $this->logger->writeRaw('Resetting patched package <info>%s</info>', array($targetName));
@@ -165,7 +184,7 @@ class PatchesApplier
             if (!$hasPatches) {
                 continue;
             }
-            
+
             $hasPatchChanges = false;
             foreach ($patchTargets as $targetName) {
                 $targetQueue = isset($patchQueue[$targetName])
@@ -194,7 +213,7 @@ class PatchesApplier
             }
 
             $packagesUpdated = true;
-            
+
             $this->logger->writeRaw(
                 'Applying patches for <info>%s</info> (%s)',
                 array($packageName, count($patches[$packageName]))
@@ -207,9 +226,9 @@ class PatchesApplier
 
             try {
                 $appliedPatches = $this->patchApplier->applyPatches($package, $packagePatchesQueue);
-                
+
                 $this->patcherStateManager->registerAppliedPatches($packageRepository, $appliedPatches);
-                
+
                 $this->logger->reset($subProcessIndentation);
             } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
                 $failedPath = $exception->getFailedPatchPath();
@@ -217,7 +236,7 @@ class PatchesApplier
                 $paths = array_keys($packagePatchesQueue);
                 $appliedPaths = array_slice($paths, 0, array_search($failedPath, $paths));
                 $appliedPatches = array_intersect_key($packagePatchesQueue, array_flip($appliedPaths));
-                
+
                 $this->patcherStateManager->registerAppliedPatches($packageRepository, $appliedPatches);
 
                 $this->patchListUtils->sanitizeFileSystem($patches);
@@ -227,7 +246,7 @@ class PatchesApplier
                 $repository->write();
 
                 throw $exception;
-            } 
+            }
 
             $this->logger->writeNewLine();
         }
@@ -235,7 +254,7 @@ class PatchesApplier
         $this->logger->reset($loggerIndentation);
 
         $this->patchListUtils->sanitizeFileSystem($patches);
-        
+
         if (!$packagesUpdated) {
             $this->logger->writeRaw('Nothing to patch');
         } else {

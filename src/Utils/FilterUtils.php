@@ -49,16 +49,13 @@ class FilterUtils
         
         return $delimiter . sprintf($pattern, implode('|', $affirmations)) . $delimiter;
     }
-    
-    public function filterBySubItemKeys($groups, $filter)
+
+    public function invert(array $filters)
     {
-        return array_map(function ($group) use ($filter) {
-            $matches = preg_grep($filter, array_keys($group));
-            
-            return array_intersect_key(
-                $group,
-                array_flip($matches)
-            );
-        }, $groups);
+        return array_map(function ($filter) {
+            $isNegation = substr($filter, 0, 1) == self::NEGATION_PREFIX;
+
+            return (!$isNegation ? self::NEGATION_PREFIX : '') . ltrim($filter, self::NEGATION_PREFIX);
+        }, $filters);
     }
 }

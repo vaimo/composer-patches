@@ -18,44 +18,44 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $this->setDescription('Apply registered patches to current project');
 
         $this->addArgument(
-            'targets', 
-            \Symfony\Component\Console\Input\InputArgument::IS_ARRAY, 
-            'Packages for the patcher to target', 
+            'targets',
+            \Symfony\Component\Console\Input\InputArgument::IS_ARRAY,
+            'Packages for the patcher to target',
             array()
         );
 
         $this->addOption(
-            '--redo', 
-            null, 
-            InputOption::VALUE_NONE, 
+            '--redo',
+            null,
+            InputOption::VALUE_NONE,
             'Re-patch all packages or a specific package when targets defined'
         );
 
         $this->addOption(
-            '--undo', 
-            null, 
-            InputOption::VALUE_NONE, 
+            '--undo',
+            null,
+            InputOption::VALUE_NONE,
             'Remove all patches or a specific patch when targets defined'
         );
-        
+
         $this->addOption(
-            '--no-dev', 
-            null, 
-            InputOption::VALUE_NONE, 
+            '--no-dev',
+            null,
+            InputOption::VALUE_NONE,
             'Disables installation of require-dev packages'
         );
 
         $this->addOption(
-            '--filter', 
-            null, 
-            InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 
+            '--filter',
+            null,
+            InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
             'Apply only those patch files/sources that match with provided filter'
         );
-        
+
         $this->addOption(
-            '--from-source', 
-            null, 
-            InputOption::VALUE_NONE, 
+            '--from-source',
+            null,
+            InputOption::VALUE_NONE,
             'Apply patches based on information directly from packages in vendor folder'
         );
     }
@@ -76,13 +76,12 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $targets = $input->getArgument('targets');
         $filters = $input->getOption('filter');
-        
+        $isDevMode = !$input->getOption('no-dev');
+
         if ($input->getOption('undo') && !$input->getOption('redo')) {
-            $bootstrap->stripPatches($targets);
+            $bootstrap->stripPatches($isDevMode, $targets, $filters);
             return;
         }
-        
-        $isDevMode = !$input->getOption('no-dev');
 
         putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
         putenv(Environment::FORCE_REAPPLY . "=" . $input->getOption('redo'));

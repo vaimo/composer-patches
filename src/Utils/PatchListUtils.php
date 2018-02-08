@@ -47,4 +47,43 @@ class PatchListUtils
             }
         }
     }
+
+    public function getAllTargets(array $patches)
+    {
+        $targetList = array();
+
+        foreach ($patches as $patchGroup) {
+            foreach ($patchGroup as $patchInfo) {
+                $targetList = array_merge($targetList, $patchInfo[PatchDefinition::TARGETS]);
+            }
+        }
+
+        return array_unique($targetList);
+    }
+
+    public function applyDefinitionFilter(array $patches, $filter, $key)
+    {
+        foreach ($patches as &$packagePatches) {
+            foreach ($packagePatches as &$patchInfo) {
+                if (!isset($patchInfo[$key])) {
+                    $patchInfo = false;
+                    continue;
+                }
+
+                $value = $patchInfo[$key];
+
+                if (is_array($value) && preg_grep($filter, $value)) {
+                    continue;
+                }
+
+                if (is_string($value) && preg_match($filter, $value)) {
+                    continue;
+                }
+
+                $patchInfo = false;
+            }
+        }
+
+        return array_filter(array_map('array_filter', $patches));
+    }
 }
