@@ -55,7 +55,8 @@
         "changelog": {
             "3.23.2": {
                 "fix": [
-                    "minor change to constant naming to make it match up with patch command. COMPOSER_PATCHES_PREFER_OWNER renamed to COMPOSER_PATCHES_FROM_SOURCE. Backwards compatible."
+                    "minor change to constant naming to make it match up with patch command. COMPOSER_PATCHES_PREFER_OWNER renamed to COMPOSER_PATCHES_FROM_SOURCE. Backwards compatible",
+                    "re-installed packages (when resetting patches) not being re-deployed when using 'patch' command (resulting in incorrect app behaviour due to some old files being still used)"
                 ],
                 "maintenance": [
                     "log messages updated to include applied patch count when resetting package",

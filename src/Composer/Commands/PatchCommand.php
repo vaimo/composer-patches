@@ -8,6 +8,8 @@ namespace Vaimo\ComposerPatches\Composer\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Composer\Script\ScriptEvents;
+
 use Vaimo\ComposerPatches\Environment;
 
 class PatchCommand extends \Composer\Command\BaseCommand
@@ -62,6 +64,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $composer = $this->getComposer();
         $bootstrap = new \Vaimo\ComposerPatches\Bootstrap(
             $this->getComposer(),
             $this->getIO(),
@@ -80,12 +83,13 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         if ($input->getOption('undo') && !$input->getOption('redo')) {
             $bootstrap->stripPatches($isDevMode, $targets, $filters);
-            return;
+        } else {
+            putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
+            putenv(Environment::FORCE_REAPPLY . "=" . $input->getOption('redo'));
+
+            $bootstrap->applyPatches($isDevMode, $targets, $filters);   
         }
 
-        putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
-        putenv(Environment::FORCE_REAPPLY . "=" . $input->getOption('redo'));
-
-        $bootstrap->applyPatches($isDevMode, $targets, $filters);
+        $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
     }
 }

@@ -181,6 +181,9 @@ class PatchesApplier
                     );
 
                     $this->installationManager->install($repository->getSource(), $operation);
+
+//                    \Composer\Script\ScriptEvents::POST_INSTALL_CMD
+//                    $resetTarget->getDeployStrategy()->deploy();
                 } finally {
                     OutputUtils::resetVerbosity($output, $verbosityLevel);
                 }
