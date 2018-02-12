@@ -102,7 +102,6 @@ class PatchesApplier
             }
         }
 
-
         /**
          * Determine packages to reset based on applied patches and patches that are defined.
          */
@@ -167,16 +166,18 @@ class PatchesApplier
 
                 $verbosityLevel = OutputUtils::resetVerbosity($output, OutputInterface::VERBOSITY_QUIET);
 
+                $resetTarget = $packages[$targetName];
+
                 try {
                     $this->installationManager->install(
                         $repository->getSource(),
-                        new ResetOperation($package, 'Package reset due to changes in patches configuration')
+                        new ResetOperation($resetTarget, 'Package reset due to changes in patches configuration')
                     );
                 } finally {
                     OutputUtils::resetVerbosity($output, $verbosityLevel);
                 }
 
-                $packagesUpdated = $this->packageUtils->resetAppliedPatches($package);
+                $packagesUpdated = $this->packageUtils->resetAppliedPatches($resetTarget);
             }
 
             $resetQueue = array_diff($resetQueue, $patchTargets);
