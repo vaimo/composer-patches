@@ -72,7 +72,7 @@ class PatchApplier
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
-
+    
     public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
         if ($package instanceof \Composer\Package\RootPackage) {
@@ -83,36 +83,36 @@ class PatchApplier
         
         $appliedPatches = array();
 
-        foreach ($patchesQueue as $source => $patchInfo) {
-            $path = $patchInfo[PatchDefinition::PATH];
-            $label = $patchInfo[PatchDefinition::LABEL];
-            $config = $patchInfo[PatchDefinition::CONFIG];
-            
+        foreach ($patchesQueue as $source => $info) {
             $this->logger->writeRaw(
-                '%s', 
-                array(sprintf('<info>%s</info>: %s', $patchInfo[PatchDefinition::OWNER], $source))
+                '<info>%s</info>: %s%s', 
+                array(
+                    $info[PatchDefinition::OWNER], 
+                    $source,
+                    $info[PatchDefinition::CHANGED] ? ' [<info>NEW</info>]' : '' 
+                )
             );
-
+            
             $loggerIndentation = $this->logger->push();
 
-            $this->logger->writeRaw(
-                '<comment>%s</comment>', 
-                array($label)
-            );
-            
+            $this->logger->writeRaw('<comment>%s</comment>', array($info[PatchDefinition::LABEL]));            
             try {
                 $this->eventDispatcher->dispatch(
                     Events::PRE_APPLY,
-                    new Event(Events::PRE_APPLY, $package, $source, $label)
+                    new Event(Events::PRE_APPLY, $package, $source, $info[PatchDefinition::LABEL])
                 );
                 
-                $this->patchApplier->applyFile($path, $installPath, $config);
+                $this->patchApplier->applyFile(
+                    $info[PatchDefinition::PATH], 
+                    $installPath, 
+                    $info[PatchDefinition::CONFIG]
+                );
 
-                $appliedPatches[$source] = $patchInfo;
+                $appliedPatches[$source] = $info;
 
                 $this->eventDispatcher->dispatch(
                     Events::POST_APPLY,
-                    new Event(Events::POST_APPLY, $package, $source, $label)
+                    new Event(Events::POST_APPLY, $package, $source, $info[PatchDefinition::LABEL])
                 );
             } catch (\Exception $exception) {
                 $this->logger->writeException($exception);

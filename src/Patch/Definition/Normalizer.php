@@ -175,6 +175,7 @@ class Normalizer
         
         return array(
             Definition::PATH => '',
+            Definition::CHANGED => true,
             Definition::BEFORE => isset($data[Definition::BEFORE]) ? $data[Definition::BEFORE] : array(),
             Definition::AFTER => isset($data[Definition::AFTER]) ? $data[Definition::AFTER] : array(), 
             Definition::URL => $sourceIncludesUrlScheme ? $source : false,

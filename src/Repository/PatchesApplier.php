@@ -157,8 +157,15 @@ class PatchesApplier
             $itemsToReset = array_intersect($resetQueue, $patchTargets);
 
             foreach ($itemsToReset as $targetName) {
+                $resetTarget = $packages[$targetName];
+
+                $resetPatches = $this->packageUtils->resetAppliedPatches($resetTarget);
+
                 if (!$hasPatches && !isset($patchQueue[$targetName])) {
-                    $this->logger->writeRaw('Resetting patched package <info>%s</info>', array($targetName));
+                    $this->logger->writeRaw(
+                        'Resetting patched package <info>%s</info> (%s)', 
+                        array($targetName, count($resetPatches))
+                    );
                 }
 
                 /** @var \Composer\IO\ConsoleIO $output */
@@ -166,18 +173,27 @@ class PatchesApplier
 
                 $verbosityLevel = OutputUtils::resetVerbosity($output, OutputInterface::VERBOSITY_QUIET);
 
-                $resetTarget = $packages[$targetName];
 
                 try {
-                    $this->installationManager->install(
-                        $repository->getSource(),
-                        new ResetOperation($resetTarget, 'Package reset due to changes in patches configuration')
+                    $operation = new ResetOperation(
+                        $resetTarget,
+                        'Package reset due to changes in patches configuration'
                     );
+
+                    $this->installationManager->install($repository->getSource(), $operation);
                 } finally {
                     OutputUtils::resetVerbosity($output, $verbosityLevel);
                 }
+                
+                if (isset($patchQueue[$targetName])) {
+                    $silentPatches = array_intersect_assoc($patchQueue[$targetName], $resetPatches);
 
-                $packagesUpdated = $this->packageUtils->resetAppliedPatches($resetTarget);
+                    foreach (array_keys($silentPatches) as $silentPatchPath) {
+                        $patches[$targetName][$silentPatchPath][PatchDefinition::CHANGED] = false;
+                    };   
+                }
+
+                $packagesUpdated = (bool)$resetPatches;
             }
 
             $resetQueue = array_diff($resetQueue, $patchTargets);

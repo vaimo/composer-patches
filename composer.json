@@ -56,6 +56,10 @@
             "3.23.2": {
                 "fix": [
                     "minor change to constant naming to make it match up with patch command. COMPOSER_PATCHES_PREFER_OWNER renamed to COMPOSER_PATCHES_FROM_SOURCE. Backwards compatible."
+                ],
+                "maintenance": [
+                    "log messages updated to include applied patch count when resetting package",
+                    "showing [NEW] flag when re-applying patches for a package and patch file was previously not applied"
                 ]
             },
             "3.23.1": {

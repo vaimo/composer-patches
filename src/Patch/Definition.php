@@ -28,4 +28,6 @@ class Definition
     const CONFIG = 'config';
     const PATCHER = 'patcher';
     const LEVEL = 'level';
+
+    const CHANGED = 'changed';
 }
