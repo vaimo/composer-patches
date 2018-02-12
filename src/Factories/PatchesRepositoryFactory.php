@@ -66,6 +66,7 @@ class PatchesRepositoryFactory
 
         $exploderComponents = array(
             new ExploderComponents\VersionConfigComponent(),
+            new ExploderComponents\VersionRangesConfigComponent(),
             new ExploderComponents\ComplexItemComponent(),
             new ExploderComponents\SequenceVersionConfigComponent(),
             new ExploderComponents\SequenceItemComponent(),

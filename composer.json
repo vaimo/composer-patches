@@ -56,7 +56,11 @@
             "3.23.0": {
                 "feature": [
                     "allow default indirect dependency to be defined for a package version restriction",
-                    "allow base patch to be defined for widgets - including variable conversion for vendor and package name"
+                    "allow base patch to be defined for widgets - including variable conversion for vendor, module name and version",
+                    "introduced new definition pattern to be used together with patches-base and base patch variables: version ranges"
+                ], 
+                "fix": [
+                    "renamed constants that conflicted with constant names that were reserved in PHP5.3.X"
                 ]
             },
             "3.22.4": {

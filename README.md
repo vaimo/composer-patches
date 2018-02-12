@@ -234,20 +234,52 @@ under same `label` or under `source` key depending on how complex rest of the de
 {
   "some/package": {
     "having two patches for same fix": {
-      "1.0.* <1.2.0": "legacy.patch",
-      ">=1.2.0": "current.patch"
+      ">=1.0.0 <1.2.0": "some/path/legacy.patch",
+      ">=1.2.0": "some/path/current.patch"
     }
   },
   "some/other-package": {
     "same done for extended patch declaration format": {
       "source": {
-        "1.0.* <1.2.0": "legacy.patch",
-        ">=1.2.0": "current.patch"
+        ">=1.0.0 <1.2.0": "some/path/legacy.patch",
+        ">=1.2.0": "some/path/current.patch"
       }
     }
   }
 }
 ```
+
+Note that if creating patches for a bigger software product, you may notice that the patch definition starts
+to get littered with repetitions where you have to have the patch files in folders that include the version
+and then go and define the version restriction again in the composer.json; if this is the case, you might
+consider the following definition convention:
+
+```json
+{
+  "extra": {
+    "patches-base": "patches/{{VendorName}}_{{ModuleName}}/{{version}}",
+    "patches-dev": {
+      "some/package-name": {
+        "Fix: back-port for some important fix": {
+          "source": "important-fix.patch",
+          "version": [
+            ">=v2.7.0 <v2.7.1",
+            ">=v2.7.1 <v2.8.33",
+            ">=v2.8.33 <v3.0.0"
+          ]
+        }
+      }
+    }
+  }
+}
+
+```
+
+The following will use the version information and targeted package name to generate source paths:
+
+    patches/Some_PackageName/2.7.0/important-fix.patch
+    patches/Some_PackageName/2.7.1/important-fix.patch
+    patches/Some_PackageName/2.8.33/important-fix.patch
 
 ## Patches: bundled patches
 

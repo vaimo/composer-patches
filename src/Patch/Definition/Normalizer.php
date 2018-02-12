@@ -69,11 +69,12 @@ class Normalizer
         /**
          * Patch path
          */
+        $sourcePathInfo = parse_url($source);
+        $sourceIncludesUrlScheme = isset($sourcePathInfo['scheme']) && $sourcePathInfo['scheme'];
+
         $basePath = '';
         
-        if (isset($ownerConfig[PluginConfig::PATCHES_BASE])) {
-            $patchPathInfo = parse_url($source);
-
+        if (isset($ownerConfig[PluginConfig::PATCHES_BASE]) && !$sourceIncludesUrlScheme) {
             $nameParts = explode('/', $target);
 
             $pathVariables = array(
@@ -142,14 +143,6 @@ class Normalizer
             );
         }
         
-        if (isset($patchPathInfo['scheme']) && $patchPathInfo['scheme']) {
-            $data[Definition::URL] = $source;
-        } else {
-            $data[Definition::URL] = false;
-
-            $source = ($basePath ? DIRECTORY_SEPARATOR . $basePath : '') . $source;
-        }
-
         /**
          * Patch sequencing
          */
@@ -181,11 +174,11 @@ class Normalizer
         }
         
         return array(
+            Definition::PATH => '',
             Definition::BEFORE => isset($data[Definition::BEFORE]) ? $data[Definition::BEFORE] : array(),
             Definition::AFTER => isset($data[Definition::AFTER]) ? $data[Definition::AFTER] : array(), 
-            Definition::PATH => '',
-            Definition::URL => $data[Definition::URL],
-            Definition::SOURCE => $source,
+            Definition::URL => $sourceIncludesUrlScheme ? $source : false,
+            Definition::SOURCE => ($basePath ? $basePath . DIRECTORY_SEPARATOR : '') . $source,
             Definition::TARGETS => isset($data[Definition::TARGETS]) && $target === Definition::BUNDLE_TARGET
                 ? $data[Definition::TARGETS]
                 : array($target),
