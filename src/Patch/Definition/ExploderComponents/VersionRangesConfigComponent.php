@@ -25,7 +25,7 @@ class VersionRangesConfigComponent implements \Vaimo\ComposerPatches\Interfaces\
             return false;
         }
 
-        if (!isset($data[PatchDefinition::VERSION])) {
+        if (!isset($data[PatchDefinition::VERSION]) || isset($value[PatchDefinition::DEPENDS])) {
             return false;
         }
 
@@ -35,9 +35,9 @@ class VersionRangesConfigComponent implements \Vaimo\ComposerPatches\Interfaces\
             return false;
         }
         
-        $key = key($version);
-
-        return !isset($value[PatchDefinition::DEPENDS]) && $this->isConstraint($key);
+        return $this->isConstraint(
+            key($version)
+        );
     }
     
     public function explode($label, $data)
