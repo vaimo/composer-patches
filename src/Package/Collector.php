@@ -10,38 +10,34 @@ use Composer\Repository\WritableRepositoryInterface;
 class Collector
 {
     /**
-     * @var \Composer\Package\RootPackageInterface
+     * @var array|\Composer\Package\PackageInterface[]
      */
-    private $rootPackage;
-    
-    /**
-     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
-     */
-    private $packageUtils;
+    private $extraPackages;
 
     /**
-     * @param \Composer\Package\RootPackageInterface $rootPackage
+     * @param \Composer\Package\PackageInterface[] $extraPackages
      */
     public function __construct(
-        \Composer\Package\RootPackageInterface $rootPackage
+        array $extraPackages = array()
     ) {
-        $this->rootPackage = $rootPackage;
+        $this->extraPackages = $extraPackages;
+        
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
     
     public function collect(WritableRepositoryInterface $repository)
     {
-        $targets = array();
-
-        /** @var \Composer\Package\CompletePackageInterface[] $packages */        
-        $packages = $repository->getPackages();
+        $packages = $this->extraPackages;
         
-        foreach ($packages as $package) {
-            $targets[$package->getName()] = $this->packageUtils->getRealPackage($package);
+        foreach ($repository->getPackages() as $package) {
+            $packages[] = $this->packageUtils->getRealPackage($package);
         }
 
-        $targets[$this->rootPackage->getName()] = $this->rootPackage;
-
-        return $targets;
+        return array_combine(
+            array_map(function (\Composer\Package\PackageInterface $package) {
+                return $package->getName();
+            }, $packages),
+            $packages
+        );
     }
 }

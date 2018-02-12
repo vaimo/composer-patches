@@ -47,14 +47,14 @@ class PatchesRepositoryFactory
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
         
         $loaders = array(
-            PluginConfig::LIST => new SourceLoaders\PatchList(),
-            PluginConfig::FILE => new SourceLoaders\PatchesFile($installationManager)
+            PluginConfig::DEFINITIONS_LIST => new SourceLoaders\PatchList(),
+            PluginConfig::DEFINITIONS_FILE => new SourceLoaders\PatchesFile($installationManager)
         );
 
         if ($devMode) {
             $loaders = array_replace($loaders, array(
-                PluginConfig::DEV_LIST => $loaders[PluginConfig::LIST],
-                PluginConfig::DEV_FILE => $loaders[PluginConfig::FILE]
+                PluginConfig::DEV_DEFINITIONS_LIST => $loaders[PluginConfig::DEFINITIONS_LIST],
+                PluginConfig::DEV_DEFINITIONS_FILE => $loaders[PluginConfig::DEFINITIONS_FILE]
             ));
         }
         
@@ -135,7 +135,7 @@ class PatchesRepositoryFactory
             )
         );
         
-        $packagesCollector = new \Vaimo\ComposerPatches\Package\Collector($rootPackage);
+        $packagesCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
 
         $definitionListLoader = new Patch\DefinitionList\Loader(
             $packagesCollector,

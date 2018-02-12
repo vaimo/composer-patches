@@ -53,6 +53,12 @@
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true,
         "changelog": {
+            "3.23.0": {
+                "feature": [
+                    "allow default indirect dependency to be defined for a package version restriction",
+                    "allow base patch to be defined for widgets - including variable conversion for vendor and package name"
+                ]
+            },
             "3.22.4": {
                 "maintenance": [
                     "package meta-data fixes. syntax error in composer.json"

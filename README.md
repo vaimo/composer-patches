@@ -63,13 +63,27 @@ Same format is used for both project (root level scope) patches and for package 
   "extra": {
     "patches": {
       "some/package": {
-        "example local patch": "my/file.patch",
+        "example local patch": "path/to/patches/fix.patch",
         "example remote patch": "http://www.example.com/patch.patch"
       }
     }
   }
 }
 ```
+
+If your patches are declared in some sub-folder, it's possible to define a base-folder that would be added
+in front of all file-path based patch definitions.
+
+```json
+{
+  "extra": {
+    "patches-base": "path/to/patches"
+  }
+}
+```
+
+In this case you can define patches without having to repeatedly use the same base-path for every patch 
+definition.
 
 ## Basic Usage: configuring a patches file
 
@@ -195,6 +209,21 @@ There are several ways a version restriction for a patch can be defined, the cho
   }
 }
 ```
+
+It's also possible to make all defined patches to depend on certain package as well by defining a following
+key under 'extras'.
+
+```json
+{
+  "extra": {
+    "patches-depend": "some/package"
+  }
+}
+```
+
+When it's defined, all versions defined in patch definition will target that package instead of targeting
+the package that the patch is for. This is useful in cases where most of the project's modules are pulled
+in by one single package. This setting will only affect patches within same composer.json 
 
 ## Patches: version branching
 

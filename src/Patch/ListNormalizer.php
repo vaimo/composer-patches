@@ -29,12 +29,12 @@ class ListNormalizer
         $this->definitionNormalizer = $definitionNormalizer;
     }
 
-    public function normalize(array $list)
+    public function normalize(array $list, array $config)
     {
         $patchesPerPackage = array();
 
         foreach ($list as $target => $packagePatches) {
-            $normalizedPatches = array();
+            $patches = array();
             
             foreach ($packagePatches as $patchLabel => $patchConfig) {
                 $definitionItems = $this->definitionExploder->process($patchLabel, $patchConfig);
@@ -42,17 +42,15 @@ class ListNormalizer
                 foreach ($definitionItems as $patchItem) {
                     list($label, $data) = $patchItem;
                     
-                    $normalizedPatches[] = $this->definitionNormalizer->process($target, $label, $data);    
+                    $patches[] = $this->definitionNormalizer->process($target, $label, $data, $config);    
                 }
             }
 
-            if (!$validPatches = array_filter($normalizedPatches)) {
-                continue;
-            }
-
-            $patchesPerPackage[$target] = $validPatches;
+            $patchesPerPackage[$target] = $patches;
         }
 
-        return $patchesPerPackage;
+        return array_filter(
+            array_map('array_filter', $patchesPerPackage)
+        );
     }
 }

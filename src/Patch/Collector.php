@@ -47,46 +47,39 @@ class Collector
      */
     public function collect(array $packages)
     {
-        $patchList = array();
+        $collection = array();
 
         foreach ($packages as $owner) {
-            $packageConfig = $this->infoExtractor->getConfig($owner);
+            $config = $this->infoExtractor->getConfig($owner);
 
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
-            $sourceLoaders = array_intersect_key(
-                $this->sourceLoaders, 
-                $packageConfig
-            );
+            $sourceLoaders = array_intersect_key($this->sourceLoaders, $config);
+            $ownerConfig = array_diff_key($config, $this->sourceLoaders);
             
-            foreach ($sourceLoaders as $key => $loader) {
-                $groups = $loader->load($owner, $packageConfig[$key]);
-                
-                foreach ($groups as $list) {
-                    $patchesByTarget = $this->listNormalizer->normalize($list);
+            $patchListCollection = array();
+            foreach ($sourceLoaders as $key => $source) {
+                $groups = $source->load($owner, $config[$key]);
 
-                    if ($loader instanceof \Vaimo\ComposerPatches\Interfaces\PatchListUpdaterInterface) {
-                        $patchesByTarget = $loader->update($patchesByTarget);
-                    }
-
-                    foreach ($patchesByTarget as $target => $patches) {
-                        if (!isset($patchList[$target])) {
-                            $patchList[$target] = array();
-                        }
-
-                        foreach ($patches as $patchDefinition) {
-                            $patchList[$target][] = array_replace(
-                                $patchDefinition,
-                                array(
-                                    PatchDefinition::OWNER => $owner->getName(),
-                                    PatchDefinition::OWNER_IS_ROOT => ($owner instanceof RootPackage),
-                                )
-                            );
-                        }
-                    }                    
+                $patchListCollection = array_merge(
+                    $patchListCollection,
+                    array_map(function (array $group) use ($ownerConfig) {
+                        return $this->listNormalizer->normalize($group, $ownerConfig);
+                    }, $groups)
+                );
+            }
+            
+            $patches = array_reduce($patchListCollection, 'array_merge_recursive', array());
+            
+            foreach ($patches as $target => $items) {
+                foreach ($items as $index => $patch) {
+                    $collection[$target][] = array_replace($patch, array(
+                        PatchDefinition::OWNER => $owner->getName(),
+                        PatchDefinition::OWNER_IS_ROOT => ($owner instanceof RootPackage),
+                    ));
                 }
             }
         }
         
-        return $patchList;
+        return $collection;
     }
 }

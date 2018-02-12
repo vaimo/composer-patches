@@ -52,6 +52,7 @@ class PatcherStateManager
     public function restoreAppliedPatchesInfo(WritableRepositoryInterface $repository)
     {
         foreach ($repository->getPackages() as $package) {
+            $package = $this->packageUtils->getRealPackage($package);
             $name = $package->getName();
             
             if (!isset($this->appliedPatches[$name]) || !$this->appliedPatches[$name]) {

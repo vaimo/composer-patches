@@ -60,7 +60,7 @@ class PatchesApplierFactory
             $vendorRoot
         );
 
-        $packageCollector = new \Vaimo\ComposerPatches\Package\Collector($rootPackage);
+        $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
 
         if ($pluginConfig->shouldResetEverything()) {
             $packagesResolver = new PackageResolvers\FullResetResolver();

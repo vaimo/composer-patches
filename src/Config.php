@@ -10,10 +10,13 @@ class Config
     const PACKAGE_CONFIG_FILE = 'composer.json';
     const CONFIG_ROOT = 'extra';
     
-    const LIST = 'patches';
-    const DEV_LIST = 'patches-dev';
-    const FILE = 'patches-file';
-    const DEV_FILE = 'patches-file-dev';
+    const PREFIX = 'patches-';
+    
+    const DEFINITIONS_LIST = 'patches';
+    const DEFINITIONS_FILE = 'patches-file';
+
+    const DEV_DEFINITIONS_LIST = 'patches-dev';
+    const DEV_DEFINITIONS_FILE = 'patches-file-dev';
  
     const EXCLUDED_PATCHES = 'patches-exclude';
     
@@ -27,6 +30,9 @@ class Config
     const PATCHER_LEVELS = 'levels';
     const PATCHER_SOURCES = 'sources';
     const PATCHER_SECURE_HTTP = 'secure-http';
+    
+    const PATCHES_DEPENDS = 'patches-depend';
+    const PATCHES_BASE = 'patches-base';
     
     const PATCHER_ARG_LEVEL = 'level';
     const PATCHER_ARG_FILE = 'file';

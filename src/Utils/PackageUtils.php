@@ -12,9 +12,11 @@ class PackageUtils
 {
     public function getRealPackage(PackageInterface $package)
     {
-        return $package instanceof \Composer\Package\AliasPackage
-            ? $package->getAliasOf()
-            : $package;
+        while ($package instanceof \Composer\Package\AliasPackage) {
+            $package = $package->getAliasOf();
+        }   
+        
+        return $package;
     }
     
     public function shouldReinstall(PackageInterface $package, array $patches)
