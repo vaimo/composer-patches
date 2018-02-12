@@ -53,6 +53,11 @@
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true,
         "changelog": {
+            "3.23.2": {
+                "fix": [
+                    "minor change to constant naming to make it match up with patch command. COMPOSER_PATCHES_PREFER_OWNER renamed to COMPOSER_PATCHES_FROM_SOURCE. Backwards compatible."
+                ]
+            },
             "3.23.1": {
                 "fix": [
                     "bundled patches reset mechanism targeting wrong packages (where root package as owner was being sent to 'patches reset' which caused a crash)"

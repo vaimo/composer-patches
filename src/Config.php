@@ -61,7 +61,7 @@ class Config
     
     public function shouldPreferOwnerPackageConfig()
     {
-        return (bool)getenv(Environment::PREFER_OWNER);
+        return (bool)getenv(Environment::PREFER_OWNER) || (bool)getEnv('COMPOSER_PATCHES_PREFER_OWNER');
     }
     
     public function shouldResetEverything()
