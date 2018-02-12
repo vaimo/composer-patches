@@ -53,7 +53,7 @@
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true,
         "changelog": {
-            "3.23.3": {
+            "3.23.3-rc": {
                 "maintenance": [
                     "definition normalizer split into separate components"
                 ]
