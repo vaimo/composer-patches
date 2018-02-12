@@ -277,9 +277,9 @@ consider the following definition convention:
 
 The following will use the version information and targeted package name to generate source paths:
 
-    patches/Some_PackageName/2.7.0/important-fix.patch
-    patches/Some_PackageName/2.7.1/important-fix.patch
-    patches/Some_PackageName/2.8.33/important-fix.patch
+    patches/Some_PackageName/v2.7.0/important-fix.patch
+    patches/Some_PackageName/v2.7.1/important-fix.patch
+    patches/Some_PackageName/v2.8.33/important-fix.patch
 
 ## Patches: bundled patches
 
