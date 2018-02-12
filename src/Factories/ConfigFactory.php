@@ -6,7 +6,6 @@
 namespace Vaimo\ComposerPatches\Factories;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
-use Tivie\OS;
 
 class ConfigFactory
 {
@@ -21,15 +20,15 @@ class ConfigFactory
     private $configUtils;
 
     /**
-     * @var OS\Detector
+     * @var \Vaimo\ComposerPatches\Config\Context
      */
-    protected $osDetector;
+    private $context;
     
     public function __construct() 
     {
         $this->defaults = new \Vaimo\ComposerPatches\Config\Defaults();
         $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
-        $this->osDetector = new OS\Detector();
+        $this->context = new \Vaimo\ComposerPatches\Config\Context();
     }
 
     public function create(\Composer\Composer $composer, array $configSources)
@@ -42,8 +41,8 @@ class ConfigFactory
         }
         
         $subConfigKeys = array(
-            $this->getOperationSystemName(),
-            $this->getOperationSystemFamily(),
+            $this->context->getOperationSystemName(),
+            $this->context->getOperationSystemFamily(),
             '',
         );
          
@@ -83,41 +82,5 @@ class ConfigFactory
         );
         
         return new PluginConfig($config);
-    }
-
-    public function getOperationSystemName()
-    {
-        $typeId = $this->osDetector->getType();
-        
-        $labels = array(
-            OS\MACOSX => 'mac',
-            OS\GEN_UNIX => 'unix',
-            OS\BSD => 'bsd',
-            OS\LINUX => 'linux',
-            OS\WINDOWS => 'windows',
-            OS\SUN_OS => 'sun'
-        );
-
-        if (isset($labels[$typeId])) {
-            return $labels[$typeId];
-        }
-        
-        return '';
-    }
-    
-    public function getOperationSystemFamily()
-    {
-        $familyId = $this->osDetector->getFamily();
-        
-        $labels = array(
-            OS\UNIX_FAMILY => 'unix',
-            OS\WINDOWS_FAMILY => 'windows'
-        );
-
-        if (isset($labels[$familyId])) {
-            return $labels[$familyId];
-        }
-
-        return '';
     }
 }

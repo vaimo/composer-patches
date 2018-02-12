@@ -53,6 +53,11 @@
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true,
         "changelog": {
+            "3.23.3": {
+                "maintenance": [
+                    "definition normalizer split into separate components"
+                ]
+            },
             "3.23.2": {
                 "fix": [
                     "minor change to constant naming to make it match up with patch command. COMPOSER_PATCHES_PREFER_OWNER renamed to COMPOSER_PATCHES_FROM_SOURCE. Backwards compatible",

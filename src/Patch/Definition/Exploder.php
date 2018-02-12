@@ -10,20 +10,20 @@ class Exploder
     /**
      * @var \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface[]
      */
-    private $processors;
+    private $components;
     
     /**
-     * @param \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface[] $processors
+     * @param \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface[] $components
      */
     public function __construct(
-        array $processors
+        array $components
     ) {
-        $this->processors = $processors;
+        $this->components = $components;
     }
     
     public function process($label, $data)
     {
-        foreach ($this->processors as $processor) {
+        foreach ($this->components as $processor) {
             if (!$processor->shouldProcess($label, $data)) {
                 continue;
             }

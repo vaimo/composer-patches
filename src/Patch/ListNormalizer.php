@@ -5,6 +5,8 @@
  */
 namespace Vaimo\ComposerPatches\Patch;
 
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+
 class ListNormalizer
 {
     /**
@@ -42,7 +44,7 @@ class ListNormalizer
                 foreach ($definitionItems as $patchItem) {
                     list($label, $data) = $patchItem;
                     
-                    $patches[] = $this->definitionNormalizer->process($target, $label, $data, $config);    
+                    $patches[] = $this->definitionNormalizer->process($target, $label, $data, $config);
                 }
             }
 

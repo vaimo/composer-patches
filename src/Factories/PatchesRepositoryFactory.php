@@ -8,6 +8,7 @@ namespace Vaimo\ComposerPatches\Factories;
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition\ExploderComponents;
+use Vaimo\ComposerPatches\Patch\Definition\NormalizerComponents;
 use Vaimo\ComposerPatches\Patch\SourceLoaders;
 use Vaimo\ComposerPatches\Package\ConfigExtractors;
 use Vaimo\ComposerPatches\Patch;
@@ -74,7 +75,19 @@ class PatchesRepositoryFactory
         );
 
         $definitionExploder = new Patch\Definition\Exploder($exploderComponents);
-        $definitionNormalizer = new Patch\Definition\Normalizer();
+
+        $normalizerComponents = array(
+            new NormalizerComponents\DefaultValuesComponent(),
+            new NormalizerComponents\BaseComponent(),
+            new NormalizerComponents\SkipComponent(),
+            new NormalizerComponents\DependencyComponent(),
+            new NormalizerComponents\PathComponent(),
+            new NormalizerComponents\UrlComponent(),
+            new NormalizerComponents\SequenceComponent(),
+            new NormalizerComponents\PatcherConfigComponent()
+        );
+        
+        $definitionNormalizer = new Patch\Definition\Normalizer($normalizerComponents);
         
         $listNormalizer = new Patch\ListNormalizer(
             $definitionExploder,
