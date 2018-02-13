@@ -65,26 +65,26 @@ class Bootstrap
         $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
     }
 
-    public function applyPatches($devMode = false, array $targets = array(), array $filters = array())
+    public function applyPatches($devMode = false, array $filters = array())
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
 
         $config = $this->configFactory->create($this->composer, array($this->config));
 
         $patchesLoader = $this->loaderFactory->create($this->composer, $config, $devMode);
-        $patchesApplier = $this->applierFactory->create($this->composer, $config, $targets, $filters);
+        $patchesApplier = $this->applierFactory->create($this->composer, $config, $filters);
 
         $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
     }
 
-    public function stripPatches($devMode = false, array $targets = array(), array $filters = array())
+    public function stripPatches($devMode = false, array $filters = array())
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
 
         $sources = array($this->config);
 
         if ($filters) {
-            $filters = $this->filterUtils->invertRules($filters);
+            $filters = array_map(array($this->filterUtils, 'invertRules'), $filters);
         } else {
             $sources[] = array(\Vaimo\ComposerPatches\Config::PATCHER_SOURCES => false);
         }
@@ -92,7 +92,7 @@ class Bootstrap
         $config = $this->configFactory->create($this->composer, $sources);
 
         $patchesLoader = $this->loaderFactory->create($this->composer, $config, $devMode);
-        $patchesApplier = $this->applierFactory->create($this->composer, $config, $targets, $filters);
+        $patchesApplier = $this->applierFactory->create($this->composer, $config, $filters);
 
         $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
     }

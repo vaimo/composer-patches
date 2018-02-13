@@ -25,9 +25,8 @@ class PatchesApplierFactory
         $this->logger = $logger;
     }
     
-    public function create(
-        \Composer\Composer $composer, PluginConfig $pluginConfig, array $targets = array(), $filters = array()
-    ) {
+    public function create(\Composer\Composer $composer, PluginConfig $pluginConfig, $filters = array()) 
+    {
         $installationManager = $composer->getInstallationManager();
             
         $eventDispatcher = $composer->getEventDispatcher();
@@ -70,10 +69,9 @@ class PatchesApplierFactory
             $packageCollector,
             $packagesResolver
         );
-
+        
         $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
             $repositoryAnalyser,
-            $targets,
             $filters
         );
 

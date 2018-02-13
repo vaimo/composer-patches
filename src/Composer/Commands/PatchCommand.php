@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Composer\Script\ScriptEvents;
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 use Vaimo\ComposerPatches\Environment;
 
@@ -76,18 +77,21 @@ class PatchCommand extends \Composer\Command\BaseCommand
                 )
             )
         );
-
-        $targets = $input->getArgument('targets');
-        $filters = $input->getOption('filter');
+        
         $isDevMode = !$input->getOption('no-dev');
 
+        $filters = array(
+            PatchDefinition::SOURCE => $input->getOption('filter'),
+            PatchDefinition::TARGETS => $input->getArgument('targets')
+        );
+        
         if ($input->getOption('undo') && !$input->getOption('redo')) {
-            $bootstrap->stripPatches($isDevMode, $targets, $filters);
+            $bootstrap->stripPatches($isDevMode, array_filter($filters));
         } else {
             putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
             putenv(Environment::FORCE_REAPPLY . "=" . $input->getOption('redo'));
 
-            $bootstrap->applyPatches($isDevMode, $targets, $filters);   
+            $bootstrap->applyPatches($isDevMode, array_filter($filters));   
         }
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
