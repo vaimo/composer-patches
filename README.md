@@ -511,7 +511,7 @@ needed. All the sources are included by default.
         "packages": true
       } 
     }
-  } 
+  }
 }
 ```
 
