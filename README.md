@@ -8,48 +8,23 @@ the composer.json of the project.
 
 ## Configuration: hard-points
 
-All the configuration of the plugin's configuration is stored in the following keys in composer.json of 
-either a project or a package.
+Patches are declared under the following keys in composer.json of the patch owner (may it be project or
+a package).
 
 ```json
 {
   "extra": {
     "patches": {},
-    "patches-file": {},
-    "patches-exclude": {},
-    "patcher": {}
+    "patches-file": {}
   }
 }
 ```
 
 The patches module mimics the way composer separates development packages from normal requirements by 
-introducing two extra keys, where exact same rules apply as for normal patch declarations: `patches-dev`, `patches-file-dev`.
+introducing two extra keys, where exact same rules apply as for normal patch declarations: `patches-dev`, 
+`patches-file-dev`. 
 
-The patches declared under those keys will not be applied when installing the project with `--no-dev` option.
-
-The examples (except in "Basic Usage") in this README are mostly given in the context of the hard-points, 
-where the first part of the topic refers to a specific hard-point under where the gives example belongs to. Some examples:
-
-  * _Patches: sequenced patches_ => `{"extra": {"patches": {}}}`
-  * _Patcher: sources_ => `{"extra": {"patcher": {}}}`
-  
-## Configuration: OS overrides
-
-Achieved by prefixing the patcher config key with general operation-system name.
- 
-```json
-{
-   "extra": {
-     "patcher-windows": {},
-     "patcher-bsd": {},
-     "patcher-linux": {}   
-   }
-}
-```
-
-The contents of each of these keys follows the same structure as described in `Patcher: configuration` and
-will be merged into the default configuration (or into configuration overrides that are defined under
-the general `patcher` key).
+The patches declared under those keys will NOT be applied when installing the project with `--no-dev` option.
   
 ## Basic Usage: configuring a patch
 
@@ -171,13 +146,17 @@ you can use partial names (instead of using full path) and wildcards to target p
 
 ```json
 {
-  "targeted/package": {
-    "will be applied after my/other-file.patch": {
-      "source": "my/file.patch",
-      "after": "other-file"
-    },
-    "some change to another targeted package": {
-      "source": "my/other-file.patch"
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "will be applied after my/other-file.patch": {
+          "source": "my/file.patch",
+          "after": "other-file"
+        },
+        "some change to another targeted package": {
+          "source": "my/other-file.patch"
+        }
+      }    
     }
   }
 }
@@ -192,18 +171,22 @@ There are several ways a version restriction for a patch can be defined, the cho
 
 ```json
 {
-  "targeted/package": {
-    "applies when targeted/package version is less than 1.2.3)": {
-      "<1.2.3": "example/some-fix.patch"
-    },
-    "same as first definition, but enabled more configuration options": {
-      "source": "example/some-fix.patch",
-      "version": "<1.2.3"
-    },
-    "applies when other/package's version is >=2.1.7": {
-      "source": "example/other-fix.patch",
-      "depends": {
-        "other/package": ">=2.1.7"
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "applies when targeted/package version is less than 1.2.3)": {
+          "<1.2.3": "example/some-fix.patch"
+        },
+        "same as first definition, but enabled more configuration options": {
+          "source": "example/some-fix.patch",
+          "version": "<1.2.3"
+        },
+        "applies when other/package's version is >=2.1.7": {
+          "source": "example/other-fix.patch",
+          "depends": {
+            "other/package": ">=2.1.7"
+          }
+        }
       }
     }
   }
@@ -232,17 +215,21 @@ under same `label` or under `source` key depending on how complex rest of the de
 
 ```json
 {
-  "some/package": {
-    "having two patches for same fix": {
-      ">=1.0.0 <1.2.0": "some/path/legacy.patch",
-      ">=1.2.0": "some/path/current.patch"
-    }
-  },
-  "some/other-package": {
-    "same done for extended patch declaration format": {
-      "source": {
-        ">=1.0.0 <1.2.0": "some/path/legacy.patch",
-        ">=1.2.0": "some/path/current.patch"
+  "extra": {
+    "patches": {
+      "some/package": {
+        "having two patches for same fix": {
+          ">=1.0.0 <1.2.0": "some/path/legacy.patch",
+          ">=1.2.0": "some/path/current.patch"
+        }
+      },
+      "some/other-package": {
+        "same done for extended patch declaration format": {
+          "source": {
+            ">=1.0.0 <1.2.0": "some/path/legacy.patch",
+            ">=1.2.0": "some/path/current.patch"
+          }
+        }
       }
     }
   }
@@ -258,7 +245,7 @@ consider the following definition convention:
 {
   "extra": {
     "patches-base": "patches/{{VendorName}}_{{ModuleName}}/{{version}}",
-    "patches-dev": {
+    "patches": {
       "some/package-name": {
         "Fix: back-port for some important fix": {
           "source": "important-fix.patch",
@@ -288,16 +275,20 @@ alternative patch definition format is recommended:
 
 ```json
 {
-  "*": {
-    "fixes for multiple packages (packages explicitly mentioned)": {
-      "source": "example/bundled-fixes.patch",
-      "targets": [
-        "some/module",
-        "other/module"
-      ]
-    },
-    "same as above, but targets are auto-resolved from file contents": {
-      "source": "example/bundled-fixes.patch"
+  "extra": {
+    "patches": {  
+      "*": {
+        "fixes for multiple packages (packages explicitly mentioned)": {
+          "source": "example/bundled-fixes.patch",
+          "targets": [
+            "some/module",
+            "other/module"
+          ]
+        },
+        "same as above, but targets are auto-resolved from file contents": {
+          "source": "example/bundled-fixes.patch"
+        }
+      }
     }
   }
 }
@@ -342,10 +333,14 @@ settings, it's possible to define custom ones for just one patch.
 
 ```json
 {
-  "targeted/package": {
-    "Some patch description": {
-      "source": "example.patch",
-      "level": "0"
+  "extra": {
+    "patches": {  
+      "targeted/package": {
+        "Some patch description": {
+          "source": "example.patch",
+          "level": "0"
+        }
+      }    
     }
   }
 }
@@ -359,8 +354,12 @@ declaration lines.
 
 ```json
 {
-  "targeted/package": {
-    "This patch will be ignored": "example.patch#skip"
+  "extra": {
+    "patches": {  
+      "targeted/package": {
+        "This patch will be ignored": "example.patch#skip"
+      }    
+    }
   }
 }
 ```
@@ -373,12 +372,16 @@ in the project's composer.json:
 
 ```json
 {
-  "patch/owner": [
-    "some/path/example.patch",
-    "example.patch",
-    "example",
-    "ex*ple"
-  ]
+  "extra": {
+    "patches-exclude": {  
+      "patch/owner": [
+        "some/path/example.patch",
+        "example.patch",
+        "example",
+        "ex*ple"
+      ]
+    }
+  }
 }
 ```
  
@@ -413,36 +416,40 @@ _Note that by default, user does not really have to declare any of this, but eve
 
 ```json
 {
-  "secure-http": true,
-  "sources": {
-    "project": true,
-    "packages": true,
-    "vendors": true
-  },
-  "appliers": {
-    "GIT": {
-      "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
-      "bin": "which git",
-      "check": "[[bin]] apply -p{{level}} --check {{file}}",
-      "patch": "[[bin]] apply -p{{level}} {{file}}"
-    },
-    "PATCH": {
-      "bin": ["which custom-patcher", "which patch"],
-      "check": "[[bin]] -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
-      "patch": "[[bin]] -p{{level}} --no-backup-if-mismatch < {{file}}"
+  "extra": {
+    "patcher": {
+      "secure-http": true,
+      "sources": {
+        "project": true,
+        "packages": true,
+        "vendors": true
+      },
+      "appliers": {
+        "GIT": {
+          "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
+          "bin": "which git",
+          "check": "[[bin]] apply -p{{level}} --check {{file}}",
+          "patch": "[[bin]] apply -p{{level}} {{file}}"
+        },
+        "PATCH": {
+          "bin": ["which custom-patcher", "which patch"],
+          "check": "[[bin]] -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
+          "patch": "[[bin]] -p{{level}} --no-backup-if-mismatch < {{file}}"
+        }
+      },
+      "operations": {
+        "ping": "Usability test",
+        "bin": "Availability test",
+        "check": "Patch validation",
+        "patch": "Patching"
+      },
+      "sequence": {
+        "appliers": ["PATCH", "GIT"],
+        "operations": ["bin", "ping", "check", "patch"]
+      },
+      "levels": [0, 1, 2]    
     }
-  },
-  "operations": {
-    "ping": "Usability test",
-    "bin": "Availability test",
-    "check": "Patch validation",
-    "patch": "Patching"
-  },
-  "sequence": {
-    "appliers": ["PATCH", "GIT"],
-    "operations": ["bin", "ping", "check", "patch"]
-  },
-  "levels": [0, 1, 2]
+  }
 }
 ```
 
@@ -470,6 +477,25 @@ next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
 
+## Patcher: OS overrides
+
+Achieved by prefixing the patcher config key with general operation-system name.
+ 
+```json
+{
+   "extra": {
+     "patcher": {},
+     "patcher-windows": {},
+     "patcher-bsd": {},
+     "patcher-linux": {}   
+   }
+}
+```
+
+The contents of each of these keys follows the same structure as described in `Patcher: configuration` and
+will be merged into the default configuration (or into configuration overrides that are defined under
+the general `patcher` key).
+
 ## Patcher: sources
 
 These flags allow developer to have more control over the patch collector and omit certain sources when
@@ -477,11 +503,15 @@ needed. All the sources are included by default.
 
 ```json
 {
-  "sources": {
-    "project": true,
-    "vendors": true,
-    "packages": true
-  }    
+  "extra": {
+    "patcher": {
+      "sources": {
+        "project": true,
+        "vendors": true,
+        "packages": true
+      } 
+    }
+  } 
 }
 ```
 
@@ -490,12 +520,16 @@ that should be included.
 
 ```json
 {
-  "sources": {
-    "vendors": [
-      "vaimo", 
-      "magento"
-    ]
-  }    
+  "extra": {
+    "patcher": {
+      "sources": {
+        "vendors": [
+          "vaimo", 
+          "magento"
+        ]
+      }    
+    }
+  }
 }
 ```
 
@@ -503,12 +537,16 @@ For packages, wildcards can be used to source form a wider range of packages.
 
 ```json
 {
-  "sources": {
-    "packages": [
-      "vaimo/patches-*", 
-      "!some/ignored-package"
-    ]
-  }    
+  "extra": {
+    "patcher": {
+      "sources": {
+        "packages": [
+          "vaimo/patches-*", 
+          "!some/ignored-package"
+        ]
+      }       
+    }
+  } 
 }
 ```
 
