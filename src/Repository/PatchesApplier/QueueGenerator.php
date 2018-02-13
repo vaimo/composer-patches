@@ -53,9 +53,9 @@ class QueueGenerator
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
-    public function generate(PackageRepository $repository, array $patches) 
+    public function generate(PackageRepository $repository, array $patchesList) 
     {
-        $names = array_keys($patches);
+        $patches = $patchesList;
 
         $targets = $this->targets;
         
@@ -65,33 +65,38 @@ class QueueGenerator
                 $this->filterUtils->composeRegex($this->filters, '/'),
                 PatchDefinition::SOURCE
             );
-
-            if (!$targets) {
-                $targets = $this->patchListUtils->getAllTargets($patches);
-            }
         }
 
         $resets = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
 
+        if ($this->filters) {
+            $targetedPatches = $this->patchListUtils->applyDefinitionFilter(
+                $patchesList,
+                $this->filterUtils->composeRegex(
+                    $this->filterUtils->trimRules($this->filters), 
+                    '/'
+                ),
+                PatchDefinition::SOURCE
+            );
+
+            $resets = array_intersect(
+                $resets, 
+                $this->patchListUtils->getAllTargets($targetedPatches)
+            );
+        }
+        
         if ($targets) {
             $targetsFilter = $this->filterUtils->composeRegex($targets, '/');
-            
+
             $patches = $this->patchListUtils->applyDefinitionFilter(
                 $patches,
                 $targetsFilter,
                 PatchDefinition::TARGETS
             );
-
-            $subset = array_merge(
-                !$patches ? array_values(preg_grep($targetsFilter, $names)) : array(),
-                $this->patchListUtils->getAllTargets($patches)
-            );
-
-            $resets = array_intersect($resets, $subset);
         }
 
         $resets = array_merge(
-            $this->patchListUtils->getRelatedTargets($patches, $resets),
+            $this->patchListUtils->getRelatedTargets($patchesList, $resets),
             $resets
         );
         

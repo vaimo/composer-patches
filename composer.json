@@ -53,7 +53,10 @@
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true,
         "changelog": {
-            "3.23.3-rc": {
+            "3.23.3": {
+                "fix": [
+                    "fix to a crash that happened when resetting targets that relate to bundle patches"
+                ],
                 "maintenance": [
                     "definition normalizer split into separate components",
                     "patch applier partially split into smaller components"

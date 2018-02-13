@@ -112,4 +112,58 @@ class PatchListUtils
 
         return array_diff($result, $targets);
     }
+    
+    public function generateKnownPatchFlagUpdates($ownerName, array $resetPatchesList, array $infoList)
+    {
+        $updates = array();
+        
+        if (!isset($resetPatchesList[$ownerName])) {
+            $resetPatchesList[$ownerName] = array_reduce($resetPatchesList, 'array_replace', array());
+        }
+
+        $resetInfoList = array_replace(
+            $infoList,
+            array(
+                $ownerName => array_reduce(
+                    array_intersect_key($infoList, $resetPatchesList),
+                    'array_replace',
+                    array()
+                )
+            )
+        );
+
+        foreach ($resetPatchesList as $targetName => $resetPatches) {
+            if (!isset($resetInfoList[$targetName])) {
+                continue;
+            }
+
+            $knownPatches = array_intersect_assoc($resetInfoList[$targetName], $resetPatches);
+
+            $updates = array_replace_recursive(
+                $updates,
+                array(
+                    $targetName => array_fill_keys(
+                        array_keys($knownPatches), 
+                        array(PatchDefinition::CHANGED => false)
+                    )
+                )
+            );
+        }
+
+        return $updates;
+    }
+    
+    public function updateList(array $patches, array $updates)
+    {
+        $items = array_map(
+            function ($items) {
+                return array_filter($items, function ($item) {
+                    return array_filter($item);
+                });
+            },
+            array_replace_recursive($patches, $updates)
+        );
+        
+        return array_filter(array_map('array_filter', $items));
+    }
 }

@@ -94,31 +94,30 @@ class PatchesApplier
 
             $itemsToReset = array_intersect($resetList, $patchTargets);
 
+            $resetResult = array();
+            
             foreach ($itemsToReset as $targetName) {
                 $resetTarget = $packages[$targetName];
-
+                
                 $resetPatches = $this->packageUtils->resetAppliedPatches($resetTarget);
-
-                if (!$hasPatches && !isset($infoList[$targetName])) {
+                $resetResult[$targetName] = is_array($resetPatches) ? $resetPatches : array();
+                
+                if (!$hasPatches && !isset($infoList[$targetName]) && $resetPatches) {
                     $this->logger->writeRaw(
                         'Resetting patched package <info>%s</info> (%s)',
-                        array($targetName, count($resetPatches))
+                        array($targetName, count($resetResult[$targetName]))
                     );
                 }
 
                 $this->repositoryManager->resetPackage($repository, $resetTarget);
-
-                if (isset($infoList[$targetName])) {
-                    $knownPatches = array_intersect_assoc($infoList[$targetName], $resetPatches);
-
-                    foreach (array_keys($knownPatches) as $silentPatchPath) {
-                        $patchList[$targetName][$silentPatchPath][PatchDefinition::CHANGED] = false;
-                    };
-                }
-
-                $packagesUpdated = (bool)$resetPatches;
+                $packagesUpdated = $packagesUpdated || (bool)$resetResult[$targetName];
             }
-
+            
+            $patchList = $this->patchListUtils->updateList(
+                $patchList,
+                $this->patchListUtils->generateKnownPatchFlagUpdates($packageName, $resetResult, $infoList)
+            );
+            
             $resetList = array_diff($resetList, $patchTargets);
 
             if (!$hasPatches) {

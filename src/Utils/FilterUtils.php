@@ -49,13 +49,20 @@ class FilterUtils
         
         return $delimiter . sprintf($pattern, implode('|', $affirmations)) . $delimiter;
     }
-
-    public function invert(array $filters)
+    
+    public function invertRules(array $filters)
     {
         return array_map(function ($filter) {
             $isNegation = substr($filter, 0, 1) == self::NEGATION_PREFIX;
 
             return (!$isNegation ? self::NEGATION_PREFIX : '') . ltrim($filter, self::NEGATION_PREFIX);
+        }, $filters);
+    }
+
+    public function trimRules(array $filters)
+    {
+        return array_map(function ($filter) {
+            return ltrim($filter, self::NEGATION_PREFIX);
         }, $filters);
     }
 }

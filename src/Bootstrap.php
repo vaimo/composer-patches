@@ -84,7 +84,7 @@ class Bootstrap
         $sources = array($this->config);
 
         if ($filters) {
-            $filters = $this->filterUtils->invert($filters);
+            $filters = $this->filterUtils->invertRules($filters);
         } else {
             $sources[] = array(\Vaimo\ComposerPatches\Config::PATCHER_SOURCES => false);
         }
