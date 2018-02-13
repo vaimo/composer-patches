@@ -76,7 +76,7 @@ class PatchesApplier
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
-    public function apply(PackageRepository $repository, array $applyQueue) 
+    public function apply(PackageRepository $repository, array $patches) 
     {
         $packages = $this->packageCollector->collect($repository);
 
@@ -84,7 +84,7 @@ class PatchesApplier
 
         $this->logger->write('info', 'Processing patches configuration');
 
-        list ($applyQueue, $resetQueue) = $this->queueGenerator->generate($repository, $applyQueue);
+        list ($applyQueue, $resetQueue) = $this->queueGenerator->generate($repository, $patches);
 
         $flatPatchesList = $this->patchListUtils->createSimplifiedList($applyQueue);
 

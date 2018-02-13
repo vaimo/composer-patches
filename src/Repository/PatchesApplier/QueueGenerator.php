@@ -91,7 +91,7 @@ class QueueGenerator
         }
 
         $resetQueue = array_merge(
-            $this->repositoryAnalyser->determineRelatedTargets($patches, $resetQueue),
+            $this->patchListUtils->getRelatedTargets($patches, $resetQueue),
             $resetQueue
         );
         

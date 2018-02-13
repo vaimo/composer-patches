@@ -86,4 +86,30 @@ class PatchListUtils
 
         return array_filter(array_map('array_filter', $patches));
     }
+
+    public function getRelatedTargets(array $patches, array $targets)
+    {
+        $result = $targets;
+
+        do {
+            $resetQueueUpdates = array();
+
+            foreach (array_diff_key($patches, array_flip($result)) as $packagePatches) {
+                foreach ($packagePatches as $patchInfo) {
+                    if (array_intersect($patchInfo[PatchDefinition::TARGETS], $result)) {
+                        $resetQueueUpdates = array_merge(
+                            $resetQueueUpdates,
+                            array_diff($patchInfo[PatchDefinition::TARGETS], $result)
+                        );
+
+                        continue;
+                    }
+                }
+            }
+
+            $result = array_merge($result, array_unique($resetQueueUpdates));
+        } while ($resetQueueUpdates);
+
+        return array_diff($result, $targets);
+    }
 }

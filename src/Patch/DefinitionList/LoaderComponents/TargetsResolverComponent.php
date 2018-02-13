@@ -15,9 +15,9 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
     private $packageInfoResolver;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\Analyser
+     * @var \Vaimo\ComposerPatches\Patch\File\Analyser
      */
-    private $patchAnalyser;
+    private $patchFileAnalyser;
 
     /**
      * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
@@ -27,7 +27,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
     ) {
         $this->packageInfoResolver = $packageInfoResolver;
 
-        $this->patchAnalyser = new \Vaimo\ComposerPatches\Patch\Analyser();
+        $this->patchFileAnalyser = new \Vaimo\ComposerPatches\Patch\File\Analyser();
     }
 
     /**
@@ -53,7 +53,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                     continue;
                 }
 
-                $paths = $this->patchAnalyser->getAllPaths(
+                $paths = $this->patchFileAnalyser->getAllPaths(
                     file_get_contents($path)
                 );
 
