@@ -17,7 +17,7 @@ class PatchesApplierFactory
     private $io;
 
     /**
-     * @param \Composer\IO\IOInterface $io
+     * @param \Composer\IO\IOInterface|\Composer\IO\ConsoleIO $io
      */
     public function __construct(
         \Composer\IO\IOInterface $io
@@ -25,11 +25,11 @@ class PatchesApplierFactory
         $this->io = $io;
     }
     
-    public function create(\Composer\Composer $composer, PluginConfig $pluginConfig)
-    {
-        $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
-            
+    public function create(
+        \Composer\Composer $composer, PluginConfig $pluginConfig, array $targets = array(), $filters = array()
+    ) {
         $installationManager = $composer->getInstallationManager();
+            
         $eventDispatcher = $composer->getEventDispatcher();
         $rootPackage = $composer->getPackage();
         $composerConfig = $composer->getConfig();
@@ -72,11 +72,25 @@ class PatchesApplierFactory
             $packageCollector,
             $packagesResolver
         );
+
+        $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
+            $repositoryAnalyser,
+            $targets,
+            $filters
+        );
+
+        $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
+        
+        $repositoryManager = new \Vaimo\ComposerPatches\Managers\RepositoryManager(
+            $this->io,
+            $installationManager
+        );
         
         return new \Vaimo\ComposerPatches\Repository\PatchesApplier(
-            $installationManager,
+            $packageCollector,
+            $repositoryManager,
             $packagePatchApplier,
-            $repositoryAnalyser,
+            $queueGenerator,
             $patcherStateManager,
             $logger
         );

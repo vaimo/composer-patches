@@ -9,7 +9,7 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class PatchListUtils
 {
-    public function createSimplifiedList(array $patches, array $targets = array())
+    public function createSimplifiedList(array $patches)
     {
         $patchesByTarget = array();
 

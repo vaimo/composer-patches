@@ -13,7 +13,7 @@ use Vaimo\ComposerPatches\Patch\SourceLoaders;
 use Vaimo\ComposerPatches\Package\ConfigExtractors;
 use Vaimo\ComposerPatches\Patch;
 
-class PatchesRepositoryFactory
+class PatchesLoaderFactory
 {
     /**
      * @var \Composer\IO\IOInterface
@@ -31,7 +31,6 @@ class PatchesRepositoryFactory
 
     public function create(\Composer\Composer $composer, PluginConfig $pluginConfig, $devMode = false) 
     {
-        $packagesRepository = $composer->getRepositoryManager()->getLocalRepository();
         $installationManager = $composer->getInstallationManager();
         $rootPackage = $composer->getPackage();
         $composerConfig = clone $composer->getConfig();
@@ -151,17 +150,11 @@ class PatchesRepositoryFactory
         
         $packagesCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
 
-        $definitionListLoader = new Patch\DefinitionList\Loader(
+        return new Patch\DefinitionList\Loader(
             $packagesCollector,
             $patchesCollector,
             array_filter($loaderComponents),
             array_intersect_key($listSources, array_filter($sourceConfig))
-        );
-        
-        return new \Vaimo\ComposerPatches\Repositories\PatchesRepository(
-            $packagesRepository,
-            $packagesCollector,
-            $definitionListLoader
         );
     }
 }

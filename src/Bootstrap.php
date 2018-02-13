@@ -23,9 +23,9 @@ class Bootstrap
     private $configFactory;
 
     /**
-     * @var \Vaimo\ComposerPatches\Factories\PatchesRepositoryFactory
+     * @var \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory
      */
-    private $repositoryFactory;
+    private $loaderFactory;
 
     /**
      * @var \Vaimo\ComposerPatches\Factories\PatchesApplierFactory
@@ -51,7 +51,7 @@ class Bootstrap
         $this->config = $config;
 
         $this->configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory();
-        $this->repositoryFactory = new \Vaimo\ComposerPatches\Factories\PatchesRepositoryFactory($io);
+        $this->loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($io);
         $this->applierFactory = new \Vaimo\ComposerPatches\Factories\PatchesApplierFactory($io);
 
         $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
@@ -61,15 +61,18 @@ class Bootstrap
     {
         $config = $this->configFactory->create($this->composer, array($this->config));
 
-        $patchesApplier = $this->applierFactory->create($this->composer, $config);
+        $patchesApplier = $this->applierFactory->create($this->composer, $config, $targets, $filters);
 
         if (!$patchesApplier) {
             return null;
         }
 
-        $repository = $this->repositoryFactory->create($this->composer, $config, $devMode);
+        $patchesLoader = $this->loaderFactory->create($this->composer, $config, $devMode);
 
-        $patchesApplier->apply($repository, $targets, $filters);
+        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
+        $patches = $patchesLoader->loadFromPackagesRepository($repository);
+        
+        $patchesApplier->apply($repository, $patches);
     }
 
     public function stripPatches($devMode = false, array $targets = array(), array $filters = array())
@@ -84,9 +87,12 @@ class Bootstrap
 
         $config = $this->configFactory->create($this->composer, $sources);
 
-        $patchesApplier = $this->applierFactory->create($this->composer, $config);
-        $repository = $this->repositoryFactory->create($this->composer, $config, $devMode);
+        $patchesApplier = $this->applierFactory->create($this->composer, $config, $targets, $filters);
+        $patchesLoader = $this->loaderFactory->create($this->composer, $config, $devMode);
 
-        $patchesApplier->apply($repository, $targets, $filters);
+        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
+        $patches = $patchesLoader->loadFromPackagesRepository($repository);
+
+        $patchesApplier->apply($repository, $patches);
     }
 }

@@ -7,7 +7,6 @@ namespace Vaimo\ComposerPatches\Managers;
 
 use Composer\Repository\WritableRepositoryInterface;
 use Vaimo\ComposerPatches\Config as PluginConfig;
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Vaimo\ComposerPatches\Composer\Constraint;
 
 class PatcherStateManager

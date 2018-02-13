@@ -61,12 +61,17 @@ class Loader
             array()
         );
         
-        return array_reduce(
+        $patches = array_reduce(
             $this->processors,
             function (array $patches, ListLoader $listLoader) use ($packages) {
                 return $listLoader->process($patches, $packages);
             },
             $this->patchesCollector->collect(array_unique($sources))
+        );
+
+        return array_replace(
+            array_fill_keys(array_keys($packages), array()),
+            $patches
         );
     }
 }
