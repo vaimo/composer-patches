@@ -477,25 +477,6 @@ next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
 
-## Patcher: OS overrides
-
-Achieved by prefixing the patcher config key with general operation-system name.
- 
-```json
-{
-   "extra": {
-     "patcher": {},
-     "patcher-windows": {},
-     "patcher-bsd": {},
-     "patcher-linux": {}   
-   }
-}
-```
-
-The contents of each of these keys follows the same structure as described in `Patcher: configuration` and
-will be merged into the default configuration (or into configuration overrides that are defined under
-the general `patcher` key).
-
 ## Patcher: sources
 
 These flags allow developer to have more control over the patch collector and omit certain sources when
@@ -553,6 +534,40 @@ For packages, wildcards can be used to source form a wider range of packages.
 _These flags do not affect the way 'patch' command works, which will apply patches even when patching has
 been said to be disabled in composer.json; These flags indicate whether the patches will be applied on 
 'install' and 'update' calls_ 
+
+## Patcher: OS overrides
+
+Achieved by prefixing the patcher config key with general operation-system name.
+ 
+```json
+{
+   "extra": {
+     "patcher": {},
+     "patcher-windows": {},
+     "patcher-linux": {},
+     "patcher-mac": {},
+     "patcher-sun": {},
+     "patcher-bsd": {},
+     "patcher-cygwin": {}
+   }
+}
+```
+
+The contents of each of these keys follows the same structure as described in `Patcher: configuration` and
+will be merged into the default configuration (or into configuration overrides that are defined under
+the general `patcher` key).
+
+Patches can also be just defined for a certain OS family.
+
+```json
+{
+   "extra": {
+     "patcher-unix": {},
+     "patcher-windows": {},
+     "patcher-windows-unix": {}   
+   }
+}
+```
 
 ## Patch Command
 
