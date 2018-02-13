@@ -71,7 +71,7 @@ class QueueGenerator
             }
         }
 
-        $resetQueue = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
+        $resets = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
 
         if ($targets) {
             $targetsFilter = $this->filterUtils->composeRegex($targets, '/');
@@ -87,14 +87,14 @@ class QueueGenerator
                 $this->patchListUtils->getAllTargets($patches)
             );
 
-            $resetQueue = array_intersect($resetQueue, $subset);
+            $resets = array_intersect($resets, $subset);
         }
 
-        $resetQueue = array_merge(
-            $this->patchListUtils->getRelatedTargets($patches, $resetQueue),
-            $resetQueue
+        $resets = array_merge(
+            $this->patchListUtils->getRelatedTargets($patches, $resets),
+            $resets
         );
         
-        return array($patches, $resetQueue);
+        return array($patches, $resets);
     }
 }
