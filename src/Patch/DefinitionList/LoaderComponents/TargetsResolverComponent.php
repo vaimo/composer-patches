@@ -34,6 +34,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
      * @param array $patches
      * @param \Composer\Package\PackageInterface[] $packagesByName
      * @return array
+     * @throws \Vaimo\ComposerPatches\Exceptions\LoaderException
      */
     public function process(array $patches, array $packagesByName)
     {
@@ -47,9 +48,13 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                     continue;
                 }
 
-                $path = $info['path'];
+                $path = $info[PatchDefinition::PATH];
 
                 if (!file_exists($path)) {
+                    throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
+                        sprintf('Failed to resolve bundle targets for %s',  $info[PatchDefinition::SOURCE])
+                    );
+                    
                     continue;
                 }
 

@@ -53,6 +53,11 @@
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true,
         "changelog": {
+            "3.23.5": {
+                "fix": [
+                    "wrong error message when bundle patch is not found from defined path"
+                ]
+            },
             "3.23.4": {
                 "maintenance": [
                     "minor modifications to patch filtering logic"
