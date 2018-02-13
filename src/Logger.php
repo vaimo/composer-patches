@@ -27,7 +27,10 @@ class Logger
     ) {
         $this->io = $io;
     }
-    
+
+    /**
+     * @return \Composer\IO\IOInterface|\Composer\IO\ConsoleIO
+     */
     public function getOutputInstance()
     {
         return $this->io;

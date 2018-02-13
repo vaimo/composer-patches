@@ -33,6 +33,11 @@ class Bootstrap
     private $applierFactory;
 
     /**
+     * @var \Vaimo\ComposerPatches\Repository\Processor
+     */
+    private $repositoryProcessor;
+
+    /**
      * @var \Vaimo\ComposerPatches\Utils\FilterUtils
      */
     private $filterUtils;
@@ -49,34 +54,33 @@ class Bootstrap
     ) {
         $this->composer = $composer;
         $this->config = $config;
-
+        
+        $logger = new \Vaimo\ComposerPatches\Logger($io);
+        
         $this->configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory();
         $this->loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($io);
-        $this->applierFactory = new \Vaimo\ComposerPatches\Factories\PatchesApplierFactory($io);
+        $this->applierFactory = new \Vaimo\ComposerPatches\Factories\PatchesApplierFactory($logger);
+        $this->repositoryProcessor = new \Vaimo\ComposerPatches\Repository\Processor($logger);
 
         $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
     }
 
     public function applyPatches($devMode = false, array $targets = array(), array $filters = array())
     {
+        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
+
         $config = $this->configFactory->create($this->composer, array($this->config));
 
+        $patchesLoader = $this->loaderFactory->create($this->composer, $config, $devMode);
         $patchesApplier = $this->applierFactory->create($this->composer, $config, $targets, $filters);
 
-        if (!$patchesApplier) {
-            return null;
-        }
-
-        $patchesLoader = $this->loaderFactory->create($this->composer, $config, $devMode);
-
-        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-        $patches = $patchesLoader->loadFromPackagesRepository($repository);
-        
-        $patchesApplier->apply($repository, $patches);
+        $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
     }
 
     public function stripPatches($devMode = false, array $targets = array(), array $filters = array())
     {
+        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
+
         $sources = array($this->config);
 
         if ($filters) {
@@ -87,12 +91,9 @@ class Bootstrap
 
         $config = $this->configFactory->create($this->composer, $sources);
 
-        $patchesApplier = $this->applierFactory->create($this->composer, $config, $targets, $filters);
         $patchesLoader = $this->loaderFactory->create($this->composer, $config, $devMode);
+        $patchesApplier = $this->applierFactory->create($this->composer, $config, $targets, $filters);
 
-        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-        $patches = $patchesLoader->loadFromPackagesRepository($repository);
-
-        $patchesApplier->apply($repository, $patches);
+        $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
     }
 }

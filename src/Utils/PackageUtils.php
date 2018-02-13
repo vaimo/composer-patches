@@ -49,11 +49,8 @@ class PackageUtils
                 return true;
             }
 
-            if (!array_diff_assoc($appliedPatches, $patches)
-                && !array_diff_assoc($patches, $appliedPatches)
-            ) {
-                return false;
-            }
+            return array_diff_assoc($appliedPatches, $patches)
+                || array_diff_assoc($patches, $appliedPatches);
         }
 
         return (bool)count($patches);

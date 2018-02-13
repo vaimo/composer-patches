@@ -55,7 +55,8 @@
         "changelog": {
             "3.23.3-rc": {
                 "maintenance": [
-                    "definition normalizer split into separate components"
+                    "definition normalizer split into separate components",
+                    "patch applier partially split into smaller components"
                 ]
             },
             "3.23.2": {

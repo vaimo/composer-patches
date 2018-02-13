@@ -5,9 +5,6 @@
  */
 namespace Vaimo\ComposerPatches\Repository;
 
-use Symfony\Component\Console\Output\OutputInterface;
-use Vaimo\ComposerPatches\Composer\ResetOperation;
-use Vaimo\ComposerPatches\Composer\OutputUtils;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Composer\Repository\WritableRepositoryInterface as PackageRepository;
 
@@ -82,31 +79,27 @@ class PatchesApplier
 
         $packagesUpdated = false;
 
-        $this->logger->write('info', 'Processing patches configuration');
+        list ($patchList, $resetList) = $this->queueGenerator->generate($repository, $patches);
 
-        list ($applyQueue, $resetQueue) = $this->queueGenerator->generate($repository, $patches);
-
-        $flatPatchesList = $this->patchListUtils->createSimplifiedList($applyQueue);
-
-        $loggerIndentation = $this->logger->push('-');
+        $infoList = $this->patchListUtils->createSimplifiedList($patchList);
 
         foreach ($packages as $packageName => $package) {
-            $hasPatches = !empty($applyQueue[$packageName]);
+            $hasPatches = !empty($patchList[$packageName]);
 
             if ($hasPatches) {
-                $patchTargets = $this->patchListUtils->getAllTargets(array($applyQueue[$packageName]));
+                $patchTargets = $this->patchListUtils->getAllTargets(array($patchList[$packageName]));
             } else {
                 $patchTargets = array($packageName);
             }
 
-            $itemsToReset = array_intersect($resetQueue, $patchTargets);
+            $itemsToReset = array_intersect($resetList, $patchTargets);
 
             foreach ($itemsToReset as $targetName) {
                 $resetTarget = $packages[$targetName];
 
                 $resetPatches = $this->packageUtils->resetAppliedPatches($resetTarget);
 
-                if (!$hasPatches && !isset($flatPatchesList[$targetName])) {
+                if (!$hasPatches && !isset($infoList[$targetName])) {
                     $this->logger->writeRaw(
                         'Resetting patched package <info>%s</info> (%s)',
                         array($targetName, count($resetPatches))
@@ -115,18 +108,18 @@ class PatchesApplier
 
                 $this->repositoryManager->resetPackage($repository, $resetTarget);
 
-                if (isset($flatPatchesList[$targetName])) {
-                    $knownPatches = array_intersect_assoc($flatPatchesList[$targetName], $resetPatches);
+                if (isset($infoList[$targetName])) {
+                    $knownPatches = array_intersect_assoc($infoList[$targetName], $resetPatches);
 
                     foreach (array_keys($knownPatches) as $silentPatchPath) {
-                        $applyQueue[$targetName][$silentPatchPath][PatchDefinition::CHANGED] = false;
+                        $patchList[$targetName][$silentPatchPath][PatchDefinition::CHANGED] = false;
                     };
                 }
 
                 $packagesUpdated = (bool)$resetPatches;
             }
 
-            $resetQueue = array_diff($resetQueue, $patchTargets);
+            $resetList = array_diff($resetList, $patchTargets);
 
             if (!$hasPatches) {
                 continue;
@@ -134,8 +127,8 @@ class PatchesApplier
 
             $hasPatchChanges = false;
             foreach ($patchTargets as $targetName) {
-                $targetQueue = isset($flatPatchesList[$targetName])
-                    ? $flatPatchesList[$targetName]
+                $targetQueue = isset($infoList[$targetName])
+                    ? $infoList[$targetName]
                     : array();
 
                 if (!isset($packages[$targetName])) {
@@ -163,19 +156,18 @@ class PatchesApplier
 
             $this->logger->writeRaw(
                 'Applying patches for <info>%s</info> (%s)',
-                array($packageName, count($applyQueue[$packageName]))
+                array($packageName, count($patchList[$packageName]))
             );
 
-            $packagePatchesQueue = $applyQueue[$packageName];
+            $packagePatchesQueue = $patchList[$packageName];
 
-            $subProcessIndentation = $this->logger->push('~');
+            $processIndentation = $this->logger->push('~');
 
             try {
                 $appliedPatches = $this->packagePatchApplier->applyPatches($package, $packagePatchesQueue);
-
                 $this->patcherStateManager->registerAppliedPatches($repository, $appliedPatches);
 
-                $this->logger->reset($subProcessIndentation);
+                $this->logger->reset($processIndentation);
             } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
                 $failedPath = $exception->getFailedPatchPath();
 
@@ -184,29 +176,13 @@ class PatchesApplier
                 $appliedPatches = array_intersect_key($packagePatchesQueue, array_flip($appliedPaths));
 
                 $this->patcherStateManager->registerAppliedPatches($repository, $appliedPatches);
-
-                $this->patchListUtils->sanitizeFileSystem($applyQueue);
-
-                $this->logger->reset($loggerIndentation);
-
-                $repository->write();
-
+                
                 throw $exception;
             }
 
             $this->logger->writeNewLine();
         }
-
-        $this->logger->reset($loggerIndentation);
-
-        $this->patchListUtils->sanitizeFileSystem($applyQueue);
-
-        if (!$packagesUpdated) {
-            $this->logger->writeRaw('Nothing to patch');
-        } else {
-            $this->logger->write('info', 'Writing patch info to install file');
-        }
-
-        $repository->write();
+        
+        return $packagesUpdated;
     }
 }

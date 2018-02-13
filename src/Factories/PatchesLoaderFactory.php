@@ -150,7 +150,7 @@ class PatchesLoaderFactory
         
         $packagesCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
 
-        return new Patch\DefinitionList\Loader(
+        return new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader(
             $packagesCollector,
             $patchesCollector,
             array_filter($loaderComponents),
