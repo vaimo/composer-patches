@@ -6,6 +6,12 @@ project. Packages can be defined both on project and on package level.
 The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable from 
 the composer.json of the project.
 
+[![GitHub release](https://img.shields.io/github/release/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/releases/latest)
+[![Total Downloads](https://img.shields.io/packagist/dt/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
+[![Daily Downloads](https://img.shields.io/packagist/dd/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
+[![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
+[![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
+
 ## Configuration: hard-points
 
 Patches are declared under the following keys in composer.json of the patch owner (may it be project or
