@@ -57,7 +57,7 @@
     },
     "3.22.2": {
         "fix": [
-            " bundled patch targets resolver failing due to patch info loaders being re-arranged and certain array values no longer being available (patch path not available as array keys)"
+            "bundled patch targets resolver failing due to patch info loaders being re-arranged and certain array values no longer being available (patch path not available as array keys)"
         ]
     },
     "3.22.1": {
