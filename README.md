@@ -242,10 +242,12 @@ under same `label` or under `source` key depending on how complex rest of the de
 }
 ```
 
-Note that if creating patches for a bigger software product, you may notice that the patch definition starts
-to get littered with repetitions where you have to have the patch files in folders that include the version
-and then go and define the version restriction again in the composer.json; if this is the case, you might
-consider the following definition convention:
+
+
+## Patches: base path variables
+
+Base path variables allow developers to shorten the definition of patch paths which might become cumbersome
+and repetitive.
 
 ```json
 {
@@ -270,9 +272,39 @@ consider the following definition convention:
 
 The following will use the version information and targeted package name to generate source paths:
 
-    patches/Some_PackageName/v2.7.0/important-fix.patch
-    patches/Some_PackageName/v2.7.1/important-fix.patch
-    patches/Some_PackageName/v2.8.33/important-fix.patch
+    <owner-root>/patches/Some_PackageName/v2.7.0/important-fix.patch
+    <owner-root>/patches/Some_PackageName/v2.7.1/important-fix.patch
+    <owner-root>/patches/Some_PackageName/v2.8.33/important-fix.patch
+
+The variables can also have partial value strip rules to shorten the names.
+
+```json
+{
+  "extra": {
+    "patches-base": "patches/{{VendorName}}_{{(Package|Other)ModuleName}}/{{version}}",
+    "patches": {
+      "some/package-name": {
+        "Fix: back-port for some important fix": {
+          "source": "important-fix.patch",
+          "version": [
+            ">=v2.7.0 <v2.7.1"
+          ]
+        }
+      }
+    }
+  }
+}
+
+```
+
+The following little change will result the patches to be taken from following paths
+
+    <owner-root>/patches/Some_Name/v2.7.0/important-fix.patch
+
+These rules will apply in the boundaries of the composer.json where the base path rule was defined. 
+
+If version is not known (not defined as a restriction), but is used in patches-base definition, then the
+value "0.0.0" will be used. 
 
 ## Patches: bundled patches
 

@@ -29,7 +29,7 @@ class PatchesLoaderFactory
         $this->io = $io;
     }
 
-    public function create(\Composer\Composer $composer, PluginConfig $pluginConfig, $devMode = false) 
+    public function create(\Composer\Composer $composer, PluginConfig $pluginConfig, $devMode = false)
     {
         $installationManager = $composer->getInstallationManager();
         $rootPackage = $composer->getPackage();
@@ -43,9 +43,9 @@ class PatchesLoaderFactory
         ));
 
         $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
-        
+
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
-        
+
         $loaders = array(
             PluginConfig::DEFINITIONS_LIST => new SourceLoaders\PatchList(),
             PluginConfig::DEFINITIONS_FILE => new SourceLoaders\PatchesFile($installationManager)
@@ -57,7 +57,7 @@ class PatchesLoaderFactory
                 PluginConfig::DEV_DEFINITIONS_FILE => $loaders[PluginConfig::DEFINITIONS_FILE]
             ));
         }
-        
+
         if ($pluginConfig->shouldPreferOwnerPackageConfig()) {
             $infoExtractor = new ConfigExtractors\VendorConfigExtractor($packageInfoResolver);
         } else {
@@ -78,35 +78,36 @@ class PatchesLoaderFactory
         $normalizerComponents = array(
             new NormalizerComponents\DefaultValuesComponent(),
             new NormalizerComponents\BaseComponent(),
-            new NormalizerComponents\SkipComponent(),
             new NormalizerComponents\DependencyComponent(),
             new NormalizerComponents\PathComponent(),
+            new NormalizerComponents\BasePathComponent(),
             new NormalizerComponents\UrlComponent(),
+            new NormalizerComponents\SkipComponent(),
             new NormalizerComponents\SequenceComponent(),
             new NormalizerComponents\PatcherConfigComponent()
         );
-        
+
         $definitionNormalizer = new Patch\Definition\Normalizer($normalizerComponents);
-        
+
         $listNormalizer = new Patch\ListNormalizer(
             $definitionExploder,
             $definitionNormalizer
         );
-        
+
         $patchesCollector = new Patch\Collector(
             $listNormalizer,
             $infoExtractor,
             $loaders
         );
-        
+
         if (isset($extra['excluded-patches']) && !isset($extra[PluginConfig::EXCLUDED_PATCHES])) {
             $extra[PluginConfig::EXCLUDED_PATCHES] = $extra['excluded-patches'];
         }
-            
-        $excludes = isset($extra[PluginConfig::EXCLUDED_PATCHES]) 
+
+        $excludes = isset($extra[PluginConfig::EXCLUDED_PATCHES])
             ? $extra[PluginConfig::EXCLUDED_PATCHES]
             : array();
-        
+
         $loaderComponents = array(
             new LoaderComponents\BundleComponent($rootPackage),
             $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,
@@ -120,7 +121,7 @@ class PatchesLoaderFactory
             new LoaderComponents\MergerComponent(),
             new LoaderComponents\SorterComponent()
         );
-        
+
         $sourceConfig = $patcherConfig[PluginConfig::PATCHER_SOURCES];
 
         if (isset($sourceConfig['packages']) && isset($sourceConfig['vendors'])) {
@@ -132,14 +133,14 @@ class PatchesLoaderFactory
                 $sourceConfig['packages'] = false;
                 $sourceConfig['vendors'] = false;
             }
-        } 
+        }
 
         $listSources = array(
             'project' => new \Vaimo\ComposerPatches\Sources\ProjectSource($rootPackage),
             'vendors' => new \Vaimo\ComposerPatches\Sources\VendorSource(
-                isset($sourceConfig['vendors']) && is_array($sourceConfig['vendors']) 
-                    ? $sourceConfig['vendors'] 
-                    : array() 
+                isset($sourceConfig['vendors']) && is_array($sourceConfig['vendors'])
+                    ? $sourceConfig['vendors']
+                    : array()
             ),
             'packages' => new \Vaimo\ComposerPatches\Sources\PackageSource(
                 isset($sourceConfig['packages']) && is_array($sourceConfig['packages'])
@@ -147,7 +148,7 @@ class PatchesLoaderFactory
                     : array()
             )
         );
-        
+
         $packagesCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
 
         return new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader(

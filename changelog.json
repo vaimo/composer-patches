@@ -1,4 +1,18 @@
 {
+    "3.24.0": {
+        "feature": [
+            "allow patch base path variables to have partial value extractors defined against them",
+            "use 0.0.0 version variable value when base-path definition includes version in it",
+            "include new base path variable: {{file-name}} (name derived from label) and {{file}} (name used from source as is)",
+            "allow file name to be resolved from patch label (when source not defined)"
+        ],
+        "fix": [
+            "wrong variable name used at patcher config normalizer component that caused a crash when 'config' used for patch definition"
+        ],
+        "maintenance": [
+            "composer lock removed; readme mic statistics badges added"
+        ]
+    },
     "3.23.5": {
         "fix": [
             "wrong error message when bundle patch is not found from defined path"

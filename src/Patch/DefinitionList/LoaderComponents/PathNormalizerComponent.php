@@ -30,12 +30,12 @@ class PathNormalizerComponent implements \Vaimo\ComposerPatches\Interfaces\Defin
      */
     public function process(array $patches, array $packagesByName)
     {
-        foreach ($patches as $targetPackage => &$packagePatches) {
+        foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$data) {
                 if ($data[PatchDefinition::URL]) {
                     continue;
                 }
-                
+
                 $patchOwner = $data[PatchDefinition::OWNER];
 
                 if (!isset($packagesByName[$patchOwner])) {
@@ -44,7 +44,7 @@ class PathNormalizerComponent implements \Vaimo\ComposerPatches\Interfaces\Defin
 
                 $ownerPath = $this->packageInfoResolver->getSourcePath($packagesByName[$patchOwner]);
                 $path = $data[PatchDefinition::SOURCE];
-                
+
                 $data[PatchDefinition::PATH] = $ownerPath . DIRECTORY_SEPARATOR . $path;
             }
         }

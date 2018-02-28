@@ -12,11 +12,14 @@ class PatcherConfigComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
 {
     public function normalize($target, $label, array $data, array $ownerConfig)
     {
+        $defaults = array_fill_keys(
+            array(PluginConfig::PATCHER_SEQUENCE, PluginConfig::PATCHER_LEVELS),
+            array()
+        );
+
         $config = array_replace(
-            array(PluginConfig::PATCHER_SEQUENCE => array(), PluginConfig::PATCHER_LEVELS => array()),
-            isset($config[PatchDefinition::CONFIG])
-                ? $config[PatchDefinition::CONFIG]
-                : array()
+            $defaults,
+            isset($data[PatchDefinition::CONFIG]) ? $data[PatchDefinition::CONFIG] : array()
         );
 
         if (isset($data[PatchDefinition::LEVEL])) {

@@ -7,6 +7,54 @@ namespace Vaimo\ComposerPatches\Utils;
 
 class TemplateUtils
 {
+    public function collectValueMutationRules($template, array $patterns)
+    {
+        $result = array();
+
+        foreach ($patterns as $pattern) {
+            preg_match_all('/' . sprintf($pattern, '([^\}]+)'). '/', $template, $usedVariables);
+
+            foreach ($usedVariables[1] as $variableName) {
+                if (!preg_match_all('/\(([^\)]+)\)/', $variableName, $valueRules)) {
+                    continue;
+                }
+
+                $valueExtractor = str_replace(
+                    str_replace($valueRules[0], '', $variableName),
+                    '(.*)',
+                    str_replace('(', '(?:', $variableName)
+                );
+
+                $normalizedName = str_replace($valueRules[0], '', $variableName);
+
+                $result[$variableName] = array($normalizedName => $valueExtractor);
+            }
+        }
+
+        return $result;
+    }
+
+    public function applyMutations(array $arguments, array $mutations)
+    {
+        $result = array();
+
+        foreach ($mutations as $mutationName => $mutation) {
+            if (!$matches = array_intersect_key($mutation, $arguments)) {
+                continue;
+            }
+
+            $argumentName = key($matches);
+
+            if (!preg_match_all('/' . reset($matches) . '/', $arguments[$argumentName], $valueMatches)) {
+                return false;
+            }
+
+            $result[$mutationName] = reset($valueMatches[1]);
+        }
+
+        return $result;
+    }
+
     public function compose($template, array $arguments, array $patterns)
     {
         $variables = array();

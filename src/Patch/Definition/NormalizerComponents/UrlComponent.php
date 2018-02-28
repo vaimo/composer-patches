@@ -11,10 +11,8 @@ class UrlComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNormal
 {
     public function normalize($target, $label, array $data, array $ownerConfig)
     {
-        $source = isset($data[PatchDefinition::URL])
-            ? $data[PatchDefinition::URL]
-            : $data[PatchDefinition::SOURCE];
-        
+        $source = $data[PatchDefinition::SOURCE];
+
         $sourcePathInfo = parse_url($source);
         $sourceIncludesUrlScheme = isset($sourcePathInfo['scheme']) && $sourcePathInfo['scheme'];
 

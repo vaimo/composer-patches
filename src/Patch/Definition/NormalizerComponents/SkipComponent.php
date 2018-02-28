@@ -11,9 +11,7 @@ class SkipComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNorma
 {
     public function normalize($target, $label, array $data, array $ownerConfig)
     {
-        $source = isset($data[PatchDefinition::URL])
-            ? $data[PatchDefinition::URL]
-            : $data[PatchDefinition::SOURCE];
+        $source = $data[PatchDefinition::SOURCE];
 
         $sourceSegments = explode('#', $source);
         $lastSegment = array_pop($sourceSegments);

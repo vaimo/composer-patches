@@ -37,13 +37,13 @@ class ListNormalizer
 
         foreach ($list as $target => $packagePatches) {
             $patches = array();
-            
+
             foreach ($packagePatches as $patchLabel => $patchConfig) {
                 $definitionItems = $this->definitionExploder->process($patchLabel, $patchConfig);
-                
+
                 foreach ($definitionItems as $patchItem) {
                     list($label, $data) = $patchItem;
-                    
+
                     $patches[] = $this->definitionNormalizer->process($target, $label, $data, $config);
                 }
             }

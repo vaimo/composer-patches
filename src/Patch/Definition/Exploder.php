@@ -11,7 +11,7 @@ class Exploder
      * @var \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface[]
      */
     private $components;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface[] $components
      */
@@ -20,9 +20,13 @@ class Exploder
     ) {
         $this->components = $components;
     }
-    
+
     public function process($label, $data)
     {
+        if ($label == 'Fix: correctly protect tags with params from html escape (https://github.com/magento/magento2/issues/9223)' && count($data) > 1)  {
+            $i = 0;
+        }
+
         foreach ($this->components as $processor) {
             if (!$processor->shouldProcess($label, $data)) {
                 continue;
@@ -32,7 +36,7 @@ class Exploder
                 return $items;
             }
         }
-        
+
         return array(
             array($label, $data)
         );
