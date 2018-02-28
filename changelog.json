@@ -1,4 +1,9 @@
 {
+    "3.24.1": {
+        "maintenance": [
+            "debug code removed (shame)"
+        ]
+    },
     "3.24.0": {
         "feature": [
             "allow patch base path variables to have partial value extractors defined against them",

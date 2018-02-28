@@ -23,10 +23,6 @@ class Exploder
 
     public function process($label, $data)
     {
-        if ($label == 'Fix: correctly protect tags with params from html escape (https://github.com/magento/magento2/issues/9223)' && count($data) > 1)  {
-            $i = 0;
-        }
-
         foreach ($this->components as $processor) {
             if (!$processor->shouldProcess($label, $data)) {
                 continue;
