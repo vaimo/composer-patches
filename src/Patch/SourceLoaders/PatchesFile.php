@@ -13,7 +13,7 @@ class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoader
      * @var \Composer\Installer\InstallationManager
      */
     private $installationManager;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Package\ConfigReader
      */
@@ -26,7 +26,7 @@ class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoader
         \Composer\Installer\InstallationManager $installationManager
     ) {
         $this->installationManager = $installationManager;
-        
+
         $this->configLoader = new \Vaimo\ComposerPatches\Package\ConfigReader();
     }
 
@@ -37,12 +37,12 @@ class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoader
         }
 
         $basePath = $this->installationManager->getInstallPath($package);
-        
+
         $groups = array();
-        
+
         foreach ($source as $item) {
             $fileContents = $this->configLoader->readToArray($basePath . DIRECTORY_SEPARATOR . $item);
-            
+
             if (isset($fileContents[PluginConfig::DEFINITIONS_LIST])) {
                 $fileContents = $fileContents[PluginConfig::DEFINITIONS_LIST];
             }

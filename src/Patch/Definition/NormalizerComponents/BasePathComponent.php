@@ -34,10 +34,19 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
 
         $nameParts = explode('/', $target);
 
+        $sourceTags = '';
+
+        if (strstr($source, '#') !== false) {
+            $sourceSegments = explode('#', $source);
+            $sourceTags = array_pop($sourceSegments);
+            $source = implode('#', $sourceSegments);
+        }
+
         $pathVariables = array(
             'file' => $source,
             'vendor' => array_shift($nameParts),
-            'package' => implode('/', $nameParts)
+            'package' => implode('/', $nameParts),
+            'label' => $label
         );
 
         $nameParts = array_map(function ($part) {
@@ -49,13 +58,14 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
                 )
             );
 
-            return str_replace(array(' ', '_', '-', '.', '/'), ' ', $part);
+            return preg_replace('/\s{2,}/', ' ', str_replace(array(' ', '_', '-', '.', '/', ':'), ' ', $part));
         }, $pathVariables);
 
         $mutationNamesMap = array(
             'file' => 'file name',
             'vendor' => 'vendor name',
-            'package' => 'module name'
+            'package' => 'module name',
+            'label' => 'label value'
         );
 
         $mutationAppliers = array(
@@ -95,7 +105,8 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
                 '',
                 strtok(reset($data[PatchDefinition::DEPENDS]) ?: '0.0.0', ' ')
             ),
-            'file' => $source
+            'file' => $source,
+            'label' => $label
         );
 
         $variablePattern = '{{%s}}';
@@ -104,26 +115,34 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         $mutationRules = $this->templateUtils->collectValueMutationRules($template, array($variablePattern));
 
         $templateVariables = array_replace(
-            $this->templateUtils->applyMutations($pathVariables, $mutationRules),
+            $this->templateUtils->applyMutations(
+                array_replace($pathVariables, $extraVariables),
+                $mutationRules,
+                ' :-_.'
+            ),
             $pathVariables,
             $extraVariables
         );
 
-        $namesWithRules = array_keys(array_reduce($mutationRules, 'array_replace', array()));
+        $source = $this->templateUtils->compose(
+            $template . ($sourceTags ? ('#' . $sourceTags) : ''),
+            $templateVariables,
+            array_fill_keys(array($variablePattern), false)
+        );
 
-        if (
-            strstr($template, sprintf($variablePattern, 'file')) === false
-            && !array_intersect($mutatedNames['file'], $namesWithRules)
-        ) {
-            $template .= DIRECTORY_SEPARATOR . sprintf($variablePattern, 'file');
+        $filename = basename($source);
+
+        if (substr($label, -strlen($filename)) == $filename) {
+            $label = str_replace(
+                $filename,
+                preg_replace('/\s{2,}/', ' ', preg_replace('/[^A-Za-z0-9]/', ' ', strtok($filename, '.'))),
+                $label
+            );
         }
 
         return array(
-            PatchDefinition::SOURCE => $this->templateUtils->compose(
-                $template,
-                $templateVariables,
-                array_fill_keys(array($variablePattern), false)
-            ),
+            PatchDefinition::LABEL => $label,
+            PatchDefinition::SOURCE => $source
         );
     }
 }

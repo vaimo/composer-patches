@@ -15,12 +15,12 @@ class Collector
      * @var \Vaimo\ComposerPatches\Patch\ListNormalizer
      */
     private $listNormalizer;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
      */
     private $infoExtractor;
-    
+
     /**
      * @var PatchSourceLoaderInterface[]
      */
@@ -55,7 +55,7 @@ class Collector
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
             $sourceLoaders = array_intersect_key($this->sourceLoaders, $config);
             $ownerConfig = array_diff_key($config, $this->sourceLoaders);
-            
+
             $patchListCollection = array();
             foreach ($sourceLoaders as $key => $source) {
                 $groups = $source->load($owner, $config[$key]);
@@ -67,9 +67,9 @@ class Collector
                     }, $groups)
                 );
             }
-            
+
             $patches = array_reduce($patchListCollection, 'array_merge_recursive', array());
-            
+
             foreach ($patches as $target => $items) {
                 foreach ($items as $index => $patch) {
                     $collection[$target][] = array_replace($patch, array(
@@ -79,7 +79,7 @@ class Collector
                 }
             }
         }
-        
+
         return $collection;
     }
 }

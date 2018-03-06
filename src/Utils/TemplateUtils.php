@@ -34,7 +34,7 @@ class TemplateUtils
         return $result;
     }
 
-    public function applyMutations(array $arguments, array $mutations)
+    public function applyMutations(array $arguments, array $mutations, $trimRules = ' ')
     {
         $result = array();
 
@@ -45,11 +45,11 @@ class TemplateUtils
 
             $argumentName = key($matches);
 
-            if (!preg_match_all('/' . reset($matches) . '/', $arguments[$argumentName], $valueMatches)) {
-                return false;
+            if (preg_match_all('/' . reset($matches) . '/i', $arguments[$argumentName], $valueMatches)) {
+                $result[$mutationName] = trim(reset($valueMatches[1]), $trimRules);
+            } else {
+                $result[$mutationName] = trim($arguments[$argumentName], $trimRules);
             }
-
-            $result[$mutationName] = reset($valueMatches[1]);
         }
 
         return $result;

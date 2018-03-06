@@ -65,6 +65,7 @@ class PatchesLoaderFactory
         }
 
         $exploderComponents = array(
+            new ExploderComponents\LabelVersionConfigComponent(),
             new ExploderComponents\VersionConfigComponent(),
             new ExploderComponents\VersionRangesConfigComponent(),
             new ExploderComponents\ComplexItemComponent(),

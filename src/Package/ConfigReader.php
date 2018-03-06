@@ -16,16 +16,15 @@ class ConfigReader
     {
         $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
     }
-    
+
     public function readToArray($source)
     {
         if (!file_exists($source)) {
             throw new \Vaimo\ComposerPatches\Exceptions\ReadException(
                 sprintf('File not found: %s', $source)
             );
+        }
 
-        } 
-        
         $sourceData = file_get_contents($source);
 
         try {
@@ -35,7 +34,7 @@ class ConfigReader
 
             throw new \Vaimo\ComposerPatches\Exceptions\ReadException($message, 0, $exception);
         }
-        
+
         return $fileContents;
     }
 }

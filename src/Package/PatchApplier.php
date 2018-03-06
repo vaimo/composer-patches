@@ -72,7 +72,7 @@ class PatchApplier
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
-    
+
     public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
         if ($package instanceof \Composer\Package\RootPackage) {
@@ -80,31 +80,32 @@ class PatchApplier
         } else {
             $installPath = $this->packageInfoResolver->getSourcePath($package);
         }
-        
+
         $appliedPatches = array();
 
         foreach ($patchesQueue as $source => $info) {
             $this->logger->writeRaw(
-                '<info>%s</info>: %s%s', 
+                '<info>%s</info>: %s%s',
                 array(
-                    $info[PatchDefinition::OWNER], 
+                    $info[PatchDefinition::OWNER],
                     $source,
-                    $info[PatchDefinition::CHANGED] ? ' [<info>NEW</info>]' : '' 
+                    $info[PatchDefinition::CHANGED] ? ' [<info>NEW</info>]' : ''
                 )
             );
-            
+
             $loggerIndentation = $this->logger->push();
 
-            $this->logger->writeRaw('<comment>%s</comment>', array($info[PatchDefinition::LABEL]));            
+            $this->logger->writeRaw('<comment>%s</comment>', array($info[PatchDefinition::LABEL]));
+
             try {
                 $this->eventDispatcher->dispatch(
                     Events::PRE_APPLY,
                     new Event(Events::PRE_APPLY, $package, $source, $info[PatchDefinition::LABEL])
                 );
-                
+
                 $this->patchApplier->applyFile(
-                    $info[PatchDefinition::PATH], 
-                    $installPath, 
+                    $info[PatchDefinition::PATH],
+                    $installPath,
                     $info[PatchDefinition::CONFIG]
                 );
 
@@ -116,7 +117,7 @@ class PatchApplier
                 );
             } catch (\Exception $exception) {
                 $this->logger->writeException($exception);
-                
+
                 $this->failureHandler->execute(
                     $exception->getMessage(),
                     $source

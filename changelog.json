@@ -1,4 +1,18 @@
 {
+    "3.25.0": {
+        "feature": [
+            "new definition format that consists of description/filename and version restriction",
+            "allow label to be used as file-name (defined in base-path pattern as {{label}} or {{label-value}})",
+            "allow items without mutations (like {{label}}) to have strip-rules defined against them",
+            "don't display label when file name is directly part of the label"
+        ],
+        "fix": [
+            "bad data type returned when base-path pattern defined and certain parts of the name did not match with any value-strip rule",
+            "skip flag not correctly moved to the end of the path when using patches-base configuration",
+            "don't append the base-path pattern with custom extras and expect users to take charge of making sure that the file name is part of the path",
+            "trim whitespace, slash, colon when patch source starts with space"
+        ]
+    },
     "3.24.1": {
         "maintenance": [
             "debug code removed (shame)"
