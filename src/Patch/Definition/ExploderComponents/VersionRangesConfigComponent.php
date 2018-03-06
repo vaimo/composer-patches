@@ -10,15 +10,15 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class VersionRangesConfigComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface
 {
     /**
-     * @var \Composer\Semver\VersionParser
+     * @var \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser
      */
-    private $versionParser;
+    private $valueAnalyser;
 
-    public function __construct() 
+    public function __construct()
     {
-        $this->versionParser = new \Composer\Semver\VersionParser();
+        $this->valueAnalyser = new \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser();
     }
-    
+
     public function shouldProcess($label, $data)
     {
         if (!is_array($data)) {
@@ -30,20 +30,18 @@ class VersionRangesConfigComponent implements \Vaimo\ComposerPatches\Interfaces\
         }
 
         $version = $data[PatchDefinition::VERSION];
-        
+
         if (!is_array($version)) {
             return false;
         }
-        
-        return $this->isConstraint(
-            key($version)
-        );
+
+        return $this->valueAnalyser->isConstraint(key($version));
     }
-    
+
     public function explode($label, $data)
     {
         $items = array();
-        
+
         foreach ($data[PatchDefinition::VERSION] as $version) {
             $items[] = array(
                 $label,
@@ -52,18 +50,7 @@ class VersionRangesConfigComponent implements \Vaimo\ComposerPatches\Interfaces\
                 ))
             );
         }
-        
-        return $items;
-    }
-    
-    private function isConstraint($value)
-    {
-        try {
-            $this->versionParser->parseConstraints($value);
-        } catch (\UnexpectedValueException $exception) {
-            return false;
-        }
 
-        return true;
+        return $items;
     }
 }

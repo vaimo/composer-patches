@@ -10,26 +10,26 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class SequenceVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface
 {
     /**
-     * @var \Composer\Semver\VersionParser
+     * @var \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser
      */
-    private $versionParser;
+    private $valueAnalyser;
 
     public function __construct()
     {
-        $this->versionParser = new \Composer\Semver\VersionParser();
+        $this->valueAnalyser = new \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser();
     }
-    
+
     public function shouldProcess($label, $data)
     {
         if (!is_array($data)) {
             return false;
         }
-        
+
         return is_numeric($label)
             && isset($data[PatchDefinition::LABEL], $data[PatchDefinition::SOURCE])
             && is_array($data[PatchDefinition::SOURCE])
             && !is_array(reset($data[PatchDefinition::SOURCE]))
-            && $this->isConstraint(key($data[PatchDefinition::SOURCE]));
+            && $this->valueAnalyser->isConstraint(key($data[PatchDefinition::SOURCE]));
     }
 
     public function explode($label, $data)
@@ -37,10 +37,10 @@ class SequenceVersionConfigComponent implements \Vaimo\ComposerPatches\Interface
         $items = array();
 
         foreach ($data[PatchDefinition::SOURCE] as $constraint => $source) {
-            if (!$this->isConstraint($constraint)) {
+            if (!$this->valueAnalyser->isConstraint($constraint)) {
                 continue;
             }
-            
+
             $items[] = array(
                 $data[PatchDefinition::LABEL],
                 array(
@@ -51,16 +51,5 @@ class SequenceVersionConfigComponent implements \Vaimo\ComposerPatches\Interface
         }
 
         return $items;
-    }
-
-    private function isConstraint($value)
-    {
-        try {
-            $this->versionParser->parseConstraints($value);
-        } catch (\UnexpectedValueException $exception) {
-            return false;
-        }
-
-        return true;
     }
 }

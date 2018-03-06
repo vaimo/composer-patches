@@ -1,4 +1,9 @@
 {
+    "3.25.2": {
+        "fix": [
+            "array-based values ended up being treated as version constraints (issue with label-version exploder)"
+        ]
+    },
     "3.25.1": {
         "fix": [
             "label-version definition exploder not handling a list of multiple versions correctly"

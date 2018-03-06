@@ -10,15 +10,15 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class VersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface
 {
     /**
-     * @var \Composer\Semver\VersionParser
+     * @var \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser
      */
-    private $versionParser;
+    private $valueAnalyser;
 
-    public function __construct() 
+    public function __construct()
     {
-        $this->versionParser = new \Composer\Semver\VersionParser();
+        $this->valueAnalyser = new \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser();
     }
-    
+
     public function shouldProcess($label, $data)
     {
         if (!is_array($data)) {
@@ -29,18 +29,18 @@ class VersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
         $value = reset($data);
 
         return !isset($value[PatchDefinition::VERSION], $value[PatchDefinition::DEPENDS]) &&
-            $this->isConstraint($key);
+            $this->valueAnalyser->isConstraint($key);
     }
-    
+
     public function explode($label, $data)
     {
         $items = array();
-        
+
         foreach ($data as $constraint => $source) {
-            if (!$this->isConstraint($constraint)) {
+            if (!$this->valueAnalyser->isConstraint($constraint)) {
                 continue;
             }
-            
+
             $items[] = array(
                 $label,
                 array(
@@ -49,18 +49,7 @@ class VersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
                 )
             );
         }
-        
-        return $items;
-    }
-    
-    private function isConstraint($value)
-    {
-        try {
-            $this->versionParser->parseConstraints($value);
-        } catch (\UnexpectedValueException $exception) {
-            return false;
-        }
 
-        return true;
+        return $items;
     }
 }

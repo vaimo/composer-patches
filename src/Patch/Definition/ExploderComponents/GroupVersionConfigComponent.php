@@ -10,21 +10,21 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class GroupVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface
 {
     /**
-     * @var \Composer\Semver\VersionParser
+     * @var \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser
      */
-    private $versionParser;
+    private $valueAnalyser;
 
-    public function __construct() 
+    public function __construct()
     {
-        $this->versionParser = new \Composer\Semver\VersionParser();
+        $this->valueAnalyser = new \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser();
     }
-    
+
     public function shouldProcess($label, $data)
     {
         if (!is_array($data)) {
             return false;
         }
-        
+
         if (!isset($data[PatchDefinition::SOURCE])) {
             return false;
         }
@@ -34,31 +34,31 @@ class GroupVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
         if (!is_array($source)) {
             return false;
         }
-        
+
         $key = key($source);
         $value = reset($source);
 
-        return $this->isConstraint($key) 
-            && !isset($data[PatchDefinition::DEPENDS], $data[PatchDefinition::VERSION]) 
+        return $this->valueAnalyser->isConstraint($key)
+            && !isset($data[PatchDefinition::DEPENDS], $data[PatchDefinition::VERSION])
             && (
-                !is_array($value) 
+                !is_array($value)
                 || !isset($value[PatchDefinition::VERSION], $value[PatchDefinition::DEPENDS])
             );
     }
-    
+
     public function explode($label, $data)
     {
         $items = array();
 
         $sources = $data[PatchDefinition::SOURCE];
-        
+
         unset($data[PatchDefinition::SOURCE]);
-        
+
         foreach ($sources as $constraint => $source) {
-            if (!$this->isConstraint($constraint)) {
+            if (!$this->valueAnalyser->isConstraint($constraint)) {
                 continue;
             }
-            
+
             $items[] = array(
                 $label,
                 array_replace(
@@ -70,18 +70,7 @@ class GroupVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
                 )
             );
         }
-        
-        return $items;
-    }
-    
-    private function isConstraint($value)
-    {
-        try {
-            $this->versionParser->parseConstraints($value);
-        } catch (\UnexpectedValueException $exception) {
-            return false;
-        }
 
-        return true;
+        return $items;
     }
 }

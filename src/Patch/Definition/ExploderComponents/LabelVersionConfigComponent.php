@@ -10,22 +10,22 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class LabelVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface
 {
     /**
-     * @var \Composer\Semver\VersionParser
+     * @var \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser
      */
-    private $versionParser;
+    private $valueAnalyser;
 
     public function __construct()
     {
-        $this->versionParser = new \Composer\Semver\VersionParser();
+        $this->valueAnalyser = new \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser();
     }
 
     public function shouldProcess($label, $data)
     {
         if (!is_array($data)) {
-            return $this->isConstraint($data);
+            return $this->valueAnalyser->isConstraint($data);
         }
 
-        return $this->isConstraint(reset($data));
+        return $this->valueAnalyser->isConstraint(reset($data));
     }
 
     public function explode($label, $data)
@@ -35,7 +35,7 @@ class LabelVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
         $versions = is_array($data) ? $data : array($data);
 
         foreach ($versions as $version) {
-            if (!$this->isConstraint($version)) {
+            if (!$this->valueAnalyser->isConstraint($version)) {
                 continue;
             }
 
@@ -46,16 +46,5 @@ class LabelVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
         }
 
         return $items;
-    }
-
-    private function isConstraint($value)
-    {
-        try {
-            $this->versionParser->parseConstraints($value);
-        } catch (\UnexpectedValueException $exception) {
-            return false;
-        }
-
-        return true;
     }
 }
