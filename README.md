@@ -252,7 +252,7 @@ and repetitive.
 ```json
 {
   "extra": {
-    "patches-base": "patches/{{VendorName}}_{{ModuleName}}/{{version}}",
+    "patches-base": "patches/{{VendorName}}_{{ModuleName}}/{{version}}/{{file}}",
     "patches": {
       "some/package-name": {
         "Fix: back-port for some important fix": {
@@ -281,7 +281,7 @@ The variables can also have partial value strip rules to shorten the names.
 ```json
 {
   "extra": {
-    "patches-base": "patches/{{VendorName}}_{{(Package|Other)ModuleName}}/{{version}}",
+    "patches-base": "patches/{{VendorName}}_{{(Package|Other)ModuleName}}/{{version}}/{{file}}",
     "patches": {
       "some/package-name": {
         "Fix: back-port for some important fix": {
@@ -305,6 +305,35 @@ These rules will apply in the boundaries of the composer.json where the base pat
 
 If version is not known (not defined as a restriction), but is used in patches-base definition, then the
 value "0.0.0" will be used. 
+
+In case patch comment is just a repetition of what the path file name says, the following can be used:
+
+```json
+{
+  "extra": {
+    "patches-base": "patches/{{VendorName}}_{{(Package|Other)ModuleName}}/{{version}}/{{(feature|fix)label}}",
+    "patches": {
+      "some/package-name": {
+        "Fix: other-fix.patch": "1.2.3",
+        "Fix: back-port-for-some-important-fix.patch": [
+            ">=2.7.0 <2.7.1",
+            ">=2.8.33 <3.0.0"
+        ]
+      }
+    }
+  }
+}
+
+```
+
+The following little change will result the patches to be taken from following paths
+
+    <owner-root>/patches/Some_Name/1.2.3/other-fix.patch
+    <owner-root>/patches/Some_Name/2.7.0/back-port-for-some-important-fix.patch
+    <owner-root>/patches/Some_Name/2.8.33/back-port-for-some-important-fix.patch
+
+Note the value-strip rules that have been defined for label which take care of not including "Fix: " prefix
+when using label as filename. 
 
 ## Patches: bundled patches
 
