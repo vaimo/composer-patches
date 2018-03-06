@@ -25,11 +25,7 @@ class LabelVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
             return $this->isConstraint($data);
         }
 
-        $key = key($data);
-        $value = reset($data);
-
-        return !isset($value[PatchDefinition::VERSION], $value[PatchDefinition::DEPENDS]) &&
-            $this->isConstraint($key);
+        return $this->isConstraint(reset($data));
     }
 
     public function explode($label, $data)

@@ -1,4 +1,9 @@
 {
+    "3.25.1": {
+        "fix": [
+            "label-version definition exploder not handling a list of multiple versions correctly"
+        ]
+    },
     "3.25.0": {
         "feature": [
             "new definition format that consists of description/filename and version restriction",
