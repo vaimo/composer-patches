@@ -1,4 +1,9 @@
 {
+    "3.25.3": {
+        "fix": [
+            "missing file added"
+        ]
+    },
     "3.25.2": {
         "fix": [
             "array-based values ended up being treated as version constraints (issue with label-version exploder)"
