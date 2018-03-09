@@ -12,7 +12,7 @@ the composer.json of the project.
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
 [![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
 
-## Configuration: hard-points
+## Configuration: hardpoints
 
 Patches are declared under the following keys in composer.json of the patch owner (may it be project or
 a package).
