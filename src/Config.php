@@ -33,6 +33,8 @@ class Config
     
     const PATCHES_DEPENDS = 'patches-depend';
     const PATCHES_BASE = 'patches-base';
+
+    const PATCHES_BASE_DEFAULT = 'default';
     
     const PATCHER_ARG_LEVEL = 'level';
     const PATCHER_ARG_FILE = 'file';

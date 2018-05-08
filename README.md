@@ -390,6 +390,22 @@ Where the `example/bundle.patch` content would have file paths defined in follow
           */
 ```
 
+Note that if you plan to use bundled patches whilst also using patches-base, the following approach could
+be used:
+
+```json
+{
+  "extra": {
+    "patches-base": {
+      "default": "patches/{{VendorName}}_{{(Magento2|Module)ModuleName}}/{{file}}/version-{{version}}.patch",
+      "*": "patches/Bundled/{{file}}/version-{{version}}.patch"
+    }
+  }
+}
+```
+
+The first dependency version will be used for the bundled patches {{version}} value.
+
 ## Patches: defining patches with strict path strip level
 
 By default, the patcher will try to apply the patch with several path stripping options - in some cases 

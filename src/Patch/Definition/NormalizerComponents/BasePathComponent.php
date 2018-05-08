@@ -19,19 +19,21 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
     {
         $this->templateUtils = new \Vaimo\ComposerPatches\Utils\TemplateUtils();
     }
-
+    
     public function normalize($target, $label, array $data, array $ownerConfig)
     {
         if (!isset($ownerConfig[PluginConfig::PATCHES_BASE])) {
             return array();
         }
-
+        
         $source = $data[PatchDefinition::SOURCE];
 
         if (parse_url($source, PHP_URL_SCHEME)) {
             return array();
         }
 
+        $template = $this->resolveTemplate($ownerConfig, $target);
+        
         $nameParts = explode('/', $target);
 
         $sourceTags = '';
@@ -68,23 +70,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             'label' => 'label value'
         );
 
-        $mutationAppliers = array(
-            function ($value) {
-                return str_replace(' ', '', $value);
-            },
-            function ($value) {
-                return str_replace(' ', '', ucwords($value));
-            },
-            function ($value) {
-                return str_replace(' ', '', ucfirst($value));
-            },
-            function ($value) {
-                return str_replace(' ', '-', $value);
-            },
-            function ($value) {
-                return str_replace(' ', '_', $value);
-            },
-        );
+        $mutationAppliers = $this->createMutationAppliers();
 
         $pathVariables = array();
         $mutatedNames = array_fill_keys(array_keys($mutationNamesMap), array());
@@ -110,7 +96,6 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         );
 
         $variablePattern = '{{%s}}';
-        $template = $ownerConfig[PluginConfig::PATCHES_BASE];
 
         $mutationRules = $this->templateUtils->collectValueMutationRules($template, array($variablePattern));
 
@@ -143,6 +128,48 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         return array(
             PatchDefinition::LABEL => $label,
             PatchDefinition::SOURCE => $source
+        );
+    }
+
+    private function resolveTemplate($ownerConfig, $packageName)
+    {
+        $templates = $ownerConfig[PluginConfig::PATCHES_BASE];
+
+        list($vendorName, ) = explode('/', $packageName);
+
+        if (is_array($templates)) {
+            if (isset($templates[$packageName])) {
+                return $templates[$packageName];
+            } else if (isset($templates[$vendorName])) {
+                return $templates[$vendorName];
+            } else if ($templates[PluginConfig::PATCHES_BASE_DEFAULT]) {
+                return $templates[PluginConfig::PATCHES_BASE_DEFAULT];
+            } else {
+                return reset($templates);
+            }
+        }
+
+        return $templates;
+    }
+    
+    private function createMutationAppliers()
+    {
+        return array(
+            function ($value) {
+                return str_replace(' ', '', $value);
+            },
+            function ($value) {
+                return str_replace(' ', '', ucwords($value));
+            },
+            function ($value) {
+                return str_replace(' ', '', ucfirst($value));
+            },
+            function ($value) {
+                return str_replace(' ', '-', $value);
+            },
+            function ($value) {
+                return str_replace(' ', '_', $value);
+            },
         );
     }
 }

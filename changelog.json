@@ -1,4 +1,9 @@
 {
+    "3.26.0": {
+        "feature": [
+            "allow multiple patch-base's to be defined based on vendor or full package name"
+        ]
+    },
     "3.25.3": {
         "fix": [
             "missing file added"
