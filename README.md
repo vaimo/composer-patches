@@ -34,7 +34,10 @@ The patches declared under those keys will NOT be applied when installing the pr
   
 ## Basic Usage: configuring a patch
 
-Same format is used for both project (root level scope) patches and for package patches.
+The way of defining the patches works for:
+
+* root/project composer.json 
+* dependency packages (if you want to define your patches in a distributable package)
 
 ```json
 {
@@ -52,6 +55,9 @@ Same format is used for both project (root level scope) patches and for package 
 }
 ```
 
+* Paths to patches are relative to the owner of the composer.json that introduces a certain file path.
+* Paths within patch files are relative to targeted package's root (might differ based on path-strip level).
+
 If your patches are declared in some sub-folder, it's possible to define a base-folder that would be added
 in front of all file-path based patch definitions.
 
@@ -68,8 +74,10 @@ definition.
 
 ## Basic Usage: configuring a patches file
 
-Same format is used for both project (root level scope) patches and for package patches. Paths are 
-relative to the owner of the composer.json that introduces a certain file path.
+The way of defining the patches works for:
+
+* root/project composer.json 
+* dependency packages (if you want to define your patches in a distributable package)
 
 ```json
 {
@@ -722,6 +730,33 @@ classes from the new version.
 
 Due to the fact that the patcher kicks in very late in the process of installing a project (before 
 auto-loader generation), developers are advised to re-execute 'composer install'.
+
+## Example: defining a patch in a dependency package that targets another package
+
+Let's say that you have a root composer.json which requires two packages: A and B. The package B depends 
+on (requires) package A. In order to be able to use package B properly, package A needs to be patched.
+
+So in this case package B would have the following in it's composer.json
+```json
+{
+    "extra": {
+        "patches": {
+            "A": {
+                "Compatibility: required change to create magic": "patches/compatibility-with-dependency-a.patch"
+            }
+        }
+    }
+}
+```
+... where the patch is placed to <package B root>/patches/compatibility-with-dependency-a.patch and paths withing the patch file are relative to the root of package A.
+
+This can be tested out with...
+
+```shell
+composer patch --redo --from-source --filter compatibility-with-dependency-a
+```
+
+_The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
 
 ## Changelog 
 
