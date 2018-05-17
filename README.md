@@ -742,7 +742,7 @@ So in this case package B would have the following in it's composer.json
     "extra": {
         "patches": {
             "A": {
-                "Compatibility: required change to create magic": "patches/compatibility-with-dependency-a.patch"
+                "Compatibility: magic": "patches/compatibility-with-package-a.patch"
             }
         }
     }
