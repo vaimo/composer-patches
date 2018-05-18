@@ -36,6 +36,8 @@ class Config
 
     const PATCHES_BASE_DEFAULT = 'default';
     
+    const PATCHES_CONFIG_DEFAULT = 'default';
+    
     const PATCHER_ARG_LEVEL = 'level';
     const PATCHER_ARG_FILE = 'file';
     const PATCHER_ARG_CWD = 'cwd';

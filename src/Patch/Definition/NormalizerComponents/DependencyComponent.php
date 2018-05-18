@@ -23,10 +23,21 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                     $data[PatchDefinition::VERSION]
                 );
             } else {
-                $dependsTarget = isset($ownerConfig[PluginConfig::PATCHES_DEPENDS])
-                    ? $ownerConfig[PluginConfig::PATCHES_DEPENDS]
-                    : $target;
-
+                $dependsTarget = $target;
+                
+                if ($dependsPatterns = $this->generateDependencyMatchPatterns($ownerConfig)) {
+                    $matches = array_filter(
+                        array_keys($dependsPatterns),
+                        function ($pattern) use ($target) {
+                            return preg_match('#' . $pattern . '#', $target);
+                        }
+                    );
+                    
+                    if ($matches) {
+                        $dependsTarget = $dependsPatterns[reset($matches)];
+                    }
+                }
+                
                 $depends = array_replace(
                     $depends,
                     array($dependsTarget => $data[PatchDefinition::VERSION])
@@ -37,5 +48,39 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
         return array(
             PatchDefinition::DEPENDS => $depends
         );
+    }
+    
+    private function generateDependencyMatchPatterns(array $config)
+    {
+        $dependsConfig = array();
+        
+        if (isset($config[PluginConfig::PATCHES_DEPENDS])) {
+            $dependsConfig = $config[PluginConfig::PATCHES_DEPENDS];
+
+            if (!is_array($dependsConfig)) {
+                $dependsConfig = array(
+                    PluginConfig::PATCHES_CONFIG_DEFAULT => $dependsConfig 
+                );
+            }
+        }
+        
+        $patterns = array_map(function ($candidate) {
+            return trim($candidate, '*') 
+                ? str_replace(chr(32), '.*', preg_quote(str_replace('*', chr(32), $candidate), '#')) 
+                : preg_quote($candidate);
+        }, array_keys($dependsConfig));
+
+        $patternValues = array_combine($patterns, $dependsConfig);
+
+        if (isset($patternValues[PluginConfig::PATCHES_CONFIG_DEFAULT])) {
+            $patternValues = array_replace(
+                $patternValues,
+                array('.*' => $patternValues[PluginConfig::PATCHES_CONFIG_DEFAULT])
+            );
+            
+            unset($patternValues[PluginConfig::PATCHES_CONFIG_DEFAULT]);
+        }
+        
+        return $patternValues;
     }
 }

@@ -208,7 +208,9 @@ There are several ways a version restriction for a patch can be defined, the cho
 ```
 
 It's also possible to make all defined patches to depend on certain package as well by defining a following
-key under 'extras'.
+key under 'extras'. This is useful in projects where most of the targeted packages are strictly pulled in by 
+same meta-package (as is the case with Magento2 for example), one can force all the dependency versions to be 
+compared against that specific meta package.
 
 ```json
 {
@@ -220,7 +222,24 @@ key under 'extras'.
 
 When it's defined, all versions defined in patch definition will target that package instead of targeting
 the package that the patch is for. This is useful in cases where most of the project's modules are pulled
-in by one single package. This setting will only affect patches within same composer.json 
+in by one single package. This setting will only affect patches within same composer.json
+
+It's also possible to branch this configuration when value is provided as an array
+
+```json
+{
+  "extra": {
+    "patches-depend": {
+        "default": "some/package",
+        "*": "some/meta-package",
+        "some/widget-*": "some/core-dependency"
+    }
+  }
+}
+``` 
+
+Note that 'default' and '*' are reserved for internal use where 'default' will be default fallback and
+'*' refers to bundled patches.
 
 ## Patches: version branching
 
@@ -249,8 +268,6 @@ under same `label` or under `source` key depending on how complex rest of the de
   }
 }
 ```
-
-
 
 ## Patches: base path variables
 
