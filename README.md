@@ -777,4 +777,4 @@ _The 'filter' part is really optional as you could also try to re-apply everythi
 
 ## Changelog 
 
-_Changelog included in the composer.json of the package_
+_Changelog included in the changelog.json of the package_
