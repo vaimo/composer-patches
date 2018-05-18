@@ -1,7 +1,7 @@
 {
     "3.27.0": {
         "feature": [
-            "allow multiple patches-depends declarations for different kind of patches (bundle VS normal patch)",
+            "allow multiple 'patches-depend' declarations for different kind of patches (bundle VS normal patch)",
             "allow wildcards to be used in target names when defining multiple patches-depends items"
         ]
     },
