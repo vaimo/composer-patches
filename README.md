@@ -1,5 +1,5 @@
 # Vaimo Composer Patches
-
+     
 Applies a patch from a local or remote file to any package that is part of a given composer 
 project. Packages can be defined both on project and on package level.
 
