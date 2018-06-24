@@ -576,8 +576,8 @@ Some things to point out on patcher configuration:
    or 'patch', then the former will be just removed from the template.
 6. The [[]] will indicate the value is used as-is, {{}} will make the value be shell-escaped.
 7. The remote patches are downloaded with same configuration as Composer packages, in case some patches are 
-   served over HTTP, developer can change the 'secure-http' key under patcher configuration to false. This
-   will NOT affect the configuration of the package downloader.
+   served over HTTPS, developer can change the 'secure-http' key under patcher configuration to false. This
+   will NOT affect the configuration of the package downloader (which has similar setting for package downloader).
 
 Appliers are executed in the sequence dictated by sequence where several path levels are used with 
 validation until validation success is hit. Note that each applier will be visited before moving on to 
