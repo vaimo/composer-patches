@@ -456,9 +456,9 @@ settings, it's possible to define custom ones for just one patch.
 
 ## Patches: skipping patches
 
-In case there's a need to temporarily fast-exclude patches which is usually the case when going through
-maintenance or upgrade of the underlying project's framework, a skip flag can be used to pass over certain 
-declaration lines.
+In case there's a need to temporarily skip patches which is usually the case when going through
+maintenance or upgrade of the underlying project's framework, a skip flag can be used to pass 
+over certain declaration lines.
 
 ```json
 {
@@ -471,6 +471,9 @@ declaration lines.
   }
 }
 ```
+
+Note that in case patches-base is used, the #skip flag will be naturally be added to the end
+of the resolve patch path.
 
 ## Patches Exclude: configuration
 
