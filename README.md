@@ -23,7 +23,7 @@ a package).
     "patches": {},
     "patches-file": {},
     "patcher": {},
-    "patcher-<OS NAME>": {}
+    "patcher-<os_type>": {}
   }
 }
 ```
