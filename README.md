@@ -12,7 +12,7 @@ the composer.json of the project.
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
 [![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
 
-## Configuration: hardpoints
+## Configuration: overview
 
 Patches are declared under the following keys in composer.json of the patch owner (may it be project or
 a package).
@@ -21,14 +21,24 @@ a package).
 {
   "extra": {
     "patches": {},
-    "patches-file": {}
+    "patches-file": {},
+    "patcher": {},
+    "patcher-<OS NAME>": {}
   }
 }
 ```
 
 The patches module mimics the way composer separates development packages from normal requirements by 
-introducing two extra keys, where exact same rules apply as for normal patch declarations: `patches-dev`, 
-`patches-file-dev`. 
+introducing two extra keys, where exact same rules apply as for normal patch declarations.
+
+```json
+{
+  "extra": {
+    "patches-dev": {},
+    "patches-file-dev": {}
+  }
+}
+```
 
 The patches declared under those keys will NOT be applied when installing the project with `--no-dev` option.
   
