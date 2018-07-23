@@ -783,7 +783,7 @@ So in this case package B would have the following in it's composer.json
 This can be tested out with...
 
 ```shell
-composer patch --redo --from-source --filter compatibility-with-dependency-a
+composer patch --redo --from-source --filter compatibility-with-pack
 ```
 
 _The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
