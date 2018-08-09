@@ -52,7 +52,9 @@
     "extra": {
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true,
-        "changelog-file": "changelog.json"
+        "changelog": {
+            "source": "changelog.json"
+        }
     },
     "autoload": {
         "psr-4": {
