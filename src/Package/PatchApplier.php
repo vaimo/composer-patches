@@ -93,7 +93,32 @@ class PatchApplier
         $appliedPatches = array();
 
         foreach ($patchesQueue as $source => $info) {
-            if (!$this->processPackagePatch($package, $source, $info)) {
+            $labelMatches = array_intersect_key($this->stateLabels, array_filter($info));
+
+            $this->logger->writeRaw(
+                '<info>%s</info>: %s%s',
+                array(
+                    $info[PatchDefinition::OWNER],
+                    $source,
+                    $labelMatches ? vsprintf(' [<info>%s</info>]', $labelMatches) : ''
+                )
+            );
+
+            $loggerIndentation = $this->logger->push();
+
+            $this->logger->writeRaw('<comment>%s</comment>', array($info[PatchDefinition::LABEL]));
+
+            try {
+                $result = $this->processPackagePatch($package, $source, $info);
+            } catch (\Exception $e) {
+                $this->logger->reset($loggerIndentation);
+
+                throw $e;
+            }
+
+            $this->logger->reset($loggerIndentation);
+
+            if (!$result) {
                 continue;
             }
 
@@ -105,21 +130,6 @@ class PatchApplier
 
     private function processPackagePatch(PackageInterface $package, $source, $info)
     {
-        $labelMatches = array_intersect_key($this->stateLabels, array_filter($info));
-
-        $this->logger->writeRaw(
-            '<info>%s</info>: %s%s',
-            array(
-                $info[PatchDefinition::OWNER],
-                $source,
-                $labelMatches ? vsprintf(' [<info>%s</info>]', $labelMatches) : ''
-            )
-        );
-
-        $loggerIndentation = $this->logger->push();
-
-        $this->logger->writeRaw('<comment>%s</comment>', array($info[PatchDefinition::LABEL]));
-
         try {
             $this->eventDispatcher->dispatch(
                 Events::PRE_APPLY,
@@ -141,12 +151,7 @@ class PatchApplier
         } catch (\Exception $exception) {
             $this->logger->writeException($exception);
 
-            $this->failureHandler->execute(
-                $exception->getMessage(),
-                $source
-            );
-        } finally {
-            $this->logger->reset($loggerIndentation);
+            $this->failureHandler->execute($exception->getMessage(), $source);
         }
 
         return false;

@@ -44,9 +44,13 @@ class RepositoryManager
 
         try {
             $this->installationManager->install($repository, $operation);
-        } finally {
+        } catch (\Exception $exception) {
             OutputUtils::resetVerbosity($this->io, $verbosityLevel);
+
+            throw $exception;
         }
+
+        OutputUtils::resetVerbosity($this->io, $verbosityLevel);;
     }
 }
 
