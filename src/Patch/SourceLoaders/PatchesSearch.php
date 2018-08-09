@@ -80,7 +80,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                 }
 
                 $groups[$target][] = array(
-                    'label' => reset($data['label']),
+                    'label' => implode(PHP_EOL, $data['label']),
                     'depends' => array(
                         isset($data['depends']) ? reset($data['depends']) : $target =>
                             isset($data['version']) ? reset($data['version']) : '>=0.0.0'

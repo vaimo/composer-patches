@@ -106,7 +106,9 @@ class PatchApplier
 
             $loggerIndentation = $this->logger->push();
 
-            $this->logger->writeRaw('<comment>%s</comment>', array($info[PatchDefinition::LABEL]));
+            foreach (explode(PHP_EOL, $info[PatchDefinition::LABEL]) as $line) {
+                $this->logger->write('comment', $line);
+            }
 
             try {
                 $result = $this->processPackagePatch($package, $source, $info);

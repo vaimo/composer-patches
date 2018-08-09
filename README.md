@@ -720,8 +720,10 @@ done by using embedded patch meta-data that is based on the following tags:
 
 ```diff
  
-This patch fixes a huge issue that made N crash while Y was running
- 
+This patch fixes a huge issue that made N crash while Y was running.
+The description here can be multiple lines which will all be presented
+to the user when patch is being applied.
+
 @label shorter description, if not provided, the long one will be used
 @issue reference to some issue ID that relates to this fix (added to label)
 @link url to additional data about this patch (added to label)
