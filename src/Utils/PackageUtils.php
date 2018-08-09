@@ -14,11 +14,11 @@ class PackageUtils
     {
         while ($package instanceof \Composer\Package\AliasPackage) {
             $package = $package->getAliasOf();
-        }   
-        
+        }
+
         return $package;
     }
-    
+
     public function shouldReinstall(PackageInterface $package, array $patches)
     {
         $extra = $package->getExtra();
@@ -55,13 +55,13 @@ class PackageUtils
 
         return (bool)count($patches);
     }
-    
+
     public function resetAppliedPatches(PackageInterface $package, $replacement = null)
     {
         $extra = $package->getExtra();
 
-        $patchesApplied = isset($extra[PluginConfig::APPLIED_FLAG]) 
-            ? $extra[PluginConfig::APPLIED_FLAG] 
+        $patchesApplied = isset($extra[PluginConfig::APPLIED_FLAG])
+            ? $extra[PluginConfig::APPLIED_FLAG]
             : array();
 
         unset($extra[PluginConfig::APPLIED_FLAG]);
@@ -73,5 +73,14 @@ class PackageUtils
         $package->setExtra($extra);
 
         return $patchesApplied;
+    }
+
+    public function getAppliedPatches(PackageInterface $package)
+    {
+        $extra = $package->getExtra();
+
+        return isset($extra[PluginConfig::APPLIED_FLAG])
+            ? $extra[PluginConfig::APPLIED_FLAG]
+            : array();
     }
 }

@@ -20,21 +20,25 @@ class PatchListUtils
                         $patchesByTarget[$target] = array();
                     }
 
-                    $path = $patchInfo['url'] ? $patchInfo['url'] : $patchPath;
-                    
+                    $path = (isset($patchInfo['url']) && $patchInfo['url']) ? $patchInfo['url'] : $patchPath;
+
                     $patchesByTarget[$target][$path] = sprintf(
-                        '%s, %s:%s', 
-                        $patchInfo[PatchDefinition::LABEL], 
-                        PatchDefinition::HASH, 
-                        $patchInfo[PatchDefinition::HASH]
+                        '%s, %s:%s',
+                        isset($patchInfo[PatchDefinition::LABEL])
+                            ? $patchInfo[PatchDefinition::LABEL]
+                            : '{no label}',
+                        PatchDefinition::HASH,
+                        isset($patchInfo[PatchDefinition::HASH])
+                            ? $patchInfo[PatchDefinition::HASH]
+                            : '{no hash}'
                     );
                 }
             }
         }
 
         return $patchesByTarget;
-    } 
-    
+    }
+
     public function sanitizeFileSystem(array $patches)
     {
         foreach ($patches as $patchGroup) {
@@ -112,11 +116,11 @@ class PatchListUtils
 
         return array_diff($result, $targets);
     }
-    
+
     public function generateKnownPatchFlagUpdates($ownerName, array $resetPatchesList, array $infoList)
     {
         $updates = array();
-        
+
         if (!isset($resetPatchesList[$ownerName])) {
             $resetPatchesList[$ownerName] = array_reduce($resetPatchesList, 'array_replace', array());
         }
@@ -143,7 +147,7 @@ class PatchListUtils
                 $updates,
                 array(
                     $targetName => array_fill_keys(
-                        array_keys($knownPatches), 
+                        array_keys($knownPatches),
                         array(PatchDefinition::CHANGED => false)
                     )
                 )
@@ -152,7 +156,7 @@ class PatchListUtils
 
         return $updates;
     }
-    
+
     public function updateList(array $patches, array $updates)
     {
         $items = array_map(
@@ -163,7 +167,7 @@ class PatchListUtils
             },
             array_replace_recursive($patches, $updates)
         );
-        
+
         return array_filter(array_map('array_filter', $items));
     }
 }
