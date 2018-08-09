@@ -704,7 +704,7 @@ Patches can also be just defined for a certain OS family.
 }
 ```
 
-## Patches: patch declaration with embedded meta-data
+## Patches: patch declaration with embedded target information
 
 There's a way of declaring a patch for a project by not writing anything into a json file. This can be
 done by using embedded patch meta-data that is based on the following tags:
@@ -714,14 +714,14 @@ done by using embedded patch meta-data that is based on the following tags:
 This patch fixes a huge issue that made N crash while Y was running
  
 @label shorter description, if not provided, the long one will be used
-@issue reference to some issue ID that relates to this fix
-@link url to additional data about this patch
+@issue reference to some issue ID that relates to this fix (added to label)
+@link url to additional data about this patch (added to label)
 @package some/package-name
+@depends other/package (make version constraint target another package instead) 
 @version >=1.1.0 <1.4.0
 
 @after Used in case a patch should be added after another branch
 @skip If this tag is present, then the patch will not be applied
-@dev Only for development
 
 --- Models/Example.php.org
 +++ Models/Example.php
