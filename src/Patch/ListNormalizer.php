@@ -5,8 +5,6 @@
  */
 namespace Vaimo\ComposerPatches\Patch;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
 class ListNormalizer
 {
     /**
@@ -38,7 +36,15 @@ class ListNormalizer
         foreach ($list as $target => $packagePatches) {
             $patches = array();
 
+            if (strpos($target, '_comment') === 0) {
+                continue;
+            }
+
             foreach ($packagePatches as $patchLabel => $patchConfig) {
+                if (strpos($target, '_comment') === 0) {
+                    continue;
+                }
+
                 $definitionItems = $this->definitionExploder->process($patchLabel, $patchConfig);
 
                 foreach ($definitionItems as $patchItem) {
