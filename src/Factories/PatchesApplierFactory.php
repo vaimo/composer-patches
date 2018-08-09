@@ -24,30 +24,30 @@ class PatchesApplierFactory
     ) {
         $this->logger = $logger;
     }
-    
-    public function create(\Composer\Composer $composer, PluginConfig $pluginConfig, $filters = array()) 
+
+    public function create(\Composer\Composer $composer, PluginConfig $pluginConfig, $filters = array())
     {
         $installationManager = $composer->getInstallationManager();
-            
+
         $eventDispatcher = $composer->getEventDispatcher();
         $rootPackage = $composer->getPackage();
         $composerConfig = $composer->getConfig();
 
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
-        
+
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
-        
+
         if ($pluginConfig->shouldExitOnFirstFailure()) {
-            $failureHandler = new FailureHandlers\FatalHandler($this->logger);    
+            $failureHandler = new FailureHandlers\FatalHandler();
         } else {
             $failureHandler = new FailureHandlers\GracefulHandler($this->logger);
         }
-        
+
         $patchApplier = new \Vaimo\ComposerPatches\Patch\Applier(
-            $this->logger, 
+            $this->logger,
             $pluginConfig->getPatcherConfig()
         );
-        
+
         $packagePatchApplier = new \Vaimo\ComposerPatches\Package\PatchApplier(
             $packageInfoResolver,
             $eventDispatcher,
@@ -64,24 +64,24 @@ class PatchesApplierFactory
         } else {
             $packagesResolver = new PackageResolvers\MissingPatchesResolver();
         }
-        
+
         $repositoryAnalyser = new \Vaimo\ComposerPatches\Repository\Analyser(
             $packageCollector,
             $packagesResolver
         );
-        
+
         $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
             $repositoryAnalyser,
             $filters
         );
 
         $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
-        
+
         $repositoryManager = new \Vaimo\ComposerPatches\Managers\RepositoryManager(
             $this->logger->getOutputInstance(),
             $installationManager
         );
-        
+
         return new \Vaimo\ComposerPatches\Repository\PatchesApplier(
             $packageCollector,
             $repositoryManager,
