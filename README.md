@@ -32,9 +32,9 @@ a package).
 Where the different groups have the following meaning:
 
 * **patches** - allows patches to be defined in same file.
-* **patches-file** - allows patches to be stored in another file.
-* **patches-search** - scans for patch files in defined directory, 
-  relies on embedded target info within the patch (>=3.28.0).
+* **patches-file** - allows patches to be stored in another file. Can be a single file or list of files.
+* **patches-search** - scans for patch files in defined directory, relies on embedded target info 
+  within the patch (>=3.28.0). Can be a single file or list of files.
 
 The patches module mimics the way composer separates development packages from normal requirements by 
 introducing two extra keys, where exact same rules apply as for normal patch declarations.
