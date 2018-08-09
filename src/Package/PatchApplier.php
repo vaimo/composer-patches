@@ -48,6 +48,16 @@ class PatchApplier
     private $vendorRoot;
 
     /**
+     * @var array
+     */
+    private $stateLabels;
+
+    /**
+     * @var array
+     */
+    private $installPathCache = array();
+
+    /**
      * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
      * @param \Composer\EventDispatcher\EventDispatcher $eventDispatcher
      * @param \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler
@@ -71,69 +81,89 @@ class PatchApplier
         $this->vendorRoot = $vendorRoot;
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
+
+        $this->stateLabels = array(
+            PatchDefinition::NEW => 'NEW',
+            PatchDefinition::CHANGED => 'CHANGED'
+        );
     }
 
     public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
-        if ($package instanceof \Composer\Package\RootPackage) {
-            $installPath = $this->vendorRoot;
-        } else {
-            $installPath = $this->packageInfoResolver->getSourcePath($package);
-        }
-
         $appliedPatches = array();
 
-        $stateLabels = array(
-            PatchDefinition::NEW => 'NEW',
-            PatchDefinition::CHANGED => 'CHANGED'
-        );
-
         foreach ($patchesQueue as $source => $info) {
-            $labelMatches = array_intersect_key($stateLabels, array_filter($info));
-
-            $this->logger->writeRaw(
-                '<info>%s</info>: %s%s',
-                array(
-                    $info[PatchDefinition::OWNER],
-                    $source,
-                    $labelMatches ? vsprintf(' [<info>%s</info>]', $labelMatches) : ''
-                )
-            );
-
-            $loggerIndentation = $this->logger->push();
-
-            $this->logger->writeRaw('<comment>%s</comment>', array($info[PatchDefinition::LABEL]));
-
-            try {
-                $this->eventDispatcher->dispatch(
-                    Events::PRE_APPLY,
-                    new Event(Events::PRE_APPLY, $package, $source, $info[PatchDefinition::LABEL])
-                );
-
-                $this->patchApplier->applyFile(
-                    $info[PatchDefinition::PATH],
-                    $installPath,
-                    $info[PatchDefinition::CONFIG]
-                );
-
-                $appliedPatches[$source] = $info;
-
-                $this->eventDispatcher->dispatch(
-                    Events::POST_APPLY,
-                    new Event(Events::POST_APPLY, $package, $source, $info[PatchDefinition::LABEL])
-                );
-            } catch (\Exception $exception) {
-                $this->logger->writeException($exception);
-
-                $this->failureHandler->execute(
-                    $exception->getMessage(),
-                    $source
-                );
-            } finally {
-                $this->logger->reset($loggerIndentation);
+            if (!$this->processPackagePatch($package, $source, $info)) {
+                continue;
             }
+
+            $appliedPatches[$source] = $info;
         }
 
         return $appliedPatches;
+    }
+
+    private function processPackagePatch(PackageInterface $package, $source, $info)
+    {
+        $labelMatches = array_intersect_key($this->stateLabels, array_filter($info));
+
+        $this->logger->writeRaw(
+            '<info>%s</info>: %s%s',
+            array(
+                $info[PatchDefinition::OWNER],
+                $source,
+                $labelMatches ? vsprintf(' [<info>%s</info>]', $labelMatches) : ''
+            )
+        );
+
+        $loggerIndentation = $this->logger->push();
+
+        $this->logger->writeRaw('<comment>%s</comment>', array($info[PatchDefinition::LABEL]));
+
+        try {
+            $this->eventDispatcher->dispatch(
+                Events::PRE_APPLY,
+                new Event(Events::PRE_APPLY, $package, $source, $info[PatchDefinition::LABEL])
+            );
+
+            $this->patchApplier->applyFile(
+                $info[PatchDefinition::PATH],
+                $this->getInstallPath($package),
+                $info[PatchDefinition::CONFIG]
+            );
+
+            $this->eventDispatcher->dispatch(
+                Events::POST_APPLY,
+                new Event(Events::POST_APPLY, $package, $source, $info[PatchDefinition::LABEL])
+            );
+
+            return true;
+        } catch (\Exception $exception) {
+            $this->logger->writeException($exception);
+
+            $this->failureHandler->execute(
+                $exception->getMessage(),
+                $source
+            );
+        } finally {
+            $this->logger->reset($loggerIndentation);
+        }
+
+        return false;
+    }
+
+    private function getInstallPath(PackageInterface $package)
+    {
+        $name = $package->getName();
+
+        if (!isset($this->installPathCache[$name])) {
+            if ($package instanceof \Composer\Package\RootPackage) {
+                $this->installPathCache[$name] = $this->vendorRoot;
+            } else {
+                $this->installPathCache[$name] = $this->packageInfoResolver->getSourcePath($package);
+            }
+        }
+
+        return $this->installPathCache[$name];
     }
 }

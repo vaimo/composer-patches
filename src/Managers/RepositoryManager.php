@@ -40,12 +40,9 @@ class RepositoryManager
     {
         $verbosityLevel = OutputUtils::resetVerbosity($this->io, OutputInterface::VERBOSITY_QUIET);
 
-        try {
-            $operation = new ResetOperation(
-                $package,
-                'Package reset due to changes in patches configuration'
-            );
+        $operation = new ResetOperation($package, 'Package reset due to changes in patches configuration');
 
+        try {
             $this->installationManager->install($repository, $operation);
         } finally {
             OutputUtils::resetVerbosity($this->io, $verbosityLevel);

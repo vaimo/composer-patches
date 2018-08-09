@@ -1,5 +1,5 @@
 {
-    "3.28.0": {
+    "DEV.3.28.0": {
         "feature": [
             "allow patches information to be extracted from the patch file (see: patch declaration with embedded meta-data)",
             "allow comments to be added to patch declaration files by using '_comment' prefix on main level of declaration",

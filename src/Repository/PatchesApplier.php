@@ -5,8 +5,11 @@
  */
 namespace Vaimo\ComposerPatches\Repository;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Composer\Repository\WritableRepositoryInterface as PackageRepository;
+use Composer\Package\PackageInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Vaimo\ComposerPatches\Composer\OutputUtils;
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class PatchesApplier
 {
@@ -19,7 +22,7 @@ class PatchesApplier
      * @var \Vaimo\ComposerPatches\Managers\RepositoryManager
      */
     private $repositoryManager;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Package\PatchApplier
      */
@@ -39,11 +42,16 @@ class PatchesApplier
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
+
+    /**
+     * \Vaimo\ComposerPatches\Utils\PatchListUtils
+     */
+    private $patchListUtils;
 
     /**
      * @param \Vaimo\ComposerPatches\Package\Collector $packageCollector
@@ -73,7 +81,7 @@ class PatchesApplier
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
-    public function apply(PackageRepository $repository, array $patches) 
+    public function apply(PackageRepository $repository, array $patches)
     {
         $packages = $this->packageCollector->collect($repository);
 
@@ -82,6 +90,7 @@ class PatchesApplier
         list ($patchList, $resetList) = $this->queueGenerator->generate($repository, $patches);
 
         $infoList = $this->patchListUtils->createSimplifiedList($patchList);
+        $output = $this->logger->getOutputInstance();
 
         foreach ($packages as $packageName => $package) {
             $hasPatches = !empty($patchList[$packageName]);
@@ -95,13 +104,13 @@ class PatchesApplier
             $itemsToReset = array_intersect($resetList, $patchTargets);
 
             $resetResult = array();
-            
+
             foreach ($itemsToReset as $targetName) {
                 $resetTarget = $packages[$targetName];
-                
+
                 $resetPatches = $this->packageUtils->resetAppliedPatches($resetTarget);
                 $resetResult[$targetName] = is_array($resetPatches) ? $resetPatches : array();
-                
+
                 if (!$hasPatches && !isset($infoList[$targetName]) && $resetPatches) {
                     $this->logger->writeRaw(
                         'Resetting patched package <info>%s</info> (%s)',
@@ -112,12 +121,12 @@ class PatchesApplier
                 $this->repositoryManager->resetPackage($repository, $resetTarget);
                 $packagesUpdated = $packagesUpdated || (bool)$resetResult[$targetName];
             }
-            
+
             $patchList = $this->patchListUtils->updateList(
                 $patchList,
                 $this->patchListUtils->generateKnownPatchFlagUpdates($packageName, $resetResult, $infoList)
             );
-            
+
             $resetList = array_diff($resetList, $patchTargets);
 
             if (!$hasPatches) {
@@ -151,37 +160,41 @@ class PatchesApplier
                 continue;
             }
 
+            $this->processPatchesForPackage($package, $patchList[$packageName], $repository);
+
             $packagesUpdated = true;
-
-            $this->logger->writeRaw(
-                'Applying patches for <info>%s</info> (%s)',
-                array($packageName, count($patchList[$packageName]))
-            );
-
-            $packagePatchesQueue = $patchList[$packageName];
-
-            $processIndentation = $this->logger->push('~');
-
-            try {
-                $appliedPatches = $this->packagePatchApplier->applyPatches($package, $packagePatchesQueue);
-                $this->patcherStateManager->registerAppliedPatches($repository, $appliedPatches);
-
-                $this->logger->reset($processIndentation);
-            } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
-                $failedPath = $exception->getFailedPatchPath();
-
-                $paths = array_keys($packagePatchesQueue);
-                $appliedPaths = array_slice($paths, 0, array_search($failedPath, $paths));
-                $appliedPatches = array_intersect_key($packagePatchesQueue, array_flip($appliedPaths));
-
-                $this->patcherStateManager->registerAppliedPatches($repository, $appliedPatches);
-                
-                throw $exception;
-            }
 
             $this->logger->writeNewLine();
         }
-        
+
         return $packagesUpdated;
+    }
+
+    private function processPatchesForPackage(PackageInterface $package, $patchesQueue, $repository)
+    {
+        $this->logger->writeRaw(
+            'Applying patches for <info>%s</info> (%s)',
+            array($package->getName(), count($patchesQueue))
+        );
+
+        $processIndentation = $this->logger->push('~');
+
+        try {
+            $appliedPatches = $this->packagePatchApplier->applyPatches($package, $patchesQueue);
+
+            $this->patcherStateManager->registerAppliedPatches($repository, $appliedPatches);
+
+            $this->logger->reset($processIndentation);
+        } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
+            $failedPath = $exception->getFailedPatchPath();
+
+            $paths = array_keys($patchesQueue);
+            $appliedPaths = array_slice($paths, 0, array_search($failedPath, $paths));
+            $appliedPatches = array_intersect_key($patchesQueue, array_flip($appliedPaths));
+
+            $this->patcherStateManager->registerAppliedPatches($repository, $appliedPatches);
+
+            throw $exception;
+        }
     }
 }
