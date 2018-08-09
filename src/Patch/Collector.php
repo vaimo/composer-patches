@@ -49,22 +49,26 @@ class Collector
     {
         $collection = array();
 
+        $normalizer = $this->listNormalizer;
+
         foreach ($packages as $owner) {
             $ownerName = $owner->getName();
             $config = $this->infoExtractor->getConfig($owner);
-            
+
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
             $sourceLoaders = array_intersect_key($this->sourceLoaders, $config);
             $ownerConfig = array_diff_key($config, $this->sourceLoaders);
 
             $patchListCollection = array();
+
+
             foreach ($sourceLoaders as $loaderName => $source) {
                 $groups = $source->load($owner, $config[$loaderName]);
 
                 $patchListCollection = array_merge(
                     $patchListCollection,
-                    array_map(function (array $group) use ($ownerConfig) {
-                        return $this->listNormalizer->normalize($group, $ownerConfig);
+                    array_map(function (array $group) use ($ownerConfig, $normalizer) {
+                        return $normalizer->normalize($group, $ownerConfig);
                     }, $groups)
                 );
             }
