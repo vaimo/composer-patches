@@ -21,12 +21,20 @@ a package).
 {
   "extra": {
     "patches": {},
-    "patches-file": {},
+    "patches-file": [],
+    "patches-search": [],
     "patcher": {},
     "patcher-<os_type>": {}
   }
 }
 ```
+
+Where the different groups have the following meaning:
+
+* **patches** - allows patches to be defined in same file.
+* **patches-file** - allows patches to be stored in another file.
+* **patches-search** - scans for patch files in defined directory, 
+  relies on embedded target info within the patch (>=3.28.0).
 
 The patches module mimics the way composer separates development packages from normal requirements by 
 introducing two extra keys, where exact same rules apply as for normal patch declarations.
@@ -35,13 +43,14 @@ introducing two extra keys, where exact same rules apply as for normal patch dec
 {
   "extra": {
     "patches-dev": {},
-    "patches-file-dev": {}
+    "patches-file-dev": [],
+    "patches-search": []
   }
 }
 ```
 
 The patches declared under those keys will NOT be applied when installing the project with `--no-dev` option.
-  
+
 ## Basic Usage: configuring a patch
 
 The way of defining the patches works for:
