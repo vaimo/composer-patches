@@ -36,7 +36,11 @@ class PatchesFile implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoader
             $source = array($source);
         }
 
-        $basePath = $this->installationManager->getInstallPath($package);
+        if ($package instanceof \Composer\Package\RootPackage) {
+            $basePath = getcwd();
+        } else {
+            $basePath = $this->installationManager->getInstallPath($package);
+        }
 
         $groups = array();
 
