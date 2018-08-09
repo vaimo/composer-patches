@@ -9,17 +9,19 @@ class Config
 {
     const PACKAGE_CONFIG_FILE = 'composer.json';
     const CONFIG_ROOT = 'extra';
-    
+
     const PREFIX = 'patches-';
-    
+
     const DEFINITIONS_LIST = 'patches';
     const DEFINITIONS_FILE = 'patches-file';
+    const DEFINITIONS_SEARCH = 'patches-search';
 
     const DEV_DEFINITIONS_LIST = 'patches-dev';
     const DEV_DEFINITIONS_FILE = 'patches-file-dev';
- 
+    const DEV_DEFINITIONS_SEARCH = 'patches-search-dev';
+
     const EXCLUDED_PATCHES = 'patches-exclude';
-    
+
     const APPLIED_FLAG = 'patches_applied';
     const PATCHER_PLUGIN_MARKER = 'patcher_plugin';
 
@@ -30,14 +32,14 @@ class Config
     const PATCHER_LEVELS = 'levels';
     const PATCHER_SOURCES = 'sources';
     const PATCHER_SECURE_HTTP = 'secure-http';
-    
+
     const PATCHES_DEPENDS = 'patches-depend';
     const PATCHES_BASE = 'patches-base';
 
     const PATCHES_BASE_DEFAULT = 'default';
-    
+
     const PATCHES_CONFIG_DEFAULT = 'default';
-    
+
     const PATCHER_ARG_LEVEL = 'level';
     const PATCHER_ARG_FILE = 'file';
     const PATCHER_ARG_CWD = 'cwd';
@@ -46,7 +48,7 @@ class Config
      * @var array
      */
     private $config;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
      */
@@ -59,40 +61,40 @@ class Config
         array $config
     ) {
         $this->config = $config;
-        
+
         $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
     }
-    
+
     public function shouldPreferOwnerPackageConfig()
     {
         return (bool)getenv(Environment::PREFER_OWNER) || (bool)getEnv('COMPOSER_PATCHES_PREFER_OWNER');
     }
-    
+
     public function shouldResetEverything()
     {
         return (bool)getenv(Environment::FORCE_REAPPLY) || (bool)getenv('COMPOSER_FORCE_PATCH_REAPPLY');
     }
-    
+
     public function shouldExitOnFirstFailure()
     {
         return (bool)getenv(Environment::EXIT_ON_FAIL) || (bool)getenv('COMPOSER_EXIT_ON_PATCH_FAILURE');
     }
-    
+
     public function getSkippedPackages()
     {
         $skipList = getenv(Environment::PACKAGE_SKIP)
             ? getenv(Environment::PACKAGE_SKIP)
             : getenv('COMPOSER_SKIP_PATCH_PACKAGES');
-            
+
         return array_filter(
             explode(',', $skipList)
         );
     }
-    
+
     public function getPatcherConfig(array $overrides = array())
     {
         $config = $this->configUtils->mergeApplierConfig($this->config, $overrides);
-        
+
         return $this->configUtils->sortApplierConfig($config);
     }
 }

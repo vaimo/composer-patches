@@ -12,7 +12,9 @@ class DefaultValuesComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
     public function normalize($target, $label, array $data, array $ownerConfig)
     {
         return array(
-            PatchDefinition::PATH => '',
+            PatchDefinition::PATH => isset($data[PatchDefinition::PATH]) && file_exists($data[PatchDefinition::PATH])
+                ? $data[PatchDefinition::PATH]
+                : '',
             PatchDefinition::NEW => true,
             PatchDefinition::CHANGED => true,
         );

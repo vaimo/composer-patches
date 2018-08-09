@@ -38,11 +38,6 @@ class Bootstrap
     private $repositoryProcessor;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\FilterUtils
-     */
-    private $filterUtils;
-
-    /**
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
      * @param array $config

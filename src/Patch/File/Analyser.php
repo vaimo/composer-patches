@@ -10,19 +10,43 @@ class Analyser
     public function getAllPaths($contents)
     {
         $paths = array();
-        
+
         $lines = explode(PHP_EOL, $contents);
-        
+
         foreach ($lines as $line) {
             $prefix = substr($line, 0, 4);
 
-            if ($prefix != '--- ' && $prefix != '+++ ') {
+            if (!$this->isPatchTargetHeader($line)) {
                 continue;
             }
 
             $paths[] = trim(substr(strtok($line, chr(9)), strlen($prefix)));
         }
-        
+
         return $paths;
+    }
+
+    public function getHeader($contents)
+    {
+        $header = array();
+
+        $lines = explode(PHP_EOL, $contents);
+
+        foreach ($lines as $line) {
+            if ($this->isPatchTargetHeader($line)) {
+                break;
+            }
+
+            $header[] = $line;
+        }
+
+        return implode(PHP_EOL, $header);
+    }
+
+    private function isPatchTargetHeader($line)
+    {
+        $prefix = substr($line, 0, 4);
+
+        return $prefix === '--- ' || $prefix === '+++ ';
     }
 }

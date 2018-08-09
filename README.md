@@ -713,14 +713,15 @@ done by using embedded patch meta-data that is based on the following tags:
  
 This patch fixes a huge issue that made N crash while Y was running
  
+@label shorter description, if not provided, the long one will be used
 @issue reference to some issue ID that relates to this fix
 @link url to additional data about this patch
-@description shorter description, if not provided, the long one will be used
 @package some/package-name
 @version >=1.1.0 <1.4.0
 
 @after Used in case a patch should be added after another branch
 @skip If this tag is present, then the patch will not be applied
+@dev Only for development
 
 --- Models/Example.php.org
 +++ Models/Example.php
@@ -748,9 +749,7 @@ patches to be searched for from the root of the owner.
 ```json
 {
   "extra": {
-    "patches-base": {
-        "scan": "path/to/patches"
-    }
+    "patches-search": "patches"
   }
 }
 ```

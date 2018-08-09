@@ -19,21 +19,32 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
     {
         $this->templateUtils = new \Vaimo\ComposerPatches\Utils\TemplateUtils();
     }
-    
+
     public function normalize($target, $label, array $data, array $ownerConfig)
     {
         if (!isset($ownerConfig[PluginConfig::PATCHES_BASE])) {
             return array();
         }
-        
+
         $source = $data[PatchDefinition::SOURCE];
 
         if (parse_url($source, PHP_URL_SCHEME)) {
             return array();
         }
 
+        if (isset($data[PatchDefinition::LABEL]) && is_numeric($label)) {
+            $label = $data[PatchDefinition::LABEL];
+        }
+
+        if (strpos($data[PatchDefinition::PATH], '/') === 0 && file_exists($data[PatchDefinition::PATH])) {
+            return array(
+                PatchDefinition::LABEL => $label,
+                PatchDefinition::SOURCE => $source
+            );
+        }
+
         $template = $this->resolveTemplate($ownerConfig, $target);
-        
+
         $nameParts = explode('/', $target);
 
         $sourceTags = '';
@@ -151,7 +162,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
 
         return $templates;
     }
-    
+
     private function createMutationAppliers()
     {
         return array(
