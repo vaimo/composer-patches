@@ -77,21 +77,31 @@ class PatchCommand extends \Composer\Command\BaseCommand
                 )
             )
         );
-        
+
         $isDevMode = !$input->getOption('no-dev');
 
         $filters = array(
             PatchDefinition::SOURCE => $input->getOption('filter'),
             PatchDefinition::TARGETS => $input->getArgument('targets')
         );
-        
-        if ($input->getOption('undo') && !$input->getOption('redo')) {
-            $bootstrap->stripPatches($isDevMode, array_filter($filters));
+
+        $shouldUndo = $input->getOption('undo') && !$input->getOption('redo');
+
+        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+
+        if ($shouldUndo && !array_filter($filters)) {
+            $bootstrap->stripPatches($isDevMode);
         } else {
             putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
-            putenv(Environment::FORCE_REAPPLY . "=" . $input->getOption('redo'));
+            putenv(Environment::FORCE_REAPPLY . "=" . ($input->getOption('redo') || $input->getOption('undo')));
 
-            $bootstrap->applyPatches($isDevMode, array_filter($filters));   
+            if ($shouldUndo) {
+                $filters[PatchDefinition::SOURCE] = $filterUtils->invertRules(
+                    $filters[PatchDefinition::SOURCE] ? $filters[PatchDefinition::SOURCE] : array('*')
+                );
+            }
+
+            $bootstrap->applyPatches($isDevMode, array_filter($filters));
         }
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);

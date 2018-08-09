@@ -141,16 +141,30 @@ class PatchListUtils
                 continue;
             }
 
+            if ($targetName == 'yotpo/module-review') {
+                $i = 0;
+            }
+
             $knownPatches = array_intersect_assoc($resetInfoList[$targetName], $resetPatches);
+            $changedPatches = array_diff_key(
+                array_intersect_key($resetInfoList[$targetName], $resetPatches),
+                $knownPatches
+            );
+
+            $patchDefinitionUpdates = array_replace(
+                array_fill_keys(
+                    array_keys($changedPatches),
+                    array(PatchDefinition::NEW => false)
+                ),
+                array_fill_keys(
+                    array_keys($knownPatches),
+                    array(PatchDefinition::NEW => false, PatchDefinition::CHANGED => false)
+                )
+            );
 
             $updates = array_replace_recursive(
                 $updates,
-                array(
-                    $targetName => array_fill_keys(
-                        array_keys($knownPatches),
-                        array(PatchDefinition::CHANGED => false)
-                    )
-                )
+                array($targetName => $patchDefinitionUpdates)
             );
         }
 

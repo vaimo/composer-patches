@@ -23,7 +23,7 @@ class QueueGenerator
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
-    
+
     /**
      * @var array
      */
@@ -39,16 +39,18 @@ class QueueGenerator
     ) {
         $this->repositoryAnalyser = $repositoryAnalyser;
         $this->filters = $filters;
-        
+
         $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
-    public function generate(PackageRepository $repository, array $patchesList) 
+    public function generate(PackageRepository $repository, array $patchesList)
     {
         $patches = array_filter($patchesList);
+
         $resets = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
-        
+        $resetsQueue = array_keys($resets);
+
         foreach ($this->filters as $key => $filter) {
             $patches = $this->patchListUtils->applyDefinitionFilter(
                 $patches,
@@ -62,15 +64,18 @@ class QueueGenerator
                 $key
             );
 
-            $resets = array_intersect(
-                $this->repositoryAnalyser->determinePackageResets($repository, $patches),
+            $resets = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
+            $resetsQueue = array_keys($resets);
+
+            $resetsQueue = array_intersect(
+                $resetsQueue,
                 $this->patchListUtils->getAllTargets($targetedPatches)
             );
         }
-        
+
         return array(
             $patches,
-            array_merge($this->patchListUtils->getRelatedTargets($patchesList, $resets), $resets)
+            array_merge($this->patchListUtils->getRelatedTargets($patchesList, $resetsQueue), $resetsQueue)
         );
     }
 }

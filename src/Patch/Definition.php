@@ -8,7 +8,7 @@ namespace Vaimo\ComposerPatches\Patch;
 class Definition
 {
     const BUNDLE_TARGET = '*';
-    
+
     const SOURCE = 'source';
     const PATH = 'path';
     const TMP = 'is_temporary';
@@ -24,10 +24,11 @@ class Definition
 
     const BEFORE = 'before';
     const AFTER = 'after';
-    
+
     const CONFIG = 'config';
     const PATCHER = 'patcher';
     const LEVEL = 'level';
 
     const CHANGED = 'changed';
+    const NEW = 'new';
 }

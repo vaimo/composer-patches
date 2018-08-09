@@ -13,6 +13,7 @@ class DefaultValuesComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
     {
         return array(
             PatchDefinition::PATH => '',
+            PatchDefinition::NEW => true,
             PatchDefinition::CHANGED => true,
         );
     }

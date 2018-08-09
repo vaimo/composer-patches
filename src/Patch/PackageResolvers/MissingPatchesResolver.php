@@ -16,23 +16,23 @@ class MissingPatchesResolver implements \Vaimo\ComposerPatches\Interfaces\PatchP
     {
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
-    
+
     public function resolve(array $patches, array $packages)
     {
         $matches = array();
-        
+
         foreach ($packages as $packageName => $package) {
-            $packagePatches = isset($patches[$packageName]) 
-                ? $patches[$packageName] 
+            $packagePatches = isset($patches[$packageName])
+                ? $patches[$packageName]
                 : array();
-            
+
             if (!$this->packageUtils->shouldReinstall($package, $packagePatches)) {
                 continue;
             }
 
-            $matches[] = $packageName;
+            $matches[$packageName] = $this->packageUtils->getAppliedPatches($package);
         }
-        
+
         return $matches;
     }
 }

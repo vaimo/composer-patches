@@ -83,13 +83,20 @@ class PatchApplier
 
         $appliedPatches = array();
 
+        $stateLabels = array(
+            PatchDefinition::NEW => 'NEW',
+            PatchDefinition::CHANGED => 'CHANGED'
+        );
+
         foreach ($patchesQueue as $source => $info) {
+            $labelMatches = array_intersect_key($stateLabels, array_filter($info));
+
             $this->logger->writeRaw(
                 '<info>%s</info>: %s%s',
                 array(
                     $info[PatchDefinition::OWNER],
                     $source,
-                    $info[PatchDefinition::CHANGED] ? ' [<info>NEW</info>]' : ''
+                    $labelMatches ? vsprintf(' [<info>%s</info>]', $labelMatches) : ''
                 )
             );
 
