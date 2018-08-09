@@ -113,7 +113,6 @@ Note that to enable the developer to perform occasional cleanup and sub-grouping
 declaration, multiple patches files can be defined:
 
 ```json
-
 {
   "extra": {
     "patches-file": ["patches.json", "legacy.json"]
@@ -125,6 +124,21 @@ The files are processed sequentially and merged in a way where all the patches i
 processed (meaning: even if the declaration in both files is exactly the same, both will be processed and 
 the merging will be done in very late state based on the absolute path of the patch file path).
 
+## Basic Usage: comments in patch declaration
+
+In case user wants to add extra comments to patch declaration file, a key that start with "_comment" can be
+used.
+
+```json
+{
+  "_comment": "This patch file should hold patches that make world a better place",
+  "whole/world": {
+    "Fix: get closer to ending poverty": "patches/provide-affordable-education.patch"
+  },
+  "_comment0": "This is another comment"
+}
+```
+
 ## Basic Usage: patch file format
 
 Patches are applied relative to the root of the composer package that the patch is targeting: the file 
@@ -134,8 +148,8 @@ So if the patch is defined for my/package and my/package has a file vendor/my/pa
 the patch would target it with
 
 ```diff
---- Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+--- Models/Example.php.org
++++ Models/Example.php
 
 @@ -31,7 +31,7 @@
       */
@@ -399,8 +413,8 @@ alternative patch definition format is recommended:
 Where the `example/bundle.patch` content would have file paths defined in following manner:
 
 ```diff
---- some/module/Models/Example.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ some/module/Models/Example.php	2017-05-24 14:14:06.640560761 +0200
+--- some/module/Models/Example.php.org
++++ some/module/Models/Example.php
 
 @@ -31,7 +31,7 @@
       */
@@ -411,8 +425,8 @@ Where the `example/bundle.patch` content would have file paths defined in follow
          /**
           * rest of the logic of the function
           */
---- other/module/Logic.php.org	2017-05-24 14:13:36.449522497 +0200
-+++ other/module/Logic.php	2017-05-24 14:14:06.640560761 +0200
+--- other/module/Logic.php.org
++++ other/module/Logic.php
 
 @@ -67,7 +67,7 @@
       */
@@ -689,6 +703,60 @@ Patches can also be just defined for a certain OS family.
    }
 }
 ```
+
+## Patches: patch declaration with embedded meta-data
+
+There's a way of declaring a patch for a project by not writing anything into a json file. This can be
+done by using embedded patch meta-data that is based on the following tags:
+
+```diff
+ 
+This patch fixes a huge issue that made N crash while Y was running
+ 
+@issue reference to some issue ID that relates to this fix
+@link url to additional data about this patch
+@description shorter description, if not provided, the long one will be used
+@package some/package-name
+@version >=1.1.0 <1.4.0
+
+@after Used in case a patch should be added after another branch
+@skip If this tag is present, then the patch will not be applied
+
+--- Models/Example.php.org
++++ Models/Example.php
+ 
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+```
+
+When a patch is declared like this, no additional information is needed to be provided to the plugin. Of
+those tags, the mandatory ones are:
+
+    1. @package - targeted package
+    1. @description - when not provided, all text before first tag is considered as description
+    
+The only extra thing that needs to be provided by the patch owner package is a flag that will allow the 
+patches to be searched for from the root of the owner.
+
+```json
+{
+  "extra": {
+    "patches-base": {
+        "scan": "path/to/patches"
+    }
+  }
+}
+```
+
+Note that "scan" can point to the same folder where you have the patches that have a proper declaration
+in a JSON file. 
 
 ## Patch Command
 

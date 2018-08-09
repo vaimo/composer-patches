@@ -1,4 +1,15 @@
 {
+    "3.28.0": {
+        "feature": [
+            "allow patches information to be extracted from the patch file (see: patch declaration with embedded meta-data)",
+            "allow comments to be added to patch declaration files by using '_comment' prefix on main level of declaration"
+        ],
+        "fix": [
+            "using patches files on project level or for root repository did not resolve their paths correctly",
+            "patches not removed when removing a patch from declarations and running 'patch' command with '--redo' flag",
+            "undo having confusing semantic meaning when used. targeting a specific package now always just targets the package, path filter gets negated on undo command"
+        ]
+    },
     "3.27.0": {
         "feature": [
             "allow multiple 'patches-depend' declarations for different kind of patches (bundle VS normal patch)",
