@@ -44,9 +44,15 @@
         "patch branching",
         "multi-version patches",
         "bundled patches",
+        "bulk patches",
         "patch command",
         "patch from vendor",
-        "utilities"
+        "utilities",
+        "utility",
+        "plugin",
+        "patch header",
+        "patch meta-data",
+        "resolve patches"
     ],
     "minimum-stability": "dev",
     "extra": {
