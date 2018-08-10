@@ -17,6 +17,8 @@ class Definition
     const DEPENDS = 'depends';
     const VERSION = 'version';
     const OWNER = 'owner';
+    const ISSUE = 'issue';
+    const LINK = 'link';
     const OWNER_IS_ROOT = 'owner_is_root';
     const HASH = 'md5';
     const TARGETS = 'targets';

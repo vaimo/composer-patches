@@ -726,8 +726,10 @@ to the user when patch is being applied.
 
 @label shorter description, if not provided, the long one will be used
 @issue reference to some issue ID that relates to this fix (added to label)
+@ticket alias for @issue
 @link url to additional data about this patch (added to label)
-@package some/package-name
+@links alias for @link (could indicate a start of a block with multiple links)
+@package some/package-name    
 @depends other/package (make version constraint target another package instead) 
 @version >=1.1.0 <1.4.0
 
@@ -751,9 +753,18 @@ to the user when patch is being applied.
 When a patch is declared like this, no additional information is needed to be provided to the plugin. Of
 those tags, the mandatory ones are:
 
-    1. @package - targeted package
-    1. @description - when not provided, all text before first tag is considered as description
-    
+```
+@package - targeted package (to indicate that the patch is a bundle patch, just use: *)
+@version - version constraint for the patch (related to targeted package)
+@description - (recommended) when not provided, all text before first tag is considered as description
+```
+ 
+Alternatively package and version can be declared together with a one-liner
+
+```
+@version some/package-name:>=1.1.0 <1.4.0 
+```
+
 The only extra thing that needs to be provided by the patch owner package is a flag that will allow the 
 patches to be searched for from the root of the owner.
 
@@ -767,6 +778,9 @@ patches to be searched for from the root of the owner.
 
 Note that "scan" can point to the same folder where you have the patches that have a proper declaration
 in a JSON file. 
+
+Note that patches-base, etc are not mandatory to be declared when using patches-search as the exact path
+of the patches will already be known.
 
 ## Patch Command
 

@@ -13,6 +13,12 @@ class BaseComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNorma
     {
         return
             array(
+                PatchDefinition::ISSUE => isset($data[PatchDefinition::ISSUE])
+                    ? $data[PatchDefinition::ISSUE]
+                    : false,
+                PatchDefinition::LINK => isset($data[PatchDefinition::LINK])
+                    ? $data[PatchDefinition::LINK]
+                    : false,
                 PatchDefinition::LABEL => isset($data[PatchDefinition::LABEL])
                     ? $data[PatchDefinition::LABEL]
                     : $label,

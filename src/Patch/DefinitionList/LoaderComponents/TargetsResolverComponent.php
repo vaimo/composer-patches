@@ -52,9 +52,9 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
 
                 if (!file_exists($path)) {
                     throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
-                        sprintf('Failed to resolve bundle targets for %s',  $info[PatchDefinition::SOURCE])
+                        sprintf('Could not resolve targets (file not found): %s ',  $info[PatchDefinition::SOURCE])
                     );
-                    
+
                     continue;
                 }
 
@@ -63,7 +63,9 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                 );
 
                 if (!$targets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths)) {
-                    continue;
+                    throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
+                        sprintf('Could not resolve targets (zero matches): %s ',  $info[PatchDefinition::SOURCE])
+                    );
                 }
 
                 $patches[$patchTarget][$index][PatchDefinition::TARGETS] = array_unique($targets);

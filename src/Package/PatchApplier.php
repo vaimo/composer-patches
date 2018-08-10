@@ -106,8 +106,29 @@ class PatchApplier
 
             $loggerIndentation = $this->logger->push();
 
-            foreach (explode(PHP_EOL, $info[PatchDefinition::LABEL]) as $line) {
-                $this->logger->write('comment', $line);
+            if (trim($info[PatchDefinition::LABEL])) {
+                $labelLines = explode(PHP_EOL, $info[PatchDefinition::LABEL]);
+
+                $labelReference = isset($info[PatchDefinition::LINK])
+                    ? $info[PatchDefinition::LINK]
+                    : (isset($info[PatchDefinition::ISSUE])
+                        ? $info[PatchDefinition::ISSUE]
+                        : false
+                    );
+
+                if ($labelReference) {
+                    if (count($labelLines) == 1) {
+                        $labelLines = array(
+                            sprintf('%s (<fg=default;options=underscore>%s</>)',reset($labelLines), $labelReference)
+                        );
+                    } else {
+                        array_unshift($labelLines, sprintf('reference: <fg=default;options=underscore>%s</>', $labelReference));
+                    }
+                }
+
+                foreach ($labelLines as $line) {
+                    $this->logger->write('comment', $line);
+                }
             }
 
             try {

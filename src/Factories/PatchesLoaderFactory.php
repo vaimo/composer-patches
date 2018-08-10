@@ -49,7 +49,10 @@ class PatchesLoaderFactory
         $loaders = array(
             PluginConfig::DEFINITIONS_LIST => new SourceLoaders\PatchList(),
             PluginConfig::DEFINITIONS_FILE => new SourceLoaders\PatchesFile($installationManager),
-            PluginConfig::DEFINITIONS_SEARCH => new SourceLoaders\PatchesSearch($installationManager)
+            PluginConfig::DEFINITIONS_SEARCH => new SourceLoaders\PatchesSearch(
+                $installationManager,
+                $rootPackage
+            )
         );
 
         if ($devMode) {

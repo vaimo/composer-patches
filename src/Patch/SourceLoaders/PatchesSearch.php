@@ -69,24 +69,51 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
 
                 $data = $this->patchHeaderParser->parseContents($header);
 
-                if (!isset($data['package']) || !isset($data['label'])) {
-                    continue;
+                $target = isset($data['package']) ? reset($data['package']) : false;
+                $depends = isset($data['depends']) ? reset($data['depends']) : false;
+                $version = isset($data['version']) ? reset($data['version']) : '>=0.0.0';
+
+                if (strpos($version, ':') !== false) {
+                    $versionParts = explode(':', $version);
+                    $depends = trim(array_shift($versionParts));
+                    $version = trim(implode(':', $versionParts));
                 }
 
-                $target = reset($data['package']);
+                if (!$target && $depends) {
+                    $target = $depends;
+                }
+
+                if (!$depends && $target) {
+                    $depends = $target;
+                }
+
+                if (!$target) {
+                    continue;
+                }
 
                 if (!isset($groups[$target])) {
                     $groups[$target] = array();
                 }
 
                 $groups[$target][] = array(
-                    'label' => implode(PHP_EOL, $data['label']),
-                    'depends' => array(
-                        isset($data['depends']) ? reset($data['depends']) : $target =>
-                            isset($data['version']) ? reset($data['version']) : '>=0.0.0'
-                    ),
+                    'label' => implode(PHP_EOL, isset($data['label']) ? $data['label'] : array('')),
+                    'depends' => array($depends => $version),
                     'path' => $path,
-                    'source' => trim(substr($path, $basePathLength), '/')
+                    'source' => trim(substr($path, $basePathLength), '/'),
+                    'skip' => isset($data['skip']),
+                    'after' => isset($data['after']) ? array_filter($data['after']) : array(),
+                    'issue' => isset($data['issue'])
+                        ? reset($data['issue'])
+                        : (isset($data['ticket'])
+                            ? reset($data['ticket'])
+                            : false
+                        ),
+                    'link' => isset($data['link'])
+                        ? reset($data['link'])
+                        : (isset($data['links'])
+                            ? reset($data['links'])
+                            : false
+                        )
                 );
             }
 

@@ -17,7 +17,13 @@ class Parser
 
         foreach ($lines as $line) {
             if (strpos($line, '@') === 0) {
-                $key = ltrim(strstr($line, ' ', true), '@');
+                $tag = strstr($line, ' ', true);
+
+                if (!$tag) {
+                    $tag = $line;
+                }
+
+                $key = ltrim($tag, '@');
 
                 $data[$key] = array();
 
@@ -30,6 +36,8 @@ class Parser
 
             $data[$key][] = $line;
         }
+
+        unset($data['']);
 
         return $data;
     }
