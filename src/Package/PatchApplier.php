@@ -122,7 +122,7 @@ class PatchApplier
                             sprintf('%s (<fg=default;options=underscore>%s</>)',reset($labelLines), $labelReference)
                         );
                     } else {
-                        array_unshift($labelLines, sprintf('reference: <fg=default;options=underscore>%s</>', $labelReference));
+                        $labelLines[] = sprintf('reference: <fg=default;options=underscore>%s</>', $labelReference);
                     }
                 }
 

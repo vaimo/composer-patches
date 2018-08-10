@@ -1,4 +1,9 @@
 {
+    "3.28.1": {
+        "fix": [
+            "patch link/issue moved to be presented after the label/description"
+        ]
+    },
     "3.28.0": {
         "feature": [
             "allow patches information to be extracted from the patch file (see: patch declaration with embedded meta-data)",

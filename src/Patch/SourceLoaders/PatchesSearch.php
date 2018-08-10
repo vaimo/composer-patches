@@ -5,6 +5,8 @@
  */
 namespace Vaimo\ComposerPatches\Patch\SourceLoaders;
 
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+
 class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface
 {
     /**
@@ -70,8 +72,14 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                 $data = $this->patchHeaderParser->parseContents($header);
 
                 $target = isset($data['package']) ? reset($data['package']) : false;
-                $depends = isset($data['depends']) ? reset($data['depends']) : false;
-                $version = isset($data['version']) ? reset($data['version']) : '>=0.0.0';
+
+                $depends = isset($data[PatchDefinition::DEPENDS])
+                    ? reset($data[PatchDefinition::DEPENDS])
+                    : false;
+
+                $version = isset($data[PatchDefinition::VERSION])
+                    ? reset($data[PatchDefinition::VERSION])
+                    : '>=0.0.0';
 
                 if (strpos($version, ':') !== false) {
                     $versionParts = explode(':', $version);
@@ -96,20 +104,25 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                 }
 
                 $groups[$target][] = array(
-                    'label' => implode(PHP_EOL, isset($data['label']) ? $data['label'] : array('')),
-                    'depends' => array($depends => $version),
-                    'path' => $path,
-                    'source' => trim(substr($path, $basePathLength), '/'),
-                    'skip' => isset($data['skip']),
-                    'after' => isset($data['after']) ? array_filter($data['after']) : array(),
-                    'issue' => isset($data['issue'])
-                        ? reset($data['issue'])
+                    PatchDefinition::LABEL => implode(
+                        PHP_EOL,
+                        isset($data[PatchDefinition::LABEL]) ? $data[PatchDefinition::LABEL] : array('')
+                    ),
+                    PatchDefinition::DEPENDS => array($depends => $version),
+                    PatchDefinition::PATH => $path,
+                    PatchDefinition::SOURCE => trim(substr($path, $basePathLength), '/'),
+                    PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP]),
+                    PatchDefinition::AFTER => isset($data[PatchDefinition::AFTER])
+                        ? array_filter($data[PatchDefinition::AFTER])
+                        : array(),
+                    PatchDefinition::ISSUE => isset($data[PatchDefinition::ISSUE])
+                        ? reset($data[PatchDefinition::ISSUE])
                         : (isset($data['ticket'])
                             ? reset($data['ticket'])
                             : false
                         ),
-                    'link' => isset($data['link'])
-                        ? reset($data['link'])
+                    PatchDefinition::LINK => isset($data[PatchDefinition::LINK])
+                        ? reset($data[PatchDefinition::LINK])
                         : (isset($data['links'])
                             ? reset($data['links'])
                             : false
