@@ -24,7 +24,7 @@ class ComponentPool
     /**
      * @var bool[]|\Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface[]
      */
-    private $components;
+    private $components = array();
 
     /**
      * @param \Composer\Composer $composer

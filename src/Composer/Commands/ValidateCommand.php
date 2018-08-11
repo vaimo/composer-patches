@@ -68,7 +68,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
                     }, $items)
                 )
             );
-        }, []);
+        }, array());
 
         // @todo: get packages that own patches
 
