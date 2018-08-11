@@ -63,6 +63,14 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
     }
 
+    protected function getBehaviourFlags(InputInterface $input)
+    {
+        return array(
+            'redo' => (bool)$input->getOption('redo'),
+            'undo' => (bool)$input->getOption('undo')
+        );
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $composer = $this->getComposer();
@@ -85,7 +93,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
             PatchDefinition::TARGETS => $input->getArgument('targets')
         );
 
-        $shouldUndo = $input->getOption('undo') && !$input->getOption('redo');
+        $behaviourFlags = $this->getBehaviourFlags($input);
+        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
 
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
 
@@ -93,7 +102,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             $bootstrap->stripPatches($isDevMode);
         } else {
             putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
-            putenv(Environment::FORCE_REAPPLY . "=" . ($input->getOption('redo') || $input->getOption('undo')));
+            putenv(Environment::FORCE_REAPPLY . "=" . ($behaviourFlags['redo'] || $behaviourFlags['undo']));
 
             if ($shouldUndo) {
                 $filters[PatchDefinition::SOURCE] = $filterUtils->invertRules(
