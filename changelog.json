@@ -9,6 +9,10 @@
             "allow one-line embedded definition via @package tag the same way it's possible with @version",
             "added aliases for @package - @target, @module",
             "added alias for @version - @constraint"
+        ],
+        "maintenance": [
+            "change towards not passing composer instance into functions and using it as dependency instead",
+            "make it possible to manipulate composer loader work by toggling or replacing loader components"
         ]
     },
     "3.28.1": {
