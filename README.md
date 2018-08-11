@@ -776,7 +776,7 @@ patches to be searched for from the root of the owner.
 }
 ```
 
-Note that "scan" can point to the same folder where you have the patches that have a proper declaration
+Note that "search" can point to the same folder where you have the patches that have a proper declaration
 in a JSON file. 
 
 Note that patches-base, etc are not mandatory to be declared when using patches-search as the exact path
