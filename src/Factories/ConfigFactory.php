@@ -10,6 +10,11 @@ use Vaimo\ComposerPatches\Config as PluginConfig;
 class ConfigFactory
 {
     /**
+     * @var \Composer\Composer
+     */
+    private $composer;
+
+    /**
      * @var \Vaimo\ComposerPatches\Config\Defaults
      */
     private $defaults;
@@ -23,29 +28,34 @@ class ConfigFactory
      * @var \Vaimo\ComposerPatches\Config\Context
      */
     private $context;
-    
-    public function __construct() 
-    {
+
+    public function __construct(
+        \Composer\Composer $composer
+    ) {
+        $this->composer = $composer;
+
         $this->defaults = new \Vaimo\ComposerPatches\Config\Defaults();
         $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
         $this->context = new \Vaimo\ComposerPatches\Config\Context();
     }
 
-    public function create(\Composer\Composer $composer, array $configSources)
+    public function create(array $configSources)
     {
+        $composer = $this->composer;
+
         $defaults = $this->defaults->getPatcherConfig();
         $extra = $composer->getPackage()->getExtra();
-        
+
         if (isset($extra['patcher-config']) && !isset($extra[PluginConfig::PATCHER_CONFIG_ROOT])) {
             $extra[PluginConfig::PATCHER_CONFIG_ROOT] = $extra['patcher-config'];
         }
-        
+
         $subConfigKeys = array(
             $this->context->getOperationSystemName(),
             $this->context->getOperationSystemFamily(),
             '',
         );
-         
+
         foreach (array_unique($subConfigKeys) as $key) {
             $configRootKey = PluginConfig::PATCHER_CONFIG_ROOT . ($key ? ('-' . $key) : '');
 
@@ -74,13 +84,13 @@ class ConfigFactory
                 array_unshift($configSources, $patcherConfig);
             }
         }
-        
+
         $config = array_reduce(
             $configSources,
             array($this->configUtils, 'mergeApplierConfig'),
             $defaults
         );
-        
+
         return new PluginConfig($config);
     }
 }

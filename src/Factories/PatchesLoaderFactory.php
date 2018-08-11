@@ -6,53 +6,50 @@
 namespace Vaimo\ComposerPatches\Factories;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
-use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
+use Vaimo\ComposerPatches\Patch;
 use Vaimo\ComposerPatches\Patch\Definition\ExploderComponents;
 use Vaimo\ComposerPatches\Patch\Definition\NormalizerComponents;
 use Vaimo\ComposerPatches\Patch\SourceLoaders;
 use Vaimo\ComposerPatches\Package\ConfigExtractors;
-use Vaimo\ComposerPatches\Patch;
+use Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool as LoaderComponents;
 
 class PatchesLoaderFactory
 {
     /**
-     * @var \Composer\IO\IOInterface
+     * @var \Composer\Composer
      */
-    private $io;
+    private $composer;
 
     /**
-     * @param \Composer\IO\IOInterface $io
+     * @param \Composer\Composer $composer
      */
     public function __construct(
-        \Composer\IO\IOInterface $io
+        \Composer\Composer $composer
     ) {
-        $this->io = $io;
+        $this->composer = $composer;
     }
 
-    public function create(\Composer\Composer $composer, PluginConfig $pluginConfig, $devMode = false)
+    public function create(LoaderComponents $loaderComponentsPool, PluginConfig $pluginConfig, $devMode = false)
     {
-        $installationManager = $composer->getInstallationManager();
-        $rootPackage = $composer->getPackage();
-        $composerConfig = clone $composer->getConfig();
+        $composer = $this->composer;
 
-        $extra = $composer->getPackage()->getExtra();
+        $installationManager = $composer->getInstallationManager();
+
+        $rootPackage = $composer->getPackage();
+
+        $composerConfig = clone $composer->getConfig();
         $patcherConfig = $pluginConfig->getPatcherConfig();
 
         $composerConfig->merge(array(
             'config' => array('secure-http' => $patcherConfig[PluginConfig::PATCHER_SECURE_HTTP])
         ));
 
-        $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
-
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
 
         $loaders = array(
             PluginConfig::DEFINITIONS_LIST => new SourceLoaders\PatchList(),
             PluginConfig::DEFINITIONS_FILE => new SourceLoaders\PatchesFile($installationManager),
-            PluginConfig::DEFINITIONS_SEARCH => new SourceLoaders\PatchesSearch(
-                $installationManager,
-                $rootPackage
-            )
+            PluginConfig::DEFINITIONS_SEARCH => new SourceLoaders\PatchesSearch($installationManager)
         );
 
         if ($devMode) {
@@ -105,27 +102,7 @@ class PatchesLoaderFactory
             $loaders
         );
 
-        if (isset($extra['excluded-patches']) && !isset($extra[PluginConfig::EXCLUDED_PATCHES])) {
-            $extra[PluginConfig::EXCLUDED_PATCHES] = $extra['excluded-patches'];
-        }
-
-        $excludes = isset($extra[PluginConfig::EXCLUDED_PATCHES])
-            ? $extra[PluginConfig::EXCLUDED_PATCHES]
-            : array();
-
-        $loaderComponents = array(
-            new LoaderComponents\BundleComponent($rootPackage),
-            $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,
-            new LoaderComponents\LocalExcludeComponent(),
-            new LoaderComponents\CustomExcludeComponent($pluginConfig->getSkippedPackages()),
-            new LoaderComponents\PathNormalizerComponent($packageInfoResolver),
-            new LoaderComponents\ConstraintsComponent(),
-            new LoaderComponents\DownloaderComponent($rootPackage, $downloader),
-            new LoaderComponents\ValidatorComponent(),
-            new LoaderComponents\TargetsResolverComponent($packageInfoResolver),
-            new LoaderComponents\MergerComponent(),
-            new LoaderComponents\SorterComponent()
-        );
+        $loaderComponents = $loaderComponentsPool->getList($pluginConfig);
 
         $sourceConfig = $patcherConfig[PluginConfig::PATCHER_SOURCES];
 
@@ -159,8 +136,11 @@ class PatchesLoaderFactory
         return new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader(
             $packagesCollector,
             $patchesCollector,
-            array_filter($loaderComponents),
-            array_intersect_key($listSources, array_filter($sourceConfig))
+            $loaderComponents,
+            array_intersect_key(
+                $listSources,
+                array_filter($sourceConfig)
+            )
         );
     }
 }

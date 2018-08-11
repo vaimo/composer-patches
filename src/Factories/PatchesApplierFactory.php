@@ -12,21 +12,31 @@ use Vaimo\ComposerPatches\Patch\PackageResolvers;
 class PatchesApplierFactory
 {
     /**
+     * @var \Composer\Composer
+     */
+    private $composer;
+
+    /**
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
 
     /**
+     * @param \Composer\Composer $composer
      * @param \Vaimo\ComposerPatches\Logger $logger
      */
     public function __construct(
+        \Composer\Composer $composer,
         \Vaimo\ComposerPatches\Logger $logger
     ) {
+        $this->composer = $composer;
         $this->logger = $logger;
     }
 
-    public function create(\Composer\Composer $composer, PluginConfig $pluginConfig, $filters = array())
+    public function create(PluginConfig $pluginConfig, $filters = array())
     {
+        $composer = $this->composer;
+
         $installationManager = $composer->getInstallationManager();
 
         $eventDispatcher = $composer->getEventDispatcher();
