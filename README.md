@@ -28,7 +28,7 @@ Configure the root folder from where the plugin should search for patches.
 }
 ```
 
-Create folder `<module/project root>/patches`, `myfix.patch` to that folder.
+Create folder `<module-root/project-root>/patches`, `myfix.patch` to that folder.
 
 Edit the `myfix.patch` and define 
 
