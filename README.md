@@ -782,46 +782,50 @@ in a JSON file.
 Note that patches-base, etc are not mandatory to be declared when using patches-search as the exact path
 of the patches will already be known.
 
-## Patch Command
+## Patch Commands
 
-Installing the plugin will introduce a new composer command: **composer patch**
+Installing the plugin will introduce a new composer command group: **patch**
 
 ```shell
-# Re-apply new patches (similar to patch apply on 'composer install') 
-composer patch 
+# Apply new patches (similar to patch apply on 'composer install') 
+composer patch:apply
 
 # Re-apply all patches
-composer patch --redo 
+composer patch:redo 
 
 # Re-apply patches for one speicif package
-composer patch --redo my/package 
+composer patch:redo my/package 
 
 # Re-apply all patches except patches declared against my/package
-composer patch --redo '!my/package'
+composer patch:redo '!my/package'
 
 # Re-apply patches for one specific package with patch name filter 
-composer patch --filter wrong-time-format --filter other-file --redo my/package 
+composer patch:redo --filter wrong-time-format --filter other-file 
 
 # Re-apply patches and skip filenames that contain 'some<anything>description'  
-composer patch --filter '!some*description' --redo my/package 
+composer patch:redo --filter '!some*description' my/package 
 
 # Reset all patched packages
-composer patch --undo 
+composer patch:undo 
 
 # Reset one specific patched package
-composer patch --undo my/package 
+composer patch:undo my/package 
 
 # Reset one specific patch on package
-composer patch --undo --filter some-fix my/package
+composer patch:undo --filter some-fix my/package
 
 # Reset packages that have patch that contains 'some-fix' in it's path definition
-composer patch --undo --filter some-fix
+composer patch:undo --filter some-fix
 
 # Gather patches information from /vendor instead of install.json
-composer patch --from-source
+composer patch:apply --from-source
 
 # Ideal for testing out a newly added patch against my/package
-composer patch --from-source --redo my/package
+composer patch:redo --from-source
+
+# Check that all patches have valid target package info (using info from vendor)
+composer patch:validate --from-source  
+
 ```
 
 The main purpose of this command is to make the maintenance of already created patches and adding new 
