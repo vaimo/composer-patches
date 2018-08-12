@@ -760,23 +760,20 @@ There's a way of declaring a patch for a project by not writing anything into a 
 done by using embedded patch meta-data that is based on the following tags:
 
 ```diff
- 
 This patch fixes a huge issue that made N crash while Y was running.
 The description here can be multiple lines which will all be presented
 to the user when patch is being applied.
 
-@label shorter description, if not provided, the long one will be used
-@issue reference to some issue ID that relates to this fix (added to label)
-@ticket alias for @issue
-@link url to additional data about this patch (added to label)
-@links alias for @link (could indicate a start of a block with multiple links)
-@package some/package-name
-@depends other/package (make version constraint target another package instead) 
-@version >=1.1.0 <1.4.0
+@package (required) some/package-name
+@label (optional) overrides the description above when provided. Otherwise above info used.
+@issue (optional) reference to some issue ID that relates to this fix (added to label)
+@ticket(optional) alias for @issue
+@link (optional) url to additional data about this patch (added to label)
+@depends (optional) other/package (make version constraint target another package instead) 
+@version (optional) >=1.1.0 <1.4.0
 
 @after Used in case a patch should be added after another branch
 @skip If this tag is present, then the patch will not be applied
-
 --- Models/Example.php.org
 +++ Models/Example.php
 @@ -31,7 +31,7 @@
@@ -795,8 +792,6 @@ those tags, the mandatory ones are:
 
 ```
 @package - targeted package (to indicate that the patch is a bundle patch, just use: *)
-@version - version constraint for the patch (related to targeted package)
-@description - (recommended) when not provided, all text before first tag is considered as description
 ```
  
 Alternatively package and version can be declared together with a one-liner
