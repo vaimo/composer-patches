@@ -149,15 +149,15 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         }
 
         if ($groups = array_filter($groups)) {
-            $output->writeln('<error>Orphans found!</error>');
-
             foreach ($groups as $packageName => $paths) {
-                $output->writeln(sprintf('<info>%s</info>', $packageName));
+                $output->writeln(sprintf('- <info>%s</info>', $packageName));
 
                 foreach ($paths as $path) {
-                    $output->writeln(sprintf('- %s', $path));
+                    $output->writeln(sprintf('  ~ %s', $path));
                 }
             }
+
+            $output->writeln('<error>Orphans found!</error>');
 
             exit(1);
         } else {
