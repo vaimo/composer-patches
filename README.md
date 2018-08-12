@@ -44,7 +44,8 @@ in any sub-folder as long as it's in the mentioned root folder.
 Edit the `whatever-your-patch-is-called.patch` and define ...
 
 ```diff
-This patch changes everything.
+This patch changes... 
+absolutely everything
 
 @package some/package-name:>=1.2.3
 
@@ -67,6 +68,8 @@ Using version is optional (just `@package some/package-name` woks as well).
 
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
+Alternatively the patch can be targeted with configuring it via providing the declaration in JSON.
+
 #### 4. make sure the patch actually applies
 
 Test out the added patch (in project root).
@@ -76,6 +79,16 @@ composer patch:redo --from-source some/package-name
 ```
 
 The patch will be automatically applied on every composer install, update when required (when it's found that it's not yet installed).
+
+```shell
+Writing lock file
+Generating autoload files
+Processing patches configuration
+  - Applying patches for some/package-name (1)
+    ~ some/patch-owner: whatever-your-patch-is-called.patch [NEW]
+      This patch changes... 
+      absolutely everything
+```
 
 # Configuration
 
