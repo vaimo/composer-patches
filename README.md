@@ -771,9 +771,8 @@ to the user when patch is being applied.
 @link (optional) url to additional data about this patch (added to label)
 @depends (optional) other/package (make version constraint target another package instead) 
 @version (optional) >=1.1.0 <1.4.0
-
-@after Used in case a patch should be added after another branch
-@skip If this tag is present, then the patch will not be applied
+@after (optional) Used in case a patch should be added after another branch
+@skip (optional) If this tag is present, then the patch will not be applied
 --- Models/Example.php.org
 +++ Models/Example.php
 @@ -31,7 +31,7 @@
