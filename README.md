@@ -50,7 +50,7 @@ This patch changes everything.
           */
 ```
 
-Note that `Models/Example.php` path is relative to the root of `some/package-name`.
+Note that `Models/Example.php` path is relative to the root of `some/package-name`. All available/usable tags listed in "patch declaration with embedded target information" sub-section of this documentation file.
 
 ## Configuration: overview
 
