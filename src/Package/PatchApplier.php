@@ -109,9 +109,9 @@ class PatchApplier
             if (trim($info[PatchDefinition::LABEL])) {
                 $labelLines = explode(PHP_EOL, $info[PatchDefinition::LABEL]);
 
-                $labelReference = isset($info[PatchDefinition::LINK])
+                $labelReference = (isset($info[PatchDefinition::LINK]) && $info[PatchDefinition::LINK])
                     ? $info[PatchDefinition::LINK]
-                    : (isset($info[PatchDefinition::ISSUE])
+                    : ((isset($info[PatchDefinition::ISSUE]) && $info[PatchDefinition::ISSUE])
                         ? $info[PatchDefinition::ISSUE]
                         : false
                     );

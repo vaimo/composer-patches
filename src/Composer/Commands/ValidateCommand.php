@@ -30,7 +30,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<info>Scanning packages for orphan patches ...</info>');
+        $output->writeln('<info>Scanning packages for orphan patches</info>');
 
         $composer = $this->getComposer();
         $io = $this->getIO();
@@ -49,7 +49,6 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         );
 
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
-
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
 
         $repository = $composer->getRepositoryManager()->getLocalRepository();
@@ -95,7 +94,6 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $packageListUtils->listToNameDictionary($pluginUsers)
         );
 
-
         $installationManager = $composer->getInstallationManager();
 
         $fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
@@ -139,21 +137,33 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $fileMatches = array_replace($fileMatches, array_fill_keys($result, $packageName));
         }
 
+        $groups = $this->collectOrphans($fileMatches, $patchesWithTargets, $installPaths);
+
+        $this->generateOutput($output, $groups);
+    }
+
+    private function collectOrphans($fileMatches, $patchesWithTargets, $installPaths)
+    {
         $orphanFiles = array_diff_key($fileMatches, array_flip($patchesWithTargets));
 
-        $groups = array_fill_keys(array_keys($matches), array());
+        $groups = array_fill_keys(array_keys($installPaths), array());
 
         foreach ($orphanFiles as $path => $ownerName)  {
             $installPath = $installPaths[$ownerName];
             $groups[$ownerName][] = ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR);
         }
 
+        return $groups;
+    }
+
+    private function generateOutput(OutputInterface $output, array $groups)
+    {
         if ($groups = array_filter($groups)) {
             foreach ($groups as $packageName => $paths) {
-                $output->writeln(sprintf('- <info>%s</info>', $packageName));
+                $output->writeln(sprintf('  - <info>%s</info>', $packageName));
 
                 foreach ($paths as $path) {
-                    $output->writeln(sprintf('  ~ %s', $path));
+                    $output->writeln(sprintf('    ~ %s', $path));
                 }
             }
 

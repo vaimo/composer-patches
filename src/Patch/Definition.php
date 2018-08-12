@@ -10,11 +10,13 @@ class Definition
     const BUNDLE_TARGET = '*';
 
     const SOURCE = 'source';
+    const TARGET = 'target';
     const PATH = 'path';
     const TMP = 'is_temporary';
     const URL = 'url';
     const LABEL = 'label';
     const DEPENDS = 'depends';
+    const PACKAGE = 'package';
     const VERSION = 'version';
     const OWNER = 'owner';
     const ISSUE = 'issue';
