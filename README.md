@@ -61,7 +61,7 @@ The path `Models/Example.php` is relative to the root of `some/package-name`.
 
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
-#### 4. test the patch
+#### 4. testing the patch
 
 Test out the added patch (in project root).
 
