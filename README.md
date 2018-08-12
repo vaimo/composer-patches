@@ -12,7 +12,7 @@ the composer.json of the project.
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
 [![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
 
-## Quick start
+## Quick Start
 
 This example uses the simplest way that the plugin allows you to include a patch in your project and 
 relies on embedded patch target information within the patch file. Other options target information 
