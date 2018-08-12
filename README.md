@@ -61,12 +61,12 @@ The path `Models/Example.php` is relative to the root of `some/package-name`.
 
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
-#### 4. testing the patch
+#### 4. make sure it applied
 
 Test out the added patch (in project root).
 
 ```shell
-composer patch:apply --from-source some/package-name
+composer patch:redo --from-source some/package-name
 ```
 
 The patch will be automatically applied on every composer install, update when required (when it's found that it's not yet installed).
