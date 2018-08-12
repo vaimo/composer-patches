@@ -766,8 +766,7 @@ to the user when patch is being applied.
 
 @package (required) some/package-name
 @label (optional) overrides the description above when provided. Otherwise above info used.
-@issue (optional) reference to some issue ID that relates to this fix (added to label)
-@ticket(optional) alias for @issue
+@ticket (optional) reference to some issue ID that relates to this fix (added to label)
 @link (optional) url to additional data about this patch (added to label)
 @depends (optional) other/package (make version constraint target another package instead) 
 @version (optional) >=1.1.0 <1.4.0
