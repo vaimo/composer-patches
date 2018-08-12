@@ -68,7 +68,7 @@ Using version is optional (just `@package some/package-name` woks as well).
 
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
-Alternatively the patch can be targeted with configuring it via providing the declaration in JSON.
+Alternatively the patch can be targeted with configuring it via [providing the declaration in JSON](#basic-usage-configuring-a-patch-via-composer-json).
 
 #### 4. make sure the patch actually applies
 
@@ -133,7 +133,7 @@ introducing two extra keys, where exact same rules apply as for normal patch dec
 
 The patches declared under those keys will NOT be applied when installing the project with `--no-dev` option.
 
-## Basic Usage: configuring a patch
+## Basic Usage: configuring a patch via composer.json
 
 The way of defining the patches works for:
 
@@ -173,7 +173,7 @@ in front of all file-path based patch definitions.
 In this case you can define patches without having to repeatedly use the same base-path for every patch 
 definition.
 
-## Basic Usage: configuring a patches file
+## Basic Usage: configuring a separet patches file
 
 The way of defining the patches works for:
 
