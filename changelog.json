@@ -1,4 +1,9 @@
 {
+    "3.29.1": {
+        "fix": [
+            "patch validation command failing on bundle patches when owned by non-root package"
+        ]
+    },
     "3.29.0": {
         "feature": [
             "split the --undo and --redo options of main command into separate commands - 'patch:undo' and 'patch:redo'",
