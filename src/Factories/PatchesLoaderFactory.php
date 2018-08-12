@@ -104,43 +104,17 @@ class PatchesLoaderFactory
 
         $loaderComponents = $loaderComponentsPool->getList($pluginConfig);
 
-        $sourceConfig = $patcherConfig[PluginConfig::PATCHER_SOURCES];
-
-        if (isset($sourceConfig['packages']) && isset($sourceConfig['vendors'])) {
-            if (is_array($sourceConfig['packages']) && !is_array($sourceConfig['vendors'])) {
-                $sourceConfig['vendors'] = false;
-            } else if (is_array($sourceConfig['vendors']) && !is_array($sourceConfig['packages'])) {
-                $sourceConfig['packages'] = false;
-            } else if ($sourceConfig['packages'] === false || $sourceConfig['vendors'] === false) {
-                $sourceConfig['packages'] = false;
-                $sourceConfig['vendors'] = false;
-            }
-        }
-
-        $listSources = array(
-            'project' => new \Vaimo\ComposerPatches\Sources\ProjectSource($rootPackage),
-            'vendors' => new \Vaimo\ComposerPatches\Sources\VendorSource(
-                isset($sourceConfig['vendors']) && is_array($sourceConfig['vendors'])
-                    ? $sourceConfig['vendors']
-                    : array()
-            ),
-            'packages' => new \Vaimo\ComposerPatches\Sources\PackageSource(
-                isset($sourceConfig['packages']) && is_array($sourceConfig['packages'])
-                    ? $sourceConfig['packages']
-                    : array()
-            )
+        $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory(
+            $this->composer
         );
 
-        $packagesCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
-
         return new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader(
-            $packagesCollector,
+            new \Vaimo\ComposerPatches\Package\Collector(
+                array($rootPackage)
+            ),
             $patchesCollector,
-            $loaderComponents,
-            array_intersect_key(
-                $listSources,
-                array_filter($sourceConfig)
-            )
+            $sourcesResolverFactory->create($pluginConfig),
+            $loaderComponents
         );
     }
 }

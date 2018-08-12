@@ -8,6 +8,7 @@ namespace Vaimo\ComposerPatches\Composer\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Vaimo\ComposerPatches\Composer\ConfigKeys;
 
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
@@ -29,6 +30,8 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('<info>Scanning packages for orphan patches ...</info>');
+
         $composer = $this->getComposer();
         $io = $this->getIO();
 
@@ -57,7 +60,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $patchesLoader = $loaderFactory->create($loaderComponentsPool, $config, true);
 
-        $patches = array_filter($patchesLoader->loadFromPackagesRepository($repository));
+        $patches = $patchesLoader->loadFromPackagesRepository($repository);
 
         $patchesWithTargets = array_reduce($patches, function (array $result, array $items) {
             return array_merge(
@@ -70,13 +73,95 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             );
         }, array());
 
-        // @todo: get packages that own patches
+        $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
+        $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
 
-        // @todo: do recursive search for .patch files
+        $sourcesResolver = $sourcesResolverFactory->create($config);
 
-        // @todo: intersect
+        $sources = $sourcesResolver->resolvePackages($repository);
 
-        // @todo: report
+        $repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
 
+        $pluginPackage = $repositoryUtils->resolveForNamespace($repository, __NAMESPACE__);
+        $pluginName = $pluginPackage->getName();
+
+        $pluginUsers = array_merge(
+            $repositoryUtils->filterByDependency($repository, $pluginName),
+            array($composer->getPackage())
+        );
+
+        $matches = array_intersect_key(
+            $packageListUtils->listToNameDictionary($sources),
+            $packageListUtils->listToNameDictionary($pluginUsers)
+        );
+
+
+        $installationManager = $composer->getInstallationManager();
+
+        $fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
+
+        $projectRoot = getcwd();
+        $vendorRoot = $composer->getConfig()->get(ConfigKeys::VENDOR_DIR);
+        $vendorPath = ltrim(
+            substr($vendorRoot, strlen($projectRoot)),
+            DIRECTORY_SEPARATOR
+        );
+
+        $fileMatches = array();
+        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+
+        $installPaths = array();
+        foreach ($matches as $packageName => $package) {
+            if ($package instanceof \Composer\Package\RootPackage) {
+                $installPath = $projectRoot;
+            } else {
+                $installPath = $installationManager->getInstallPath($package);
+            }
+
+            $installPaths[$packageName] = $installPath;
+        }
+
+        foreach ($matches as $packageName => $package) {
+            $installPath = $installPaths[$packageName];
+
+            $skippedPaths = array(
+                $installPath . DIRECTORY_SEPARATOR . $vendorPath,
+                $installPath . DIRECTORY_SEPARATOR . '.hg',
+                $installPath . DIRECTORY_SEPARATOR . '.git'
+            );
+
+            $filter = $filterUtils->composeRegex($filterUtils->invertRules($skippedPaths), '/');
+
+            $filter = rtrim($filter, '/') . '.+\.patch' . '/i';
+
+            $result = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
+
+            $fileMatches = array_replace($fileMatches, array_fill_keys($result, $packageName));
+        }
+
+        $orphanFiles = array_diff_key($fileMatches, array_flip($patchesWithTargets));
+
+        $groups = array_fill_keys(array_keys($matches), array());
+
+        foreach ($orphanFiles as $path => $ownerName)  {
+            $installPath = $installPaths[$ownerName];
+            $groups[$ownerName][] = ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR);
+        }
+
+        if ($groups = array_filter($groups)) {
+            $output->writeln('<error>Orphans found!</error>');
+
+            foreach ($groups as $packageName => $paths) {
+                $output->writeln(sprintf('<info>%s</info>', $packageName));
+
+                foreach ($paths as $path) {
+                    $output->writeln(sprintf('- %s', $path));
+                }
+            }
+
+            exit(1);
+        } else {
+            $output->writeln('<info>Done</info>');
+        }
     }
 }

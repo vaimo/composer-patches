@@ -30,6 +30,11 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     private $patchHeaderParser;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\FileSystemUtils
+     */
+    private $fileSystemUtils;
+
+    /**
      * @param \Composer\Installer\InstallationManager $installationManager
      */
     public function __construct(
@@ -40,6 +45,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         $this->configLoader = new \Vaimo\ComposerPatches\Package\ConfigReader();
         $this->fileAnalyser = new \Vaimo\ComposerPatches\Patch\File\Analyser();
         $this->patchHeaderParser = new \Vaimo\ComposerPatches\Patch\File\Header\Parser();
+        $this->fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
     }
 
     public function load(\Composer\Package\PackageInterface $package, $source)
@@ -60,7 +66,10 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $rootPath = $basePath . DIRECTORY_SEPARATOR . $item;
             $basePathLength = strlen($basePath);
 
-            $paths = $this->collectPaths($rootPath, '/^.+\.patch/i');
+            $paths = $this->fileSystemUtils->collectPathsRecursively(
+                $rootPath,
+                \Vaimo\ComposerPatches\Config::PATCH_FILE_REGEX_MATCHER
+            );
 
             $groups = array();
 
@@ -134,21 +143,5 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         }
 
         return $results;
-    }
-
-    private function collectPaths($rootPath, $pattern)
-    {
-        $directory = new \RecursiveDirectoryIterator($rootPath);
-        $iterator = new \RecursiveIteratorIterator($directory);
-
-        $regexIterator = new \RegexIterator($iterator, $pattern, \RecursiveRegexIterator::GET_MATCH);
-
-        $files = array();
-
-        foreach ($regexIterator as $info) {
-            $files[] = reset($info);
-        }
-
-        return $files;
     }
 }

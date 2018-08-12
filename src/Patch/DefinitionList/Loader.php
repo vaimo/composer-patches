@@ -15,58 +15,51 @@ class Loader
      * @var \Vaimo\ComposerPatches\Package\Collector
      */
     private $packagesCollector;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Patch\Collector
      */
     private $patchesCollector;
-    
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\SourcesResolver
+     */
+    private $sourcesResolver;
+
     /**
      * @var ListLoader[]
      */
     private $processors;
 
     /**
-     * @var PatchSourceListInterface[]
-     */
-    private $listSources;
-
-    /**
      * @param \Vaimo\ComposerPatches\Package\Collector $packagesCollector
      * @param \Vaimo\ComposerPatches\Patch\Collector $patchesCollector
+     * @param \Vaimo\ComposerPatches\Patch\SourcesResolver $sourcesResolver
      * @param ListLoader[] $processors
-     * @param PatchSourceListInterface[] $listSources
      */
     public function __construct(
         \Vaimo\ComposerPatches\Package\Collector $packagesCollector,
         \Vaimo\ComposerPatches\Patch\Collector $patchesCollector,
-        array $processors,
-        array $listSources
+        \Vaimo\ComposerPatches\Patch\SourcesResolver $sourcesResolver,
+        array $processors
     ) {
         $this->packagesCollector = $packagesCollector;
         $this->patchesCollector = $patchesCollector;
+        $this->sourcesResolver = $sourcesResolver;
         $this->processors = $processors;
-        $this->listSources = $listSources;
     }
-    
+
     public function loadFromPackagesRepository(PackageRepository $repository)
     {
         $packages = $this->packagesCollector->collect($repository);
+        $sources = $this->sourcesResolver->resolvePackages($repository);
 
-        $sources = array_reduce(
-            $this->listSources, 
-            function ($result, PatchSourceListInterface $listSource) use ($repository) {
-                return array_merge($result, $listSource->getItems($repository));
-            },
-            array()
-        );
-        
         $patches = array_reduce(
             $this->processors,
             function (array $patches, ListLoader $listLoader) use ($packages) {
                 return $listLoader->process($patches, $packages);
             },
-            $this->patchesCollector->collect(array_unique($sources))
+            $this->patchesCollector->collect($sources)
         );
 
         return array_replace(

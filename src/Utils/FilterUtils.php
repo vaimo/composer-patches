@@ -8,14 +8,14 @@ namespace Vaimo\ComposerPatches\Utils;
 class FilterUtils
 {
     const NEGATION_PREFIX = '!';
-    
+
     public function composeRegex(array $filters, $delimiter)
     {
         $negations = array();
         $affirmations = array();
 
         $escapeChar = chr('27');
-        
+
         array_map(function ($filter) use ($delimiter, &$negations, &$affirmations, $escapeChar) {
             $isNegation = substr($filter, 0, 1) == self::NEGATION_PREFIX;
 
@@ -33,23 +33,23 @@ class FilterUtils
             if (!$escapedFilter) {
                 return;
             }
-            
+
             if ($isNegation) {
                 $negations[] = $escapedFilter;
             } else {
                 $affirmations[] = $escapedFilter;
             }
         }, $filters);
-        
+
         $pattern = '%s';
 
         if ($negations) {
             $pattern = sprintf('^((?!.*(%s)).*%s)', implode('|', $negations), $affirmations ? '(%s)' : '');
         }
-        
+
         return $delimiter . sprintf($pattern, implode('|', $affirmations)) . $delimiter;
     }
-    
+
     public function invertRules(array $filters)
     {
         return array_map(function ($filter) {

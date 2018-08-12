@@ -51,9 +51,9 @@ class Collector
 
         $normalizer = $this->listNormalizer;
 
-        foreach ($packages as $owner) {
-            $ownerName = $owner->getName();
-            $config = $this->infoExtractor->getConfig($owner);
+        foreach ($packages as $package) {
+            $ownerName = $package->getName();
+            $config = $this->infoExtractor->getConfig($package);
 
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
             $sourceLoaders = array_intersect_key($this->sourceLoaders, $config);
@@ -61,9 +61,8 @@ class Collector
 
             $patchListCollection = array();
 
-
             foreach ($sourceLoaders as $loaderName => $source) {
-                $groups = $source->load($owner, $config[$loaderName]);
+                $groups = $source->load($package, $config[$loaderName]);
 
                 $patchListCollection = array_merge(
                     $patchListCollection,
@@ -79,7 +78,7 @@ class Collector
                 foreach ($items as $index => $patch) {
                     $collection[$target][] = array_replace($patch, array(
                         PatchDefinition::OWNER => $ownerName,
-                        PatchDefinition::OWNER_IS_ROOT => ($owner instanceof RootPackage),
+                        PatchDefinition::OWNER_IS_ROOT => ($package instanceof RootPackage),
                     ));
                 }
             }
