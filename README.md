@@ -148,8 +148,8 @@ The way of defining the patches works for:
   "extra": {
     "patches": {
       "some/package": {
-        "example local patch": "path/to/patches/fix.patch",
-        "example remote patch": "http://www.example.com/patch.patch"
+        "example local patch": "path/to/patches/relative/to/patch/owner/some-fix.patch",
+        "example remote patch": "http://www.example.com/remote-patch.patch"
       }
     }
   }
