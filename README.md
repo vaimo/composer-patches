@@ -12,6 +12,46 @@ the composer.json of the project.
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
 [![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
 
+## Quick start
+
+This example uses the simplest way that the plugin allows you to include a patch in your project and 
+relies on embedded patch target information within the patch file. Other options target information 
+definition options are available (based on defining it in JSON files).
+
+Configure the root folder from where the plugin should search for patches.
+
+```json
+{
+  "extra": {
+    "patches-search": "patches"
+  }
+}
+```
+
+Create folder `module/project root>/patches`, `myfix.patch` to that folder.
+
+Edit the `myfix.patch` and define 
+
+```diff
+This patch changes everything.
+
+@package some/package-name:>=1.2.3
+
+--- Models/Example.php.org
++++ Models/Example.php
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+```
+
+Note that `Models/Example.php` path is relative to the root of `some/package-name`.
+
 ## Configuration: overview
 
 Patches are declared under the following keys in composer.json of the patch owner (may it be project or
@@ -159,7 +199,6 @@ the patch would target it with
 ```diff
 --- Models/Example.php.org
 +++ Models/Example.php
-
 @@ -31,7 +31,7 @@
       */
      protected function someFunction($someArg)
@@ -729,7 +768,7 @@ to the user when patch is being applied.
 @ticket alias for @issue
 @link url to additional data about this patch (added to label)
 @links alias for @link (could indicate a start of a block with multiple links)
-@package some/package-name    
+@package some/package-name
 @depends other/package (make version constraint target another package instead) 
 @version >=1.1.0 <1.4.0
 
@@ -738,7 +777,6 @@ to the user when patch is being applied.
 
 --- Models/Example.php.org
 +++ Models/Example.php
- 
 @@ -31,7 +31,7 @@
       */
      protected function someFunction($someArg)
