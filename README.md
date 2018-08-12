@@ -75,6 +75,10 @@ composer patch:redo --from-source some/package-name
 
 The patch will be automatically applied on every composer install, update when required (when it's found that it's not yet installed).
 
+# Configuration
+
+More detailed information on what the module is capable of and how to configure it.
+
 ## Configuration: overview
 
 Patches are declared under the following keys in composer.json of the patch owner (may it be project or
