@@ -63,6 +63,8 @@ This patch changes everything.
 
 The path `Models/Example.php` is relative to the root of `some/package-name`. 
 
+Using version is optional (`@package some/package-name` woks as well).
+
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
 #### 4. make sure the patch actually applies
