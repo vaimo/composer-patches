@@ -52,7 +52,9 @@
         "plugin",
         "patch header",
         "patch meta-data",
-        "resolve patches"
+        "resolve patches",
+        "patch search",
+        "patch resolve"
     ],
     "minimum-stability": "dev",
     "extra": {
