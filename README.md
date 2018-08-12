@@ -68,7 +68,7 @@ Using version is optional (just `@package some/package-name` woks as well).
 
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
-Alternatively the patch can be targeted with configuring it via [providing the declaration in JSON](#basic-usage-configuring-a-patch-via-composerjson).
+Alternatively the patch can be targeted with configuring it via [providing the declaration in composer.json](#basic-usage-configuring-a-patch-via-composerjson).
 
 #### 4. make sure the patch actually applies
 
