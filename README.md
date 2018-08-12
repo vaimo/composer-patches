@@ -29,13 +29,17 @@ Configure the root folder from where the plugin should search for patches.
   }
 }
 ```
+Can be done for root package or a library/module/component package.
 
 #### 2. file system
 
 Create folder `<module-root/project-root>/patches` and move `whatever-your-patch-is-called.patch` to 
-that folder (it can situate in a sub-folder of that path).
+that folder.
 
-#### 3. patch contents
+The searching for patches from that folder will be recursive so developer is free to place the file
+in any sub-folder as long as it's in the mentioned root folder.
+
+#### 3. edit patch contents
 
 Edit the `whatever-your-patch-is-called.patch` and define ...
 
@@ -61,7 +65,7 @@ The path `Models/Example.php` is relative to the root of `some/package-name`.
 
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
-#### 4. make sure it applied
+#### 4. make sure the patch actually applies
 
 Test out the added patch (in project root).
 
