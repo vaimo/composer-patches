@@ -18,7 +18,7 @@ This example uses the simplest way that the plugin allows you to include a patch
 relies on embedded patch target information within the patch file. Other options target information 
 definition options are available (based on defining it in JSON files). 
 
-##### composer.json
+##### 1. composer.json
 
 Configure the root folder from where the plugin should search for patches.
 
@@ -30,12 +30,12 @@ Configure the root folder from where the plugin should search for patches.
 }
 ```
 
-##### file system
+##### 2. file system
 
 Create folder `<module-root/project-root>/patches` and move `whatever-your-patch-is-called.patch` to 
 that folder (it can situate in a sub-folder of that path).
 
-##### patch contents
+##### 3. patch contents
 
 Edit the `whatever-your-patch-is-called.patch` and define ...
 
@@ -61,7 +61,7 @@ The path `Models/Example.php` is relative to the root of `some/package-name`.
 
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
-##### test the patch
+##### 4. test the patch
 
 Test out the added patch (in project root).
 
