@@ -90,6 +90,8 @@ Processing patches configuration
       absolutely everything
 ```
 
+All patches are applied when after all packages are installed to allow any package to provide patches for any other package.
+
 # Configuration
 
 More detailed information on what the module is capable of and how to configure it.
