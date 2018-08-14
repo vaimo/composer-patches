@@ -5,49 +5,79 @@
  */
 namespace Vaimo\ComposerPatches\Utils;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class PatchListUtils
 {
     public function createSimplifiedList(array $patches)
     {
-        $patchesByTarget = array();
+        $groups = $this->createTargetsList($patches);
 
-        foreach ($patches as $patchGroup) {
+        $result =  array_map(function ($group) {
+            return array_map(function($item) {
+                return sprintf(
+                    '%s, %s:%s',
+                    isset($item[Patch::LABEL]) ? $item[Patch::LABEL] : '{no label}',
+                    Patch::HASH, isset($item[Patch::HASH]) ? $item[Patch::HASH] : '{no hash}'
+                );
+            }, $group);
+        }, $groups);
+
+        return $result;
+    }
+
+    public function createTargetsList(array $patches)
+    {
+        $result = array();
+
+        foreach ($patches as $originName => $patchGroup) {
             foreach ($patchGroup as $patchPath => $patchInfo) {
-                foreach ($patchInfo[PatchDefinition::TARGETS] as $target) {
-                    if (!isset($patchesByTarget[$target])) {
-                        $patchesByTarget[$target] = array();
+                foreach ($patchInfo[Patch::TARGETS] as $target) {
+                    if (!isset($result[$target])) {
+                        $result[$target] = array();
                     }
 
                     $path = (isset($patchInfo['url']) && $patchInfo['url']) ? $patchInfo['url'] : $patchPath;
 
-                    $patchesByTarget[$target][$path] = sprintf(
-                        '%s, %s:%s',
-                        isset($patchInfo[PatchDefinition::LABEL])
-                            ? $patchInfo[PatchDefinition::LABEL]
-                            : '{no label}',
-                        PatchDefinition::HASH,
-                        isset($patchInfo[PatchDefinition::HASH])
-                            ? $patchInfo[PatchDefinition::HASH]
-                            : '{no hash}'
+                    $result[$target][$path] = array_merge(
+                        $patchInfo,
+                        array(Patch::ORIGIN => $originName)
                     );
                 }
             }
         }
 
-        return $patchesByTarget;
+        return $result;
+    }
+
+    public function createDetailedList(array $patches)
+    {
+        $result = array();
+
+        foreach ($patches as $name => $group) {
+            $result[$name] = array();
+
+            foreach ($group as $path => $label) {
+                $result[$name][$path] = array(
+                    'path' => $path,
+                    'targets' => array($name),
+                    'source' => $path
+                );
+            }
+        }
+
+        return $result;
     }
 
     public function sanitizeFileSystem(array $patches)
     {
         foreach ($patches as $patchGroup) {
             foreach ($patchGroup as $patchPath => $patchInfo) {
-                if (!isset($patchInfo[PatchDefinition::TMP]) || !$patchInfo[PatchDefinition::TMP]) {
+                if (!isset($patchInfo[Patch::TMP]) || !$patchInfo[Patch::TMP]) {
                     continue;
                 }
 
-                unlink($patchInfo[PatchDefinition::PATH]);
+                unlink($patchInfo[Patch::PATH]);
             }
         }
     }
@@ -58,7 +88,7 @@ class PatchListUtils
 
         foreach ($patches as $patchGroup) {
             foreach ($patchGroup as $patchInfo) {
-                $targetList = array_merge($targetList, $patchInfo[PatchDefinition::TARGETS]);
+                $targetList = array_merge($targetList, $patchInfo[Patch::TARGETS]);
             }
         }
 
@@ -100,10 +130,10 @@ class PatchListUtils
 
             foreach (array_diff_key($patches, array_flip($result)) as $packagePatches) {
                 foreach ($packagePatches as $patchInfo) {
-                    if (array_intersect($patchInfo[PatchDefinition::TARGETS], $result)) {
+                    if (array_intersect($patchInfo[Patch::TARGETS], $result)) {
                         $resetQueueUpdates = array_merge(
                             $resetQueueUpdates,
-                            array_diff($patchInfo[PatchDefinition::TARGETS], $result)
+                            array_diff($patchInfo[Patch::TARGETS], $result)
                         );
 
                         continue;
@@ -141,10 +171,6 @@ class PatchListUtils
                 continue;
             }
 
-            if ($targetName == 'yotpo/module-review') {
-                $i = 0;
-            }
-
             $knownPatches = array_intersect_assoc($resetInfoList[$targetName], $resetPatches);
             $changedPatches = array_diff_key(
                 array_intersect_key($resetInfoList[$targetName], $resetPatches),
@@ -154,11 +180,11 @@ class PatchListUtils
             $patchDefinitionUpdates = array_replace(
                 array_fill_keys(
                     array_keys($changedPatches),
-                    array(PatchDefinition::NEW => false)
+                    array(Patch::NEW => false)
                 ),
                 array_fill_keys(
                     array_keys($knownPatches),
-                    array(PatchDefinition::NEW => false, PatchDefinition::CHANGED => false)
+                    array(Patch::NEW => false, Patch::CHANGED => false)
                 )
             );
 

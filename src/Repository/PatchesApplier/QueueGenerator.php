@@ -46,10 +46,42 @@ class QueueGenerator
 
     public function generate(PackageRepository $repository, array $patchesList)
     {
-        $patches = array_filter($patchesList);
+        $patches = $this->resolvePatchesQueue($patchesList);
+        $resets = $this->resolvePatchesResets($repository, $patches);
 
+        return array(
+            $patches,
+            array_unique(
+                array_merge($this->patchListUtils->getRelatedTargets($patchesList, $resets), $resets)
+            )
+        );
+    }
+
+    private function resolvePatchesResets(PackageRepository $repository, array $patches)
+    {
         $resets = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
-        $resetsQueue = array_keys($resets);
+
+        $targets = array_replace_recursive(
+            $resets,
+            $this->patchListUtils->createSimplifiedList(array_intersect_key($patches, $resets))
+        );
+
+        $resetPatches = $this->patchListUtils->createDetailedList($targets);
+
+        foreach ($this->filters as $key => $filter) {
+            $resetPatches = $this->patchListUtils->applyDefinitionFilter(
+                $resetPatches,
+                $this->filterUtils->composeRegex($this->filterUtils->trimRules($filter), '/'),
+                $key
+            );
+        }
+
+        return $this->patchListUtils->getAllTargets($resetPatches);
+    }
+
+    private function resolvePatchesQueue(array $patches)
+    {
+        $patches = array_filter($patches);
 
         foreach ($this->filters as $key => $filter) {
             $patches = $this->patchListUtils->applyDefinitionFilter(
@@ -57,25 +89,8 @@ class QueueGenerator
                 $this->filterUtils->composeRegex($filter, '/'),
                 $key
             );
-
-            $targetedPatches = $this->patchListUtils->applyDefinitionFilter(
-                $patchesList,
-                $this->filterUtils->composeRegex($this->filterUtils->trimRules($filter), '/'),
-                $key
-            );
-
-            $resets = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
-            $resetsQueue = array_keys($resets);
-
-            $resetsQueue = array_intersect(
-                $resetsQueue,
-                $this->patchListUtils->getAllTargets($targetedPatches)
-            );
         }
 
-        return array(
-            $patches,
-            array_merge($this->patchListUtils->getRelatedTargets($patchesList, $resetsQueue), $resetsQueue)
-        );
+        return $patches;
     }
 }

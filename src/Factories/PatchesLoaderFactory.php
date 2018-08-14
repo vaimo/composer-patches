@@ -29,8 +29,9 @@ class PatchesLoaderFactory
         $this->composer = $composer;
     }
 
-    public function create(LoaderComponents $loaderComponentsPool, PluginConfig $pluginConfig, $devMode = false)
-    {
+    public function create(
+        LoaderComponents $loaderComponentsPool, PluginConfig $pluginConfig, $devMode = false
+    ) {
         $composer = $this->composer;
 
         $installationManager = $composer->getInstallationManager();
@@ -49,7 +50,10 @@ class PatchesLoaderFactory
         $loaders = array(
             PluginConfig::DEFINITIONS_LIST => new SourceLoaders\PatchList(),
             PluginConfig::DEFINITIONS_FILE => new SourceLoaders\PatchesFile($installationManager),
-            PluginConfig::DEFINITIONS_SEARCH => new SourceLoaders\PatchesSearch($installationManager)
+            PluginConfig::DEFINITIONS_SEARCH => new SourceLoaders\PatchesSearch(
+                $installationManager,
+                $devMode
+            )
         );
 
         if ($devMode) {

@@ -21,16 +21,14 @@ class MissingPatchesResolver implements \Vaimo\ComposerPatches\Interfaces\PatchP
     {
         $matches = array();
 
-        foreach ($packages as $packageName => $package) {
-            $packagePatches = isset($patches[$packageName])
-                ? $patches[$packageName]
-                : array();
+        foreach ($packages as $name => $package) {
+            $packagePatches = isset($patches[$name]) ? $patches[$name] : array();
 
             if (!$this->packageUtils->shouldReinstall($package, $packagePatches)) {
                 continue;
             }
 
-            $matches[$packageName] = $this->packageUtils->getAppliedPatches($package);
+            $matches[$name] = $this->packageUtils->getAppliedPatches($package);
         }
 
         return $matches;

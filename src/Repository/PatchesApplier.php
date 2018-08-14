@@ -7,9 +7,8 @@ namespace Vaimo\ComposerPatches\Repository;
 
 use Composer\Repository\WritableRepositoryInterface as PackageRepository;
 use Composer\Package\PackageInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Vaimo\ComposerPatches\Composer\OutputUtils;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+
 
 class PatchesApplier
 {
@@ -87,21 +86,20 @@ class PatchesApplier
 
         $packagesUpdated = false;
 
-        list ($patchList, $resetList) = $this->queueGenerator->generate($repository, $patches);
+        list ($patchQueue, $resetQueue) = $this->queueGenerator->generate($repository, $patches);
 
-        $infoList = $this->patchListUtils->createSimplifiedList($patchList);
-        $output = $this->logger->getOutputInstance();
+        $queueFootprint = $this->patchListUtils->createSimplifiedList($patchQueue);
 
         foreach ($packages as $packageName => $package) {
-            $hasPatches = !empty($patchList[$packageName]);
+            $hasPatches = !empty($patchQueue[$packageName]);
 
             if ($hasPatches) {
-                $patchTargets = $this->patchListUtils->getAllTargets(array($patchList[$packageName]));
+                $patchTargets = $this->patchListUtils->getAllTargets(array($patchQueue[$packageName]));
             } else {
                 $patchTargets = array($packageName);
             }
 
-            $itemsToReset = array_intersect($resetList, $patchTargets);
+            $itemsToReset = array_intersect($resetQueue, $patchTargets);
 
             $resetResult = array();
 
@@ -111,7 +109,7 @@ class PatchesApplier
                 $resetPatches = $this->packageUtils->resetAppliedPatches($resetTarget);
                 $resetResult[$targetName] = is_array($resetPatches) ? $resetPatches : array();
 
-                if (!$hasPatches && !isset($infoList[$targetName]) && $resetPatches) {
+                if (!$hasPatches && !isset($queueFootprint[$targetName]) && $resetPatches) {
                     $this->logger->writeRaw(
                         'Resetting patched package <info>%s</info> (%s)',
                         array($targetName, count($resetResult[$targetName]))
@@ -119,24 +117,29 @@ class PatchesApplier
                 }
 
                 $this->repositoryManager->resetPackage($repository, $resetTarget);
+
                 $packagesUpdated = $packagesUpdated || (bool)$resetResult[$targetName];
             }
 
-            $patchList = $this->patchListUtils->updateList(
-                $patchList,
-                $this->patchListUtils->generateKnownPatchFlagUpdates($packageName, $resetResult, $infoList)
+            $patchQueue = $this->patchListUtils->updateList(
+                $patchQueue,
+                $this->patchListUtils->generateKnownPatchFlagUpdates(
+                    $packageName,
+                    $resetResult,
+                    $queueFootprint
+                )
             );
 
-            $resetList = array_diff($resetList, $patchTargets);
+            $resetQueue = array_diff($resetQueue, $patchTargets);
 
             if (!$hasPatches) {
                 continue;
             }
 
-            $hasPatchChanges = false;
+            $changesMap = array();
             foreach ($patchTargets as $targetName) {
-                $targetQueue = isset($infoList[$targetName])
-                    ? $infoList[$targetName]
+                $targetQueue = isset($queueFootprint[$targetName])
+                    ? $queueFootprint[$targetName]
                     : array();
 
                 if (!isset($packages[$targetName])) {
@@ -149,18 +152,23 @@ class PatchesApplier
                     );
                 }
 
-                $target = $packages[$targetName];
-
-                if (!$hasPatchChanges = $this->packageUtils->hasPatchChanges($target, $targetQueue)) {
-                    continue;
-                }
+                $changesMap[$targetName] = $this->packageUtils->hasPatchChanges(
+                    $packages[$targetName],
+                    $targetQueue
+                );
             }
 
-            if (!$hasPatchChanges) {
+            $changedTargets = array_keys(array_filter($changesMap));
+
+            if (!$changedTargets) {
                 continue;
             }
 
-            $this->processPatchesForPackage($package, $patchList[$packageName], $repository);
+            $queuedPatches = array_filter($patchQueue[$packageName], function ($data) use ($changedTargets) {
+                return array_intersect($data[PatchDefinition::TARGETS], $changedTargets);
+            });
+
+            $this->processPatchesForPackage($package, $queuedPatches, $repository);
 
             $packagesUpdated = true;
 

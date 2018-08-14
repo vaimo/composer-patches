@@ -814,6 +814,8 @@ to the user when patch is being applied.
 @version (optional) >=1.1.0 <1.4.0
 @after (optional) Used in case a patch should be added after another branch
 @skip (optional) If this tag is present, then the patch will not be applied
+@type (optional) dev 
+
 --- Models/Example.php.org
 +++ Models/Example.php
 @@ -31,7 +31,7 @@

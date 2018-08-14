@@ -1,4 +1,13 @@
 {
+    "3.30.0": {
+        "feature": [
+            "allow @type tag in embedded target info to indicate that patch should only be applied when running composer without --no-dev"
+        ],
+        "fix": [
+            "patch:redo not re-applying patches correctly for targeted package when empty patch list provided (in situations where previously patches were applied)",
+            "when testing bundled packages with --filter, consider all bundle patch targets as full reset candidates (used to produce inconsistent behaviour)"
+        ]
+    },
     "3.29.1": {
         "fix": [
             "patch validation command failing on bundle patches when owned by non-root package"

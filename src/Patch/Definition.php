@@ -24,6 +24,7 @@ class Definition
     const OWNER_IS_ROOT = 'owner_is_root';
     const HASH = 'md5';
     const TARGETS = 'targets';
+    const ORIGIN = 'origin';
     const SKIP = 'skip';
 
     const BEFORE = 'before';
@@ -32,6 +33,7 @@ class Definition
     const CONFIG = 'config';
     const PATCHER = 'patcher';
     const LEVEL = 'level';
+    const TYPE = 'type';
 
     const CHANGED = 'changed';
     const NEW = 'new';
