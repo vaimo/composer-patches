@@ -6,7 +6,7 @@
     },
     "3.29.0": {
         "feature": [
-            "split the --undo and --redo options of main command into separate commands - 'patch:undo' and 'patch:redo'",
+            "split the --undo and --redo options of main command into separate commands - 'patch:undo' and 'patch:redo' (the functionality will still also be accessible via flags of 'composer patch')",
             "create alias command for 'composer patch' to have all commands available under the keyword 'patch' - patch:apply ('composer patch' still works as well though)",
             "added 'patch:validate' to make sure that there are no patches in owner repo that miss proper target definition (has been a real issue when re-arranging code in some projects)",
             "allow one-line embedded definition via @package tag the same way it's possible with @version",
