@@ -78,7 +78,8 @@ Test out the added patch (in project root).
 composer patch:redo --from-source some/package-name
 ```
 
-The patch will be automatically applied on every composer install, update when required (when it's found that it's not yet installed).
+The patch will be automatically applied on every composer install, update when required (when it's found 
+that it's not yet installed).
 
 ```shell
 Writing lock file
@@ -90,7 +91,21 @@ Processing patches configuration
       absolutely everything
 ```
 
-All patches are applied when after all packages are installed to allow any package to provide patches for any other package.
+All patches are applied when after all packages are installed to allow any package to provide patches for 
+any other package.
+
+#### 5. (demo) simulate normal flow of applying the patch
+
+```shell
+composer patch:undo # remove the patch that we added at last step
+composer install # will trigger install AND re-apply the patch
+composer install # no patches are applied as no new patches were added
+```
+
+By default, the patches will be applied in non-graceful mode: first failure will cause a fatal exception
+and the whole process will halt. In case it's required for the composer command run to continue without
+halting, a specific [environment variable](#environment-variables) or patch command `--graceful` flag 
+can be used.  
 
 # Configuration
 
@@ -698,6 +713,8 @@ Some things to point out on patcher configuration:
 7. The remote patches are downloaded with same configuration as Composer packages, in case some patches are 
    served over HTTPS, developer can change the 'secure-http' key under patcher configuration to false. This
    will NOT affect the configuration of the package downloader (which has similar setting for package downloader).
+8. Setting 'graceful' to true will force the module to continue to apply patches even when some of them 
+   fail to apply. By default, the module will halt of first failure.
 
 Appliers are executed in the sequence dictated by sequence where several path levels are used with 
 validation until validation success is hit. Note that each applier will be visited before moving on to 
@@ -868,6 +885,9 @@ Installing the plugin will introduce a new composer command group: **patch**
 # Apply new patches (similar to patch apply on 'composer install') 
 composer patch:apply
 
+# Apply new patches and continue even if some of them fail
+composer patch:apply --graceful
+
 # Re-apply all patches
 composer patch:redo 
 
@@ -895,7 +915,7 @@ composer patch:undo --filter some-fix my/package
 # Reset packages that have patch that contains 'some-fix' in it's path definition
 composer patch:undo --filter some-fix
 
-# Gather patches information from /vendor instead of install.json
+# Gather patches information from /vendor instead of install.json and apply
 composer patch:apply --from-source
 
 # Ideal for testing out a newly added patch against my/package

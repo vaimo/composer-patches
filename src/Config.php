@@ -47,6 +47,9 @@ class Config
 
     const PATCH_FILE_REGEX_MATCHER = '/^.+\.patch/i';
 
+    const PATCHER_FROM_SOURCE = 'from-source';
+    const PATCHER_FORCE_REAPPLY = 'force-reapply';
+
     /**
      * @var array
      */
@@ -68,30 +71,19 @@ class Config
         $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
     }
 
+    public function shouldExitOnFirstFailure()
+    {
+        return !$this->config[self::PATCHER_GRACEFUL];
+    }
+
     public function shouldPreferOwnerPackageConfig()
     {
-        return (bool)getenv(Environment::PREFER_OWNER) || (bool)getEnv('COMPOSER_PATCHES_PREFER_OWNER');
+        return (bool)$this->config[self::PATCHER_FROM_SOURCE];
     }
 
     public function shouldResetEverything()
     {
-        return (bool)getenv(Environment::FORCE_REAPPLY) || (bool)getenv('COMPOSER_FORCE_PATCH_REAPPLY');
-    }
-
-    public function shouldExitOnFirstFailure()
-    {
-        return (bool)getenv(Environment::EXIT_ON_FAIL) || (bool)getenv('COMPOSER_EXIT_ON_PATCH_FAILURE');
-    }
-
-    public function getSkippedPackages()
-    {
-        $skipList = getenv(Environment::PACKAGE_SKIP)
-            ? getenv(Environment::PACKAGE_SKIP)
-            : getenv('COMPOSER_SKIP_PATCH_PACKAGES');
-
-        return array_filter(
-            explode(',', $skipList)
-        );
+        return (bool)$this->config[self::PATCHER_FORCE_REAPPLY];
     }
 
     public function getPatcherConfig(array $overrides = array())

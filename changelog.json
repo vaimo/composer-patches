@@ -1,4 +1,18 @@
 {
+    "4.0.0": {
+        "breaking": [
+            "installation/update/applying patches fails on first patch failure (used to be activated by COMPOSER_PATCHES_FATAL_FAIL); old default behaviour usable via COMPOSER_PATCHES_GRACEFUL or using --graceful flag",
+            "removed COMPOSER_PATCHES_REAPPLY_ALL, COMPOSER_FORCE_PATCH_REAPPLY; replaced by 'composer patch:redo'",
+            "removed COMPOSER_PATCHES_FATAL_FAIL, COMPOSER_EXIT_ON_PATCH_FAILURE; replaceb by COMPOSER_PATCHES_GRACEFUL",
+            "removed COMPOSER_PATCHES_FROM_SOURCE, COMPOSER_PATCHES_PREFER_OWNER; replaced with --from-source flag on commands (was meant for testing out a patch)",
+            "removed COMPOSER_SKIP_PATCH_PACKAGES, COMPOSER_PATCHES_SKIP_PACKAGES; never really used for anything, could be achieved via using patcher configuration"
+        ],
+        "feature": [
+            "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
+            "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
+            "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
     "3.30.1": {
         "fix": [
             "patch apply failure on fresh projects under certain conditions when loading the 'patches-applied' from .lock file (which in-between the run is set to 'true')",

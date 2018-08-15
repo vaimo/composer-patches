@@ -62,9 +62,6 @@ class ComponentPool
             'bundle' => new LoaderComponents\BundleComponent($rootPackage),
             'global-exclude' => $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,
             'local-exclude' => new LoaderComponents\LocalExcludeComponent(),
-            'custom-exclude' => new LoaderComponents\CustomExcludeComponent(
-                $pluginConfig->getSkippedPackages()
-            ),
             'path-normalizer' => new LoaderComponents\PathNormalizerComponent($packageInfoResolver),
             'constraints' => new LoaderComponents\ConstraintsComponent(),
             'downloader' => new LoaderComponents\DownloaderComponent($rootPackage, $downloader),

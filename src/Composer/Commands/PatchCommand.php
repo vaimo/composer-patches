@@ -9,7 +9,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Composer\Script\ScriptEvents;
+
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Config;
 
 use Vaimo\ComposerPatches\Environment;
 
@@ -61,6 +63,13 @@ class PatchCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Apply patches based on information directly from packages in vendor folder'
         );
+
+        $this->addOption(
+            '--graceful',
+            null,
+            InputOption::VALUE_NONE,
+            'Continue even when some patch fails to apply'
+        );
     }
 
     protected function getBehaviourFlags(InputInterface $input)
@@ -73,37 +82,37 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $composer = $this->getComposer();
-        $bootstrap = new \Vaimo\ComposerPatches\Bootstrap(
-            $this->getComposer(),
-            $this->getIO(),
-            array(
-                \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
-                    'project' => true,
-                    'packages' => true,
-                    'vendors' => true
-                )
-            )
-        );
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+        $defaults = $configDefaults->getPatcherConfig();
 
-        $isDevMode = !$input->getOption('no-dev');
+        $composer = $this->getComposer();
+
+        $behaviourFlags = $this->getBehaviourFlags($input);
+        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
 
         $filters = array(
             PatchDefinition::SOURCE => $input->getOption('filter'),
             PatchDefinition::TARGETS => $input->getArgument('targets')
         );
 
-        $behaviourFlags = $this->getBehaviourFlags($input);
-        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
+        $shouldReApply = $shouldUndo && !array_filter($filters);
+
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
+            Config::PATCHER_FORCE_REAPPLY => $shouldReApply,
+            Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source'),
+            Config::PATCHER_GRACEFUL => (bool)$input->getOption('graceful'),
+            Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)
+        ));
+
+        $bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $this->getIO(), $configFactory);
+
+        $isDevMode = !$input->getOption('no-dev');
 
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
 
         if ($shouldUndo && !array_filter($filters)) {
             $bootstrap->stripPatches($isDevMode);
         } else {
-            putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
-            putenv(Environment::FORCE_REAPPLY . "=" . ($behaviourFlags['redo'] || $behaviourFlags['undo']));
-
             if ($shouldUndo) {
                 $filters[PatchDefinition::SOURCE] = $filterUtils->invertRules(
                     $filters[PatchDefinition::SOURCE] ? $filters[PatchDefinition::SOURCE] : array('*')
