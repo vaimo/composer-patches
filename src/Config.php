@@ -32,6 +32,7 @@ class Config
     const PATCHER_LEVELS = 'levels';
     const PATCHER_SOURCES = 'sources';
     const PATCHER_SECURE_HTTP = 'secure-http';
+    const PATCHER_GRACEFUL = 'graceful';
 
     const PATCHES_DEPENDS = 'patches-depend';
     const PATCHES_BASE = 'patches-base';
