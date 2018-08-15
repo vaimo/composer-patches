@@ -665,8 +665,8 @@ _Note that by default, user does not really have to declare any of this, but eve
   "extra": {
     "patcher": {
       "graceful": false,
+      "force-reset": false,
       "secure-http": true,
-      "force-reset": true,
       "sources": {
         "project": true,
         "packages": true,
