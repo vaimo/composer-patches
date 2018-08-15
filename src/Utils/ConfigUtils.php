@@ -19,6 +19,10 @@ class ConfigUtils
             $config[Config::PATCHER_GRACEFUL] = $updates[Config::PATCHER_GRACEFUL];
         }
 
+        if (isset($updates[Config::PATCHER_FORCE_RESET])) {
+            $config[Config::PATCHER_FORCE_RESET] = $updates[Config::PATCHER_FORCE_RESET];
+        }
+
         foreach ($config[Config::PATCHER_APPLIERS] as $code => $applier) {
             if (!isset($updates[Config::PATCHER_APPLIERS][$code])) {
                 continue;

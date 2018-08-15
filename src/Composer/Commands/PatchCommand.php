@@ -70,6 +70,13 @@ class PatchCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Continue even when some patch fails to apply'
         );
+
+        $this->addOption(
+            '--force',
+            null,
+            InputOption::VALUE_NONE,
+            'Force package reset even when it has local change'
+        );
     }
 
     protected function getBehaviourFlags(InputInterface $input)
@@ -107,6 +114,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $isDevMode = !$input->getOption('no-dev');
 
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+
+        putenv(Environment::FORCE_RESET . "=" . (bool)$input->getOption('force'));
 
         if ($shouldUndo && !array_filter($filters)) {
             $bootstrap->stripPatches($isDevMode);

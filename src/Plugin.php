@@ -19,7 +19,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     private $patcherStateManager;
 
     /**
-     * @var \Vaimo\ComposerPatches\Bootstrap\Strategy
+     * @var \Vaimo\ComposerPatches\Strategies\BootstrapStrategy
      */
     private $bootstrapStrategy;
 
@@ -33,7 +33,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
 
-        $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Bootstrap\Strategy();
+        $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
 
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
 

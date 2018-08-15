@@ -11,6 +11,11 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+            ]
+    },
+    "3.31.0": {
+        "feature": [
+            "halt applying patches when encountering package with local changes to avoid developer from losing their work (allow override with env flag or command --force flag)"
         ]
     },
     "3.30.1": {
