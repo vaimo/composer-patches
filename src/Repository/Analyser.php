@@ -7,8 +7,6 @@ namespace Vaimo\ComposerPatches\Repository;
 
 use Composer\Repository\WritableRepositoryInterface;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
 class Analyser
 {
     /**

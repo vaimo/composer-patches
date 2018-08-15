@@ -5,7 +5,7 @@
  */
 namespace Vaimo\ComposerPatches;
 
-class Plugin implements \Composer\Plugin\PluginInterface, 
+class Plugin implements \Composer\Plugin\PluginInterface,
     \Composer\EventDispatcher\EventSubscriberInterface, \Composer\Plugin\Capable
 {
     /**
@@ -19,15 +19,22 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     private $patcherStateManager;
 
     /**
+     * @var \Vaimo\ComposerPatches\Bootstrap\Strategy
+     */
+    private $bootstrapStrategy;
+
+    /**
      * @var \Vaimo\ComposerPatches\Bootstrap
      */
     private $bootstrap;
-    
-    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io) 
+
+    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
     {
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
-        
+
+        $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Bootstrap\Strategy();
+
         $this->bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $io);
     }
 
@@ -37,7 +44,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
             'Composer\Plugin\Capability\CommandProvider' => '\Vaimo\ComposerPatches\Composer\CommandsProvider',
         );
     }
-    
+
     public static function getSubscribedEvents()
     {
         return array(
@@ -54,6 +61,12 @@ class Plugin implements \Composer\Plugin\PluginInterface,
             return;
         }
 
+        if (!$this->bootstrapStrategy->shouldAllow()) {
+            $this->bootstrap = null;
+            return;
+        }
+
+
         $this->patcherStateManager->extractAppliedPatchesInfo(
             $event->getComposer()->getRepositoryManager()->getLocalRepository()
         );
@@ -64,14 +77,14 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         if (!$this->bootstrap) {
             return;
         }
-        
+
         $this->patcherStateManager->restoreAppliedPatchesInfo(
             $event->getComposer()->getRepositoryManager()->getLocalRepository()
         );
-        
+
         $this->bootstrap->applyPatches($event->isDevMode());
     }
-    
+
     public function resetPackages(\Composer\Installer\PackageEvent $event)
     {
         if (!$this->operationAnalyser->isPatcherUninstallOperation($event->getOperation())) {
@@ -81,7 +94,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         if (!getenv(\Vaimo\ComposerPatches\Environment::SKIP_CLEANUP)) {
             $this->bootstrap->stripPatches();
         }
-        
+
         $this->bootstrap = null;
     }
 }

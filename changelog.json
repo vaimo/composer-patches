@@ -1,4 +1,10 @@
 {
+    "3.30.1": {
+        "fix": [
+            "patch apply failure on fresh projects under certain conditions when loading the 'patches-applied' from .lock file (which in-between the run is set to 'true')",
+            "skip initiating the patches in case composer update is only targeting composer.lock (running update with --lock) and not really installing/updating any modules"
+        ]
+    },
     "3.30.0": {
         "feature": [
             "allow @type tag in embedded target info to indicate that patch should only be applied when running composer without --no-dev"
