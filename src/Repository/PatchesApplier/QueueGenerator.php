@@ -52,7 +52,10 @@ class QueueGenerator
         return array(
             $patches,
             array_unique(
-                array_merge($this->patchListUtils->getRelatedTargets($patchesList, $resets), $resets)
+                array_merge(
+                    $this->patchListUtils->getRelatedTargets($patchesList, $resets),
+                    $resets
+                )
             )
         );
     }

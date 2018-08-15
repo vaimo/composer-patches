@@ -97,7 +97,7 @@ any other package.
 #### 5. (demo) simulate normal flow of applying the patch
 
 ```shell
-composer patch:undo # remove the patch that we added at last step
+composer patch:undo # remove the patch that we added at the last step
 composer install # will trigger install AND re-apply the patch
 composer install # no patches are applied as no new patches were added
 ```
@@ -561,6 +561,10 @@ be used:
 ```
 
 The first dependency version will be used for the bundled patches {{version}} value.
+
+Note that using bundled patches may cause massive re-applying of patches for certain modules when they 
+change due to the architecture of this plugin, which relies on re-installing the targeted packages to
+avoid potential errors that might be caused by the package's code being in an unexpected/tampered state. 
 
 ## Patches: defining patches with strict path strip level
 

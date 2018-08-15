@@ -95,10 +95,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
             PatchDefinition::TARGETS => $input->getArgument('targets')
         );
 
-        $shouldReApply = $shouldUndo && !array_filter($filters);
-
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
-            Config::PATCHER_FORCE_REAPPLY => $shouldReApply,
+            Config::PATCHER_FORCE_REAPPLY => $behaviourFlags['redo'] || $behaviourFlags['undo'],
             Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source'),
             Config::PATCHER_GRACEFUL => (bool)$input->getOption('graceful'),
             Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)

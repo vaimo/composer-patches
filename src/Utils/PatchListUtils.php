@@ -138,14 +138,14 @@ class PatchListUtils
 
             foreach (array_diff_key($patches, array_flip($result)) as $packagePatches) {
                 foreach ($packagePatches as $patchInfo) {
-                    if (array_intersect($patchInfo[Patch::TARGETS], $result)) {
-                        $resetQueueUpdates = array_merge(
-                            $resetQueueUpdates,
-                            array_diff($patchInfo[Patch::TARGETS], $result)
-                        );
-
+                    if (!array_intersect($patchInfo[Patch::TARGETS], $result)) {
                         continue;
                     }
+
+                    $resetQueueUpdates = array_merge(
+                        $resetQueueUpdates,
+                        array_diff($patchInfo[Patch::TARGETS], $result)
+                    );
                 }
             }
 
