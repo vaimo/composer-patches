@@ -58,11 +58,9 @@ class PackageUtils
 
     public function resetAppliedPatches(PackageInterface $package, $replacement = null)
     {
-        $extra = $package->getExtra();
+        $patchesApplied = $this->getAppliedPatches($package);
 
-        $patchesApplied = isset($extra[PluginConfig::APPLIED_FLAG])
-            ? $extra[PluginConfig::APPLIED_FLAG]
-            : array();
+        $extra = $package->getExtra();
 
         unset($extra[PluginConfig::APPLIED_FLAG]);
 

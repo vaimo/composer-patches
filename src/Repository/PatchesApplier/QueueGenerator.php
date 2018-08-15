@@ -61,6 +61,10 @@ class QueueGenerator
     {
         $resets = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
 
+        $fullResets = array_keys(array_filter($resets, 'is_bool'));
+
+        $resets = array_diff_key($resets, array_flip($fullResets));
+
         $targets = array_replace_recursive(
             $resets,
             $this->patchListUtils->createSimplifiedList(array_intersect_key($patches, $resets))
@@ -76,7 +80,9 @@ class QueueGenerator
             );
         }
 
-        return $this->patchListUtils->getAllTargets($resetPatches);
+        return array_unique(
+            array_merge($this->patchListUtils->getAllTargets($resetPatches), $fullResets)
+        );
     }
 
     private function resolvePatchesQueue(array $patches)

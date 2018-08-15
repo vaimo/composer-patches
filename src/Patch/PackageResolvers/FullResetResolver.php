@@ -21,12 +21,12 @@ class FullResetResolver implements \Vaimo\ComposerPatches\Interfaces\PatchPackag
     {
         $matches = array();
 
-        foreach ($packages as $packageName => $package) {
-            if (!$this->packageUtils->shouldReinstall($package, array()) && !isset($patches[$packageName])) {
+        foreach ($packages as $name => $package) {
+            if (!$this->packageUtils->shouldReinstall($package, array()) && !isset($patches[$name])) {
                 continue;
             }
 
-            $matches[$packageName] = $this->packageUtils->getAppliedPatches($package);
+            $matches[$name] = $this->packageUtils->getAppliedPatches($package);
         }
 
         return $matches;

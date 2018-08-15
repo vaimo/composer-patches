@@ -31,6 +31,10 @@ class PatchListUtils
         $result = array();
 
         foreach ($patches as $originName => $patchGroup) {
+            if (!is_array($patchGroup)) {
+                continue;
+            }
+
             foreach ($patchGroup as $patchPath => $patchInfo) {
                 foreach ($patchInfo[Patch::TARGETS] as $target) {
                     if (!isset($result[$target])) {
@@ -56,6 +60,10 @@ class PatchListUtils
 
         foreach ($patches as $name => $group) {
             $result[$name] = array();
+
+            if (!is_array($group)) {
+                continue;
+            }
 
             foreach ($group as $path => $label) {
                 $result[$name][$path] = array(
