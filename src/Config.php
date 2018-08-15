@@ -32,6 +32,7 @@ class Config
     const PATCHER_LEVELS = 'levels';
     const PATCHER_SOURCES = 'sources';
     const PATCHER_SECURE_HTTP = 'secure-http';
+    const PATCHER_FORCE_RESET = 'force-reset';
 
     const PATCHES_DEPENDS = 'patches-depend';
     const PATCHES_BASE = 'patches-base';
@@ -80,6 +81,11 @@ class Config
     public function shouldExitOnFirstFailure()
     {
         return (bool)getenv(Environment::EXIT_ON_FAIL) || (bool)getenv('COMPOSER_EXIT_ON_PATCH_FAILURE');
+    }
+
+    public function shouldForcePackageReset()
+    {
+        return $this->config[self::PATCHER_FORCE_RESET] || (bool)getenv(Environment::FORCE_RESET);
     }
 
     public function getSkippedPackages()

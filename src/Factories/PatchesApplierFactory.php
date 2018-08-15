@@ -8,6 +8,7 @@ namespace Vaimo\ComposerPatches\Factories;
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Patch\FailureHandlers;
 use Vaimo\ComposerPatches\Patch\PackageResolvers;
+use Vaimo\ComposerPatches\Strategies;
 
 class PatchesApplierFactory
 {
@@ -38,6 +39,7 @@ class PatchesApplierFactory
         $composer = $this->composer;
 
         $installationManager = $composer->getInstallationManager();
+        $downloadManager = $composer->getDownloadManager();
 
         $eventDispatcher = $composer->getEventDispatcher();
         $rootPackage = $composer->getPackage();
@@ -87,9 +89,19 @@ class PatchesApplierFactory
 
         $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
 
+        if ($pluginConfig->shouldForcePackageReset()) {
+            $packageResetStrategy = new Strategies\Package\ForcedResetStrategy();
+        } else {
+            $packageResetStrategy = new Strategies\Package\DefaultResetStrategy(
+                $installationManager,
+                $downloadManager
+            );
+        }
+
         $repositoryManager = new \Vaimo\ComposerPatches\Managers\RepositoryManager(
             $this->logger->getOutputInstance(),
-            $installationManager
+            $installationManager,
+            $packageResetStrategy
         );
 
         return new \Vaimo\ComposerPatches\Repository\PatchesApplier(

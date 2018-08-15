@@ -3,9 +3,9 @@
  * Copyright © Vaimo Group. All rights reserved.
  * See LICENSE_VAIMO.txt for license details.
  */
-namespace Vaimo\ComposerPatches\Bootstrap;
+namespace Vaimo\ComposerPatches\Strategies;
 
-class Strategy
+class BootstrapStrategy
 {
     public function shouldAllow()
     {

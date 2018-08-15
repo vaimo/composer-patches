@@ -646,6 +646,7 @@ _Note that by default, user does not really have to declare any of this, but eve
   "extra": {
     "patcher": {
       "secure-http": true,
+      "force-reset": true,
       "sources": {
         "project": true,
         "packages": true,
@@ -697,6 +698,9 @@ Some things to point out on patcher configuration:
 7. The remote patches are downloaded with same configuration as Composer packages, in case some patches are 
    served over HTTPS, developer can change the 'secure-http' key under patcher configuration to false. This
    will NOT affect the configuration of the package downloader (which has similar setting for package downloader).
+8. By default, the patcher will halt when encountering a package that has local changes to avoid developer
+   losing their work by accident. the 'force-reset' flag will force the patcher to continue resetting the 
+   package code even when there are changes.
 
 Appliers are executed in the sequence dictated by sequence where several path levels are used with 
 validation until validation success is hit. Note that each applier will be visited before moving on to 
@@ -870,6 +874,9 @@ composer patch:apply
 # Re-apply all patches
 composer patch:redo 
 
+# Re-apply all patches and ignore any local changes on packages
+composer patch:redo --force
+
 # Re-apply patches for one speicif package
 composer patch:redo my/package 
 
@@ -921,6 +928,9 @@ having to trigger 'composer update' or 'composer install'.
 * **COMPOSER_PATCHES_SKIP_CLEANUP** - Will leave packages patched even when vaimo/composer-patches is 
   removed. By default, patched packages are re-installed to reset the patches (useful when creating 
   immutable build artifacts without any unnecessary modules installed).
+* **COMPOSER_PATCHES_FORCE_RESET** - Allows patcher to reset patch-targeted packages that have local 
+  changes. Default behaviour will lead to the process to be halted to avoid developers from losing their
+  work.
 
 ## Upgrading The Module
 
