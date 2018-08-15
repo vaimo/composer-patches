@@ -99,7 +99,7 @@ any other package.
 ```shell
 composer patch:undo # remove the patch that we added at the last step
 composer install # will trigger install AND re-apply the patch
-composer install # no patches are applied as no new patches were added
+composer install # second run; to illustrate that already applied patches remain applied
 ```
 
 By default, the patches will be applied in non-graceful mode: first failure will cause a fatal exception
