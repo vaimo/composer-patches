@@ -943,6 +943,9 @@ The main purpose of this command is to make the maintenance of already created p
 ones as easy as possible by allowing user to test out a patch directly right after defining it without 
 having to trigger 'composer update' or 'composer install'.
 
+Note that 'validate' command will also validate patches with constraints or with #skip flag in their
+path (or in embedded data).
+
 ## Environment Variables
 
 * **COMPOSER_PATCHES_GRACEFUL** - continue applying patches even if some of them fail.
