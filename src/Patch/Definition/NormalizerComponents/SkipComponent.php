@@ -12,18 +12,19 @@ class SkipComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNorma
     public function normalize($target, $label, array $data, array $ownerConfig)
     {
         $source = $data[PatchDefinition::SOURCE];
+        $flag = '#' . PatchDefinition::SKIP;
 
-        $sourceSegments = explode('#', $source);
-        $lastSegment = array_pop($sourceSegments);
-
-        if ($lastSegment === PatchDefinition::SKIP) {
-            $data[PatchDefinition::SKIP] = true;
+        if (strstr($source, $flag) !== $flag) {
+            return array(
+                PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP])
+                    ? $data[PatchDefinition::SKIP]
+                    : false
+            );
         }
 
         return array(
-            PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP])
-                ? $data[PatchDefinition::SKIP]
-                : false
+            PatchDefinition::SOURCE => substr($source, 0, strrpos($source, $flag)),
+            PatchDefinition::SKIP => true
         );
     }
 }

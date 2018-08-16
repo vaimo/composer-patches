@@ -1,6 +1,14 @@
 {
     "DEV.4.X.X": [
     ],
+    "4.1.1": {
+        "fix": [
+            "forward-port(3.32.1): definition list validation command returning with false failures when using #skip on patch paths"
+        ],
+        "maintenance": [
+            "forward-port(3.32.1): removing #skip flag from path when encountered (previously it remained in the path)"
+        ]
+    },
     "4.1.0": {
         "feature": [
             "forward-port(3.32.0): allow comments on any level and with any keyword as long as it starts with underscore (_)"
@@ -19,6 +27,15 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.32.1": {
+        "fix": [
+            "definition list validation command returning with false failures when using #skip on patch paths"
+        ],
+        "maintenance": [
+            "removing #skip flag from path when encountered (previously it remained in the path)"
+        ],
+        "branch": "release/3.X"
     },
     "3.32.0": {
         "feature": [
