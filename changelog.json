@@ -1,6 +1,15 @@
 {
     "DEV.3.X.X": [
     ],
+    "3.32.1": {
+        "fix": [
+            "definition list validation command returning with false failures when using #skip on patch paths"
+        ],
+        "maintenance": [
+            "removing #skip flag from path when encountered (previously it remained in the path)"
+        ],
+        "branch": "release/3.X"
+    },
     "3.32.0": {
         "feature": [
             "allow comments on any level and with any keyword as long as it starts with underscore (_)"

@@ -55,8 +55,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $config = $configFactory->create(array($config));
 
-        $loaderComponentsPool->registerComponent('constraints', false);
-        $loaderComponentsPool->registerComponent('targets-resolver', false);
+        $skippedComponents = array('constraints', 'targets-resolver', 'local-exclude', 'global-exclude');
+
+        foreach ($skippedComponents as $componentName) {
+            $loaderComponentsPool->registerComponent($componentName, false);
+        }
 
         $patchesLoader = $loaderFactory->create($loaderComponentsPool, $config, true);
 
