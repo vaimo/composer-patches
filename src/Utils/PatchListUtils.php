@@ -9,6 +9,16 @@ use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class PatchListUtils
 {
+    /**
+     * @var \Vaimo\ComposerPatches\Utils\DataUtils
+     */
+    private $dataUtils;
+
+    public function __construct()
+    {
+        $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
+    }
+
     public function createSimplifiedList(array $patches)
     {
         $groups = $this->createTargetsList($patches);
@@ -217,5 +227,17 @@ class PatchListUtils
         );
 
         return array_filter(array_map('array_filter', $items));
+    }
+
+    public function getSanitizedList(array $patches)
+    {
+        $dataUtils = $this->dataUtils;
+
+        return $this->dataUtils->walkArrayNodes(
+            $patches,
+            function (array $value) use ($dataUtils) {
+                return $dataUtils->removeKeysByPrefix($value, '_');
+            }
+        );
     }
 }

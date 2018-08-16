@@ -1,4 +1,9 @@
 {
+    "4.1.0": {
+        "feature": [
+            "allow comments on any level and with any keyword as long as it starts with underscore (_)"
+        ]
+    },
     "4.0.0": {
         "breaking": [
             "logic: installation/update/applying patches fails on first patch failure (used to be activated by COMPOSER_PATCHES_FATAL_FAIL); old default behaviour usable via COMPOSER_PATCHES_GRACEFUL or using --graceful flag",
@@ -13,10 +18,17 @@
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
     },
+    "3.32.0": {
+        "feature": [
+            "allow comments on any level and with any keyword as long as it starts with underscore (_)"
+        ],
+        "branch": "release/3.X"
+    },
     "3.31.0": {
         "feature": [
             "halt applying patches when encountering package with local changes to avoid developer from losing their work (allow override with env flag or command --force flag)"
-        ]
+        ],
+        "branch": "release/3.X"
     },
     "3.30.1": {
         "fix": [
