@@ -18,6 +18,11 @@ class ListNormalizer
     private $definitionNormalizer;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
+     */
+    private $patchListUtils;
+
+    /**
      * @param \Vaimo\ComposerPatches\Patch\Definition\Exploder $definitionExploder
      * @param \Vaimo\ComposerPatches\Patch\Definition\Normalizer $definitionNormalizer
      */
@@ -27,38 +32,40 @@ class ListNormalizer
     ) {
         $this->definitionExploder = $definitionExploder;
         $this->definitionNormalizer = $definitionNormalizer;
+
+        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     public function normalize(array $list, array $config)
     {
-        $patchesPerPackage = array();
+        $result = array();
 
-        foreach ($list as $target => $packagePatches) {
+        foreach ($this->patchListUtils->getSanitizedList($list) as $target => $packagePatches) {
             $patches = array();
 
-            if (strpos($target, '_comment') === 0) {
-                continue;
-            }
-
             foreach ($packagePatches as $patchLabel => $patchConfig) {
-                if (strpos($target, '_comment') === 0) {
-                    continue;
-                }
-
-                $definitionItems = $this->definitionExploder->process($patchLabel, $patchConfig);
+                $definitionItems = $this->definitionExploder->process(
+                    $patchLabel,
+                    $patchConfig
+                );
 
                 foreach ($definitionItems as $patchItem) {
                     list($label, $data) = $patchItem;
 
-                    $patches[] = $this->definitionNormalizer->process($target, $label, $data, $config);
+                    $patches[] = $this->definitionNormalizer->process(
+                        $target,
+                        $label,
+                        $data,
+                        $config
+                    );
                 }
             }
 
-            $patchesPerPackage[$target] = $patches;
+            $result[$target] = $patches;
         }
 
         return array_filter(
-            array_map('array_filter', $patchesPerPackage)
+            array_map('array_filter', $result)
         );
     }
 }

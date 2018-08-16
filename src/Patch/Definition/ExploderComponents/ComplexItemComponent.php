@@ -14,24 +14,24 @@ class ComplexItemComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
         if (!is_array($data)) {
             return false;
         }
-        
+
         $key = key($data);
         $value = reset($data);
 
         $versionKeySet = false;
-        
+
         if (is_array($value)) {
-            $versionKeySet = isset($value[PatchDefinition::VERSION]) 
+            $versionKeySet = isset($value[PatchDefinition::VERSION])
                 || isset($value[PatchDefinition::DEPENDS]);
-        }   
-        
+        }
+
         return !is_numeric($key) && is_array($value) && $versionKeySet;
     }
-    
+
     public function explode($label, $data)
     {
         $items = array();
-        
+
         foreach ($data as $source => $subItem) {
             $items[] = array(
                 $label,
@@ -40,7 +40,7 @@ class ComplexItemComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                 ))
             );
         }
-        
+
         return $items;
     }
 }

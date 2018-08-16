@@ -1,10 +1,17 @@
 {
     "DEV.3.X.X": [
     ],
+    "3.32.0": {
+        "feature": [
+            "allow comments on any level and with any keyword as long as it starts with underscore (_)"
+        ],
+        "branch": "release/3.X"
+    },
     "3.31.0": {
         "feature": [
             "halt applying patches when encountering package with local changes to avoid developer from losing their work (allow override with env flag or command --force flag)"
-        ]
+        ],
+        "branch": "release/3.X"
     },
     "3.30.1": {
         "fix": [

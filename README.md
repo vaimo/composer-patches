@@ -219,16 +219,17 @@ the merging will be done in very late state based on the absolute path of the pa
 
 ## Basic Usage: comments in patch declaration
 
-In case user wants to add extra comments to patch declaration file, a key that start with "_comment" can be
-used.
+In case user wants to add extra comments to patch declaration file, any key that start with "_" can be
+used. Works on any level of the patch declaration.
 
 ```json
 {
   "_comment": "This patch file should hold patches that make world a better place",
   "whole/world": {
+    "_excuse": "I really need this one",
     "Fix: get closer to ending poverty": "patches/provide-affordable-education.patch"
   },
-  "_comment0": "This is another comment"
+  "_note": "This is another comment"
 }
 ```
 

@@ -15,6 +15,9 @@
         "tivie/php-os-detector": "^1.0",
         "marcj/topsort": "^1.0"
     },
+    "require-dev": {
+        "vaimo/composer-changelogs": "^0.6.2"
+    },
     "support": {
         "source": "https://github.com/vaimo/composer-patches",
         "docs": "https://github.com/vaimo/composer-patches",
