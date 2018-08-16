@@ -1,7 +1,8 @@
 # Vaimo Composer Patches
      
 Applies a patch from a local or remote file to any package that is part of a given composer 
-project. Patches can be defined both on project and on package level.
+project. Patches can be defined both on project and on package level in package config or 
+separate JSON file. Declaration-free mode (using embedded info within patch files) is available as well.
 
 The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable from 
 the composer.json of the project.
