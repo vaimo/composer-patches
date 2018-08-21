@@ -198,11 +198,11 @@ class PatchListUtils
             $patchDefinitionUpdates = array_replace(
                 array_fill_keys(
                     array_keys($changedPatches),
-                    array(Patch::NEW => false)
+                    array(Patch::STATE_NEW => false)
                 ),
                 array_fill_keys(
                     array_keys($knownPatches),
-                    array(Patch::NEW => false, Patch::CHANGED => false)
+                    array(Patch::STATE_NEW => false, Patch::STATE_CHANGED => false)
                 )
             );
 

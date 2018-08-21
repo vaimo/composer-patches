@@ -83,8 +83,8 @@ class PatchApplier
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
 
         $this->stateLabels = array(
-            PatchDefinition::NEW => 'NEW',
-            PatchDefinition::CHANGED => 'CHANGED'
+            PatchDefinition::STATE_NEW => 'NEW',
+            PatchDefinition::STATE_CHANGED => 'CHANGED'
         );
     }
 

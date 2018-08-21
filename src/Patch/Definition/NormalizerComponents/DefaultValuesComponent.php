@@ -15,8 +15,8 @@ class DefaultValuesComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
             PatchDefinition::PATH => isset($data[PatchDefinition::PATH]) && file_exists($data[PatchDefinition::PATH])
                 ? $data[PatchDefinition::PATH]
                 : '',
-            PatchDefinition::NEW => true,
-            PatchDefinition::CHANGED => true,
+            PatchDefinition::STATE_NEW => true,
+            PatchDefinition::STATE_CHANGED => true,
         );
     }
 }

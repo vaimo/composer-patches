@@ -35,6 +35,6 @@ class Definition
     const LEVEL = 'level';
     const TYPE = 'type';
 
-    const CHANGED = 'changed';
-    const NEW = 'new';
+    const STATE_CHANGED = 'changed';
+    const STATE_NEW = 'new';
 }

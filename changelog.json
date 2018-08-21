@@ -1,6 +1,9 @@
 {
-    "DEV.3.X.X": [
-    ],
+    "DEV.3.X.X": {
+        "fix": [
+            "switched away from using a class constant name that on older php versions is reserved (new)"
+        ]
+    },
     "3.32.1": {
         "fix": [
             "definition list validation command returning with false failures when using #skip on patch paths"
