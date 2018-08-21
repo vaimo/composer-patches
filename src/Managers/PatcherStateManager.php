@@ -20,46 +20,11 @@ class PatcherStateManager
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
-    
-    /**
-     * @var array
-     */
-    private $appliedPatches = array();
 
     public function __construct()
     {
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
-    }
-    
-    public function extractAppliedPatchesInfo(WritableRepositoryInterface $repository)
-    {
-        $this->appliedPatches = array();
-
-        foreach ($repository->getPackages() as $package) {
-            $package = $this->packageUtils->getRealPackage($package);
-            $name = $package->getName();
-            
-            if (isset($this->appliedPatches[$name])) {
-                continue;
-            }
-
-            $this->appliedPatches[$name] = $this->packageUtils->resetAppliedPatches($package, true);
-        }
-    }
-
-    public function restoreAppliedPatchesInfo(WritableRepositoryInterface $repository)
-    {
-        foreach ($repository->getPackages() as $package) {
-            $package = $this->packageUtils->getRealPackage($package);
-            $name = $package->getName();
-            
-            if (!isset($this->appliedPatches[$name]) || !$this->appliedPatches[$name]) {
-                continue;
-            }
-
-            $this->packageUtils->resetAppliedPatches($package, $this->appliedPatches[$name]);
-        }
     }
 
     public function registerAppliedPatches(WritableRepositoryInterface $repository, array $patches)
@@ -69,7 +34,7 @@ class PatcherStateManager
         $patchQueue = $this->patchListUtils->createSimplifiedList(
             array($patches)
         );
-        
+
         foreach ($patchQueue as $target => $patches) {
             if (!$package = $repository->findPackage($target, Constraint::ANY)) {
                 continue;

@@ -43,6 +43,11 @@ class Bootstrap
     private $loaderComponents;
 
     /**
+     * @var \Vaimo\ComposerPatches\Managers\LockerManager
+     */
+    private $lockerManager;
+
+    /**
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
      * @param array $config
@@ -72,6 +77,8 @@ class Bootstrap
         );
 
         $this->repositoryProcessor = new \Vaimo\ComposerPatches\Repository\Processor($logger);
+
+        $this->lockerManager = new \Vaimo\ComposerPatches\Managers\LockerManager();
     }
 
     public function applyPatches($devMode = false, array $filters = array())
@@ -100,5 +107,18 @@ class Bootstrap
         $patchesApplier = $this->applierFactory->create($config);
 
         $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
+    }
+
+    public function sanitizeLocker(\Composer\Package\Locker $locker)
+    {
+        $data = $this->lockerManager->extractLockData($locker);
+
+        foreach (array_merge($data['packages'], $data['packages-dev']) as $package) {
+            $package->setExtra(
+                array_diff_key($package->getExtra(), array('patches_applied' => true))
+            );
+        }
+
+        $this->lockerManager->updateLockData($locker, $data);
     }
 }

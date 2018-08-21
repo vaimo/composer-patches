@@ -1,7 +1,9 @@
 {
-    "DEV.3.X.X": {
+    "DEV.3.32.X": {
         "fix": [
-            "switched away from using a class constant name that on older php versions is reserved (new)"
+            "switched away from using a class constant name that on older php versions is reserved (new)",
+            "avoid reporting non-vcs package differences as reason for halting the patch applying (which requires package reset)",
+            "full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)"
         ],
         "branch": "release/3.X"
     },

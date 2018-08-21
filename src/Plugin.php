@@ -14,11 +14,6 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     private $operationAnalyser;
 
     /**
-     * @var \Vaimo\ComposerPatches\Managers\PatcherStateManager
-     */
-    private $patcherStateManager;
-
-    /**
      * @var \Vaimo\ComposerPatches\Strategies\BootstrapStrategy
      */
     private $bootstrapStrategy;
@@ -31,10 +26,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
     {
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
-        $this->patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
-
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
-
         $this->bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $io);
     }
 
@@ -48,27 +40,8 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     public static function getSubscribedEvents()
     {
         return array(
-            \Composer\Script\ScriptEvents::PRE_UPDATE_CMD => 'extractPatchesFromLock',
-            \Composer\Script\ScriptEvents::PRE_INSTALL_CMD => 'extractPatchesFromLock',
             \Composer\Script\ScriptEvents::PRE_AUTOLOAD_DUMP => 'postInstall',
             \Composer\Installer\PackageEvents::PRE_PACKAGE_UNINSTALL => 'resetPackages'
-        );
-    }
-
-    public function extractPatchesFromLock(\Composer\Script\Event $event)
-    {
-        if (!$this->bootstrap) {
-            return;
-        }
-
-        if (!$this->bootstrapStrategy->shouldAllow()) {
-            $this->bootstrap = null;
-            return;
-        }
-
-
-        $this->patcherStateManager->extractAppliedPatchesInfo(
-            $event->getComposer()->getRepositoryManager()->getLocalRepository()
         );
     }
 
@@ -78,11 +51,15 @@ class Plugin implements \Composer\Plugin\PluginInterface,
             return;
         }
 
-        $this->patcherStateManager->restoreAppliedPatchesInfo(
-            $event->getComposer()->getRepositoryManager()->getLocalRepository()
-        );
+        $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
 
-        $this->bootstrap->applyPatches($event->isDevMode());
+        if (!$this->bootstrapStrategy->shouldAllow()) {
+            $repository->write();
+        } else {
+            $this->bootstrap->applyPatches($event->isDevMode());
+        }
+
+        $this->bootstrap->sanitizeLocker($event->getComposer()->getLocker());
     }
 
     public function resetPackages(\Composer\Installer\PackageEvent $event)
