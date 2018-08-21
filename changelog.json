@@ -2,7 +2,8 @@
     "DEV.3.X.X": {
         "fix": [
             "switched away from using a class constant name that on older php versions is reserved (new)"
-        ]
+        ],
+        "branch": "release/3.X"
     },
     "3.32.1": {
         "fix": [
