@@ -36,7 +36,7 @@ class LockerManager
     public function extractLockData(\Composer\Package\Locker $locker)
     {
         $lockData = $locker->getLockData();
-        $repository = $locker->getLockedRepository();
+        $repository = $locker->getLockedRepository(true);
         $packages = $this->packageListUtils->listToNameDictionary($repository->getPackages());
 
         $aliases = array();
