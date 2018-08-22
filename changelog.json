@@ -1,5 +1,5 @@
 {
-    "DEV.3.32.X": {
+    "3.33.0": {
         "feature": [
             "allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: custom applier cwd)'"
         ],
