@@ -612,7 +612,7 @@ over certain declaration lines.
 Note that in case patches-base is used, the #skip flag will be naturally be added to the end
 of the resolve patch path.
 
-## Patches: custom applier cwd
+## Patches: patch applier cwd options
 
 In cases where there's a need to apply a patch on a file that is mapped to the project root or vendor bin
 root, a custom applier patch target installation path resolver mode can be defined:
