@@ -622,7 +622,7 @@ root, a custom applier patch target installation path resolver mode can be defin
     "extra": {
       "patches": {  
         "targeted/package": {
-          "This patch will be ignored": {
+          "This patch downloads a file to project root": {
             "source": "example.patch",
             "cwd": "project"
           }
@@ -632,7 +632,7 @@ root, a custom applier patch target installation path resolver mode can be defin
   }
 ```
 
-This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root.
+This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root. That means that the targeted file paths within example.patch should also target files relative to project root.
 
 Available cwd options:
 
