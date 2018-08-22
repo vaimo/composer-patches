@@ -1,7 +1,7 @@
 {
     "4.2.0": {
         "feature": [
-            "forward-port(3.33.0): allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: custom applier cwd)'"
+            "forward-port(3.33.0): allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: patch applier cwd options')"
         ],
         "fix": [
             "forward-port(3.33.0): switched away from using a class constant name that on older php versions is reserved (new)",
@@ -39,7 +39,7 @@
     },
     "3.33.0": {
         "feature": [
-            "allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: custom applier cwd)'"
+            "allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: patch applier cwd options')"
         ],
         "fix": [
             "switched away from using a class constant name that on older php versions is reserved (new)",
