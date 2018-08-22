@@ -1,9 +1,13 @@
 {
     "DEV.3.32.X": {
+        "feature": [
+            "allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: custom applier cwd)'"
+        ],
         "fix": [
             "switched away from using a class constant name that on older php versions is reserved (new)",
             "avoid reporting non-vcs package differences as reason for halting the patch applying (which requires package reset)",
-            "full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)"
+            "full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)",
+            "multiple dependencies on patches with embedded target info not respected"
         ],
         "branch": "release/3.X"
     },

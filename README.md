@@ -592,6 +592,34 @@ over certain declaration lines.
 Note that in case patches-base is used, the #skip flag will be naturally be added to the end
 of the resolve patch path.
 
+## Patches: custom applier cwd
+
+In cases where there's a need to apply a patch on a file that is mapped to the project root or vendor bin
+root, a custom applier patch target installation path resolver mode can be defined:
+
+```json
+  {
+    "extra": {
+      "patches": {  
+        "targeted/package": {
+          "This patch will be ignored": {
+            "source": "example.patch",
+            "cwd": "project"
+          }
+        }    
+      }
+    }
+  }
+```
+
+This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root.
+
+Available cwd options:
+
+1. install (default) - uses package install folder 
+2. vendor - uses vendor path
+3. project - uses project path
+
 ## Patches Exclude: configuration
 
 In case some patches that are defined in packages have to be excluded from the project (project has 
@@ -819,7 +847,8 @@ to the user when patch is being applied.
 @version (optional) >=1.1.0 <1.4.0
 @after (optional) Used in case a patch should be added after another branch
 @skip (optional) If this tag is present, then the patch will not be applied
-@type (optional) dev 
+@cwd (optional) Specify which cwd the patcher should use to apply the patch 
+@type (optional) dev
 
 --- Models/Example.php.org
 +++ Models/Example.php

@@ -161,7 +161,7 @@ class PatchApplier
 
             $this->patchApplier->applyFile(
                 $info[PatchDefinition::PATH],
-                $this->getInstallPath($package),
+                $this->getInstallPath($package, $info['cwd']),
                 $info[PatchDefinition::CONFIG]
             );
 
@@ -180,18 +180,31 @@ class PatchApplier
         return false;
     }
 
-    private function getInstallPath(PackageInterface $package)
+    private function getInstallPath(PackageInterface $package, $resolveMode)
     {
         $name = $package->getName();
+        $key = $name . '|' . $resolveMode;
 
-        if (!isset($this->installPathCache[$name])) {
-            if ($package instanceof \Composer\Package\RootPackage) {
-                $this->installPathCache[$name] = $this->vendorRoot;
-            } else {
-                $this->installPathCache[$name] = $this->packageInfoResolver->getSourcePath($package);
+        if (!isset($this->installPathCache[$key])) {
+            switch ($resolveMode) {
+                case PatchDefinition::CWD_VENDOR:
+                    $this->installPathCache[$key] = $this->vendorRoot;
+                    break;
+                case PatchDefinition::CWD_PROJECT:
+                    $this->installPathCache[$key] = getcwd();
+                    break;
+                case PatchDefinition::CWD_INSTALL:
+                default:
+                    if ($package instanceof \Composer\Package\RootPackage) {
+                        $this->installPathCache[$key] = $this->vendorRoot;
+                    } else {
+                        $this->installPathCache[$key] = $this->packageInfoResolver->getSourcePath($package);
+                    }
+
+                    break;
             }
         }
 
-        return $this->installPathCache[$name];
+        return $this->installPathCache[$key];
     }
 }

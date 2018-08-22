@@ -24,7 +24,10 @@ class BaseComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNorma
                     : $label,
                 PatchDefinition::TARGETS => isset($data[PatchDefinition::TARGETS]) && $target === PatchDefinition::BUNDLE_TARGET
                     ? $data[PatchDefinition::TARGETS]
-                    : array($target)
+                    : array($target),
+                PatchDefinition::CWD => isset($data[PatchDefinition::CWD])
+                    ? $data[PatchDefinition::CWD]
+                    : PatchDefinition::CWD_INSTALL
             );
     }
 }
