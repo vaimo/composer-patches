@@ -13,8 +13,8 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
      * @var \Composer\Package\Version\VersionParser
      */
     private $versionParser;
-    
-    public function __construct() 
+
+    public function __construct()
     {
         $this->versionParser = new \Composer\Package\Version\VersionParser();
     }
@@ -24,11 +24,11 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
      * @param \Composer\Package\PackageInterface[] $packagesByName
      * @return array
      */
-    public function process(array $patches, array $packagesByName) 
+    public function process(array $patches, array $packagesByName)
     {
         foreach ($patches as $target => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
-                if ($target != PatchDefinition::BUNDLE_TARGET && !isset($packagesByName[$target])) {
+                if ($target !== PatchDefinition::BUNDLE_TARGET && !isset($packagesByName[$target])) {
                     $patchData = false;
                     continue;
                 }

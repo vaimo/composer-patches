@@ -27,6 +27,11 @@ class Definition
     const ORIGIN = 'origin';
     const SKIP = 'skip';
 
+    const CWD = 'cwd';
+    const CWD_INSTALL = 'install';
+    const CWD_VENDOR = 'vendor';
+    const CWD_PROJECT = 'project';
+
     const BEFORE = 'before';
     const AFTER = 'after';
 
@@ -35,6 +40,6 @@ class Definition
     const LEVEL = 'level';
     const TYPE = 'type';
 
-    const CHANGED = 'changed';
-    const NEW = 'new';
+    const STATE_CHANGED = 'changed';
+    const STATE_NEW = 'new';
 }

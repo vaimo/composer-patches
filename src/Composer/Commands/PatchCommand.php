@@ -127,6 +127,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             }
 
             $bootstrap->applyPatches($isDevMode, array_filter($filters));
+            $bootstrap->sanitizeLocker($composer->getLocker());
         }
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);

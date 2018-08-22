@@ -1,6 +1,15 @@
 {
-    "DEV.4.X.X": [
-    ],
+    "4.2.0": {
+        "feature": [
+            "forward-port(3.33.0): allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: custom applier cwd)'"
+        ],
+        "fix": [
+            "forward-port(3.33.0): switched away from using a class constant name that on older php versions is reserved (new)",
+            "forward-port(3.33.0): avoid reporting non-vcs package differences as reason for halting the patch applying (which requires package reset)",
+            "forward-port(3.33.0): full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)",
+            "forward-port(3.33.0): multiple dependencies on patches with embedded target info not respected"
+        ]
+    },
     "4.1.1": {
         "fix": [
             "forward-port(3.32.1): definition list validation command returning with false failures when using #skip on patch paths"
@@ -27,6 +36,18 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.33.0": {
+        "feature": [
+            "allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: custom applier cwd)'"
+        ],
+        "fix": [
+            "switched away from using a class constant name that on older php versions is reserved (new)",
+            "avoid reporting non-vcs package differences as reason for halting the patch applying (which requires package reset)",
+            "full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)",
+            "multiple dependencies on patches with embedded target info not respected"
+        ],
+        "branch": "release/3.X"
     },
     "3.32.1": {
         "fix": [

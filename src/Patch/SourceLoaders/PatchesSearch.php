@@ -140,7 +140,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $this->tagAliases
         );
 
-        list($target, $version, $depends) = $this->resolveBaseInfo($data);
+        list($target, $depends) = $this->resolveBaseInfo($data);
 
         if (!$target) {
             return array();
@@ -158,7 +158,9 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                 isset($data[PatchDefinition::LABEL]) ? $data[PatchDefinition::LABEL] : array('')
             ),
             PatchDefinition::TARGET => $target,
-            PatchDefinition::DEPENDS => array($depends => $version),
+            PatchDefinition::CWD => $this->extractSingleValue($data, PatchDefinition::CWD),
+            PatchDefinition::TARGETS => $this->extractValueList($data, PatchDefinition::TARGETS),
+            PatchDefinition::DEPENDS => $depends,
             PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP]),
             PatchDefinition::AFTER => $this->extractValueList($data, PatchDefinition::AFTER),
             PatchDefinition::ISSUE => $this->extractSingleValue($data, PatchDefinition::ISSUE),
@@ -166,7 +168,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         ), $values);
     }
 
-    private function resolveBaseInfo($data)
+    private function resolveBaseInfo(array $data)
     {
         $target = false;
 
@@ -200,7 +202,28 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $depends = $target;
         }
 
-        return array($target, $version, $depends);
+        $extraDepends = array_reduce(
+            array_map(function ($item) {
+                $valueParts = explode(':', $item);
+
+                return array(
+                    trim(array_shift($valueParts)) => trim(implode(':', $valueParts)) ?: '>=0.0.0'
+                );
+            }, $this->extractValueList($data, PatchDefinition::DEPENDS)),
+            'array_replace',
+            array()
+        );
+
+        return array(
+            $target,
+            array_filter(
+                array_replace(
+                    array($depends => $version),
+                    $extraDepends,
+                    array(PatchDefinition::BUNDLE_TARGET => false)
+                )
+            )
+        );
     }
 
     private function extractValueList(array $data, $name)
