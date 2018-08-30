@@ -1,4 +1,9 @@
 {
+    "4.2.1": {
+        "fix": [
+            "forward-port(3.33.1): improved error reporting when encountering issues on composer lock cleanup"
+        ]
+    },
     "4.2.0": {
         "feature": [
             "forward-port(3.33.0): allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: patch applier cwd options')"
@@ -36,6 +41,12 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.33.1": {
+        "fix": [
+            "improved error reporting when encountering issues on composer lock cleanup"
+        ],
+        "branch": "release/3.X"
     },
     "3.33.0": {
         "feature": [
