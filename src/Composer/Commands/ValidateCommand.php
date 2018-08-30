@@ -175,7 +175,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
             exit(1);
         } else {
-            $output->writeln('<info>Done</info>');
+            $output->writeln('<info>Validation completed successfully</info>');
         }
     }
 }

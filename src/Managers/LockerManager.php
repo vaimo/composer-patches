@@ -5,6 +5,8 @@
  */
 namespace Vaimo\ComposerPatches\Managers;
 
+use Vaimo\ComposerPatches\Exceptions\PackageResolverException;
+
 class LockerManager
 {
     /**
@@ -65,11 +67,17 @@ class LockerManager
     {
         $targets = $this->packageListUtils->listToNameDictionary($data);
 
-        return array_values(
-            array_replace(
-                $targets,
-                array_intersect_key($packages, $targets)
-            )
+        $result = array_replace(
+            $targets,
+            array_intersect_key($packages, $targets)
         );
+
+        if ($invalidTargets = array_filter($result, 'is_array')) {
+            throw new PackageResolverException(
+                sprintf('Failed to locate package object for: %s', key($invalidTargets))
+            );
+        }
+
+        return array_values($result);
     }
 }
