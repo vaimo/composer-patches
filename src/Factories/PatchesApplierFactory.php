@@ -82,8 +82,18 @@ class PatchesApplierFactory
             $packagesResolver
         );
 
-        $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
+        $missingItemsAnalyser = new \Vaimo\ComposerPatches\Repository\Analyser(
+            $packageCollector,
+            new \Vaimo\ComposerPatches\Patch\PackageResolvers\MissingPatchesResolver()
+        );
+        
+        $listResolver = new \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver(
             $repositoryAnalyser,
+            $missingItemsAnalyser
+        );
+        
+        $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
+            $listResolver,
             $filters
         );
 

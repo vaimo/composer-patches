@@ -139,30 +139,41 @@ class PatchListUtils
         return array_filter(array_map('array_filter', $patches));
     }
 
-    public function getRelatedTargets(array $patches, array $targets)
+    public function getRelatedTargets(array $patchesList, array $targets)
     {
         $result = $targets;
 
+        $relatedPatches = array();
+
         do {
-            $resetQueueUpdates = array();
+            $scanQueue = array_diff_key($patchesList, array_flip($result));
 
-            foreach (array_diff_key($patches, array_flip($result)) as $packagePatches) {
-                foreach ($packagePatches as $patchInfo) {
-                    if (array_intersect($patchInfo[Patch::TARGETS], $result)) {
-                        $resetQueueUpdates = array_merge(
-                            $resetQueueUpdates,
-                            array_diff($patchInfo[Patch::TARGETS], $result)
-                        );
+            $resets = array();
 
+            foreach ($scanQueue as $patches) {
+                foreach ($patches as $patchPath => $patchInfo) {
+                    if (!array_intersect($patchInfo[Patch::TARGETS], $result)) {
                         continue;
                     }
+
+                    $relatedTargets = array_diff($patchInfo[Patch::TARGETS], $result);
+
+                    foreach ($relatedTargets as $relatedTarget) {
+                        if (!isset($relatedPatches[$relatedTarget])) {
+                            $relatedPatches[$relatedTarget] = array();
+                        }
+
+                        $relatedPatches[$relatedTarget][] = $patchPath;
+                    }
+
+                    $resets = array_merge($resets, $relatedTargets);
                 }
             }
 
-            $result = array_merge($result, array_unique($resetQueueUpdates));
-        } while ($resetQueueUpdates);
+            $result = array_merge($result, array_unique($resets));
+        } while ($resets);
 
-        return array_diff($result, $targets);
+        return $relatedPatches;
     }
 
     public function generateKnownPatchFlagUpdates($ownerName, array $resetPatchesList, array $infoList)
@@ -190,6 +201,7 @@ class PatchListUtils
             }
 
             $knownPatches = array_intersect_assoc($resetInfoList[$targetName], $resetPatches);
+
             $changedPatches = array_diff_key(
                 array_intersect_key($resetInfoList[$targetName], $resetPatches),
                 $knownPatches

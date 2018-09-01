@@ -1,4 +1,14 @@
 {
+    "3.34.0": {
+        "feature": [
+            "allow patch path strip level to be defined in patch's embedded target-info declaration (@level <int>)"
+        ],
+        "fix": [
+            "patches queue generator sometimes generated lists that did not queue proper re-applying of patches when dealing with bundles and indirect targets so that 'patch:redo' == 'patch:undo' + 'patch:apply'",
+            "make sure that the removal od 'dev' bundle (or any other type with indirect targets) patches cause proper re-patching of related targets when running with --no-dev"
+        ],
+        "branch": "release/3.X"
+    },
     "3.33.1": {
         "fix": [
             "improved error reporting when encountering issues on composer lock cleanup"

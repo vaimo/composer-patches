@@ -26,6 +26,7 @@ class Definition
     const TARGETS = 'targets';
     const ORIGIN = 'origin';
     const SKIP = 'skip';
+    const CATEGORY = 'category';
 
     const CWD = 'cwd';
     const CWD_INSTALL = 'install';

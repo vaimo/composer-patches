@@ -840,7 +840,7 @@ The description here can be multiple lines which will all be presented
 to the user when patch is being applied.
 
 @package (required) some/package-name
-@label (optional) overrides the description above when provided. Otherwise above info used.
+@label (optional) overrides the description above when provided. Otherwise above info used
 @ticket (optional) reference to some issue ID that relates to this fix (added to label)
 @link (optional) url to additional data about this patch (added to label)
 @depends (optional) other/package (make version constraint target another package instead) 
@@ -849,6 +849,8 @@ to the user when patch is being applied.
 @skip (optional) If this tag is present, then the patch will not be applied
 @cwd (optional) Specify which cwd the patcher should use to apply the patch 
 @type (optional) dev
+@level (optional) 0 (forces/locks the patch applier to use certain patch path strip level)
+@category (optional) free-form value to explain what the patch is (fix/feature/enhancement)
 
 --- Models/Example.php.org
 +++ Models/Example.php
