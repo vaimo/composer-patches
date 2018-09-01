@@ -164,7 +164,9 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP]),
             PatchDefinition::AFTER => $this->extractValueList($data, PatchDefinition::AFTER),
             PatchDefinition::ISSUE => $this->extractSingleValue($data, PatchDefinition::ISSUE),
-            PatchDefinition::LINK => $this->extractSingleValue($data, PatchDefinition::LINK)
+            PatchDefinition::LINK => $this->extractSingleValue($data, PatchDefinition::LINK),
+            PatchDefinition::LEVEL => $this->extractSingleValue($data, PatchDefinition::LEVEL),
+            PatchDefinition::CATEGORY => $this->extractSingleValue($data, PatchDefinition::CATEGORY)
         ), $values);
     }
 

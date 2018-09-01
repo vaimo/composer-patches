@@ -27,7 +27,16 @@ class BaseComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNorma
                     : array($target),
                 PatchDefinition::CWD => isset($data[PatchDefinition::CWD])
                     ? $data[PatchDefinition::CWD]
-                    : PatchDefinition::CWD_INSTALL
+                    : PatchDefinition::CWD_INSTALL,
+                PatchDefinition::LEVEL => isset($data[PatchDefinition::LEVEL])
+                    ? $data[PatchDefinition::LEVEL]
+                    : null,
+                PatchDefinition::LEVEL => isset($data[PatchDefinition::LEVEL])
+                    ? $data[PatchDefinition::LEVEL]
+                    : null,
+                PatchDefinition::CATEGORY => isset($data[PatchDefinition::CATEGORY])
+                    ? $data[PatchDefinition::CATEGORY]
+                    : null,
             );
     }
 }

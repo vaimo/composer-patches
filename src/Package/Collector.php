@@ -15,6 +15,11 @@ class Collector
     private $extraPackages;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PackageUtils 
+     */
+    private $packageUtils;
+
+    /**
      * @param \Composer\Package\PackageInterface[] $extraPackages
      */
     public function __construct(

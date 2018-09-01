@@ -10,19 +10,9 @@ use Composer\Repository\WritableRepositoryInterface as PackageRepository;
 class QueueGenerator
 {
     /**
-     * @var \Vaimo\ComposerPatches\Repository\Analyser
+     * @var \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver
      */
-    private $repositoryAnalyser;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Utils\FilterUtils
-     */
-    private $filterUtils;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
-     */
-    private $patchListUtils;
+    private $listResolver;
 
     /**
      * @var array
@@ -30,76 +20,45 @@ class QueueGenerator
     private $filters;
 
     /**
-     * @param \Vaimo\ComposerPatches\Repository\Analyser $repositoryAnalyser
+     * @param \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver $listResolver,
      * @param array $filters
      */
     public function __construct(
-        \Vaimo\ComposerPatches\Repository\Analyser $repositoryAnalyser,
+        \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver $listResolver,
         array $filters
     ) {
-        $this->repositoryAnalyser = $repositoryAnalyser;
+        $this->listResolver = $listResolver;
         $this->filters = $filters;
-
-        $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
-        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
-    public function generate(PackageRepository $repository, array $patchesList)
+    public function generate(PackageRepository $repository, array $patches)
     {
-        $patches = $this->resolvePatchesQueue($patchesList);
-        $resets = $this->resolvePatchesResets($repository, $patches);
-
-        return array(
+        $patchesQueue = $this->listResolver->resolvePatchesQueue(
             $patches,
-            array_unique(
-                array_merge(
-                    $this->patchListUtils->getRelatedTargets($patchesList, $resets),
-                    $resets
-                )
-            )
+            $this->filters
         );
-    }
-
-    private function resolvePatchesResets(PackageRepository $repository, array $patches)
-    {
-        $resets = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
-
-        $fullResets = array_keys(array_filter($resets, 'is_bool'));
-
-        $resets = array_diff_key($resets, array_flip($fullResets));
-
-        $targets = array_replace_recursive(
-            $resets,
-            $this->patchListUtils->createSimplifiedList(array_intersect_key($patches, $resets))
+        
+        $resetsQueue = $this->listResolver->resolvePatchesResets(
+            $repository, 
+            $patchesQueue, 
+            $this->filters
         );
-
-        $resetPatches = $this->patchListUtils->createDetailedList($targets);
-
-        foreach ($this->filters as $key => $filter) {
-            $resetPatches = $this->patchListUtils->applyDefinitionFilter(
-                $resetPatches,
-                $this->filterUtils->composeRegex($this->filterUtils->trimRules($filter), '/'),
-                $key
+        
+        $relatedQueue = $this->listResolver->resolveRelatedQueue(
+            $repository, 
+            $patches, 
+            $resetsQueue
+        );
+        
+        foreach ($relatedQueue as $key => $items) {
+            $patchesQueue[$key] = array_replace(
+                isset($patchesQueue[$key]) ? $patchesQueue[$key] : array(),
+                $items
             );
         }
-
-        return array_unique(
-            array_merge($this->patchListUtils->getAllTargets($resetPatches), $fullResets)
-        );
-    }
-
-    private function resolvePatchesQueue(array $patches)
-    {
-        $patches = array_filter($patches);
-
-        foreach ($this->filters as $key => $filter) {
-            $patches = $this->patchListUtils->applyDefinitionFilter(
-                $patches,
-                $this->filterUtils->composeRegex($filter, '/'),
-                $key
-            );
-        }
-
-        return $patches;
+        
+        $resetQueue = array_merge(array_keys($relatedQueue), $resetsQueue);
+        
+        return array($patchesQueue, array_unique($resetQueue));
     }
 }
