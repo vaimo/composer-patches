@@ -33,6 +33,7 @@ class Config
     const PATCHER_SOURCES = 'sources';
     const PATCHER_SECURE_HTTP = 'secure-http';
     const PATCHER_GRACEFUL = 'graceful';
+
     const PATCHER_FORCE_RESET = 'force-reset';
 
     const PATCHES_DEPENDS = 'patches-depend';

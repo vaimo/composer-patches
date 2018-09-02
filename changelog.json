@@ -5,7 +5,8 @@
         ],
         "fix": [
             "forward-port(3.34.0): patches queue generator sometimes generated lists that did not queue proper re-applying of patches when dealing with bundles and indirect targets so that 'patch:redo' == 'patch:undo' + 'patch:apply'",
-            "forward-port(3.34.0): make sure that the removal od 'dev' bundle (or any other type with indirect targets) patches cause proper re-patching of related targets when running with --no-dev"
+            "forward-port(3.34.0): make sure that the removal od 'dev' bundle (or any other type with indirect targets) patches cause proper re-patching of related targets when running with --no-dev",
+            "forward-port(3.34.1): conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that"
         ]
     },
     "4.2.1": {
@@ -49,6 +50,11 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
+    "3.34.1": {
+        "fix": [
+            "conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that"
         ]
     },
     "3.34.0": {

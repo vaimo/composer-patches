@@ -126,7 +126,12 @@ class PatchCommand extends \Composer\Command\BaseCommand
                 );
             }
 
-            $bootstrap->applyPatches($isDevMode, array_filter($filters));
+            $bootstrap->applyPatches(
+                $isDevMode, 
+                array_filter($filters),
+                $behaviourFlags['redo'] ? array('related') : array('direct', 'related') 
+            );
+            
             $bootstrap->sanitizeLocker($composer->getLocker());
         }
 
