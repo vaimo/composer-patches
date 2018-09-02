@@ -48,7 +48,7 @@ Edit the `whatever-your-patch-is-called.patch` and define ...
 This patch changes... 
 absolutely everything
 
-@package some/package-name:>=1.2.3
+@package some/package-name
 
 --- Models/Example.php.org
 +++ Models/Example.php
