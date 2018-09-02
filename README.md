@@ -65,7 +65,7 @@ absolutely everything
 
 The path `Models/Example.php` is relative to the root of `some/package-name`. 
 
-Using version is optional (just `@package some/package-name` woks as well).
+Version constraint can be used by defining `@version >=1.2.3`.
 
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
