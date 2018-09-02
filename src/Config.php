@@ -32,6 +32,7 @@ class Config
     const PATCHER_LEVELS = 'levels';
     const PATCHER_SOURCES = 'sources';
     const PATCHER_SECURE_HTTP = 'secure-http';
+    
     const PATCHER_FORCE_RESET = 'force-reset';
 
     const PATCHES_DEPENDS = 'patches-depend';
@@ -87,7 +88,7 @@ class Config
     {
         return $this->config[self::PATCHER_FORCE_RESET] || (bool)getenv(Environment::FORCE_RESET);
     }
-
+    
     public function getSkippedPackages()
     {
         $skipList = getenv(Environment::PACKAGE_SKIP)

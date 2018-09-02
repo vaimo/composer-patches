@@ -27,6 +27,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     {
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
+        
         $this->bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $io);
     }
 

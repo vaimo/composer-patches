@@ -67,34 +67,6 @@ class ListResolver
         return $relatedPatchesQueue;
     }
 
-    public function resolvePatchesResets(PackageRepository $repository, array $patches, array $filters)
-    {
-        $resets = $this->repositoryAnalyser->determinePackageResets($repository, $patches);
-
-        $fullResets = array_keys(array_filter($resets, 'is_bool'));
-
-        $resets = array_diff_key($resets, array_flip($fullResets));
-
-        $targets = array_replace_recursive(
-            $resets,
-            $this->patchListUtils->createSimplifiedList(array_intersect_key($patches, $resets))
-        );
-
-        $resetPatches = $this->patchListUtils->createDetailedList($targets);
-
-        foreach ($filters as $key => $filter) {
-            $resetPatches = $this->patchListUtils->applyDefinitionFilter(
-                $resetPatches,
-                $this->filterUtils->composeRegex($this->filterUtils->trimRules($filter), '/'),
-                $key
-            );
-        }
-
-        return array_unique(
-            array_merge($this->patchListUtils->getAllTargets($resetPatches), $fullResets)
-        );
-    }
-
     public function resolvePatchesQueue(array $patches, array $filters)
     {
         $patches = array_filter($patches);

@@ -41,7 +41,7 @@ class Bootstrap
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool
      */
     private $loaderComponents;
-
+    
     /**
      * @var \Vaimo\ComposerPatches\Managers\LockerManager
      */
@@ -75,20 +75,22 @@ class Bootstrap
             $composer,
             $logger
         );
-
+        
         $this->repositoryProcessor = new \Vaimo\ComposerPatches\Repository\Processor($logger);
 
         $this->lockerManager = new \Vaimo\ComposerPatches\Managers\LockerManager();
     }
 
-    public function applyPatches($devMode = false, array $filters = array())
+    public function applyPatches($devMode = false, array $filters = array(), array $resets = array())
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
 
-        $config = $this->configFactory->create(array($this->config));
-
+        $config = $this->configFactory->create(
+            array($this->config)
+        );
+        
         $patchesLoader = $this->loaderFactory->create($this->loaderComponents, $config, $devMode);
-        $patchesApplier = $this->applierFactory->create($config, $filters);
+        $patchesApplier = $this->applierFactory->create($config, $filters, $resets);
 
         $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
     }

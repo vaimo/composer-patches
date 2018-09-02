@@ -7,7 +7,6 @@ namespace Vaimo\ComposerPatches\Factories;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Patch\FailureHandlers;
-use Vaimo\ComposerPatches\Patch\PackageResolvers;
 use Vaimo\ComposerPatches\Strategies;
 
 class PatchesApplierFactory
@@ -23,6 +22,11 @@ class PatchesApplierFactory
     private $logger;
 
     /**
+     * @var \Vaimo\ComposerPatches\Factories\QueueGeneratorFactory
+     */
+    private $queueGeneratorFactory;
+    
+    /**
      * @param \Composer\Composer $composer
      * @param \Vaimo\ComposerPatches\Logger $logger
      */
@@ -32,9 +36,13 @@ class PatchesApplierFactory
     ) {
         $this->composer = $composer;
         $this->logger = $logger;
+
+        $this->queueGeneratorFactory = new \Vaimo\ComposerPatches\Factories\QueueGeneratorFactory(
+            $this->composer
+        );
     }
 
-    public function create(PluginConfig $pluginConfig, $filters = array())
+    public function create(PluginConfig $pluginConfig, array $filters = array(), array $resets = array())
     {
         $composer = $this->composer;
 
@@ -71,31 +79,11 @@ class PatchesApplierFactory
 
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
 
-        if ($pluginConfig->shouldResetEverything()) {
-            $packagesResolver = new PackageResolvers\FullResetResolver();
-        } else {
-            $packagesResolver = new PackageResolvers\MissingPatchesResolver();
-        }
-
-        $repositoryAnalyser = new \Vaimo\ComposerPatches\Repository\Analyser(
-            $packageCollector,
-            $packagesResolver
-        );
-
-        $missingItemsAnalyser = new \Vaimo\ComposerPatches\Repository\Analyser(
-            $packageCollector,
-            new \Vaimo\ComposerPatches\Patch\PackageResolvers\MissingPatchesResolver()
-        );
+        $this->queueGeneratorFactory->create($pluginConfig, $filters, $resets);
         
-        $listResolver = new \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver(
-            $repositoryAnalyser,
-            $missingItemsAnalyser
-        );
-        
-        $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
-            $listResolver,
-            $filters
-        );
+        $queueGeneratorFactory = new \Vaimo\ComposerPatches\Factories\QueueGeneratorFactory($composer);
+
+        $queueGenerator = $queueGeneratorFactory->create($pluginConfig, $filters, $resets);
 
         $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
 

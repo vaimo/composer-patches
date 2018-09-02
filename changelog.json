@@ -1,4 +1,9 @@
 {
+    "3.34.1": {
+        "fix": [
+            "conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that"
+        ]
+    },
     "3.34.0": {
         "feature": [
             "allow patch path strip level to be defined in patch's embedded target-info declaration (@level <int>)"

@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Repository\PatchesApplier;
 
 use Composer\Repository\WritableRepositoryInterface as PackageRepository;
+use Vaimo\ComposerPatches\Interfaces\PatchesResetsResolverInterface;
 
 class QueueGenerator
 {
@@ -15,19 +16,27 @@ class QueueGenerator
     private $listResolver;
 
     /**
+     * @var \Vaimo\ComposerPatches\Interfaces\PatchesResetsResolverInterface[]
+     */
+    private $resetResolvers;
+
+    /**
      * @var array
      */
     private $filters;
 
     /**
      * @param \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver $listResolver,
+     * @param PatchesResetsResolverInterface[] $resetResolvers
      * @param array $filters
      */
     public function __construct(
         \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver $listResolver,
+        array $resetResolvers,
         array $filters
     ) {
         $this->listResolver = $listResolver;
+        $this->resetResolvers = $resetResolvers;
         $this->filters = $filters;
     }
 
@@ -37,12 +46,17 @@ class QueueGenerator
             $patches, 
             $this->filters
         );
-        
-        $resetsQueue = $this->listResolver->resolvePatchesResets(
-            $repository, 
-            $patchesQueue, 
-            $this->filters
-        );
+
+        $resetsQueue = array();
+
+        foreach ($this->resetResolvers as $resolver) {
+            $resetsQueue = array_unique(
+                array_merge(
+                    $resetsQueue, 
+                    $resolver->resolvePatchesResets($repository, $patchesQueue, $this->filters)
+                )
+            );
+        }
         
         $relatedQueue = $this->listResolver->resolveRelatedQueue(
             $repository, 
