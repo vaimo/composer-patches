@@ -5,15 +5,8 @@
  */
 namespace Vaimo\ComposerPatches\Repository;
 
-use Composer\Repository\WritableRepositoryInterface;
-
 class Analyser
 {
-    /**
-     * @var \Vaimo\ComposerPatches\Package\Collector
-     */
-    private $packageCollector;
-
     /**
      * @var \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface
      */
@@ -25,24 +18,21 @@ class Analyser
     private $patchListUtils;
 
     /**
-     * @param \Vaimo\ComposerPatches\Package\Collector $packageCollector
      * @param \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface $packagesResolver
      */
     public function __construct(
-        \Vaimo\ComposerPatches\Package\Collector $packageCollector,
         \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface $packagesResolver
     ) {
-        $this->packageCollector = $packageCollector;
         $this->packagesResolver = $packagesResolver;
 
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
-    public function determinePackageResets(WritableRepositoryInterface $repository, array $patches)
+    public function determinePackageResets(array $repositoryState, array $patches)
     {
-        $packages = $this->packageCollector->collect($repository);
-        $patchFootprints = $this->patchListUtils->createSimplifiedList($patches);
+        $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
+        $patchFootprints = $this->patchListUtils->createSimplifiedList($patchesByTarget);
 
-        return $this->packagesResolver->resolve($patchFootprints, $packages);
+        return $this->packagesResolver->resolve($patchFootprints, $repositoryState);
     }
 }

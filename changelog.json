@@ -1,4 +1,13 @@
 {
+    "3.35.0": {
+        "feature": [
+            "list command added (allows listing all registered patches and their state)"
+        ],
+        "fix": [
+            "bundled patch targets not properly reset when using patch:redo in case patches applied on packages, but installed.json reset to provide no information about applied patches",
+            "patches for packages that are covered with certain bundle patch do not get re-applied when running patch:redo with filter (redo should not leave any patch uninstalled even when executed with a filter)"
+        ]
+    },
     "3.34.1": {
         "fix": [
             "conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that"

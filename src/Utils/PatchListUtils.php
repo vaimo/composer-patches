@@ -9,16 +9,6 @@ use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class PatchListUtils
 {
-    /**
-     * @var \Vaimo\ComposerPatches\Utils\DataUtils
-     */
-    private $dataUtils;
-
-    public function __construct()
-    {
-        $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
-    }
-
     public function createSimplifiedList(array $patches)
     {
         $groups = $this->createTargetsList($patches);
@@ -64,29 +54,6 @@ class PatchListUtils
         return $result;
     }
 
-    public function createDetailedList(array $patches)
-    {
-        $result = array();
-
-        foreach ($patches as $name => $group) {
-            $result[$name] = array();
-
-            if (!is_array($group)) {
-                continue;
-            }
-
-            foreach ($group as $path => $label) {
-                $result[$name][$path] = array(
-                    'path' => $path,
-                    'targets' => array($name),
-                    'source' => $path
-                );
-            }
-        }
-
-        return $result;
-    }
-
     public function sanitizeFileSystem(array $patches)
     {
         foreach ($patches as $patchGroup) {
@@ -110,7 +77,7 @@ class PatchListUtils
             }
         }
 
-        return array_unique($targetList);
+        return array_values(array_unique($targetList));
     }
 
     public function applyDefinitionFilter(array $patches, $filter, $key)
@@ -139,7 +106,26 @@ class PatchListUtils
         return array_filter(array_map('array_filter', $patches));
     }
 
-    public function getRelatedTargets(array $patchesList, array $targets)
+    public function groupItemsByTarget(array $patchesList)
+    {
+        $patchesByTarget = array();
+        
+        foreach ($patchesList as $owner => $group) {
+            if (!isset($patchesByTarget[$owner])) {
+                $patchesByTarget[$owner] = array();
+            }
+            
+            foreach ($group as $path => $patch) {
+                foreach ($patch[Patch::TARGETS] as $target) {
+                    $patchesByTarget[$target][$path] = $patch;
+                }
+            }
+        }
+
+        return array_filter($patchesByTarget);
+    }
+    
+    public function getRelatedPatches(array $patchesList, array $targets)
     {
         $result = $targets;
 
@@ -150,23 +136,22 @@ class PatchListUtils
 
             $resets = array();
 
-            foreach ($scanQueue as $patches) {
+            foreach ($scanQueue as $owner => $patches) {
                 foreach ($patches as $patchPath => $patchInfo) {
                     if (!array_intersect($patchInfo[Patch::TARGETS], $result)) {
                         continue;
                     }
-
-                    $relatedTargets = array_diff($patchInfo[Patch::TARGETS], $result);
-
-                    foreach ($relatedTargets as $relatedTarget) {
-                        if (!isset($relatedPatches[$relatedTarget])) {
-                            $relatedPatches[$relatedTarget] = array();
-                        }
-
-                        $relatedPatches[$relatedTarget][] = $patchPath;
+                    
+                    if (!isset($relatedPatches[$owner])) {
+                        $relatedPatches[$owner] = array();
                     }
 
-                    $resets = array_merge($resets, $relatedTargets);
+                    $relatedPatches[$owner][$patchPath] = $patchInfo;
+
+                    $resets = array_merge(
+                        $resets, 
+                        array_diff($patchInfo[Patch::TARGETS], $result)
+                    );
                 }
             }
 
@@ -229,27 +214,66 @@ class PatchListUtils
 
     public function updateList(array $patches, array $updates)
     {
-        $items = array_map(
+        foreach ($patches as $target => $group) {
+            foreach ($group as $path => $item) {
+                $patches[$target][$path] = array_replace(
+                    $patches[$target][$path], 
+                    isset($updates[$target][$path]) ? $updates[$target][$path] : array() 
+                );
+            }
+        }
+
+        $patches = array_map(
             function ($items) {
                 return array_filter($items, function ($item) {
                     return array_filter($item);
                 });
             },
-            array_replace_recursive($patches, $updates)
+            $patches
         );
 
-        return array_filter(array_map('array_filter', $items));
+        return array_filter(
+            array_map('array_filter', $patches)
+        );
     }
 
-    public function getSanitizedList(array $patches)
+    public function embedInfoToItems(array $patches, array $updates)
     {
-        $dataUtils = $this->dataUtils;
-
-        return $this->dataUtils->walkArrayNodes(
-            $patches,
-            function (array $value) use ($dataUtils) {
-                return $dataUtils->removeKeysByPrefix($value, '_');
+        foreach ($patches as $target => $group) {
+            foreach ($group as $path => $item) {
+                $patches[$target][$path] = array_replace($patches[$target][$path], $updates);
             }
-        );
+        }
+
+        return $patches;
+    }
+    
+    public function filterListByTargets(array $patches, array $targets)
+    {
+        foreach ($patches as $target => $group) {
+            foreach ($group as $path => $patch) {
+                if (array_intersect($patch[Patch::TARGETS], $targets)) {
+                    continue;
+                }
+
+                unset($patches[$target][$path]);
+            }
+        }
+        
+        return array_filter($patches);
+    }
+    
+    public function mergeLists(array $listA, array $listB)
+    {
+        $result = array();
+
+        foreach ($listA as $key => $items) {
+            $result[$key] = array_replace(
+                $items, 
+                isset($listB[$key]) ? $listB[$key] : array()
+            );
+        }
+
+        return $result;
     }
 }

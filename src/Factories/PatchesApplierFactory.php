@@ -42,7 +42,7 @@ class PatchesApplierFactory
         );
     }
 
-    public function create(PluginConfig $pluginConfig, array $filters = array(), array $resets = array())
+    public function create(PluginConfig $pluginConfig, \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver)
     {
         $composer = $this->composer;
 
@@ -78,12 +78,10 @@ class PatchesApplierFactory
         );
 
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
-
-        $this->queueGeneratorFactory->create($pluginConfig, $filters, $resets);
         
         $queueGeneratorFactory = new \Vaimo\ComposerPatches\Factories\QueueGeneratorFactory($composer);
 
-        $queueGenerator = $queueGeneratorFactory->create($pluginConfig, $filters, $resets);
+        $queueGenerator = $queueGeneratorFactory->create($pluginConfig, $listResolver);
 
         $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
 

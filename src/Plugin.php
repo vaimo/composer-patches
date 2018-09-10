@@ -19,16 +19,23 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     private $bootstrapStrategy;
 
     /**
+     * @var \Vaimo\ComposerPatches\Factories\BootstrapFactory
+     */
+    private $bootstrapFactory;
+
+    /**
      * @var \Vaimo\ComposerPatches\Bootstrap
      */
-    private $bootstrap;
-
+    private $bootstrap; 
+    
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
     {
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
-        
-        $this->bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $io);
+
+        $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
+
+        $this->bootstrap = $this->bootstrapFactory->create();
     }
 
     public function getCapabilities()

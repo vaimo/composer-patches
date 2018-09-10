@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Composer\Script\ScriptEvents;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 
 use Vaimo\ComposerPatches\Environment;
 
@@ -81,18 +82,10 @@ class PatchCommand extends \Composer\Command\BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $composer = $this->getComposer();
-        $bootstrap = new \Vaimo\ComposerPatches\Bootstrap(
-            $this->getComposer(),
-            $this->getIO(),
-            array(
-                \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
-                    'project' => true,
-                    'packages' => true,
-                    'vendors' => true
-                )
-            )
-        );
-
+        $io = $this->getIO();
+        
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
+        
         $isDevMode = !$input->getOption('no-dev');
 
         $filters = array(
@@ -103,26 +96,41 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $behaviourFlags = $this->getBehaviourFlags($input);
         $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
 
-        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+        $listResolver = new ListResolvers\FilteredListResolver($filters);
+        
+        if ($shouldUndo) {
+            $listResolver = new ListResolvers\InvertedListResolver($listResolver);
+        } else {
+            $listResolver = new ListResolvers\InclusiveListResolver($listResolver);
+        }
 
-        putenv(Environment::FORCE_RESET . "=" . (bool)$input->getOption('force'));
+        $config = array(
+            \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
+                'project' => true,
+                'packages' => true,
+                'vendors' => true
+            )
+        );
+        
+        $bootstrap = $bootstrapFactory->create($listResolver, $config);
+
+        putenv(Environment::FORCE_RESET . '=' . (bool)$input->getOption('force'));
 
         if ($shouldUndo && !array_filter($filters)) {
             $bootstrap->stripPatches($isDevMode);
         } else {
-            putenv(Environment::PREFER_OWNER . "=" . $input->getOption('from-source'));
-            putenv(Environment::FORCE_REAPPLY . "=" . ($behaviourFlags['redo'] || $behaviourFlags['undo']));
+            putenv(Environment::PREFER_OWNER . '=' . $input->getOption('from-source'));
+            putenv(Environment::FORCE_REAPPLY . '=' . $behaviourFlags['redo']);
 
             if ($shouldUndo) {
-                $filters[PatchDefinition::SOURCE] = $filterUtils->invertRules(
-                    $filters[PatchDefinition::SOURCE] ? $filters[PatchDefinition::SOURCE] : array('*')
-                );
+                $filters[PatchDefinition::SOURCE] = $filters[PatchDefinition::SOURCE] 
+                    ? $filters[PatchDefinition::SOURCE] 
+                    : array('*');
             }
 
             $bootstrap->applyPatches(
                 $isDevMode, 
-                array_filter($filters),
-                $behaviourFlags['redo'] ? array('related') : array('direct', 'related') 
+                array_filter($filters)
             );
             
             $bootstrap->sanitizeLocker($composer->getLocker());

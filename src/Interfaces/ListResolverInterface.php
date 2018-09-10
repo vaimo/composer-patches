@@ -5,12 +5,11 @@
  */
 namespace Vaimo\ComposerPatches\Interfaces;
 
-interface PatchPackagesResolverInterface
+interface ListResolverInterface
 {
     /**
      * @param array $patches
-     * @param array $repositoryState
-     * @return string[]
+     * @return array
      */
-    public function resolve(array $patches, array $repositoryState);
+    public function resolvePatchesQueue(array $patches);
 }

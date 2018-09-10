@@ -8,7 +8,7 @@ namespace Vaimo\ComposerPatches\Repository;
 use Composer\Repository\WritableRepositoryInterface as PackageRepository;
 use Composer\Package\PackageInterface;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
+use Vaimo\ComposerPatches\Config as PluginConfig;
 
 class PatchesApplier
 {
@@ -53,6 +53,11 @@ class PatchesApplier
     private $patchListUtils;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PackageListUtils 
+     */
+    private $packageListUtils;
+
+    /**
      * @param \Vaimo\ComposerPatches\Package\Collector $packageCollector
      * @param \Vaimo\ComposerPatches\Managers\RepositoryManager $repositoryManager
      * @param \Vaimo\ComposerPatches\Package\PatchApplier $patchApplier
@@ -78,6 +83,7 @@ class PatchesApplier
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
+        $this->packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
     }
 
     public function apply(PackageRepository $repository, array $patches)
@@ -86,9 +92,12 @@ class PatchesApplier
 
         $packagesUpdated = false;
 
-        list ($patchQueue, $resetQueue) = $this->queueGenerator->generate($repository, $patches);
+        $repositoryState = $this->packageListUtils->extractExtraData($packages, PluginConfig::APPLIED_FLAG);
 
-        $queueFootprint = $this->patchListUtils->createSimplifiedList($patchQueue);
+        $patchQueue = $this->queueGenerator->generate($patches, $repositoryState);
+        $resetQueue = array_keys($patchQueue);
+
+        $patchQueueFootprints = $this->patchListUtils->createSimplifiedList($patchQueue);
 
         foreach ($packages as $packageName => $package) {
             $hasPatches = !empty($patchQueue[$packageName]);
@@ -109,7 +118,7 @@ class PatchesApplier
                 $resetPatches = $this->packageUtils->resetAppliedPatches($resetTarget);
                 $resetResult[$targetName] = is_array($resetPatches) ? $resetPatches : array();
 
-                if (!$hasPatches && !isset($queueFootprint[$targetName]) && $resetPatches) {
+                if (!$hasPatches && !isset($patchQueueFootprints[$targetName]) && $resetPatches) {
                     $this->logger->writeRaw(
                         'Resetting patched package <info>%s</info> (%s)',
                         array($targetName, count($resetResult[$targetName]))
@@ -126,7 +135,7 @@ class PatchesApplier
                 $this->patchListUtils->generateKnownPatchFlagUpdates(
                     $packageName,
                     $resetResult,
-                    $queueFootprint
+                    $patchQueueFootprints
                 )
             );
 
@@ -138,8 +147,8 @@ class PatchesApplier
 
             $changesMap = array();
             foreach ($patchTargets as $targetName) {
-                $targetQueue = isset($queueFootprint[$targetName])
-                    ? $queueFootprint[$targetName]
+                $targetQueue = isset($patchQueueFootprints[$targetName])
+                    ? $patchQueueFootprints[$targetName]
                     : array();
 
                 if (!isset($packages[$targetName])) {
