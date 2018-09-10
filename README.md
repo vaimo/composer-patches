@@ -973,12 +973,11 @@ composer patch:redo --from-source
 # Check that all patches have valid target package info (using info from vendor)
 composer patch:validate --from-source
 
-# List registered with their current status (with optional filter)
-copmposer patch:list --status new
+# List registered with their current status (with optional filter(s))
+copmposer patch:list --status new --status removed
 
 # List all patches that have either changed, are new or got removed 
-patch:list --status '!applied'
-
+composer patch:list --status '!applied'
 ```
 
 Note that `--from-source` is only needed when patch target definitions are provided within a 
