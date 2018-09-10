@@ -121,18 +121,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
         } else {
             putenv(Environment::PREFER_OWNER . '=' . $input->getOption('from-source'));
             putenv(Environment::FORCE_REAPPLY . '=' . $behaviourFlags['redo']);
-
-            if ($shouldUndo) {
-                $filters[PatchDefinition::SOURCE] = $filters[PatchDefinition::SOURCE] 
-                    ? $filters[PatchDefinition::SOURCE] 
-                    : array('*');
-            }
-
-            $bootstrap->applyPatches(
-                $isDevMode, 
-                array_filter($filters)
-            );
             
+            $bootstrap->applyPatches($isDevMode);
             $bootstrap->sanitizeLocker($composer->getLocker());
         }
 
