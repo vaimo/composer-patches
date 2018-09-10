@@ -26,6 +26,31 @@ class PatchListUtils
         return $result;
     }
 
+    public function createDetailedList(array $patches)
+    {
+        $result = array();
+        
+        foreach ($patches as $owner => $group) {
+            $result[$owner] = array();
+            
+            if (!is_array($group)) {
+                continue;
+            }
+            
+            foreach ($group as $path => $label) {
+                $result[$owner][$path] = array(
+                    'path' => $path,
+                    'targets' => array($owner),
+                    'source' => $path,
+                    'owner' => 'unknown',
+                    'label' => implode(',', array_slice(explode(',', $label), 0, -1))
+                );
+            }
+        }
+        
+        return $result;
+    }
+    
     public function createTargetsList(array $patches)
     {
         $result = array();
@@ -43,7 +68,7 @@ class PatchListUtils
 
                     $path = (isset($patchInfo['url']) && $patchInfo['url']) ? $patchInfo['url'] : $patchPath;
 
-                    $result[$target][$path] = array_merge(
+                    $result[$target][$path] = array_replace(
                         $patchInfo,
                         array(Patch::ORIGIN => $originName)
                     );
@@ -54,6 +79,28 @@ class PatchListUtils
         return $result;
     }
 
+    public function groupItemsByTarget(array $patchesList)
+    {
+        $result = array();
+
+        foreach ($patchesList as $origin => $group) {
+            if (!isset($result[$origin])) {
+                $result[$origin] = array();
+            }
+
+            foreach ($group as $path => $patch) {
+                foreach ($patch[Patch::TARGETS] as $target) {
+                    $result[$target][$path] = array_replace(
+                        $patch,
+                        array(Patch::ORIGIN => $origin)
+                    );
+                }
+            }
+        }
+
+        return array_filter($result);
+    }
+    
     public function sanitizeFileSystem(array $patches)
     {
         foreach ($patches as $patchGroup) {
@@ -104,25 +151,6 @@ class PatchListUtils
         }
 
         return array_filter(array_map('array_filter', $patches));
-    }
-
-    public function groupItemsByTarget(array $patchesList)
-    {
-        $patchesByTarget = array();
-        
-        foreach ($patchesList as $owner => $group) {
-            if (!isset($patchesByTarget[$owner])) {
-                $patchesByTarget[$owner] = array();
-            }
-            
-            foreach ($group as $path => $patch) {
-                foreach ($patch[Patch::TARGETS] as $target) {
-                    $patchesByTarget[$target][$path] = $patch;
-                }
-            }
-        }
-
-        return array_filter($patchesByTarget);
     }
     
     public function getRelatedPatches(array $patchesList, array $targets)

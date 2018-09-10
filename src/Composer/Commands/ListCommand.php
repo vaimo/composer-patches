@@ -8,7 +8,6 @@ namespace Vaimo\ComposerPatches\Composer\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-use Vaimo\ComposerPatches\Environment;
 
 use Symfony\Component\Console\Input\InputOption;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
@@ -45,6 +44,13 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
 
         $this->addOption(
+            '--status',
+            null,
+            InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+            'Match specific statuses (changed, new, applied, removed)'
+        );
+
+        $this->addOption(
             '--from-source',
             null,
             InputOption::VALUE_NONE,
@@ -56,17 +62,13 @@ class ListCommand extends \Composer\Command\BaseCommand
     {
         $composer = $this->getComposer();
         $io = $this->getIO();
-
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
-
+        
         $isDevMode = !$input->getOption('no-dev');
 
         $filters = array(
             PatchDefinition::SOURCE => $input->getOption('filter'),
             PatchDefinition::TARGETS => $input->getArgument('targets')
         );
-
-        $listResolver = new ListResolvers\FilteredListResolver($filters);
         
         $config = array(
             \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
@@ -80,26 +82,57 @@ class ListCommand extends \Composer\Command\BaseCommand
             $composer,
             $io
         );
-
+        
+        $patchListManager = new \Vaimo\ComposerPatches\Managers\PatchListManager(
+            new ListResolvers\FilteredListResolver($filters)
+        );
+        
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
+        $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(array($composer->getPackage()));
 
         $repository = $composer->getRepositoryManager()->getLocalRepository();
-
-        $config = $configFactory->create(array($config));
-
-        $patchesLoader = $loaderFactory->create($loaderComponentsPool, $config, $isDevMode);
-
-        $patches = $patchesLoader->loadFromPackagesRepository($repository);
         
-        $matches = $listResolver->resolvePatchesQueue($patches);
+        $statusFilters = $input->getOption('status');
 
-        foreach ($matches as $packageName => $patches) {
+        $patchesLoader = $loaderFactory->create(
+            $loaderComponentsPool, 
+            $configFactory->create(array($config)), 
+            $isDevMode
+        );
+
+        $patches = $patchListManager->getPatchesWithStatuses(
+            $patchesLoader->loadFromPackagesRepository($repository), 
+            $packageCollector->collect($repository), 
+            $statusFilters
+        );
+        
+        $this->generateOutput($output, $patches);
+    }
+    
+    private function generateOutput(OutputInterface $output, array $list)
+    {
+        $stateDecorators = array(
+            'new' => '<info>NEW</info>',
+            'changed' => '<info>CHANGED</info>',
+            'applied' => '<fg=white;options=bold>APPLIED</>',
+            'removed' => '<fg=red>REMOVED</>',
+            'unknown' => 'UNKNOWN'
+        );
+        
+        foreach ($list as $packageName => $patches) {
             $output->writeln(sprintf('<info>%s</info>', $packageName));
 
             foreach ($patches as $path => $info) {
-                $output->writeln(sprintf('  ~ <info>%s</info>: %s', $info['owner'], $path));
-                $output->writeln(sprintf('    <comment>%s</comment>', $info['label']));
+                $state = isset($info[PatchDefinition::STATE]) 
+                    ? $info[PatchDefinition::STATE] 
+                    : 'unknown';
+
+                $stateLabel = sprintf(' [%s]', $stateDecorators[$state]);
+                $owner = $info[PatchDefinition::OWNER];
+                
+                $output->writeln(sprintf('  ~ <info>%s</info>: %s%s', $owner, $path, $stateLabel));
+                $output->writeln(sprintf('    <comment>%s</comment>', $info[PatchDefinition::LABEL]));
             }
 
             $output->writeln('');
