@@ -115,7 +115,9 @@ class Bootstrap
     
     public function sanitizeLocker(\Composer\Package\Locker $locker)
     {
-        $data = $this->lockerManager->extractLockData($locker);
+        if (!$data = $this->lockerManager->extractLockData($locker)) {
+            return;
+        }
 
         /** @var \Composer\Package\PackageInterface[] $packages */
         $packages = array_merge($data['packages'], $data['packages-dev']);

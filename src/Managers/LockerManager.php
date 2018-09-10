@@ -6,6 +6,8 @@
 namespace Vaimo\ComposerPatches\Managers;
 
 use Vaimo\ComposerPatches\Exceptions\PackageResolverException;
+use Vaimo\ComposerPatches\Composer\ConfigKeys;
+use Composer\Repository\RepositoryInterface;
 
 class LockerManager
 {
@@ -22,62 +24,73 @@ class LockerManager
     public function updateLockData(\Composer\Package\Locker $locker, array $data)
     {
         $locker->setLockData(
-            $data['packages'],
-            $data['packages-dev'],
-            $data['platform'],
-            $data['platform-dev'],
-            $data['aliases'],
-            $data['minimum-stability'],
-            $data['stability-flags'],
-            $data['prefer-stable'],
-            $data['prefer-lowest'],
-            $data['platform-overrides']
+            $data[ConfigKeys::PACKAGES],
+            $data[ConfigKeys::PACKAGES_DEV],
+            $data[ConfigKeys::PLATFORM],
+            $data[ConfigKeys::PLATFORM_DEV],
+            $data[ConfigKeys::ALIASES],
+            $data[ConfigKeys::MINIMUM_STABILITY],
+            $data[ConfigKeys::STABILITY_FLAGS],
+            $data[ConfigKeys::PREFER_STABLE],
+            $data[ConfigKeys::PREFER_LOWEST],
+            $data[ConfigKeys::PLATFORM_OVERRIDES]
         );
     }
 
     public function extractLockData(\Composer\Package\Locker $locker)
     {
-        $lockData = $locker->getLockData();
+        try {
+            $lockData = $locker->getLockData();
+        } catch (\LogicException $exception) {
+            return array();
+        }
+
         $repository = $locker->getLockedRepository(true);
-        $packages = $this->packageListUtils->listToNameDictionary($repository->getPackages());
 
         $aliases = array();
 
-        foreach ($lockData['aliases'] as $alias) {
-            $package = $alias['package'];
+        foreach ($lockData[ConfigKeys::ALIASES] as $alias) {
+            $package = $alias[ConfigKeys::ALIAS_PACKAGE];
 
             if (!isset($aliases[$package])) {
                 $aliases[$package] = array();
             }
 
-            $aliases[$package][$alias['version']] = $alias;
+            $aliases[$package][$alias[ConfigKeys::ALIAS_VERSION]] = $alias;
         }
 
         return array_replace($lockData, array(
-            'packages' => $this->packageDataToInstances($lockData['packages'], $packages),
-            'packages-dev' => $this->packageDataToInstances($lockData['packages-dev'], $packages),
-            'aliases' => $aliases,
-            'platform-overrides' => isset($lockData['platform-overrides'])
-                ? $lockData['platform-overrides']
+            ConfigKeys::PACKAGES => $this->packageDataToInstances(
+                $lockData[ConfigKeys::PACKAGES],
+                $repository
+            ),
+            ConfigKeys::PACKAGES_DEV => $this->packageDataToInstances(
+                $lockData[ConfigKeys::PACKAGES_DEV],
+                $repository
+            ),
+            ConfigKeys::ALIASES => $aliases,
+            ConfigKeys::PLATFORM_OVERRIDES => isset($lockData[ConfigKeys::PLATFORM_OVERRIDES])
+                ? $lockData[ConfigKeys::PLATFORM_OVERRIDES]
                 : array()
         ));
     }
 
-    private function packageDataToInstances(array $data, array $packages)
+    private function packageDataToInstances(array $packages, RepositoryInterface $repository)
     {
-        $targets = $this->packageListUtils->listToNameDictionary($data);
-
-        $result = array_replace(
-            $targets,
-            array_intersect_key($packages, $targets)
-        );
-
-        if ($invalidTargets = array_filter($result, 'is_array')) {
-            throw new PackageResolverException(
-                sprintf('Failed to locate package object for: %s', key($invalidTargets))
-            );
-        }
-
-        return array_values($result);
+        $matches = array();
+        
+        foreach ($packages as $package) {
+            $match = $repository->findPackage($package['name'], '*');
+            
+            if ($match === null) {
+                throw new PackageResolverException(
+                    sprintf('Failed to acquire package object for: %s', $package['name'])
+                );
+            }
+            
+            $matches[] = $match;
+        } 
+        
+        return $matches;
     }
 }
