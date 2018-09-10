@@ -106,7 +106,12 @@ composer install # second run; just to illustrate that already applied patches r
 By default, the patches will be applied in non-graceful mode: first failure will cause a fatal exception
 and the whole process will halt. In case it's required for the composer command run to continue without
 halting, a specific [environment variable](#environment-variables) or patch command `--graceful` flag 
-can be used.  
+can be used.
+
+Note that in case patches are provided by a dependency package, the `composer install` will NOT work
+right away as the patches folder root information is not yet available in installed.json, which does 
+require the package (that owns the patches) to be installed on the same (or newer) changeset that introduced
+the `patches-search` config value. 
 
 # Configuration
 
