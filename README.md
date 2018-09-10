@@ -76,7 +76,7 @@ Alternatively the patch can be targeted with configuring it via [providing the d
 Test out the added patch (in project root).
 
 ```shell
-composer patch:apply some/package-name
+composer patch:apply --from-source some/package-name
 ```
 
 The patch will be automatically applied on every composer install, update when required (when it's found 
