@@ -12,6 +12,7 @@ use Composer\Script\ScriptEvents;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Vaimo\ComposerPatches\Config;
+use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 
 use Vaimo\ComposerPatches\Environment;
 
@@ -93,9 +94,12 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $defaults = $configDefaults->getPatcherConfig();
 
         $composer = $this->getComposer();
-
         $behaviourFlags = $this->getBehaviourFlags($input);
         $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
+
+        $io = $this->getIO();
+
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
 
         $filters = array(
             PatchDefinition::SOURCE => $input->getOption('filter'),
@@ -103,35 +107,30 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
 
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
-            Config::PATCHER_FORCE_REAPPLY => $behaviourFlags['redo'] || $behaviourFlags['undo'],
+            Config::PATCHER_FORCE_REAPPLY => $behaviourFlags['redo'],
             Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source'),
             Config::PATCHER_GRACEFUL => (bool)$input->getOption('graceful'),
             Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)
         ));
-
-        $bootstrap = new \Vaimo\ComposerPatches\Bootstrap($composer, $this->getIO(), $configFactory);
-
+        
         $isDevMode = !$input->getOption('no-dev');
 
-        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+        $listResolver = new ListResolvers\FilteredListResolver($filters);
+        
+        if ($shouldUndo) {
+            $listResolver = new ListResolvers\InvertedListResolver($listResolver);
+        } else {
+            $listResolver = new ListResolvers\InclusiveListResolver($listResolver);
+        }
+        
+        $bootstrap = $bootstrapFactory->create($configFactory, $listResolver);
 
-        putenv(Environment::FORCE_RESET . "=" . (bool)$input->getOption('force'));
+        putenv(Environment::FORCE_RESET . '=' . (bool)$input->getOption('force'));
 
         if ($shouldUndo && !array_filter($filters)) {
             $bootstrap->stripPatches($isDevMode);
         } else {
-            if ($shouldUndo) {
-                $filters[PatchDefinition::SOURCE] = $filterUtils->invertRules(
-                    $filters[PatchDefinition::SOURCE] ? $filters[PatchDefinition::SOURCE] : array('*')
-                );
-            }
-
-            $bootstrap->applyPatches(
-                $isDevMode, 
-                array_filter($filters),
-                $behaviourFlags['redo'] ? array('related') : array('direct', 'related') 
-            );
-            
+            $bootstrap->applyPatches($isDevMode);
             $bootstrap->sanitizeLocker($composer->getLocker());
         }
 

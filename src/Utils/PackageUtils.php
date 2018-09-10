@@ -18,26 +18,7 @@ class PackageUtils
 
         return $package;
     }
-
-    public function shouldReinstall(PackageInterface $package, array $patches)
-    {
-        $extra = $package->getExtra();
-
-        if (!isset($extra[PluginConfig::APPLIED_FLAG])) {
-            return false;
-        }
-
-        if (!$applied = $extra[PluginConfig::APPLIED_FLAG]) {
-            return false;
-        }
-
-        if ($applied === true) {
-            return true;
-        }
-
-        return array_diff_assoc($applied, $patches) || array_diff_assoc($patches, $applied);
-    }
-
+    
     public function hasPatchChanges(PackageInterface $package, array $patches)
     {
         $extra = $package->getExtra();

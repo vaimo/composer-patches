@@ -36,6 +36,11 @@ class Bootstrap
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool
      */
     private $loaderComponents;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
+     */
+    private $listResolver;
     
     /**
      * @var \Vaimo\ComposerPatches\Managers\LockerManager
@@ -45,18 +50,22 @@ class Bootstrap
     /**
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
-     * @parma \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory
+     * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
+     * @param \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory
      */
     public function __construct(
         \Composer\Composer $composer,
         \Composer\IO\IOInterface $io,
-        \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory
+        \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory,
+        \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
     ) {
         $this->composer = $composer;
         $this->configFactory = $configFactory;
 
         $logger = new \Vaimo\ComposerPatches\Logger($io);
 
+        $this->listResolver = $listResolver;
+        
         $this->loaderComponents = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
             $composer,
             $io
@@ -74,39 +83,44 @@ class Bootstrap
         $this->lockerManager = new \Vaimo\ComposerPatches\Managers\LockerManager();
     }
 
-    public function applyPatches($devMode = false, array $filters = array(), array $resets = array())
+    public function applyPatches($devMode = false)
     {
-        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-
-        $config = $this->configFactory->create();
-
-        $patchesLoader = $this->loaderFactory->create($this->loaderComponents, $config, $devMode);
-        $patchesApplier = $this->applierFactory->create($config, $filters, $resets);
-
-        $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
+        $this->applyPatchesWithConfig(
+            $this->configFactory->create(),
+            $devMode
+        );
     }
 
     public function stripPatches($devMode = false)
     {
-        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
-
-        $sources = array(
+        $configSources = array(
             array(\Vaimo\ComposerPatches\Config::PATCHER_SOURCES => false)
         );
+        
+        $this->applyPatchesWithConfig(
+            $this->configFactory->create($configSources),
+            $devMode
+        );
+    }
 
-        $config = $this->configFactory->create($sources);
+    private function applyPatchesWithConfig(\Vaimo\ComposerPatches\Config $config, $devMode = false)
+    {
+        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
 
         $patchesLoader = $this->loaderFactory->create($this->loaderComponents, $config, $devMode);
-        $patchesApplier = $this->applierFactory->create($config);
+        $patchesApplier = $this->applierFactory->create($config, $this->listResolver);
 
         $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
     }
-
+    
     public function sanitizeLocker(\Composer\Package\Locker $locker)
     {
         $data = $this->lockerManager->extractLockData($locker);
 
-        foreach (array_merge($data['packages'], $data['packages-dev']) as $package) {
+        /** @var \Composer\Package\PackageInterface[] $packages */
+        $packages = array_merge($data['packages'], $data['packages-dev']);
+        
+        foreach ($packages as $package) {
             $package->setExtra(
                 array_diff_key($package->getExtra(), array('patches_applied' => true))
             );

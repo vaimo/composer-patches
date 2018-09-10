@@ -43,4 +43,7 @@ class Definition
 
     const STATE_CHANGED = 'changed';
     const STATE_NEW = 'new';
+    const STATE_LABEL = 'state_label';
+
+    const STATE = 'state';
 }

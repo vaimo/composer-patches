@@ -44,7 +44,9 @@ class Processor
             $packagesUpdated = $applier->apply($repository, $patches);
         } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
             $this->logger->reset($loggerIndentation);
+            
             $this->patchListUtils->sanitizeFileSystem($patches);
+            
             $repository->write();
             
             throw $exception;

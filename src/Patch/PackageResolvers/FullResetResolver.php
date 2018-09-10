@@ -8,25 +8,31 @@ namespace Vaimo\ComposerPatches\Patch\PackageResolvers;
 class FullResetResolver implements \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface
 {
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils 
+     */
+    private $packagePatchDataUtils;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
 
     public function __construct()
     {
+        $this->packagePatchDataUtils = new \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils();
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 
-    public function resolve(array $patches, array $packages)
+    public function resolve(array $patches, array $repositoryState)
     {
         $matches = array();
 
-        foreach ($packages as $name => $package) {
-            if (!$this->packageUtils->shouldReinstall($package, array()) && !isset($patches[$name])) {
+        foreach ($repositoryState as $name => $packageState) {
+            if (!$this->packagePatchDataUtils->shouldReinstall($packageState, array()) && !isset($patches[$name])) {
                 continue;
             }
 
-            $matches[$name] = $this->packageUtils->getAppliedPatches($package);
+            $matches[] = $name;
         }
 
         return $matches;

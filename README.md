@@ -968,6 +968,12 @@ composer patch:redo --from-source
 # Check that all patches have valid target package info (using info from vendor)
 composer patch:validate --from-source  
 
+# List registered with their current status (with optional filter)
+copmposer patch:list --status new
+
+# List all patches that have either changed, are new or got removed 
+patch:list magento/module-widget --status '!applied'
+
 ```
 
 The main purpose of this command is to make the maintenance of already created patches and adding new 

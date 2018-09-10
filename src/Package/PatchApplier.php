@@ -93,8 +93,12 @@ class PatchApplier
         $appliedPatches = array();
 
         foreach ($patchesQueue as $source => $info) {
-            $labelMatches = array_intersect_key($this->stateLabels, array_filter($info));
-
+            if (isset($info[PatchDefinition::STATE_LABEL])) {
+                $labelMatches = array($info[PatchDefinition::STATE_LABEL]);
+            } else {
+                $labelMatches = array_intersect_key($this->stateLabels, array_filter($info));
+            }
+            
             $this->logger->writeRaw(
                 '<info>%s</info>: %s%s',
                 array(

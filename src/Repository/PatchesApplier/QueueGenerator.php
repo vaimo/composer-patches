@@ -5,74 +5,65 @@
  */
 namespace Vaimo\ComposerPatches\Repository\PatchesApplier;
 
-use Composer\Repository\WritableRepositoryInterface as PackageRepository;
-use Vaimo\ComposerPatches\Interfaces\PatchesResetsResolverInterface;
-
 class QueueGenerator
 {
     /**
-     * @var \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver
+     * @var \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
      */
     private $listResolver;
 
     /**
-     * @var \Vaimo\ComposerPatches\Interfaces\PatchesResetsResolverInterface[]
+     * @var \Vaimo\ComposerPatches\Repository\Analyser
      */
-    private $resetResolvers;
-
+    private $itemsAnalyser;
+    
     /**
-     * @var array
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
-    private $filters;
-
+    private $patchListUtils;
+    
     /**
-     * @param \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver $listResolver,
-     * @param PatchesResetsResolverInterface[] $resetResolvers
-     * @param array $filters
+     * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver,
+     * @param \Vaimo\ComposerPatches\Repository\Analyser $itemsAnalyser
      */
     public function __construct(
-        \Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolver $listResolver,
-        array $resetResolvers,
-        array $filters
+        \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver,
+        \Vaimo\ComposerPatches\Repository\Analyser $itemsAnalyser
     ) {
         $this->listResolver = $listResolver;
-        $this->resetResolvers = $resetResolvers;
-        $this->filters = $filters;
+        $this->itemsAnalyser = $itemsAnalyser;
+
+        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
-    public function generate(PackageRepository $repository, array $patches)
+    public function generate(array $patches, array $repositoryState)
     {
-        $patchesQueue = $this->listResolver->resolvePatchesQueue(
-            $patches,
-            $this->filters
+        $patchesQueue = $this->listResolver->resolvePatchesQueue($patches);
+        $queueTargets = $this->patchListUtils->getAllTargets($patchesQueue);
+        
+        $relatedQueue = $this->patchListUtils->getRelatedPatches($patches, $queueTargets);
+        $relatedQueueTargets = $this->patchListUtils->getAllTargets($relatedQueue);
+
+        $hardResetStubs = array_diff_key($patchesQueue, array_filter($patchesQueue));
+        
+        $patchesQueue = $this->patchListUtils->filterListByTargets(
+            array_replace($patches, $patchesQueue),
+            array_merge($relatedQueueTargets, $queueTargets)
         );
 
-        $resetsQueue = array();
+        $resetQueue = $this->itemsAnalyser->determinePackageResets($repositoryState, $patchesQueue);
 
-        foreach ($this->resetResolvers as $resolver) {
-            $resetsQueue = array_unique(
-                array_merge(
-                    $resetsQueue, 
-                    $resolver->resolvePatchesResets($repository, $patchesQueue, $this->filters)
-                )
-            );
-        }
-        
-        $relatedQueue = $this->listResolver->resolveRelatedQueue(
-            $repository, 
-            $patches, 
-            $resetsQueue
+        $hardResetItems = array_diff(
+            $resetQueue,
+            array_keys(
+                array_filter($this->patchListUtils->groupItemsByTarget($patches))
+            )
         );
+
+        $hardResetStubs = array_replace($hardResetStubs, array_fill_keys($hardResetItems, array()));
+        $patchesQueue = $this->patchListUtils->filterListByTargets($patchesQueue, $resetQueue);
+        $otherItems = array_intersect_key($patches, array_flip($this->patchListUtils->getAllTargets($patchesQueue)));
         
-        foreach ($relatedQueue as $key => $items) {
-            $patchesQueue[$key] = array_replace(
-                isset($patchesQueue[$key]) ? $patchesQueue[$key] : array(),
-                $items
-            );
-        }
-        
-        $resetQueue = array_merge(array_keys($relatedQueue), $resetsQueue);
-        
-        return array($patchesQueue, array_unique($resetQueue));
+        return array_replace($hardResetStubs, $otherItems, $patchesQueue);
     }
 }

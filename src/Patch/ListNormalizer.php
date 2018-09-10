@@ -18,9 +18,9 @@ class ListNormalizer
     private $definitionNormalizer;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Sanitizer
      */
-    private $patchListUtils;
+    private $patchListSanitizer;
 
     /**
      * @param \Vaimo\ComposerPatches\Patch\Definition\Exploder $definitionExploder
@@ -33,14 +33,15 @@ class ListNormalizer
         $this->definitionExploder = $definitionExploder;
         $this->definitionNormalizer = $definitionNormalizer;
 
-        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
+        $this->patchListSanitizer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Sanitizer();
+        
     }
 
     public function normalize(array $list, array $config)
     {
         $result = array();
 
-        foreach ($this->patchListUtils->getSanitizedList($list) as $target => $packagePatches) {
+        foreach ($this->patchListSanitizer->getSanitizedList($list) as $target => $packagePatches) {
             $patches = array();
 
             foreach ($packagePatches as $patchLabel => $patchConfig) {
