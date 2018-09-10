@@ -1,4 +1,9 @@
 {
+    "3.35.1": {
+        "fix": [
+            "lock management reworked to use built-in methods for locating a package to avoid issues with potential aliases, etc"
+        ]
+    },
     "3.35.0": {
         "feature": [
             "list command added (allows listing all registered patches and their state)"

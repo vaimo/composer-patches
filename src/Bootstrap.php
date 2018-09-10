@@ -123,9 +123,14 @@ class Bootstrap
     
     public function sanitizeLocker(\Composer\Package\Locker $locker)
     {
-        $data = $this->lockerManager->extractLockData($locker);
+        if (!$data = $this->lockerManager->extractLockData($locker)) {
+            return;
+        }
 
-        foreach (array_merge($data['packages'], $data['packages-dev']) as $package) {
+        /** @var \Composer\Package\PackageInterface[] $packages */
+        $packages = array_merge($data['packages'], $data['packages-dev']);
+        
+        foreach ($packages as $package) {
             $package->setExtra(
                 array_diff_key($package->getExtra(), array('patches_applied' => true))
             );
