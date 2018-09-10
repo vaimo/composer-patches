@@ -76,7 +76,7 @@ Alternatively the patch can be targeted with configuring it via [providing the d
 Test out the added patch (in project root).
 
 ```shell
-composer patch:apply --from-source some/package-name
+composer patch:apply some/package-name
 ```
 
 The patch will be automatically applied on every composer install, update when required (when it's found 
@@ -966,7 +966,7 @@ composer patch:apply --from-source
 composer patch:redo --from-source
 
 # Check that all patches have valid target package info (using info from vendor)
-composer patch:validate --from-source  
+composer patch:validate --from-source
 
 # List registered with their current status (with optional filter)
 copmposer patch:list --status new
@@ -975,6 +975,10 @@ copmposer patch:list --status new
 patch:list magento/module-widget --status '!applied'
 
 ```
+
+Note that `--from-source` is only needed when patch target definitions are provided within a 
+composer.json file. If patches Provided in a separate file, the only reason to use this flag
+is when `patches-file` definitions have changed.
 
 The main purpose of this command is to make the maintenance of already created patches and adding new 
 ones as easy as possible by allowing user to test out a patch directly right after defining it without 
