@@ -977,7 +977,7 @@ composer patch:validate --from-source
 copmposer patch:list --status new
 
 # List all patches that have either changed, are new or got removed 
-patch:list magento/module-widget --status '!applied'
+patch:list --status '!applied'
 
 ```
 
