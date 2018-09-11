@@ -69,7 +69,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
             $this->bootstrap->applyPatches($event->isDevMode());
         }
 
-        $this->bootstrap->sanitizeLocker($event->getComposer()->getLocker());
+        $this->bootstrap->sanitizeLocker();
     }
 
     public function resetPackages(\Composer\Installer\PackageEvent $event)

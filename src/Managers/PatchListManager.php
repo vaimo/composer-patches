@@ -59,14 +59,14 @@ class PatchListManager
             $this->patchListUtils->groupItemsByTarget($patches)
         );
 
-        $patchStates = array();
+        $patchStatuses = array();
 
         foreach ($matchesFootprints as $target => $items) {
             $newItems = array_diff_key($items, $repositoryState[$target]);
             $changeItems = array_diff_key(array_diff_assoc($items, $repositoryState[$target]), $newItems);
 
-            $patchStates = array_replace(
-                $patchStates,
+            $patchStatuses = array_replace(
+                $patchStatuses,
                 array_fill_keys(array_keys($items), 'applied'),
                 array_fill_keys(array_keys($newItems), 'new'),
                 array_fill_keys(array_keys($changeItems), 'changed')
@@ -81,27 +81,27 @@ class PatchListManager
                     $items,
                     isset($patchesFootprints[$target]) ? $patchesFootprints[$target] : array()
                 ),
-                $patchStates
+                $patchStatuses
             );
         }
 
         $removedItems = $this->patchListUtils->createDetailedList($removedItems);
 
         foreach ($removedItems as $target => $items) {
-            $patchStates = array_replace(
-                $patchStates,
+            $patchStatuses = array_replace(
+                $patchStatuses,
                 array_fill_keys(array_keys($items), 'removed')
             );
         }
 
         $matches = $this->patchListUtils->mergeLists($matches, $removedItems);
 
-        $patchStates = preg_grep($statusFilterRegex, $patchStates);
+        $patchStatuses = preg_grep($statusFilterRegex, $patchStatuses);
 
         foreach ($matches as $target => $items) {
             foreach (array_keys($items) as $path) {
-                if (isset($patchStates[$path])) {
-                    $matches[$target][$path][PatchDefinition::STATE] = $patchStates[$path];
+                if (isset($patchStatuses[$path])) {
+                    $matches[$target][$path][PatchDefinition::STATUS] = $patchStatuses[$path];
 
                     continue;
                 }

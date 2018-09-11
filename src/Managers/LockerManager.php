@@ -5,92 +5,52 @@
  */
 namespace Vaimo\ComposerPatches\Managers;
 
-use Vaimo\ComposerPatches\Exceptions\PackageResolverException;
-use Vaimo\ComposerPatches\Composer\ConfigKeys;
-use Composer\Repository\RepositoryInterface;
-
 class LockerManager
 {
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PackageListUtils
+     * @var \Composer\IO\IOInterface 
      */
-    private $packageListUtils;
+    private $io;
 
-    public function __construct()
-    {
-        $this->packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
+    /**
+     * @param \Composer\IO\IOInterface $io
+     */
+    public function __construct(
+        \Composer\IO\IOInterface $io
+    ) {
+        $this->io = $io;
     }
-
-    public function updateLockData(\Composer\Package\Locker $locker, array $data)
+    
+    public function readLockData()
     {
-        $locker->setLockData(
-            $data[ConfigKeys::PACKAGES],
-            $data[ConfigKeys::PACKAGES_DEV],
-            $data[ConfigKeys::PLATFORM],
-            $data[ConfigKeys::PLATFORM_DEV],
-            $data[ConfigKeys::ALIASES],
-            $data[ConfigKeys::MINIMUM_STABILITY],
-            $data[ConfigKeys::STABILITY_FLAGS],
-            $data[ConfigKeys::PREFER_STABLE],
-            $data[ConfigKeys::PREFER_LOWEST],
-            $data[ConfigKeys::PLATFORM_OVERRIDES]
-        );
-    }
+        $lockFile = $this->getLockFile();
 
-    public function extractLockData(\Composer\Package\Locker $locker)
-    {
-        try {
-            $lockData = $locker->getLockData();
-        } catch (\LogicException $exception) {
-            return array();
+        if (!$lockFile->exists()) {
+            return null;
         }
+        
+        return $lockFile->read();
+    }
+    
+    public function writeLockData(array $lock)
+    {
+        $lockFile = $this->getLockFile();
 
-        $repository = $locker->getLockedRepository(true);
-
-        $aliases = array();
-
-        foreach ($lockData[ConfigKeys::ALIASES] as $alias) {
-            $package = $alias[ConfigKeys::ALIAS_PACKAGE];
-
-            if (!isset($aliases[$package])) {
-                $aliases[$package] = array();
-            }
-
-            $aliases[$package][$alias[ConfigKeys::ALIAS_VERSION]] = $alias;
+        if (!$lockFile->exists()) {
+            return;
         }
-
-        return array_replace($lockData, array(
-            ConfigKeys::PACKAGES => $this->packageDataToInstances(
-                $lockData[ConfigKeys::PACKAGES],
-                $repository
-            ),
-            ConfigKeys::PACKAGES_DEV => $this->packageDataToInstances(
-                $lockData[ConfigKeys::PACKAGES_DEV],
-                $repository
-            ),
-            ConfigKeys::ALIASES => $aliases,
-            ConfigKeys::PLATFORM_OVERRIDES => isset($lockData[ConfigKeys::PLATFORM_OVERRIDES])
-                ? $lockData[ConfigKeys::PLATFORM_OVERRIDES]
-                : array()
-        ));
+        
+        $lockFile->write($lock);
     }
 
-    private function packageDataToInstances(array $packages, RepositoryInterface $repository)
+    private function getLockFile()
     {
-        $matches = array();
-        
-        foreach ($packages as $package) {
-            $match = $repository->findPackage($package['name'], '*');
-            
-            if ($match === null) {
-                throw new PackageResolverException(
-                    sprintf('Failed to acquire package object for: %s', $package['name'])
-                );
-            }
-            
-            $matches[] = $match;
-        } 
-        
-        return $matches;
+        $composerFile = \Composer\Factory::getComposerFile();
+
+        $lockFile = 'json' === pathinfo($composerFile, PATHINFO_EXTENSION)
+            ? substr($composerFile, 0, -4).'lock'
+            : $composerFile . '.lock';
+
+        return new \Composer\Json\JsonFile($lockFile, null, $this->io);
     }
 }

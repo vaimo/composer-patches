@@ -1,4 +1,9 @@
 {
+    "4.4.2": {
+        "fix": [
+            "forward-port(3.35.2): lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock"
+        ]
+    },
     "4.4.1": {
         "fix": [
             "forward-port(3.35.1): lock management reworked to use built-in methods for locating a package to avoid issues with potential aliases, etc"
@@ -64,6 +69,11 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
+    "3.35.2": {
+        "fix": [
+            "lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock"
         ]
     },
     "3.35.1": {

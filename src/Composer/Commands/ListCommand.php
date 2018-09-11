@@ -112,7 +112,7 @@ class ListCommand extends \Composer\Command\BaseCommand
     
     private function generateOutput(OutputInterface $output, array $list)
     {
-        $stateDecorators = array(
+        $statusDecorators = array(
             'new' => '<info>NEW</info>',
             'changed' => '<info>CHANGED</info>',
             'applied' => '<fg=white;options=bold>APPLIED</>',
@@ -124,14 +124,14 @@ class ListCommand extends \Composer\Command\BaseCommand
             $output->writeln(sprintf('<info>%s</info>', $packageName));
 
             foreach ($patches as $path => $info) {
-                $state = isset($info[PatchDefinition::STATE]) 
-                    ? $info[PatchDefinition::STATE] 
+                $status = isset($info[PatchDefinition::STATUS]) 
+                    ? $info[PatchDefinition::STATUS] 
                     : 'unknown';
 
-                $stateLabel = sprintf(' [%s]', $stateDecorators[$state]);
+                $statusLabel = sprintf(' [%s]', $statusDecorators[$status]);
                 $owner = $info[PatchDefinition::OWNER];
                 
-                $output->writeln(sprintf('  ~ <info>%s</info>: %s%s', $owner, $path, $stateLabel));
+                $output->writeln(sprintf('  ~ <info>%s</info>: %s%s', $owner, $path, $statusLabel));
                 $output->writeln(sprintf('    <comment>%s</comment>', $info[PatchDefinition::LABEL]));
             }
 

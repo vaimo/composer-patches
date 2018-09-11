@@ -5,6 +5,9 @@
  */
 namespace Vaimo\ComposerPatches;
 
+use Vaimo\ComposerPatches\Composer\ConfigKeys as Config;
+use Vaimo\ComposerPatches\Config as PluginConfig;
+
 class Bootstrap
 {
     /**
@@ -48,6 +51,11 @@ class Bootstrap
     private $lockerManager;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\DataUtils
+     */
+    private $dataUtils;
+
+    /**
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
@@ -80,7 +88,9 @@ class Bootstrap
         
         $this->repositoryProcessor = new \Vaimo\ComposerPatches\Repository\Processor($logger);
 
-        $this->lockerManager = new \Vaimo\ComposerPatches\Managers\LockerManager();
+        $this->lockerManager = new \Vaimo\ComposerPatches\Managers\LockerManager($io);
+        
+        $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
 
     public function applyPatches($devMode = false)
@@ -113,21 +123,28 @@ class Bootstrap
         $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
     }
     
-    public function sanitizeLocker(\Composer\Package\Locker $locker)
+    public function sanitizeLocker()
     {
-        if (!$data = $this->lockerManager->extractLockData($locker)) {
+        if (!$lock = $this->lockerManager->readLockData()) {
             return;
         }
 
-        /** @var \Composer\Package\PackageInterface[] $packages */
-        $packages = array_merge($data['packages'], $data['packages-dev']);
+        $lockBefore = serialize($lock);
         
-        foreach ($packages as $package) {
-            $package->setExtra(
-                array_diff_key($package->getExtra(), array('patches_applied' => true))
-            );
-        }
+        $nodes = $this->dataUtils->getNodeReferencesByPaths($lock, array(
+            implode('/', array(Config::PACKAGES, '*', Config::CONFIG_ROOT)),
+            implode('/', array(Config::PACKAGES_DEV, '*', Config::CONFIG_ROOT))
+        ));
 
-        $this->lockerManager->updateLockData($locker, $data);
+        foreach ($nodes as &$node) {
+            unset($node[PluginConfig::APPLIED_FLAG]);
+            unset($node);
+        }
+        
+        if (serialize($lock) === $lockBefore) {
+            return;
+        }
+        
+        $this->lockerManager->writeLockData($lock);
     }
 }
