@@ -223,11 +223,11 @@ class PatchListUtils
             $patchDefinitionUpdates = array_replace(
                 array_fill_keys(
                     array_keys($changedPatches),
-                    array(Patch::STATE_NEW => false)
+                    array(Patch::STATUS_NEW => false)
                 ),
                 array_fill_keys(
                     array_keys($knownPatches),
-                    array(Patch::STATE_NEW => false, Patch::STATE_CHANGED => false)
+                    array(Patch::STATUS_NEW => false, Patch::STATUS_CHANGED => false)
                 )
             );
 

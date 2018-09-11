@@ -51,7 +51,7 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
         if (array_filter($this->filters)) {
             $patches = $this->patchListUtils->embedInfoToItems(
                 $patches,
-                array(PatchDefinition::STATE_LABEL => 'MATCH')
+                array(PatchDefinition::STATUS_LABEL => 'MATCH')
             );
         }
 

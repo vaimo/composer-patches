@@ -83,8 +83,8 @@ class PatchApplier
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
 
         $this->stateLabels = array(
-            PatchDefinition::STATE_NEW => 'NEW',
-            PatchDefinition::STATE_CHANGED => 'CHANGED'
+            PatchDefinition::STATUS_NEW => 'NEW',
+            PatchDefinition::STATUS_CHANGED => 'CHANGED'
         );
     }
 
@@ -93,8 +93,8 @@ class PatchApplier
         $appliedPatches = array();
 
         foreach ($patchesQueue as $source => $info) {
-            if (isset($info[PatchDefinition::STATE_LABEL])) {
-                $labelMatches = array($info[PatchDefinition::STATE_LABEL]);
+            if (isset($info[PatchDefinition::STATUS_LABEL])) {
+                $labelMatches = array($info[PatchDefinition::STATUS_LABEL]);
             } else {
                 $labelMatches = array_intersect_key($this->stateLabels, array_filter($info));
             }
