@@ -123,7 +123,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             putenv(Environment::FORCE_REAPPLY . '=' . $behaviourFlags['redo']);
             
             $bootstrap->applyPatches($isDevMode);
-            $bootstrap->sanitizeLocker($composer->getLocker());
+            $bootstrap->sanitizeLocker();
         }
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);

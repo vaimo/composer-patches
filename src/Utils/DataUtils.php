@@ -36,4 +36,35 @@ class DataUtils
 
         return $list;
     }
+    
+    public function getNodeReferencesByPaths(array &$data, array $paths)
+    {
+        $stack = array();
+
+        foreach ($paths as $path) {
+            $stack[] = array(array(&$data), explode('/', $path));
+        }
+
+        $result = array();
+        
+        while ($item = array_shift($stack)) {
+            $segment = array_shift($item[1]);
+
+            foreach ($item[0] as &$node) {
+                if ($segment === null) {
+                    $result[] = &$node;
+                } else {
+                    if ($segment === '*') {
+                        $stack[] = array(&$node, $item[1]);
+                    } else if (isset($node[$segment])) {
+                        $stack[] = array(array(&$node[$segment]), $item[1]);
+                    }
+                }
+
+                unset($node);
+            }
+        }
+        
+        return $result;
+    }
 }
