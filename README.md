@@ -641,7 +641,7 @@ This will tell the patch applier to: (a) reset targeted/package; (b) apply 'exam
 
 Available cwd options:
 
-1. install (default) - uses package install folder 
+1. install - uses package install folder (used by default)
 2. vendor - uses vendor path
 3. project - uses project path
 
