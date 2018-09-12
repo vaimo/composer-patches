@@ -645,6 +645,8 @@ Available cwd options:
 2. vendor - uses vendor path
 3. project - uses project path
 
+This is particulary useful when `targeted/package` introduces it's own file mapper mechanism that is triggered by composer events (which might mean that files are copied away from the re-install package before patch applier kicks in).
+
 ## Patches Exclude: configuration
 
 In case some patches that are defined in packages have to be excluded from the project (project has 
