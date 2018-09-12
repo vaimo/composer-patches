@@ -620,7 +620,7 @@ of the resolve patch path.
 ## Patches: patch applier cwd options
 
 In cases where there's a need to apply a patch on a file that is mapped to the project root or vendor bin
-root, a custom applier patch target installation path resolver mode can be defined:
+root, a patch applier working directory resolver mode can be defined (which technically would mean that the applier works off of custom root/directory when applying certain patch):
 
 ```json
   {
@@ -637,7 +637,7 @@ root, a custom applier patch target installation path resolver mode can be defin
   }
 ```
 
-This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root. That means that the targeted file paths within example.patch should also target files relative to project root.
+This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root. That means that the targeted file paths within example.patch should also target files relative to project root. 
 
 Available cwd options:
 
