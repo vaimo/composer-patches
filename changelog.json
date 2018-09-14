@@ -1,4 +1,9 @@
 {
+    "4.4.3": {
+        "fix": [
+            "forward-port(3.35.3): backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)"
+        ]
+    },
     "4.4.2": {
         "fix": [
             "forward-port(3.35.2): lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock"
@@ -69,6 +74,11 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
+    "3.35.3": {
+        "fix": [
+            "backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)"
         ]
     },
     "3.35.2": {

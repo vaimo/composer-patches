@@ -18,19 +18,24 @@ class PackageListUtils
             $packages
         );
     }
-    
-    public function extractExtraData(array $packages, $key = null, $default = array())
-    {
-        return array_map(function (\Composer\Package\PackageInterface $package) use ($key, $default) {
-            $extra = $package->getExtra();
-            
-            if (!$key) {
-                return $extra;
-            }
 
-            return isset($extra[$key])
-                ? $extra[$key]
-                : $default;
-        }, $packages);
+    public function extractDataFromExtra(array $packages, $key = null, $default = null)
+    {
+        $defaultType = gettype($default);
+
+        return array_map(
+            function (\Composer\Package\PackageInterface $package) use ($key, $default, $defaultType) {
+                $extra = $package->getExtra();
+
+                if (!$key) {
+                    return $extra;
+                }
+
+                return isset($extra[$key])
+                    ? (gettype($extra[$key]) === $defaultType || $default === null) ? $extra[$key] : $default
+                    : $default;
+            },
+            $packages
+        );
     }
 }
