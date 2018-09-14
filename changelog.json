@@ -1,4 +1,9 @@
 {
+    "3.35.3": {
+        "fix": [
+            "backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)"
+        ]
+    },
     "3.35.2": {
         "fix": [
             "lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock"

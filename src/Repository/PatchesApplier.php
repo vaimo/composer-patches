@@ -92,7 +92,11 @@ class PatchesApplier
 
         $packagesUpdated = false;
 
-        $repositoryState = $this->packageListUtils->extractExtraData($packages, PluginConfig::APPLIED_FLAG);
+        $repositoryState = $this->packageListUtils->extractDataFromExtra(
+            $packages, 
+            PluginConfig::APPLIED_FLAG,
+            array()
+        );
 
         $patchQueue = $this->queueGenerator->generate($patches, $repositoryState);
         $resetQueue = array_keys($patchQueue);

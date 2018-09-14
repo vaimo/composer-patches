@@ -46,9 +46,10 @@ class PatchListManager
 
         $matches = $this->listResolver->resolvePatchesQueue($patches);
 
-        $repositoryState = $this->packageListUtils->extractExtraData(
+        $repositoryState = $this->packageListUtils->extractDataFromExtra(
             $packages,
-            PluginConfig::APPLIED_FLAG
+            PluginConfig::APPLIED_FLAG,
+            array()
         );
 
         $matchesFootprints = $this->patchListUtils->createSimplifiedList(
