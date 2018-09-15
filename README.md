@@ -4,8 +4,7 @@ Applies a patch from a local or remote file to any package that is part of a giv
 project. Patches can be defined both on project and on package level in package config or 
 separate JSON file. Declaration-free mode (using embedded info within patch files) is available as well.
 
-The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable from 
-the composer.json of the project.
+The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable (including the actual commands that are executed to apply the patch) from the composer.json of the project.
 
 [![GitHub release](https://img.shields.io/github/release/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/releases/latest)
 [![Total Downloads](https://img.shields.io/packagist/dt/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
@@ -16,8 +15,9 @@ the composer.json of the project.
 ## Quick Start
 
 This example uses the simplest way that the plugin allows you to include a patch in your project and 
-relies on embedded patch target information within the patch file. Other options target information 
-definition options are available (based on defining it in JSON files). 
+relies on embedded patch target information within the patch file (Alternatvely, same information 
+can be provided in a JSON format either directly in package's composer.json or in a separate file 
+that composer.json refers to).
 
 #### 1. composer.json
 
@@ -138,8 +138,10 @@ Where the different groups have the following meaning:
 
 * **patches** - allows patches to be defined in same file.
 * **patches-file** - allows patches to be stored in another file. Can be a single file or list of files.
-* **patches-search** - scans for patch files in defined directory, relies on embedded target info 
-  within the patch (>=3.28.0). Can be a single file or list of files.
+* **patches-search** - (>=3.28.0) scans for patch files in defined directory, relies on embedded info 
+  within the patch. Can be a single path reference or a list of paths. 
+  
+_All paths are relative to package root._
 
 The patches module mimics the way composer separates development packages from normal requirements by 
 introducing two extra keys, where exact same rules apply as for normal patch declarations.
@@ -149,7 +151,7 @@ introducing two extra keys, where exact same rules apply as for normal patch dec
   "extra": {
     "patches-dev": {},
     "patches-file-dev": [],
-    "patches-search": []
+    "patches-search-dev": []
   }
 }
 ```
