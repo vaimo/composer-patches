@@ -16,11 +16,6 @@ class Bootstrap
     private $composer;
 
     /**
-     * @var array
-     */
-    private $config;
-
-    /**
      * @var \Vaimo\ComposerPatches\Factories\ConfigFactory
      */
     private $configFactory;
@@ -64,23 +59,21 @@ class Bootstrap
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
-     * @param array $config
+     * @param \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory
      */
     public function __construct(
         \Composer\Composer $composer,
         \Composer\IO\IOInterface $io,
-        \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver = null,
-        $config = array()
+        \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory,
+        \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
     ) {
         $this->composer = $composer;
-        $this->config = $config;
+        $this->configFactory = $configFactory;
 
         $logger = new \Vaimo\ComposerPatches\Logger($io);
 
         $this->listResolver = $listResolver;
-
-        $this->configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
-
+        
         $this->loaderComponents = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
             $composer,
             $io
@@ -103,20 +96,19 @@ class Bootstrap
     public function applyPatches($devMode = false)
     {
         $this->applyPatchesWithConfig(
-            $this->configFactory->create(array(
-                $this->config
-            )), 
+            $this->configFactory->create(),
             $devMode
         );
     }
 
     public function stripPatches($devMode = false)
     {
+        $configSources = array(
+            array(\Vaimo\ComposerPatches\Config::PATCHER_SOURCES => false)
+        );
+        
         $this->applyPatchesWithConfig(
-            $this->configFactory->create(array(
-                $this->config,
-                array(\Vaimo\ComposerPatches\Config::PATCHER_SOURCES => false)
-            )),
+            $this->configFactory->create($configSources),
             $devMode
         );
     }

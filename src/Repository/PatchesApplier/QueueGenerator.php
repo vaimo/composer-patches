@@ -40,7 +40,7 @@ class QueueGenerator
     {
         $patchesQueue = $this->listResolver->resolvePatchesQueue($patches);
         $queueTargets = $this->patchListUtils->getAllTargets($patchesQueue);
-
+        
         $relatedQueue = $this->patchListUtils->getRelatedPatches($patches, $queueTargets);
         $relatedQueueTargets = $this->patchListUtils->getAllTargets($relatedQueue);
 

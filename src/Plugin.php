@@ -32,10 +32,12 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     {
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
+        
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
 
         $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
-
-        $this->bootstrap = $this->bootstrapFactory->create();
+        
+        $this->bootstrap = $this->bootstrapFactory->create($configFactory);
     }
 
     public function getCapabilities()
