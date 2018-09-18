@@ -44,6 +44,13 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
 
         $this->addOption(
+            '--excluded',
+            null,
+            InputOption::VALUE_NONE,
+            'Include patches that have been ruled out based on some constraint mismatch'
+        );
+        
+        $this->addOption(
             '--status',
             null,
             InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
@@ -61,14 +68,16 @@ class ListCommand extends \Composer\Command\BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $composer = $this->getComposer();
-        $io = $this->getIO();
         
         $isDevMode = !$input->getOption('no-dev');
+        $withExcluded = $input->getOption('excluded');
 
         $filters = array(
             PatchDefinition::SOURCE => $input->getOption('filter'),
             PatchDefinition::TARGETS => $input->getArgument('targets')
         );
+
+        $statusFilters = $input->getOption('status');
         
         $config = array(
             \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
@@ -77,11 +86,11 @@ class ListCommand extends \Composer\Command\BaseCommand
                 'vendors' => true
             )
         );
+        
+        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
 
-        $loaderComponentsPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
-            $composer,
-            $io
-        );
+        $filteredPool = $this->createLoaderPool();
+        $unfilteredPool = $this->createLoaderPool(array('constraints', 'local-exclude', 'global-exclude'));
         
         $patchListManager = new \Vaimo\ComposerPatches\Managers\PatchListManager(
             new ListResolvers\FilteredListResolver($filters)
@@ -91,23 +100,51 @@ class ListCommand extends \Composer\Command\BaseCommand
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(array($composer->getPackage()));
 
+        $configInstance = $configFactory->create(array($config));
         $repository = $composer->getRepositoryManager()->getLocalRepository();
+
+        $packages = $packageCollector->collect($repository);
+            
+        $filteredPatchesLoader = $loaderFactory->create($filteredPool, $configInstance, $isDevMode);
+        $filteredPatches = $filteredPatchesLoader->loadFromPackagesRepository($repository);
         
-        $statusFilters = $input->getOption('status');
+        $patches = $patchListManager->getPatchesWithStatuses($filteredPatches, $packages, $statusFilters);
+        
+        if ($withExcluded) {
+            if (!$statusFilters || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded')) {
+                $patchesLoader = $loaderFactory->create($unfilteredPool, $configInstance, $isDevMode);
+                $allPatches = $patchesLoader->loadFromPackagesRepository($repository);
 
-        $patchesLoader = $loaderFactory->create(
-            $loaderComponentsPool, 
-            $configFactory->create(array($config)), 
-            $isDevMode
-        );
+                $excludedPatches = $patchListManager->updateStatuses(
+                    $patchListManager->getPatchListDifference($allPatches, $filteredPatches),
+                    'excluded'
+                );
 
-        $patches = $patchListManager->getPatchesWithStatuses(
-            $patchesLoader->loadFromPackagesRepository($repository), 
-            $packageCollector->collect($repository), 
-            $statusFilters
-        );
+                $patches = array_replace_recursive(
+                    $patches,
+                    $patchListManager->updateStatuses($excludedPatches, 'excluded')
+                );
+            }
+        }
         
         $this->generateOutput($output, $patches);
+    }
+    
+    private function createLoaderPool(array $excludedComponentNames = array())
+    {
+        $composer = $this->getComposer();
+        $io = $this->getIO();
+
+        $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
+            $composer,
+            $io
+        );
+
+        foreach ($excludedComponentNames as $componentName) {
+            $componentPool->registerComponent($componentName, false);
+        }
+        
+        return $componentPool;
     }
     
     private function generateOutput(OutputInterface $output, array $list)
@@ -117,6 +154,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             'changed' => '<info>CHANGED</info>',
             'applied' => '<fg=white;options=bold>APPLIED</>',
             'removed' => '<fg=red>REMOVED</>',
+            'excluded' => '<fg=black>EXCLUDED</>',
             'unknown' => 'UNKNOWN'
         );
         

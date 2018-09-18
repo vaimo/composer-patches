@@ -113,4 +113,35 @@ class PatchListManager
 
         return array_filter($matches);
     }    
+    
+    public function getPatchListDifference($list1, $list2)
+    {
+        $result = array();
+        
+        foreach ($list1 as $target => $group) {
+            if (!isset($list2[$target])) {
+                $result[$target] = $group;
+                continue;
+            }
+            
+            if (!$differences = array_diff_key($group, $list2[$target])) {
+                continue;
+            }
+
+            $result[$target] = $differences;
+        }
+
+        return $result;
+    }
+    
+    public function updateStatuses(array $patches, $status)
+    {
+        return array_map(function (array $group) use ($status) {
+            return array_map(function (array $patch) use ($status) {
+                return array_replace($patch, array(
+                    PatchDefinition::STATUS => $status
+                ));
+            }, $group);
+        }, $patches);
+    }
 }

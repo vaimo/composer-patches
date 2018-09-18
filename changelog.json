@@ -1,4 +1,12 @@
 {
+    "3.37.0": {
+        "feature": [
+            "new flag introduced for patch:list to allow including patches that have been ruled out due to mismatch with certain constraint: --excluded"
+        ],
+        "fix": [
+            "embedded targeting info for bundled patches that declares constrains not processed correctly (@depends,@version)"
+        ]
+    },
     "3.36.0": {
         "feature": [
             "allow '@type bundle' to be used for bundle package instead of using somewhat cryptic '@package *'",

@@ -150,7 +150,6 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         
         if (array_intersect_key($flags, array_flip($this->bundledModeTypes))) {
             $target = PatchDefinition::BUNDLE_TARGET;
-            $depends = array();
         }
         
         if (!$target) {
@@ -161,7 +160,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $data[PatchDefinition::SKIP] = true;
         }
 
-        return array_replace(array(
+        $definition = array_replace(array(
             PatchDefinition::LABEL => implode(
                 PHP_EOL,
                 isset($data[PatchDefinition::LABEL]) ? $data[PatchDefinition::LABEL] : array('')
@@ -181,6 +180,8 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             PatchDefinition::LEVEL => $this->extractSingleValue($data, PatchDefinition::LEVEL),
             PatchDefinition::CATEGORY => $this->extractSingleValue($data, PatchDefinition::CATEGORY)
         ), $values);
+
+        return $definition;
     }
 
     private function resolveBaseInfo(array $data)
@@ -217,14 +218,17 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $depends = $target;
         }
 
-        $extraDepends = array_reduce(
+        $dependsConfig = array_reduce(
             array_map(function ($item) {
                 $valueParts = explode(':', $item);
-
+                
                 return array(
                     trim(array_shift($valueParts)) => trim(implode(':', $valueParts)) ?: '>=0.0.0'
                 );
-            }, $this->extractValueList($data, PatchDefinition::DEPENDS)),
+            }, array_merge(
+                array($depends . ':' . $version), 
+                $this->extractValueList($data, PatchDefinition::DEPENDS))
+            ),
             'array_replace',
             array()
         );
@@ -240,11 +244,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         return array(
             $target,
             array_filter(
-                array_replace(
-                    array($depends => $version),
-                    $extraDepends,
-                    array(PatchDefinition::BUNDLE_TARGET => false)
-                )
+                array_replace($dependsConfig, array(PatchDefinition::BUNDLE_TARGET => false, '' => false))
             ),
             $patchTypeFlags
         );
