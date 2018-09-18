@@ -36,7 +36,7 @@ class BundleComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
             if (!isset($patches[$rootName])) {
                 $patches[$rootName] = array();
             }
-
+            
             $patches[$rootName] = array_merge(
                 $patches[$rootName],
                 $patches[PatchDefinition::BUNDLE_TARGET]

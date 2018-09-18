@@ -39,7 +39,9 @@ class Definition
     const CONFIG = 'config';
     const PATCHER = 'patcher';
     const LEVEL = 'level';
+    
     const TYPE = 'type';
+    const TYPE_SEPARATOR = '+';
 
     const STATE_CHANGED = 'changed';
     const STATE_NEW = 'new';

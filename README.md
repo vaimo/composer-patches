@@ -839,16 +839,16 @@ This patch fixes a huge issue that made N crash while Y was running.
 The description here can be multiple lines which will all be presented
 to the user when patch is being applied.
 
-@package (required) some/package-name
-@label (optional) overrides the description above when provided. Otherwise above info used
-@ticket (optional) reference to some issue ID that relates to this fix (added to label)
-@link (optional) url to additional data about this patch (added to label)
-@depends (optional) other/package (make version constraint target another package instead) 
-@version (optional) >=1.1.0 <1.4.0
-@after (optional) Used in case a patch should be added after another branch
+@package <value> (required) indicate which package to target (example: some/package-name)
+@label <value> (optional) overrides the description above when provided. Otherwise above info used
+@ticket <value> (optional) reference to some issue ID that relates to this fix (added to label)
+@link <value> (optional) url to additional data about this patch (added to label)
+@depends <value> (optional) other/package (make version constraint target another package instead) 
+@version <value> (optional) >=1.1.0 <1.4.0
+@after <value> (optional) Used in case a patch should be added after another branch
 @skip (optional) If this tag is present, then the patch will not be applied
-@cwd (optional) Specify which cwd the patcher should use to apply the patch 
-@type (optional) dev
+@cwd <value> (optional) Specify which cwd the patcher should use to apply the patch 
+@type <value> (optional) Options: dev, bundle (Using multiple: dev+bundle)
 @level (optional) 0 (forces/locks the patch applier to use certain patch path strip level)
 @category (optional) free-form value to explain what the patch is (fix/feature/enhancement)
 

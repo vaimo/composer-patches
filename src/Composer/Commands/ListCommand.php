@@ -132,7 +132,12 @@ class ListCommand extends \Composer\Command\BaseCommand
                 $owner = $info[PatchDefinition::OWNER];
                 
                 $output->writeln(sprintf('  ~ <info>%s</info>: %s%s', $owner, $path, $statusLabel));
-                $output->writeln(sprintf('    <comment>%s</comment>', $info[PatchDefinition::LABEL]));
+                
+                foreach (explode(PHP_EOL, $info[PatchDefinition::LABEL]) as $line) {
+                    $output->writeln(
+                        sprintf('    <comment>%s</comment>', $line)
+                    );
+                }
             }
 
             $output->writeln('');

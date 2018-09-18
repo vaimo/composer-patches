@@ -1,4 +1,14 @@
 {
+    "3.36.0": {
+        "feature": [
+            "allow '@type bundle' to be used for bundle package instead of using somewhat cryptic '@package *'",
+            "allow multiple types to be combined in embedded info (@type dev+bundle)"
+        ],
+        "fix": [
+           "multi-line description not presented properly when using composer patch:list command",
+           "bundled patches not included as expected when using embedded patch target info"
+        ] 
+    },
     "3.35.3": {
         "fix": [
             "backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)"

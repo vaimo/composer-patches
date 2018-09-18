@@ -51,6 +51,11 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     private $devModeTypes;
 
     /**
+     * @var array 
+     */
+    private $bundledModeTypes;
+
+    /**
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param bool $devMode
      */
@@ -75,7 +80,8 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             PatchDefinition::TYPE => array('mode')
         );
 
-        $this->devModeTypes = array('developer', 'dev', 'development');
+        $this->devModeTypes = array('developer', 'dev', 'development', 'develop');
+        $this->bundledModeTypes = array('bundle', 'bundled', 'merged', 'multiple', 'multi', 'group');
     }
 
     public function load(\Composer\Package\PackageInterface $package, $source)
@@ -140,15 +146,18 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $this->tagAliases
         );
 
-        list($target, $depends) = $this->resolveBaseInfo($data);
-
+        list($target, $depends, $flags) = $this->resolveBaseInfo($data);
+        
+        if (array_intersect_key($flags, array_flip($this->bundledModeTypes))) {
+            $target = PatchDefinition::BUNDLE_TARGET;
+            $depends = array();
+        }
+        
         if (!$target) {
             return array();
         }
 
-        $patchType = $this->extractSingleValue($data, PatchDefinition::TYPE);
-
-        if (!$this->devMode && in_array($patchType, $this->devModeTypes)) {
+        if (!$this->devMode && array_intersect_key($flags, array_flip($this->devModeTypes))) {
             $data[PatchDefinition::SKIP] = true;
         }
 
@@ -159,7 +168,11 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             ),
             PatchDefinition::TARGET => $target,
             PatchDefinition::CWD => $this->extractSingleValue($data, PatchDefinition::CWD),
-            PatchDefinition::TARGETS => $this->extractValueList($data, PatchDefinition::TARGETS),
+            PatchDefinition::TARGETS => $this->extractValueList(
+                $data, 
+                PatchDefinition::TARGETS, 
+                array($target)
+            ),
             PatchDefinition::DEPENDS => $depends,
             PatchDefinition::SKIP => isset($data[PatchDefinition::SKIP]),
             PatchDefinition::AFTER => $this->extractValueList($data, PatchDefinition::AFTER),
@@ -216,6 +229,14 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             array()
         );
 
+        $patchTypeFlags = array_fill_keys(
+            explode(
+                PatchDefinition::TYPE_SEPARATOR,
+                $this->extractSingleValue($data, PatchDefinition::TYPE)
+            ),
+            true
+        );
+        
         return array(
             $target,
             array_filter(
@@ -224,13 +245,14 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                     $extraDepends,
                     array(PatchDefinition::BUNDLE_TARGET => false)
                 )
-            )
+            ),
+            $patchTypeFlags
         );
     }
 
-    private function extractValueList(array $data, $name)
+    private function extractValueList(array $data, $name, $default = array())
     {
-        return isset($data[$name]) ? array_filter($data[$name]) : array();
+        return isset($data[$name]) ? array_filter($data[$name]) : $default;
     }
 
     private function extractSingleValue(array $data, $name, $default = null)
