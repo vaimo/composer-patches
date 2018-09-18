@@ -847,10 +847,10 @@ to the user when patch is being applied.
 @version <value> (optional) >=1.1.0 <1.4.0
 @after <value> (optional) Used in case a patch should be added after another branch
 @skip (optional) If this tag is present, then the patch will not be applied
-@cwd <value> (optional) Specify which cwd the patcher should use to apply the patch 
+@cwd <value> (optional) Specify in which root pathc the patch is applied (install,vendor,project)
 @type <value> (optional) Options: dev, bundle (Using multiple: dev+bundle)
-@level (optional) 0 (forces/locks the patch applier to use certain patch path strip level)
-@category (optional) free-form value to explain what the patch is (fix/feature/enhancement)
+@level <value> (optional) 0 (forces/locks the patch applier to use certain patch path strip level)
+@category <value> (optional) free-form value to explain what the patch is (fix/feature/enhancement)
 
 --- Models/Example.php.org
 +++ Models/Example.php
@@ -869,7 +869,8 @@ When a patch is declared like this, no additional information is needed to be pr
 those tags, the mandatory ones are:
 
 ```
-@package - targeted package (to indicate that the patch is a bundle patch, just use: *)
+@package - targeted package
+@type bundle - as an alternative to @package when dealing with patch that targets multiple packages
 ```
  
 Alternatively package and version can be declared together with a one-liner
