@@ -1,4 +1,9 @@
 {
+    "4.6.1": {
+        "fix": [
+            "forward-port(3.37.1): some patches that patched multiple files applied only half-way through on certain OS's without returning with proper exit code on failure (or failed hunks considered as ignoreable junk)"
+        ]
+    },
     "4.6.0": {
         "feature": [
             "forward-port(3.37.0): new flag introduced for patch:list to allow including patches that have been ruled out due to mismatch with certain constraint: --excluded"
@@ -94,13 +99,20 @@
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
     },
+    "3.37.1": {
+        "fix": [
+            "some patches that patched multiple files applied only half-way through on certain OS's without returning with proper exit code on failure (or failed hunks considered as ignoreable junk)"
+        ],
+        "branch": "release/3.X"
+    },
     "3.37.0": {
         "feature": [
             "new flag introduced for patch:list to allow including patches that have been ruled out due to mismatch with certain constraint: --excluded"
         ],
         "fix": [
             "embedded targeting info for bundled patches that declares constrains not processed correctly (@depends,@version)"
-        ]
+        ],
+        "branch": "release/3.X"
     },
     "3.36.0": {
         "feature": [
@@ -110,23 +122,27 @@
         "fix": [
             "multi-line description not presented properly when using composer patch:list command",
             "bundled patches not included as expected when using embedded patch target info"
-        ]
+        ],
+        "branch": "release/3.X"
     },
 
     "3.35.3": {
         "fix": [
             "backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)"
-        ]
+        ],
+        "branch": "release/3.X"
     },
     "3.35.2": {
         "fix": [
             "lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock"
-        ]
+        ],
+        "branch": "release/3.X"
     },
     "3.35.1": {
         "fix": [
             "lock management reworked to use built-in methods for locating a package to avoid issues with potential aliases, etc"
-        ]
+        ],
+        "branch": "release/3.X"
     },
     "3.35.0": {
         "feature": [
@@ -135,12 +151,14 @@
         "fix": [
             "bundled patch targets not properly reset when using patch:redo in case patches applied on packages, but installed.json reset to provide no information about applied patches",
             "patches for packages that are covered with certain bundle patch do not get re-applied when running patch:redo with filter (redo should not leave any patch uninstalled even when executed with a filter)"
-        ]
+        ],
+        "branch": "release/3.X"
     },
     "3.34.1": {
         "fix": [
             "conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that"
-        ]
+        ],
+        "branch": "release/3.X"
     },
     "3.34.0": {
         "feature": [
