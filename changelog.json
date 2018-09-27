@@ -7,7 +7,7 @@
             "... rework on fix done in 3.37.1 for patches that applied half-way while 'patch' command still returned SUCCESS exit code; using patch command usage output parsing instead due to several issues that posix flag usage introduced"
         ]
     },
-    "DEV.3.38.0": {
+    "3.38.0": {
         "feature": [
             "hide all information on previously applied patches by default (when patches for certain package are re-applied) and only show the ones that changed, are new or got matches with a filter (--explicit flag added for commands to use old output that shows every patch that gets re-applied)"
         ],
