@@ -15,17 +15,30 @@ class Logger
     private $io;
 
     /**
+     * @var bool
+     */
+    private $allowMuting;
+    
+    /**
      * @var array
      */
-    private $indentationStack = array(); 
-
+    private $indentationStack = array();
+    
+    /**
+     * @var int 
+     */
+    private $muteDepth = 0;
+    
     /**
      * @param \Composer\IO\IOInterface $io
+     * @param bool $allowMuting
      */
     public function __construct(
-        \Composer\IO\IOInterface $io
+        \Composer\IO\IOInterface $io,
+        $allowMuting = true
     ) {
         $this->io = $io;
+        $this->allowMuting = $allowMuting;
     }
 
     /**
@@ -36,8 +49,24 @@ class Logger
         return $this->io;
     }
 
+    public function mute()
+    {
+        return $this->allowMuting ? $this->muteDepth++ : null;
+    }
+
+    public function unMute($muteDepth = null)
+    {
+        $this->muteDepth = $this->allowMuting 
+            ? ($muteDepth ? $muteDepth : max(--$this->muteDepth, 0)) 
+            : 0;
+    }
+    
     public function writeRaw($message, array $args = array())
     {
+        if ($this->muteDepth) {
+            return;
+        }
+        
         $prefix = $this->getIndentationString();
 
         $lines = array_map(function ($line) use ($prefix) {
@@ -75,6 +104,10 @@ class Logger
 
     public function writeNewLine()
     {
+        if ($this->muteDepth) {
+            return;
+        }
+        
         $this->io->write('');
     }
     
@@ -94,6 +127,10 @@ class Logger
 
     public function writeIndentation()
     {
+        if ($this->muteDepth) {
+            return;
+        }
+        
         $this->io->write(
             $this->getIndentationString(), 
             false

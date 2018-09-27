@@ -96,8 +96,17 @@
         "feature": [
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
-            "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+            "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package",
         ]
+    },
+    "3.38.0": {
+        "feature": [
+            "hide all information on previously applied patches by default (when patches for certain package are re-applied) and only show the ones that changed, are new or got matches with a filter (--explicit flag added for commands to use old output that shows every patch that gets re-applied)"
+        ],
+        "fix": [
+            "rollback to fix in 3.37.1 (caused errors for patches that created new files, new solution needed)"
+        ],
+        "branch": "release/3.X"
     },
     "3.37.1": {
         "fix": [

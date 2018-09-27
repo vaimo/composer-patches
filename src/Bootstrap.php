@@ -60,17 +60,19 @@ class Bootstrap
      * @param \Composer\IO\IOInterface $io
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
      * @param \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory
+     * @param bool $explicitMode
      */
     public function __construct(
         \Composer\Composer $composer,
         \Composer\IO\IOInterface $io,
         \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory,
-        \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
+        \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver,
+        $explicitMode = false
     ) {
         $this->composer = $composer;
         $this->configFactory = $configFactory;
 
-        $logger = new \Vaimo\ComposerPatches\Logger($io);
+        $logger = new \Vaimo\ComposerPatches\Logger($io, !$explicitMode);
 
         $this->listResolver = $listResolver;
         

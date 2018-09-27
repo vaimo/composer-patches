@@ -32,8 +32,9 @@ class BootstrapFactory
         $this->io = $io;
     }
 
-    public function create(ConfigFactory $configFactory, ListResolverInterface $listResolver = null)
-    {
+    public function create(
+        ConfigFactory $configFactory, ListResolverInterface $listResolver = null, $isExplicit = false
+    ) {
         if ($listResolver === null) {
             $listResolver = new ListResolvers\DirectListResolver();
         }
@@ -42,7 +43,8 @@ class BootstrapFactory
             $this->composer, 
             $this->io, 
             $configFactory,
-            $listResolver
+            $listResolver,
+            $isExplicit
         );
     }    
 }

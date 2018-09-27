@@ -31,8 +31,8 @@ class Defaults
                 ),
                 'PATCH' => array(
                     'bin' => 'which patch',
-                    'check' => '[[bin]] -t --posix -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
-                    'patch' => '[[bin]] -t --posix -p{{level}} --no-backup-if-mismatch < {{file}}'
+                    'check' => '[[bin]] -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
+                    'patch' => '[[bin]] -p{{level}} --no-backup-if-mismatch < {{file}}'
                 )
             ),
             Config::PATCHER_OPERATIONS => array(
