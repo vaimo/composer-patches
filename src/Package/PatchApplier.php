@@ -88,11 +88,20 @@ class PatchApplier
         );
     }
 
+    private function shouldNotify(array $patch)
+    {
+        return (bool)$patch[PatchDefinition::STATUS_NEW]
+            || $patch[PatchDefinition::STATUS_CHANGED]
+            || (isset($patch[PatchDefinition::STATUS_LABEL]) && $patch[PatchDefinition::STATUS_LABEL]);
+    }
+    
     public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
         $appliedPatches = array();
 
         foreach ($patchesQueue as $source => $info) {
+            $muteDepth = !$this->shouldNotify($info) ? $this->logger->mute() : null;
+            
             if (isset($info[PatchDefinition::STATUS_LABEL])) {
                 $labelMatches = array($info[PatchDefinition::STATUS_LABEL]);
             } else {
@@ -139,11 +148,19 @@ class PatchApplier
                 $result = $this->processPackagePatch($package, $source, $info);
             } catch (\Exception $e) {
                 $this->logger->reset($loggerIndentation);
+                
+                if ($muteDepth !== null) {
+                    $this->logger->unMute($muteDepth);
+                }
 
                 throw $e;
             }
 
             $this->logger->reset($loggerIndentation);
+            
+            if ($muteDepth !== null) {
+                $this->logger->unMute($muteDepth);
+            }
 
             if (!$result) {
                 continue;

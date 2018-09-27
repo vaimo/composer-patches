@@ -36,14 +36,15 @@ class PatchesApplierFactory
     ) {
         $this->composer = $composer;
         $this->logger = $logger;
-
+        
         $this->queueGeneratorFactory = new \Vaimo\ComposerPatches\Factories\QueueGeneratorFactory(
             $this->composer
         );
     }
 
-    public function create(PluginConfig $pluginConfig, \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver)
-    {
+    public function create(
+        PluginConfig $pluginConfig, \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
+    ) {
         $composer = $this->composer;
 
         $installationManager = $composer->getInstallationManager();

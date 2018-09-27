@@ -32,12 +32,19 @@ class BootstrapFactory
         $this->io = $io;
     }
 
-    public function create(ListResolverInterface $listResolver = null, array $config = array())
-    {
+    public function create(
+        ListResolverInterface $listResolver = null, array $config = array(), $isExplicit = false
+    ) {
         if ($listResolver === null) {
             $listResolver = new ListResolvers\DirectListResolver();
         }
 
-        return new \Vaimo\ComposerPatches\Bootstrap($this->composer, $this->io, $listResolver, $config);
+        return new \Vaimo\ComposerPatches\Bootstrap(
+            $this->composer, 
+            $this->io, 
+            $listResolver, 
+            $config, 
+            $isExplicit
+        );
     }    
 }

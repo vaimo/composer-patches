@@ -78,7 +78,6 @@ class PatchesApplier
         $this->packagePatchApplier = $patchApplier;
         $this->queueGenerator = $queueGenerator;
         $this->patcherStateManager = $patcherStateManager;
-
         $this->logger = $logger;
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
@@ -181,16 +180,37 @@ class PatchesApplier
                 return array_intersect($data[PatchDefinition::TARGETS], $changedTargets);
             });
 
-            $this->processPatchesForPackage($package, $queuedPatches, $repository);
+            $muteDepth = !$this->shouldNotify($queuedPatches) ? $this->logger->mute() : null;
+            
+            try {
+                $this->processPatchesForPackage($package, $queuedPatches, $repository);
+            } catch (\Exception $exception) {
+                $this->logger->unMute();
+                
+                throw $exception;
+            }
 
             $packagesUpdated = true;
 
             $this->logger->writeNewLine();
+
+            if ($muteDepth !== null) {
+                $this->logger->unMute($muteDepth);
+            }
         }
 
         return $packagesUpdated;
     }
-
+    
+    private function shouldNotify(array $patchesQueue) 
+    {
+        return (bool)array_filter($patchesQueue, function (array $patch) {
+            return (bool)$patch[PatchDefinition::STATUS_NEW] 
+            || $patch[PatchDefinition::STATUS_CHANGED] 
+            || (isset($patch[PatchDefinition::STATUS_LABEL]) && $patch[PatchDefinition::STATUS_LABEL]);
+        });
+    } 
+    
     private function processPatchesForPackage(PackageInterface $package, $patchesQueue, $repository)
     {
         $this->logger->writeRaw(

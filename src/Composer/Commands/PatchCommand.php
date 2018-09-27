@@ -57,6 +57,13 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
 
         $this->addOption(
+            '--explicit',
+            null,
+            InputOption::VALUE_NONE,
+            'Show information for every patch that gets re-applied (due to package reset)'
+        );
+        
+        $this->addOption(
             '--from-source',
             null,
             InputOption::VALUE_NONE,
@@ -85,7 +92,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $io = $this->getIO();
         
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
-        
+
+        $isExplicit = $input->getOption('explicit');
         $isDevMode = !$input->getOption('no-dev');
 
         $filters = array(
@@ -112,7 +120,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             )
         );
         
-        $bootstrap = $bootstrapFactory->create($listResolver, $config);
+        $bootstrap = $bootstrapFactory->create($listResolver, $config, $isExplicit);
 
         putenv(Environment::FORCE_RESET . '=' . (bool)$input->getOption('force'));
 

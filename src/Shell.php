@@ -33,8 +33,10 @@ class Shell
         $logger = $this->logger;
 
         $output = '';
+        
         $outputHandler = function ($type, $data) use ($logger, &$output) {
             $output = $output . trim($data);
+            
             $logger->writeVerbose('comment', trim($data));
         };
         
