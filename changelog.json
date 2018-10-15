@@ -6,7 +6,7 @@
         "fix": [
             "... rework on fix done in 3.37.1 for patches that applied half-way while 'patch' command still returned SUCCESS exit code; using patch command usage output parsing instead due to several issues that posix flag usage introduced"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.38.0": {
         "feature": [
@@ -15,13 +15,13 @@
         "fix": [
             "rollback to fix in 3.37.1 (caused errors for patches that created new files, new solution needed)"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.37.1": {
         "fix": [
             "some patches that patched multiple files applied only half-way through on certain OS's without returning with proper exit code on failure (or failed hunks considered as ignoreable junk)"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.37.0": {
         "feature": [
@@ -30,7 +30,7 @@
         "fix": [
             "embedded targeting info for bundled patches that declares constrains not processed correctly (@depends,@version)"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.36.0": {
         "feature": [
@@ -41,25 +41,25 @@
            "multi-line description not presented properly when using composer patch:list command",
            "bundled patches not included as expected when using embedded patch target info"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.35.3": {
         "fix": [
             "backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.35.2": {
         "fix": [
             "lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.35.1": {
         "fix": [
             "lock management reworked to use built-in methods for locating a package to avoid issues with potential aliases, etc"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.35.0": {
         "feature": [
@@ -69,13 +69,13 @@
             "bundled patch targets not properly reset when using patch:redo in case patches applied on packages, but installed.json reset to provide no information about applied patches",
             "patches for packages that are covered with certain bundle patch do not get re-applied when running patch:redo with filter (redo should not leave any patch uninstalled even when executed with a filter)"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.34.1": {
         "fix": [
             "conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.34.0": {
         "feature": [
@@ -85,13 +85,13 @@
             "patches queue generator sometimes generated lists that did not queue proper re-applying of patches when dealing with bundles and indirect targets so that 'patch:redo' == 'patch:undo' + 'patch:apply'",
             "make sure that the removal od 'dev' bundle (or any other type with indirect targets) patches cause proper re-patching of related targets when running with --no-dev"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.33.1": {
         "fix": [
             "improved error reporting when encountering issues on composer lock cleanup"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.33.0": {
         "feature": [
@@ -103,7 +103,7 @@
             "full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)",
             "multiple dependencies on patches with embedded target info not respected"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.32.1": {
         "fix": [
@@ -112,19 +112,19 @@
         "maintenance": [
             "removing #skip flag from path when encountered (previously it remained in the path)"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.32.0": {
         "feature": [
             "allow comments on any level and with any keyword as long as it starts with underscore (_)"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.31.0": {
         "feature": [
             "halt applying patches when encountering package with local changes to avoid developer from losing their work (allow override with env flag or command --force flag)"
         ],
-        "branch": "release/3.X"
+        "branch": "release/3"
     },
     "3.30.1": {
         "fix": [
