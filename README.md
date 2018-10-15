@@ -15,9 +15,10 @@ The way the patches are applied (the commands, pre-checks) by the plugin is full
 ## Quick Start
 
 This example uses the simplest way that the plugin allows you to include a patch in your project and 
-relies on embedded patch target information within the patch file (Alternatvely, same information 
-can be provided in a JSON format either directly in package's composer.json or in a separate file 
-that composer.json refers to).
+relies on embedded patch target information within the patch file. 
+
+Alternatvely, same information can be provided in a JSON format either directly in package's composer.json 
+or in a separate file that composer.json refers to
 
 #### 1. composer.json
 
