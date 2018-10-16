@@ -63,8 +63,8 @@ class Applier
 
         $applierConfig = $this->applierUtils->sortApplierConfig($applierConfig);
         
-        $patchers = isset($applierConfig[PluginConfig::PATCHER_APPLIERS ]) 
-            ? array_filter($applierConfig[PluginConfig::PATCHER_APPLIERS ]) 
+        $patchers = isset($applierConfig[PluginConfig::PATCHER_APPLIERS]) 
+            ? array_filter($applierConfig[PluginConfig::PATCHER_APPLIERS]) 
             : array();
         
         $operations = isset($applierConfig[PluginConfig::PATCHER_OPERATIONS]) 

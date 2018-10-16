@@ -11,6 +11,7 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 use Symfony\Component\Console\Input\InputOption;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
+use Vaimo\ComposerPatches\Config;
 
 class ListCommand extends \Composer\Command\BaseCommand
 {
@@ -49,6 +50,13 @@ class ListCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Include patches that have been ruled out based on some constraint mismatch'
         );
+
+        $this->addOption(
+            '--brief',
+            null,
+            InputOption::VALUE_NONE,
+            'Show more compact output of the list (remove description, owner , etc)'
+        );
         
         $this->addOption(
             '--status',
@@ -71,30 +79,35 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         $isDevMode = !$input->getOption('no-dev');
         $withExcluded = $input->getOption('excluded');
+        $beBrief = $input->getOption('brief');
 
         $filters = array(
             PatchDefinition::SOURCE => $input->getOption('filter'),
             PatchDefinition::TARGETS => $input->getArgument('targets')
         );
 
-        $statusFilters = $input->getOption('status');
+        $statusFilters = array_map('strtolower', $input->getOption('status'));
+
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+
+        $defaultValues = $configDefaults->getPatcherConfig();
         
         $config = array(
-            \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
-                'project' => true,
-                'packages' => true,
-                'vendors' => true
+            Config::PATCHER_SOURCES => array_fill_keys(
+                array_keys($defaultValues[Config::PATCHER_SOURCES]),
+                true
             )
         );
         
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+        $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
 
         $filteredPool = $this->createLoaderPool();
         $unfilteredPool = $this->createLoaderPool(array('constraints', 'local-exclude', 'global-exclude'));
+
+        $listResolver = new ListResolvers\FilteredListResolver($filters);
         
-        $patchListManager = new \Vaimo\ComposerPatches\Managers\PatchListManager(
-            new ListResolvers\FilteredListResolver($filters)
-        );
+        $patchListManager = new \Vaimo\ComposerPatches\Managers\PatchListManager($listResolver);
         
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
@@ -110,21 +123,36 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         $patches = $patchListManager->getPatchesWithStatuses($filteredPatches, $packages, $statusFilters);
         
-        if ($withExcluded) {
-            if (!$statusFilters || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded')) {
-                $patchesLoader = $loaderFactory->create($unfilteredPool, $configInstance, $isDevMode);
-                $allPatches = $patchesLoader->loadFromPackagesRepository($repository);
+        $shouldIncludeExcludedPatches = $withExcluded 
+            && (!$statusFilters || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded'));
+        
+        if ($shouldIncludeExcludedPatches) {
+            $patchesLoader = $loaderFactory->create($unfilteredPool, $configInstance, $isDevMode);
+            
+            $allPatches = $listResolver->resolvePatchesQueue(
+                $patchesLoader->loadFromPackagesRepository($repository)
+            );
+            
+            $excludedPatches = $patchListManager->updateStatuses(
+                array_filter($patchListUtils->diffListsByPath($allPatches, $filteredPatches)),
+                'excluded'
+            );
 
-                $excludedPatches = $patchListManager->updateStatuses(
-                    $patchListManager->getPatchListDifference($allPatches, $filteredPatches),
-                    'excluded'
-                );
+            $patches = array_replace_recursive(
+                $patches,
+                $patchListManager->updateStatuses($excludedPatches, 'excluded')
+            );
 
-                $patches = array_replace_recursive(
-                    $patches,
-                    $patchListManager->updateStatuses($excludedPatches, 'excluded')
-                );
-            }
+            array_walk($patches, function (array &$group) {
+                ksort($group);
+            }, $patches);
+        }
+        
+        if ($beBrief) {
+            $patches = $patchListUtils->embedInfoToItems($patches, array(
+                PatchDefinition::LABEL => false,
+                PatchDefinition::OWNER => false
+            ));
         }
         
         $this->generateOutput($output, $patches);
@@ -169,12 +197,22 @@ class ListCommand extends \Composer\Command\BaseCommand
                 $statusLabel = sprintf(' [%s]', $statusDecorators[$status]);
                 $owner = $info[PatchDefinition::OWNER];
                 
-                $output->writeln(sprintf('  ~ <info>%s</info>: %s%s', $owner, $path, $statusLabel));
+                if ($owner === PatchDefinition::OWNER_UNKNOWN) {
+                    $patchInfoLabel = sprintf('  ~ %s%s', $path, $statusLabel);
+                } else if ($owner) {
+                    $patchInfoLabel = sprintf('  ~ <info>%s</info>: %s%s', $owner, $path, $statusLabel);
+                } else {
+                    $patchInfoLabel = sprintf('%s%s', $path, $statusLabel);
+                }
+
+                $output->writeln($patchInfoLabel);
+
+                $descriptionLines = array_filter(
+                    explode(PHP_EOL, $info[PatchDefinition::LABEL])
+                );
                 
-                foreach (explode(PHP_EOL, $info[PatchDefinition::LABEL]) as $line) {
-                    $output->writeln(
-                        sprintf('    <comment>%s</comment>', $line)
-                    );
+                foreach ($descriptionLines as $line) {
+                    $output->writeln(sprintf('    <comment>%s</comment>', $line));
                 }
             }
 

@@ -119,11 +119,11 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
         
-        $defaults = $configDefaults->getPatcherConfig();
+        $defaultValues = $configDefaults->getPatcherConfig();
         
         $config = array(
             Config::PATCHER_SOURCES => array_fill_keys(
-                array_keys($defaults[Config::PATCHER_SOURCES]), 
+                array_keys($defaultValues[Config::PATCHER_SOURCES]), 
                 true
             )
         );

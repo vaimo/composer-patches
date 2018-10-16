@@ -97,6 +97,11 @@ class PatchListManager
 
         $matches = $this->patchListUtils->mergeLists($matches, $removedItems);
 
+        $matches = array_replace(
+            array_intersect_key($packages, $matches),
+            $matches
+        );
+        
         $patchStatuses = preg_grep($statusFilterRegex, $patchStatuses);
 
         foreach ($matches as $target => $items) {
@@ -111,27 +116,9 @@ class PatchListManager
             }
         }
 
-        return array_filter($matches);
-    }    
-    
-    public function getPatchListDifference($list1, $list2)
-    {
-        $result = array();
-        
-        foreach ($list1 as $target => $group) {
-            if (!isset($list2[$target])) {
-                $result[$target] = $group;
-                continue;
-            }
-            
-            if (!$differences = array_diff_key($group, $list2[$target])) {
-                continue;
-            }
-
-            $result[$target] = $differences;
-        }
-
-        return $result;
+        return $this->listResolver->resolvePatchesQueue(
+            array_filter($matches)
+        );
     }
     
     public function updateStatuses(array $patches, $status)

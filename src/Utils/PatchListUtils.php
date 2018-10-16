@@ -42,7 +42,7 @@ class PatchListUtils
                     'path' => $path,
                     'targets' => array($owner),
                     'source' => $path,
-                    'owner' => 'unknown',
+                    'owner' => Patch::OWNER_UNKNOWN,
                     'label' => implode(',', array_slice(explode(',', $label), 0, -1))
                 );
             }
@@ -289,7 +289,10 @@ class PatchListUtils
     {
         foreach ($patches as $target => $group) {
             foreach ($group as $path => $item) {
-                $patches[$target][$path] = array_replace($patches[$target][$path], $updates);
+                $patches[$target][$path] = array_replace(
+                    $patches[$target][$path], 
+                    $updates
+                );
             }
         }
 
@@ -315,9 +318,13 @@ class PatchListUtils
     {
         $result = array();
 
-        foreach ($listA as $key => $items) {
+        $keys = array_unique(
+            array_merge(array_keys($listA), array_keys($listB))
+        );
+        
+        foreach ($keys as $key) {
             $result[$key] = array_replace(
-                $items, 
+                isset($listA[$key]) ? $listA[$key] : array(), 
                 isset($listB[$key]) ? $listB[$key] : array()
             );
         }

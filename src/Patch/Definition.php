@@ -52,5 +52,7 @@ class Definition
     const STATUS_MATCH = 'match';
     const STATUS_LABEL = 'state_label';
     
+    const OWNER_UNKNOWN = 'unknown';
+    
     const STATUS = 'state';
 }
