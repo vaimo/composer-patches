@@ -907,19 +907,23 @@ composer patch:apply
 # Re-apply all patches
 composer patch:redo 
 
-# Re-apply all patches and ignore any local changes on packages
+# Re-apply all patches and ignore any local repository changes on packages
 composer patch:redo --force
 
 # Re-apply patches for one speicif package
+# (Keeps the patches that were not matched, applied)
 composer patch:redo my/package 
 
 # Re-apply all patches except patches declared against my/package
+# (Keeps the patches that were not matched, applied)
 composer patch:redo '!my/package'
 
 # Re-apply patches for one specific package with patch name filter 
+# (Keeps the patches that were not matched, applied)
 composer patch:redo --filter wrong-time-format --filter other-file 
 
 # Re-apply patches and skip filenames that contain 'some<anything>description'  
+# (Keeps the patches that were not matched, applied)
 composer patch:redo --filter '!some*description' my/package 
 
 # Reset all patched packages

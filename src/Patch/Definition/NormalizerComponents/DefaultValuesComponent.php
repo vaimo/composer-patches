@@ -17,6 +17,8 @@ class DefaultValuesComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
                 : '',
             PatchDefinition::STATUS_NEW => true,
             PatchDefinition::STATUS_CHANGED => true,
+            PatchDefinition::STATUS_MATCH => false,
+            PatchDefinition::STATUS_LABEL => ''
         );
     }
 }

@@ -5,6 +5,8 @@
  */
 namespace Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 
+use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+
 class InclusiveListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
 {
     /**
@@ -37,5 +39,10 @@ class InclusiveListResolver implements \Vaimo\ComposerPatches\Interfaces\ListRes
             $this->patchListUtils->filterListByTargets($patches, $targets),
             $matches
         );
+    }
+
+    public function resolveRelevantPatches(array $patches, array $subset)
+    {
+        return $patches;
     }
 }

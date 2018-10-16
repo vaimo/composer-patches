@@ -84,7 +84,7 @@ class PatchesApplier
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
         $this->packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
     }
-
+    
     public function apply(PackageRepository $repository, array $patches)
     {
         $packages = $this->packageCollector->collect($repository);
@@ -98,10 +98,13 @@ class PatchesApplier
         );
 
         $patchQueue = $this->queueGenerator->generate($patches, $repositoryState);
+        
         $resetQueue = array_keys($patchQueue);
 
         $patchQueueFootprints = $this->patchListUtils->createSimplifiedList($patchQueue);
 
+        $outputTriggers = $this->resolveOutputTriggers($patchQueue);
+        
         foreach ($packages as $packageName => $package) {
             $hasPatches = !empty($patchQueue[$packageName]);
 
@@ -133,15 +136,14 @@ class PatchesApplier
                 $packagesUpdated = $packagesUpdated || (bool)$resetResult[$targetName];
             }
 
-            $patchQueue = $this->patchListUtils->updateList(
-                $patchQueue,
-                $this->patchListUtils->generateKnownPatchFlagUpdates(
-                    $packageName,
-                    $resetResult,
-                    $patchQueueFootprints
-                )
+            $updates = $this->patchListUtils->generateKnownPatchFlagUpdates(
+                $packageName, 
+                $resetResult, 
+                $patchQueueFootprints
             );
-
+            
+            $patchQueue = $this->patchListUtils->updateList($patchQueue, $updates);
+            
             $resetQueue = array_diff($resetQueue, $patchTargets);
 
             if (!$hasPatches) {
@@ -149,6 +151,7 @@ class PatchesApplier
             }
 
             $changesMap = array();
+            
             foreach ($patchTargets as $targetName) {
                 $targetQueue = isset($patchQueueFootprints[$targetName])
                     ? $patchQueueFootprints[$targetName]
@@ -180,7 +183,7 @@ class PatchesApplier
                 return array_intersect($data[PatchDefinition::TARGETS], $changedTargets);
             });
 
-            $muteDepth = !$this->shouldNotify($queuedPatches) ? $this->logger->mute() : null;
+            $muteDepth = !$this->shouldNotify($queuedPatches, $outputTriggers) ? $this->logger->mute() : null;
             
             try {
                 $this->processPatchesForPackage($package, $queuedPatches, $repository);
@@ -202,12 +205,34 @@ class PatchesApplier
         return $packagesUpdated;
     }
     
-    private function shouldNotify(array $patchesQueue) 
+    private function resolveOutputTriggers(array $patchQueue)
     {
-        return (bool)array_filter($patchesQueue, function (array $patch) {
-            return (bool)$patch[PatchDefinition::STATUS_NEW] 
-            || $patch[PatchDefinition::STATUS_CHANGED] 
-            || (isset($patch[PatchDefinition::STATUS_LABEL]) && $patch[PatchDefinition::STATUS_LABEL]);
+        $hasFilterMatches = (bool)$this->patchListUtils->applyDefinitionFilter(
+            $patchQueue,
+            true,
+            PatchDefinition::STATUS_MATCH
+        );
+
+        if ($hasFilterMatches) {
+            return array(
+                PatchDefinition::STATUS_MATCH
+            );
+        }
+
+        return array(
+            PatchDefinition::STATUS_NEW,
+            PatchDefinition::STATUS_CHANGED
+        );
+    }
+    
+    private function shouldNotify(array $patchesQueue, $outputTriggers) 
+    {
+        $muteTriggersMatcher = array_flip($outputTriggers);
+        
+        return (bool)array_filter($patchesQueue, function (array $patch) use ($muteTriggersMatcher) {
+            return array_filter(
+                array_intersect_key($patch, $muteTriggersMatcher)
+            );
         });
     } 
     

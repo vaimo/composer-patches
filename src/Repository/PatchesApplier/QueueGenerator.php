@@ -39,19 +39,27 @@ class QueueGenerator
     public function generate(array $patches, array $repositoryState)
     {
         $patchesQueue = $this->listResolver->resolvePatchesQueue($patches);
+        $patches = $this->listResolver->resolveRelevantPatches($patches, $patchesQueue);
+        
         $queueTargets = $this->patchListUtils->getAllTargets($patchesQueue);
-
+        
         $relatedQueue = $this->patchListUtils->getRelatedPatches($patches, $queueTargets);
         $relatedQueueTargets = $this->patchListUtils->getAllTargets($relatedQueue);
 
-        $hardResetStubs = array_diff_key($patchesQueue, array_filter($patchesQueue));
+        $hardResetStubs = array_diff_key(
+            $patchesQueue, 
+            array_filter($patchesQueue)
+        );
         
         $patchesQueue = $this->patchListUtils->filterListByTargets(
             array_replace($patches, $patchesQueue),
             array_merge($relatedQueueTargets, $queueTargets)
         );
 
-        $resetQueue = $this->itemsAnalyser->determinePackageResets($repositoryState, $patchesQueue);
+        $resetQueue = $this->itemsAnalyser->determinePackageResets(
+            $repositoryState, 
+            $patchesQueue
+        );
 
         $hardResetItems = array_diff(
             $resetQueue,

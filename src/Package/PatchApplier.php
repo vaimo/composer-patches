@@ -38,6 +38,11 @@ class PatchApplier
     private $packageUtils;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils 
+     */
+    private $patchListUtils;
+
+    /**
      * @var \Vaimo\ComposerPatches\Patch\Applier
      */
     private $patchApplier;
@@ -81,6 +86,7 @@ class PatchApplier
         $this->vendorRoot = $vendorRoot;
 
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
+        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
 
         $this->stateLabels = array(
             PatchDefinition::STATUS_NEW => 'NEW',
@@ -88,21 +94,47 @@ class PatchApplier
         );
     }
 
-    private function shouldNotify(array $patch)
+    private function resolveOutputTriggers(array $patchQueue)
     {
-        return (bool)$patch[PatchDefinition::STATUS_NEW]
-            || $patch[PatchDefinition::STATUS_CHANGED]
-            || (isset($patch[PatchDefinition::STATUS_LABEL]) && $patch[PatchDefinition::STATUS_LABEL]);
+        $hasFilterMatches = (bool)$this->patchListUtils->applyDefinitionFilter(
+            $patchQueue,
+            true,
+            PatchDefinition::STATUS_MATCH
+        );
+
+        if ($hasFilterMatches) {
+            return array(
+                PatchDefinition::STATUS_MATCH
+            );
+        }
+
+        return array(
+            PatchDefinition::STATUS_NEW,
+            PatchDefinition::STATUS_CHANGED
+        );
     }
-    
+
+    private function shouldNotify(array $patchesQueue, array $outputTriggers)
+    {
+        $muteTriggersMatcher = array_flip($outputTriggers);
+
+        return (bool)array_filter($patchesQueue, function (array $patch) use ($muteTriggersMatcher) {
+            return array_filter(
+                array_intersect_key($patch, $muteTriggersMatcher)
+            );
+        });
+    }
+
     public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
         $appliedPatches = array();
 
+        $outputTriggers = $this->resolveOutputTriggers([$patchesQueue]);
+        
         foreach ($patchesQueue as $source => $info) {
-            $muteDepth = !$this->shouldNotify($info) ? $this->logger->mute() : null;
+            $muteDepth = !$this->shouldNotify([$info], $outputTriggers) ? $this->logger->mute() : null;
             
-            if (isset($info[PatchDefinition::STATUS_LABEL])) {
+            if ($info[PatchDefinition::STATUS_LABEL]) {
                 $labelMatches = array($info[PatchDefinition::STATUS_LABEL]);
             } else {
                 $labelMatches = array_intersect_key($this->stateLabels, array_filter($info));

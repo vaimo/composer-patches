@@ -13,7 +13,7 @@ class PatchListUtils
     {
         $groups = $this->createTargetsList($patches);
 
-        $result =  array_map(function ($group) {
+        $result = array_map(function ($group) {
             return array_map(function($item) {
                 return sprintf(
                     '%s, %s:%s',
@@ -114,6 +114,19 @@ class PatchListUtils
         }
     }
 
+    public function createFlatList(array $patches)
+    {
+        $result = array();
+
+        foreach ($patches as $patchGroup) {
+            foreach ($patchGroup as $patchInfo) {
+                $result[] = $patchInfo;
+            }
+        }
+
+        return $result;
+    }
+    
     public function getAllTargets(array $patches)
     {
         $targetList = array();
@@ -133,6 +146,7 @@ class PatchListUtils
             foreach ($packagePatches as &$patchInfo) {
                 if (!isset($patchInfo[$key])) {
                     $patchInfo = false;
+                    
                     continue;
                 }
 
@@ -145,12 +159,18 @@ class PatchListUtils
                 if (is_string($value) && preg_match($filter, $value)) {
                     continue;
                 }
+                
+                if (is_bool($filter) && $value === $filter) {
+                    continue;
+                }
 
                 $patchInfo = false;
             }
         }
 
-        return array_filter(array_map('array_filter', $patches));
+        return array_filter(
+            array_map('array_filter', $patches)
+        );
     }
     
     public function getRelatedPatches(array $patchesList, array $targets)
@@ -303,5 +323,55 @@ class PatchListUtils
         }
 
         return $result;
+    }
+    
+    public function getAllPaths($patches)
+    {
+        return array_reduce(
+            $patches,
+            function ($result, array $group) {
+                return array_merge(
+                    $result,
+                    array_values(
+                        array_map(function (array $item) {
+                            return $item[Patch::PATH] ? $item[Patch::PATH] : $item[Patch::URL];
+                        }, $group)
+                    )
+                );
+            },
+            array()
+        );
+    }
+    
+    public function diffListsByPath(array $listA, array $listB)
+    {
+        $pathFlags = array_fill_keys($this->getAllPaths($listB), true);
+
+        return array_map(function (array $group) use ($pathFlags) {
+            return array_filter(
+                $group,
+                function (array $item) use ($pathFlags) {
+                    $path = $item[Patch::PATH] ? $item[Patch::PATH] : $item[Patch::URL];
+                    
+                    return !isset($pathFlags[$path]);
+                }
+            );
+        }, $listA);
+    }
+
+    public function intersectListsByPath(array $listA, array $listB)
+    {
+        $pathFlags = array_fill_keys($this->getAllPaths($listB), true);
+
+        return array_map(function (array $group) use ($pathFlags) {
+            return array_filter(
+                $group,
+                function (array $item) use ($pathFlags) {
+                    $path = $item[Patch::PATH] ? $item[Patch::PATH] : $item[Patch::URL];
+
+                    return isset($pathFlags[$path]);
+                }
+            );
+        }, $listA);
     }
 }

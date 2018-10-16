@@ -49,6 +49,7 @@ class Definition
 
     const STATUS_CHANGED = 'changed';
     const STATUS_NEW = 'new';
+    const STATUS_MATCH = 'match';
     const STATUS_LABEL = 'state_label';
     
     const STATUS = 'state';

@@ -33,7 +33,7 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
     public function resolvePatchesQueue(array $patches)
     {
         $exclusions = $this->baseResolver->resolvePatchesQueue($patches);
-        $targets = $this->patchListUtils->getAllTargets($exclusions);
+        $targets = $this->patchListUtils->getAllTargets($patches);
 
         $matches = array();
 
@@ -57,5 +57,10 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
             array_fill_keys($targets, array()),
             $this->patchListUtils->filterListByTargets($matches, $targets)
         );
+    }
+
+    public function resolveRelevantPatches(array $patches, array $subset)
+    {
+        return $this->patchListUtils->intersectListsByPath($patches, $subset);
     }
 }

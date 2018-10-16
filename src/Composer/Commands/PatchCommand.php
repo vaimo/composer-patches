@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Composer\Script\ScriptEvents;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
+use Vaimo\ComposerPatches\Config;
 
 use Vaimo\ComposerPatches\Environment;
 
@@ -91,8 +92,6 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $composer = $this->getComposer();
         $io = $this->getIO();
         
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
-
         $isExplicit = $input->getOption('explicit');
         $isDevMode = !$input->getOption('no-dev');
 
@@ -104,6 +103,10 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $behaviourFlags = $this->getBehaviourFlags($input);
         $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
 
+        if (!array_filter($filters) && $behaviourFlags['redo']) {
+            $isExplicit = true;
+        } 
+        
         $listResolver = new ListResolvers\FilteredListResolver($filters);
         
         if ($shouldUndo) {
@@ -112,23 +115,41 @@ class PatchCommand extends \Composer\Command\BaseCommand
             $listResolver = new ListResolvers\InclusiveListResolver($listResolver);
         }
 
+        $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
+
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+        
+        $defaults = $configDefaults->getPatcherConfig();
+        
         $config = array(
-            \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
-                'project' => true,
-                'packages' => true,
-                'vendors' => true
+            Config::PATCHER_SOURCES => array_fill_keys(
+                array_keys($defaults[Config::PATCHER_SOURCES]), 
+                true
             )
         );
-        
+
+        if ($behaviourFlags['redo'] || $behaviourFlags['undo']) {
+            $runtimeUtils->setEnvironmentValues(array(
+                Environment::EXIT_ON_FAIL => 0,
+                'COMPOSER_EXIT_ON_PATCH_FAILURE' => 0
+            ));
+        }
+
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
+
         $bootstrap = $bootstrapFactory->create($listResolver, $config, $isExplicit);
 
-        putenv(Environment::FORCE_RESET . '=' . (bool)$input->getOption('force'));
-
+        $runtimeUtils->setEnvironmentValues(array(
+            Environment::FORCE_RESET => (int)(bool)$input->getOption('force')
+        ));
+        
         if ($shouldUndo && !array_filter($filters)) {
             $bootstrap->stripPatches($isDevMode);
         } else {
-            putenv(Environment::PREFER_OWNER . '=' . $input->getOption('from-source'));
-            putenv(Environment::FORCE_REAPPLY . '=' . $behaviourFlags['redo']);
+            $runtimeUtils->setEnvironmentValues(array(
+                Environment::PREFER_OWNER => $input->getOption('from-source'),
+                Environment::FORCE_REAPPLY => $behaviourFlags['redo']
+            ));
             
             $bootstrap->applyPatches($isDevMode);
             $bootstrap->sanitizeLocker();

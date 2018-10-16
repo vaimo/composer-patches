@@ -1,9 +1,14 @@
 {
-    "DEV.3.38.1": {
+    "DEV.3.39.0": {
         "feature": [
+            "when using --filter or targeting a specific package with 'redo', 'undo' or 'apply', show only those patches that match with the filter; other patches still applied, just not reported (all actions can still be made visible when using --explicit flag)",
             "... show information about patches that are removed when running without --explicit flag"
         ],
         "fix": [
+            "allow both 'undo' and 'redo' command to finish even when there are errors encountered while re-applying some patches (bundled patches might get re-applied; encountered when doing partial/targeted command call)",
+            "queue resolver re-introducing undo'd patches when patches targeting a package that had bundled patches defined against it",
+            "show all applied patches when running 'redo' command without a filter (otherwise only matched patches are shown)",
+            "hide NEW patches (that might be failing) when doing filtered redo/undo calls to avoid too much noise in output where it's pretty clear that developer is working with a sub-selection of patches (all shown when doing explicit call)",
             "... rework on fix done in 3.37.1 for patches that applied half-way while 'patch' command still returned SUCCESS exit code; using patch command usage output parsing instead due to several issues that posix flag usage introduced"
         ],
         "branch": "release/3"
@@ -130,7 +135,8 @@
         "fix": [
             "patch apply failure on fresh projects under certain conditions when loading the 'patches-applied' from .lock file (which in-between the run is set to 'true')",
             "skip initiating the patches in case composer update is only targeting composer.lock (running update with --lock) and not really installing/updating any modules"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.30.0": {
         "feature": [
@@ -139,12 +145,14 @@
         "fix": [
             "patch:redo not re-applying patches correctly for targeted package when empty patch list provided (in situations where previously patches were applied)",
             "when testing bundled packages with --filter, consider all bundle patch targets as full reset candidates (used to produce inconsistent behaviour)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.29.1": {
         "fix": [
             "patch validation command failing on bundle patches when owned by non-root package"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.29.0": {
         "feature": [
@@ -161,7 +169,8 @@
         "maintenance": [
             "change towards not passing composer instance into functions and using it as dependency instead",
             "make it possible to manipulate composer loader work by toggling or replacing loader components"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.28.1": {
         "fix": [
@@ -178,33 +187,39 @@
             "using patches files on project level or for root repository did not resolve their paths correctly",
             "undo having confusing semantic meaning when used. targeting a specific package now always just targets the package, path filter gets negated on undo command",
             "work towards restoring compatibility with 5.3"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.27.0": {
         "feature": [
             "allow multiple 'patches-depend' declarations for different kind of patches (bundle VS normal patch)",
             "allow wildcards to be used in target names when defining multiple patches-depends items"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.26.0": {
         "feature": [
             "allow multiple patch-base's to be defined based on vendor or full package name"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.25.3": {
         "fix": [
             "missing file added"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.25.2": {
         "fix": [
             "array-based values ended up being treated as version constraints (issue with label-version exploder)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.25.1": {
         "fix": [
             "label-version definition exploder not handling a list of multiple versions correctly"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.25.0": {
         "feature": [
@@ -218,12 +233,14 @@
             "skip flag not correctly moved to the end of the path when using patches-base configuration",
             "don't append the base-path pattern with custom extras and expect users to take charge of making sure that the file name is part of the path",
             "trim whitespace, slash, colon when patch source starts with space"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.24.1": {
         "maintenance": [
-            "debug code removed (shame)"
-        ]
+            "debug code removed (shame!)"
+        ],
+        "branch": "release/3"
     },
     "3.24.0": {
         "feature": [
@@ -237,17 +254,20 @@
         ],
         "maintenance": [
             "composer lock removed; readme mic statistics badges added"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.23.5": {
         "fix": [
             "wrong error message when bundle patch is not found from defined path"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.23.4": {
         "maintenance": [
             "minor modifications to patch filtering logic"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.23.3": {
         "fix": [
@@ -256,7 +276,8 @@
         "maintenance": [
             "definition normalizer split into separate components",
             "patch applier partially split into smaller components"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.23.2": {
         "fix": [
@@ -266,12 +287,14 @@
         "maintenance": [
             "log messages updated to include applied patch count when resetting package",
             "showing [NEW] flag when re-applying patches for a package and patch file was previously not applied"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.23.1": {
         "fix": [
             "bundled patches reset mechanism targeting wrong packages (where root package as owner was being sent to 'patches reset' which caused a crash)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.23.0": {
         "feature": [
@@ -281,29 +304,34 @@
         ],
         "fix": [
             "renamed constants that conflicted with constant names that were reserved in PHP5.3.X"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.22.4": {
         "maintenance": [
             "package meta-data fixes. syntax error in composer.json"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.22.3": {
         "fix": [
             "incorrect re-applying of bundle patch after 'patch' command had been used to exclude it or when single bundle patch was explicitly targeted",
             "package not reset when using --filter (without --redo), even when targeted patches were a subset of what was applied",
             "the --filter flag not properly respected when running 'patch' command with --undo"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.22.2": {
         "fix": [
             "bundled patch targets resolver failing due to patch info loaders being re-arranged and certain array values no longer being available (patch path not available as array keys)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.22.1": {
         "fix": [
             "minor architecture changes around filtering patch files / packages"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.22.0": {
         "feature": [
@@ -312,7 +340,8 @@
         ],
         "fix": [
             "patch exclusion failed to kick in due to bad configuration pass-down from factory to the component that is responsible for the exclusion"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.21.0": {
         "feature": [
@@ -322,7 +351,8 @@
         ],
         "fix": [
             "the --filter argument to work similarly to how package filter narrows down on what is being targeted"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.20.0": {
         "feature": [
@@ -331,7 +361,8 @@
         "fix": [
             "fail early when some of the remote patches fail to download (only for patches that are actually required)",
             "make sure that same patch file is not downloaded twice (might happen with bundled patches)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.19.5": {
         "fix": [
@@ -341,28 +372,33 @@
         "maintenance": [
             "moved patch downloading to be done before any patches are applied",
             "documentation simplified. Using comments in examples to explain what certain config does"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.19.4": {
         "maintenance": [
             "documentation re-organized and simplified"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.19.3": {
         "maintenance": [
             "minor readme and package description updates"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.19.2": {
         "maintenance": [
             "documentation changes. Some explanations re-written. Added example for bundle-patch"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.19.1": {
         "maintenance": [
             "documentation re-organized to prioritize quick comprehension on the basics of the module's functionality",
             "minor code restyle changes"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.19.0": {
         "feature": [
@@ -373,7 +409,8 @@
         ],
         "fix": [
             "removed references to $this within closures (as it's not supported in 5.3.X)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.18.0": {
         "feature": [
@@ -381,7 +418,8 @@
             "patch enabling moved under patcher/sources (project:bool, packages:bool|array, vendors:bool|array). Backwards compatible",
             "allow granular patch sources inclusion (so that only some vendors would be included)",
             "allow some providers to have special extra operations (before this change, every applier was expected to have every listed operation declared)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.17.3": {
         "fix": [
@@ -390,19 +428,22 @@
         "maintenance": [
             "switched to using constants for each free-text array key value + reduced code repetition",
             "logger indentation reworked not to be hardcoded in log messages in text form to open up the chance to switch to different logging methods/formats in the future"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.17.2": {
         "fix": [
             "patches not registered for patch target packages when 'COMPOSER_PATCHES_FATAL_FAIL' enabled and error is encountered"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.17.1": {
         "fix": [
             "composer patch command option 'undo' not working correctly when patching explicitly set to be enabled in composer.json of the project",
             "composer patch command option 'redo' not working correctly when patching explicitly set to be enabled in composer.json of the project",
             "using 'undo' and 'redo' together still triggers 'undo' functionality"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.17.0": {
         "fix": [
@@ -412,7 +453,8 @@
         "maintenance": [
             "code split into smaller classes where applicable to move towards single-responsibility entities in design",
             "reduced the mess around re-using same terminology in too many different contexts"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.16.0": {
         "feature": [
@@ -425,7 +467,8 @@
             "bundled patch was not registering/resetting target packages when performing redo/undo",
             "patches-dev and patches-file not enabling patching by default when defined on project level",
             "having patcher enabled only on project level did not compile patch queue correctly when disabling the option of including patches from packages"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.15.0": {
         "feature": [
@@ -433,12 +476,14 @@
         ],
         "fix": [
             "patch files not loaded from relative path even when they belong to a package rather than being referred directly from the project"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.14.1": {
         "fix": [
             "crash when trying to declare path stripping level for version-branched sources"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.14.0": {
         "feature": [
@@ -451,17 +496,20 @@
         ],
         "maintenance": [
             "changed the 'validate' in patcher configuration key to 'check'. Support for 'validate' kept"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.13.2": {
         "fix": [
             "updated lock to latest due to composer validate error"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.13.1": {
         "fix": [
             "roll-back with 'undo' to reset package when used with specific targets"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.13.0": {
         "feature": [
@@ -473,7 +521,8 @@
             "changed patch applier logic to test different patchers with same level rather than going through all patches with levels in sequence",
             "preferring standard patcher instead of starting with GIT",
             "patches not being reset when removing all patches from patch provider in vendor folder and running '--from-source --redo my/package'"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.12.1": {
         "feature": [
@@ -481,12 +530,14 @@
         ],
         "fix": [
             "properly re-apply all patches when using 'from-source' nad 'redo' arguments together"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.12.0": {
         "feature": [
             "introduced a new composer command to make it easier to re-apply all patches and give newly defined patches a quick test-run (composer patch)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.11.0": {
         "feature": [
@@ -495,28 +546,33 @@
         ],
         "fix": [
             "avoid crashing at the end of a composer operation when vaimo/composer-patches was removed while it was executing, but it's plugin class remains loaded and triggers an action after all install/uninstall actions are done"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.10.4": {
         "fix": [
             "changes to package meta-data"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.10.3": {
         "fix": [
             "crash due to 'missing array key' that's caused by bad comparison in code when using only 'depends' on certain patch declarations"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.10.2": {
         "fix": [
             "declaration of 'depends' was overriding 'version'. Constraints defined on those keys are now merged",
             "patch applied when single version constraint was matched even when multiple ones defined"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.10.1": {
         "maintenance": [
             "changes to package metadata"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.10.0": {
         "feature": [
@@ -528,17 +584,20 @@
         ],
         "maintenance": [
             "code re-organized to centralize the access to env flags"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.9.0": {
         "feature": [
             "added new environment flag to force patcher to extract the patch info from vendor folder instead of using the information from installed.json (mainly for patch maintenance)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.8.1": {
         "fix": [
             "process every source path and check for 'skip' flag. In certain cases, the source-path flag was ignored"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.8.0": {
         "feature": [
@@ -546,18 +605,21 @@
         ],
         "fix": [
             "excluded patches required develop to specify patch owner vendor path instead of just the path that was relative to the patch owner folder"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.7.1": {
         "maintenance": [
             "code cleanup (some debugging code removed)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.7.0": {
         "feature": [
             "added version branching for sequenced items",
             "added simplified version branching format where json object key is constraint and value the source"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.6.0": {
         "feature": [
@@ -566,26 +628,31 @@
         ],
         "fix": [
             "restored backwards compatibility with PHP versions that do not support new new array markup"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.5.2": {
         "fix": [
             "make sure that path normalizer does not touch root-level patch declarations"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.5.1": {
         "fix": [
             "make sure that 'resetting patched package' is not shown when package is indirectly targeted"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.5.0": {
         "feature": [
             "allow bundled patches (that target multiple packages) to be declared, tracked, reverted correctly when changed or removed (see: Bundled patches)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.4.0": {
         "feature": [
             "allow dev-only patches to be declared (see: Development patches)"
-        ]
+        ],
+        "branch": "release/3"
     }
 }

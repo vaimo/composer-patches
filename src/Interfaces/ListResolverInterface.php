@@ -12,4 +12,11 @@ interface ListResolverInterface
      * @return array
      */
     public function resolvePatchesQueue(array $patches);
+
+    /**
+     * @param array $patches
+     * @param array $subset
+     * @return array
+     */
+    public function resolveRelevantPatches(array $patches, array $subset);
 }
