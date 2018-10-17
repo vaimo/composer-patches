@@ -5,8 +5,6 @@
  */
 namespace Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
 class InclusiveListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
 {
     /**

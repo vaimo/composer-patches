@@ -5,7 +5,7 @@
  */
 namespace Vaimo\ComposerPatches\Repository;
 
-use Composer\Repository\WritableRepositoryInterface as PackageRepository;
+use Composer\Repository\WritableRepositoryInterface as Repository;
 use Vaimo\ComposerPatches\Repository\PatchesApplier as Applier;
 use Vaimo\ComposerPatches\Patch\DefinitionList\Loader;
 
@@ -32,7 +32,7 @@ class Processor
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
     
-    public function process(PackageRepository $repository, Loader $loader, Applier $applier)
+    public function process(Repository $repository, Loader $loader, Applier $applier)
     {
         $this->logger->write('info', 'Processing patches configuration');
         

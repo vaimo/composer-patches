@@ -5,8 +5,8 @@
  */
 namespace Vaimo\ComposerPatches\Repository;
 
-use Composer\Repository\WritableRepositoryInterface as PackageRepository;
-use Composer\Package\PackageInterface;
+use Composer\Repository\WritableRepositoryInterface as Repository;
+use Composer\Package\PackageInterface as Package;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class PatchesApplier
@@ -50,21 +50,16 @@ class PatchesApplier
      * @var \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger
      */
     private $patchInfoLogger;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy 
+     */
+    private $outputStrategy;
     
     /**
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Package\PatchApplier\OutputTriggersResolver 
-     */
-    private $outputTriggersResolver;
-    
-    /**
-     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy 
-     */
-    private $outputStrategy;
     
     /**
      * @var \Vaimo\ComposerPatches\Utils\PackageUtils
@@ -89,6 +84,7 @@ class PatchesApplier
      * @param \Vaimo\ComposerPatches\Managers\PatcherStateManager $patcherStateManager
      * @param \Vaimo\ComposerPatches\Repository\State\Analyser $repositoryStateAnalyser
      * @param \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $patchInfoLogger
+     * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy
      * @param \Vaimo\ComposerPatches\Logger $logger
      */
     public function __construct(
@@ -99,6 +95,7 @@ class PatchesApplier
         \Vaimo\ComposerPatches\Managers\PatcherStateManager $patcherStateManager,
         \Vaimo\ComposerPatches\Repository\State\Analyser $repositoryStateAnalyser,
         \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $patchInfoLogger,
+        \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy,
         \Vaimo\ComposerPatches\Logger $logger
     ) {
         $this->packageCollector = $packageCollector;
@@ -114,15 +111,14 @@ class PatchesApplier
             $this->packageCollector
         );
 
-        $this->outputTriggersResolver = new \Vaimo\ComposerPatches\Package\PatchApplier\OutputTriggersResolver();
-        $this->outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy();
+        $this->outputStrategy = $outputStrategy;
         
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
         $this->packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
     }
     
-    public function apply(PackageRepository $repository, array $patches)
+    public function apply(Repository $repository, array $patches)
     {
         $packages = $this->packageCollector->collect($repository);
 
@@ -130,15 +126,19 @@ class PatchesApplier
 
         $repositoryState = $this->repositoryStateGenerator->generate($repository);
         
-        $patchQueue = $this->queueGenerator->generate($patches, $repositoryState);
+        $patchQueue = $this->queueGenerator->generateApplyQueue($patches, $repositoryState);
         
         $resetQueue = array_keys($patchQueue);
 
         $patchQueueFootprints = $this->patchListUtils->createSimplifiedList($patchQueue);
 
-        $outputTriggers = $this->outputTriggersResolver->resolveForPatches($patchQueue);
-        
-        $patchRemovals = $this->collectRemovals($repositoryState, $patchQueue);
+        $patchRemovals = array_replace(
+            array_fill_keys(array_keys($packages), array()),
+            $this->queueGenerator->generateRemovalQueue(
+                array_replace($patches, $patchQueue), 
+                $repositoryState
+            )
+        );
         
         foreach ($packages as $packageName => $package) {
             $hasPatches = !empty($patchQueue[$packageName]);
@@ -214,21 +214,26 @@ class PatchesApplier
                 continue;
             }
 
-            $queuedPatches = array_filter($patchQueue[$packageName], function ($data) use ($changedTargets) {
-                return array_intersect($data[Patch::TARGETS], $changedTargets);
-            });
-
-            $muteDepth = !$this->outputStrategy->shouldAllowForPatches($queuedPatches, $outputTriggers) 
-                ? $this->logger->mute() 
-                : null;
+            $queuedPatches = array_filter(
+                $patchQueue[$packageName],
+                function ($data) use ($changedTargets) {
+                    return array_intersect($data[Patch::TARGETS], $changedTargets);
+                }
+            );
+            
+            $muteDepth = null;
+            
+            if (!$this->shouldAllowOutput($queuedPatches, $patchRemovals[$packageName])) {
+                $muteDepth = $this->logger->mute();
+            } 
             
             try {
                 $this->logger->writeRaw(
                     'Applying patches for <info>%s</info> (%s)',
-                    array($package->getName(), count($queuedPatches))
+                    array($packageName, count($queuedPatches))
                 );
                 
-                if (isset($patchRemovals[$packageName])) {
+                if ($patchRemovals[$packageName]) {
                     $processIndentation = $this->logger->push('~');
 
                     foreach ($patchRemovals[$packageName] as $item) {
@@ -257,9 +262,8 @@ class PatchesApplier
         return $packagesUpdated;
     }
     
-    private function processPatchesForPackage(
-        PackageRepository $repository, PackageInterface $package, $patchesQueue
-    ) {
+    private function processPatchesForPackage(Repository $repository, Package $package, $patchesQueue) 
+    {
         $processIndentation = $this->logger->push('~');
 
         try {
@@ -281,15 +285,9 @@ class PatchesApplier
         }
     }
     
-    private function collectRemovals(array $repositoryState, array $patches)
+    private function shouldAllowOutput(array $patches, array $removals)
     {
-        $removals = array_filter(
-            $this->repositoryStateAnalyser->collectPatchRemovals($repositoryState, $patches)
-        );
-
-        return $this->patchListUtils->embedInfoToItems(
-            $removals,
-            array(Patch::STATE_LABEL => '<fg=red>REMOVED</>')
-        );
+        return $this->outputStrategy->shouldAllowForPatches($patches)
+            || $this->outputStrategy->shouldAllowForPatches($removals);
     }
 }

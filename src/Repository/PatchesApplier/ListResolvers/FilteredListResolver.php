@@ -5,7 +5,7 @@
  */
 namespace Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
 {
@@ -52,8 +52,8 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
             $patches = $this->patchListUtils->embedInfoToItems(
                 $patches,
                 array(
-                    PatchDefinition::STATUS_LABEL => 'MATCH', 
-                    PatchDefinition::STATUS_MATCH => true
+                    Patch::STATUS_LABEL => 'MATCH', 
+                    Patch::STATUS_MATCH => true
                 )
             );
         }

@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Composer\Script\ScriptEvents;
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
 
@@ -96,8 +96,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $isDevMode = !$input->getOption('no-dev');
 
         $filters = array(
-            PatchDefinition::SOURCE => $input->getOption('filter'),
-            PatchDefinition::TARGETS => $input->getArgument('targets')
+            Patch::SOURCE => $input->getOption('filter'),
+            Patch::TARGETS => $input->getArgument('targets')
         );
 
         $behaviourFlags = $this->getBehaviourFlags($input);
@@ -137,7 +137,21 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
 
-        $bootstrap = $bootstrapFactory->create($listResolver, $config, $isExplicit);
+        $hasFilers = array_filter($filters);
+        
+        $outputTriggerFlags = array(
+            Patch::STATUS_NEW => !$hasFilers, 
+            Patch::STATUS_CHANGED => !$hasFilers, 
+            Patch::STATUS_MATCH => true
+        );
+
+        $outputTriggers = array_keys(
+            array_filter($outputTriggerFlags)
+        );
+        
+        $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
+        
+        $bootstrap = $bootstrapFactory->create($listResolver, $outputStrategy, $config, $isExplicit);
 
         $runtimeUtils->setEnvironmentValues(array(
             Environment::FORCE_RESET => (int)(bool)$input->getOption('force')

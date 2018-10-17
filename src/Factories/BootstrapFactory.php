@@ -5,8 +5,10 @@
  */
 namespace Vaimo\ComposerPatches\Factories;
 
-use Vaimo\ComposerPatches\Interfaces\ListResolverInterface;
+use Vaimo\ComposerPatches\Interfaces\ListResolverInterface as ListResolver;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
+use Vaimo\ComposerPatches\Strategies\OutputStrategy;
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class BootstrapFactory
 {
@@ -33,16 +35,26 @@ class BootstrapFactory
     }
 
     public function create(
-        ListResolverInterface $listResolver = null, array $config = array(), $isExplicit = false
+        ListResolver $listResolver = null,
+        OutputStrategy $outputStrategy = null,
+        array $config = array(), 
+        $isExplicit = false
     ) {
         if ($listResolver === null) {
             $listResolver = new ListResolvers\DirectListResolver();
+        }
+        
+        if ($outputStrategy === null) {
+            $outputStrategy = new OutputStrategy(
+                array(Patch::STATUS_NEW, Patch::STATUS_CHANGED, Patch::STATUS_MATCH)
+            );
         }
 
         return new \Vaimo\ComposerPatches\Bootstrap(
             $this->composer, 
             $this->io, 
-            $listResolver, 
+            $listResolver,
+            $outputStrategy,
             $config, 
             $isExplicit
         );

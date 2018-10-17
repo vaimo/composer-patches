@@ -36,6 +36,11 @@ class PatchApplier
      * @var \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger
      */
     private $patchInfoLogger;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy 
+     */
+    private $outputStrategy;
     
     /**
      * @var \Vaimo\ComposerPatches\Logger
@@ -43,21 +48,12 @@ class PatchApplier
     private $logger;
 
     /**
-     * @var \Vaimo\ComposerPatches\Package\PatchApplier\OutputTriggersResolver
-     */
-    private $outputTriggersResolver;
-    
-    /**
-     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy 
-     */
-    private $outputStrategy;
-
-    /**
      * @param \Composer\EventDispatcher\EventDispatcher $eventDispatcher
      * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
      * @param \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler
      * @param \Vaimo\ComposerPatches\Patch\File\Applier $patchApplier
      * @param \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $patchInfoLogger
+     * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy
      * @param \Vaimo\ComposerPatches\Logger $logger
      */
     public function __construct(
@@ -66,29 +62,24 @@ class PatchApplier
         \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler,
         \Vaimo\ComposerPatches\Patch\File\Applier $patchApplier,
         \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $patchInfoLogger,
+        \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy,
         \Vaimo\ComposerPatches\Logger $logger
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->packageInfoResolver = $packageInfoResolver;
         $this->failureHandler = $failureHandler;
-        $this->logger = $logger;
         $this->patchApplier = $patchApplier;
         $this->patchInfoLogger = $patchInfoLogger;
-
-        $this->outputTriggersResolver = new \Vaimo\ComposerPatches\Package\PatchApplier\OutputTriggersResolver();
-        $this->outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy();
+        $this->outputStrategy = $outputStrategy;
+        $this->logger = $logger;
     }
     
     public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
         $appliedPatches = array();
-
-        $outputTriggers = $this->outputTriggersResolver->resolveForPatches(
-            [$patchesQueue]
-        );
         
         foreach ($patchesQueue as $source => $info) {
-            $muteDepth = !$this->outputStrategy->shouldAllowForPatches([$info], $outputTriggers) 
+            $muteDepth = !$this->outputStrategy->shouldAllowForPatches([$info]) 
                 ? $this->logger->mute() 
                 : null;
 

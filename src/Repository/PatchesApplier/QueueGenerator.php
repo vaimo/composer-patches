@@ -5,6 +5,8 @@
  */
 namespace Vaimo\ComposerPatches\Repository\PatchesApplier;
 
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
+
 class QueueGenerator
 {
     /**
@@ -36,7 +38,7 @@ class QueueGenerator
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
-    public function generate(array $patches, array $repositoryState)
+    public function generateApplyQueue(array $patches, array $repositoryState)
     {
         $patchesQueue = $this->listResolver->resolvePatchesQueue($patches);
         $patches = $this->listResolver->resolveRelevantPatches($patches, $patchesQueue);
@@ -73,5 +75,20 @@ class QueueGenerator
         $otherItems = array_intersect_key($patches, array_flip($queueTargets));
         
         return array_replace($hardResetStubs, $otherItems, $patchesQueue);
+    }
+    
+    public function generateRemovalQueue(array $patches, array $repositoryState)
+    {
+        $removals = array_filter(
+            $this->repositoryStateAnalyser->collectPatchRemovals($repositoryState, $patches)
+        );
+        
+        return $this->patchListUtils->embedInfoToItems(
+            $removals,
+            array(
+                Patch::STATE_LABEL => '<fg=red>REMOVED</>',
+                Patch::STATUS_MATCH => true
+            )
+        );
     }
 }

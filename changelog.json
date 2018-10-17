@@ -3,7 +3,7 @@
         "feature": [
             "added --brief to list command (skips over description, etc)",
             "when using --filter or targeting a specific package with 'redo', 'undo' or 'apply', show only those patches that match with the filter; other patches still applied, just not reported (all actions can still be made visible when using --explicit flag)",
-            "show information about patches that are removed when running without --explicit flag"
+            "show information about patches that are removed (when patches are re-applied, show which items were applied, but no longer listed/queued)"
         ],
         "fix": [
             "the command 'list' listing removals even when --filter used",
@@ -14,7 +14,8 @@
             "queue resolver re-introducing undo'd patches when patches targeting a package that had bundled patches defined against it",
             "show all applied patches when running 'redo' command without a filter (otherwise only matched patches are shown)",
             "hide NEW patches (that might be failing) when doing filtered redo/undo calls to avoid too much noise in output where it's pretty clear that developer is working with a sub-selection of patches (all shown when doing explicit call)",
-            "... rework on fix done in 3.37.1 for patches that applied half-way while 'patch' command still returned SUCCESS exit code; using patch command usage output parsing instead due to several issues that posix flag usage introduced"
+            "... patch apply failure not shown correctly when failure caused by a new patch (patches targeting same area of a file; conflicting)",
+            "... rework on fix done in 3.37.1 for patches that applied half-way while 'patch' command still returned SUCCESS exit code; restoring the use of --posix, but also dealing with issue where the file-creation patch fails when target folder does not exist"
         ],
         "branch": "release/3"
     },

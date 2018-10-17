@@ -8,7 +8,8 @@ namespace Vaimo\ComposerPatches\Factories;
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Patch\FailureHandlers;
 use Vaimo\ComposerPatches\Strategies;
-use Vaimo\ComposerPatches\Interfaces\ListResolverInterface;
+use Vaimo\ComposerPatches\Interfaces\ListResolverInterface as ListResolver;
+use Vaimo\ComposerPatches\Strategies\OutputStrategy;
 
 class PatchesApplierFactory
 {
@@ -34,7 +35,7 @@ class PatchesApplierFactory
         $this->logger = $logger;
     }
 
-    public function create(PluginConfig $pluginConfig, ListResolverInterface $listResolver) 
+    public function create(PluginConfig $pluginConfig, ListResolver $listResolver, OutputStrategy $outputStrategy) 
     {
         $composer = $this->composer;
 
@@ -71,6 +72,7 @@ class PatchesApplierFactory
             $failureHandler,
             $patchFileApplier,
             $patchInfoLogger,
+            $outputStrategy,
             $this->logger
         );
 
@@ -112,6 +114,7 @@ class PatchesApplierFactory
             $patcherStateManager,
             $repositoryStateAnalyser,
             $patchInfoLogger,
+            $outputStrategy,
             $this->logger
         );
     }
