@@ -13,9 +13,9 @@ class QueueGenerator
     private $listResolver;
 
     /**
-     * @var \Vaimo\ComposerPatches\Repository\Analyser
+     * @var \Vaimo\ComposerPatches\Repository\State\Analyser
      */
-    private $itemsAnalyser;
+    private $repositoryStateAnalyser;
     
     /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
@@ -24,14 +24,14 @@ class QueueGenerator
     
     /**
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver,
-     * @param \Vaimo\ComposerPatches\Repository\Analyser $itemsAnalyser
+     * @param \Vaimo\ComposerPatches\Repository\State\Analyser $repositoryStateAnalyser
      */
     public function __construct(
         \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver,
-        \Vaimo\ComposerPatches\Repository\Analyser $itemsAnalyser
+        \Vaimo\ComposerPatches\Repository\State\Analyser $repositoryStateAnalyser
     ) {
         $this->listResolver = $listResolver;
-        $this->itemsAnalyser = $itemsAnalyser;
+        $this->repositoryStateAnalyser = $repositoryStateAnalyser;
 
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
@@ -46,17 +46,14 @@ class QueueGenerator
         $relatedQueue = $this->patchListUtils->getRelatedPatches($patches, $queueTargets);
         $relatedQueueTargets = $this->patchListUtils->getAllTargets($relatedQueue);
 
-        $hardResetStubs = array_diff_key(
-            $patchesQueue, 
-            array_filter($patchesQueue)
-        );
+        $hardResetStubs = array_diff_key($patchesQueue, array_filter($patchesQueue));
         
         $patchesQueue = $this->patchListUtils->filterListByTargets(
             array_replace($patches, $patchesQueue),
             array_merge($relatedQueueTargets, $queueTargets)
         );
 
-        $resetQueue = $this->itemsAnalyser->determinePackageResets(
+        $resetQueue = $this->repositoryStateAnalyser->collectPackageResets(
             $repositoryState, 
             $patchesQueue
         );
@@ -69,8 +66,11 @@ class QueueGenerator
         );
 
         $hardResetStubs = array_replace($hardResetStubs, array_fill_keys($hardResetItems, array()));
+        
         $patchesQueue = $this->patchListUtils->filterListByTargets($patchesQueue, $resetQueue);
-        $otherItems = array_intersect_key($patches, array_flip($this->patchListUtils->getAllTargets($patchesQueue)));
+        $queueTargets = $this->patchListUtils->getAllTargets($patchesQueue);
+        
+        $otherItems = array_intersect_key($patches, array_flip($queueTargets));
         
         return array_replace($hardResetStubs, $otherItems, $patchesQueue);
     }

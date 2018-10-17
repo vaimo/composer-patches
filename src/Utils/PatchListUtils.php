@@ -381,4 +381,15 @@ class PatchListUtils
             );
         }, $listA);
     }
+
+    public function updateStatuses(array $patches, $status)
+    {
+        return array_map(function (array $group) use ($status) {
+            return array_map(function (array $patch) use ($status) {
+                return array_replace($patch, array(
+                    Patch::STATUS => $status
+                ));
+            }, $group);
+        }, $patches);
+    }
 }

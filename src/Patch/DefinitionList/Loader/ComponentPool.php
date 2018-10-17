@@ -56,7 +56,12 @@ class ComponentPool
         $composerConfig = clone $this->composer->getConfig();
         $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
 
-        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
+        $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
+
+        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
+            $installationManager, 
+            $vendorRoot
+        );
 
         $defaults = array(
             'bundle' => new LoaderComponents\BundleComponent($rootPackage),

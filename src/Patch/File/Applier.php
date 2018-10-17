@@ -3,7 +3,7 @@
  * Copyright © Vaimo Group. All rights reserved.
  * See LICENSE_VAIMO.txt for license details.
  */
-namespace Vaimo\ComposerPatches\Patch;
+namespace Vaimo\ComposerPatches\Patch\File;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
 
@@ -126,7 +126,9 @@ class Applier
                         if ($passOnFailure) {
                             $this->logger->writeVerbose(
                                 \Vaimo\ComposerPatches\Logger::TYPE_NONE, 
-                                '<comment>***</comment> The expected result to execution is a failure <comment>***</comment>'
+                                '<comment>***</comment> ' 
+                                . 'The expected result to execution is a failure'
+                                . '<comment>***</comment>'
                             );
                         }
 

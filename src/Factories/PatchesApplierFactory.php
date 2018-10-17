@@ -8,6 +8,7 @@ namespace Vaimo\ComposerPatches\Factories;
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Patch\FailureHandlers;
 use Vaimo\ComposerPatches\Strategies;
+use Vaimo\ComposerPatches\Interfaces\ListResolverInterface;
 
 class PatchesApplierFactory
 {
@@ -20,11 +21,6 @@ class PatchesApplierFactory
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Factories\QueueGeneratorFactory
-     */
-    private $queueGeneratorFactory;
     
     /**
      * @param \Composer\Composer $composer
@@ -36,15 +32,10 @@ class PatchesApplierFactory
     ) {
         $this->composer = $composer;
         $this->logger = $logger;
-        
-        $this->queueGeneratorFactory = new \Vaimo\ComposerPatches\Factories\QueueGeneratorFactory(
-            $this->composer
-        );
     }
 
-    public function create(
-        PluginConfig $pluginConfig, \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
-    ) {
+    public function create(PluginConfig $pluginConfig, ListResolverInterface $listResolver) 
+    {
         $composer = $this->composer;
 
         $installationManager = $composer->getInstallationManager();
@@ -56,7 +47,10 @@ class PatchesApplierFactory
 
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
 
-        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
+        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
+            $installationManager, 
+            $vendorRoot
+        );
 
         if ($pluginConfig->shouldExitOnFirstFailure()) {
             $failureHandler = new FailureHandlers\FatalHandler();
@@ -64,26 +58,35 @@ class PatchesApplierFactory
             $failureHandler = new FailureHandlers\GracefulHandler($this->logger);
         }
 
-        $patchApplier = new \Vaimo\ComposerPatches\Patch\Applier(
+        $patchFileApplier = new \Vaimo\ComposerPatches\Patch\File\Applier(
             $this->logger,
             $pluginConfig->getPatcherConfig()
         );
 
+        $patchInfoLogger = new \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger($this->logger);
+        
         $packagePatchApplier = new \Vaimo\ComposerPatches\Package\PatchApplier(
-            $packageInfoResolver,
             $eventDispatcher,
+            $packageInfoResolver,
             $failureHandler,
-            $this->logger,
-            $patchApplier,
-            $vendorRoot
+            $patchFileApplier,
+            $patchInfoLogger,
+            $this->logger
         );
 
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
         
-        $queueGeneratorFactory = new \Vaimo\ComposerPatches\Factories\QueueGeneratorFactory($composer);
+        $repositoryStateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
+            $composer
+        );
 
-        $queueGenerator = $queueGeneratorFactory->create($pluginConfig, $listResolver);
+        $repositoryStateAnalyser = $repositoryStateAnalyserFactory->create($pluginConfig);
 
+        $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
+            $listResolver,
+            $repositoryStateAnalyser
+        );
+        
         $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
 
         if ($pluginConfig->shouldForcePackageReset()) {
@@ -107,6 +110,8 @@ class PatchesApplierFactory
             $packagePatchApplier,
             $queueGenerator,
             $patcherStateManager,
+            $repositoryStateAnalyser,
+            $patchInfoLogger,
             $this->logger
         );
     }

@@ -102,26 +102,39 @@ class ListCommand extends \Composer\Command\BaseCommand
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
         $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
 
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
+        $configInstance = $configFactory->create(array($config));
+        
         $filteredPool = $this->createLoaderPool();
         $unfilteredPool = $this->createLoaderPool(array('constraints', 'local-exclude', 'global-exclude'));
 
         $listResolver = new ListResolvers\FilteredListResolver($filters);
+
+        $repositoryStateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
+            $composer
+        );
+
+        $repositoryStateAnalyser = $repositoryStateAnalyserFactory->create($configInstance);
         
-        $patchListManager = new \Vaimo\ComposerPatches\Managers\PatchListManager($listResolver);
-        
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(array($composer->getPackage()));
 
-        $configInstance = $configFactory->create(array($config));
+        $repositoryAnalyser = new \Vaimo\ComposerPatches\Repository\Analyser(
+            $packageCollector,
+            $repositoryStateAnalyser,
+            $listResolver
+        );
+        
         $repository = $composer->getRepositoryManager()->getLocalRepository();
-
-        $packages = $packageCollector->collect($repository);
-            
+        
         $filteredPatchesLoader = $loaderFactory->create($filteredPool, $configInstance, $isDevMode);
         $filteredPatches = $filteredPatchesLoader->loadFromPackagesRepository($repository);
         
-        $patches = $patchListManager->getPatchesWithStatuses($filteredPatches, $packages, $statusFilters);
+        $patches = $repositoryAnalyser->getPatchesWithStatuses(
+            $repository,
+            $filteredPatches, 
+            $statusFilters
+        );
         
         $shouldIncludeExcludedPatches = $withExcluded 
             && (!$statusFilters || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded'));
@@ -133,14 +146,14 @@ class ListCommand extends \Composer\Command\BaseCommand
                 $patchesLoader->loadFromPackagesRepository($repository)
             );
             
-            $excludedPatches = $patchListManager->updateStatuses(
+            $excludedPatches = $patchListUtils->updateStatuses(
                 array_filter($patchListUtils->diffListsByPath($allPatches, $filteredPatches)),
                 'excluded'
             );
 
             $patches = array_replace_recursive(
                 $patches,
-                $patchListManager->updateStatuses($excludedPatches, 'excluded')
+                $patchListUtils->updateStatuses($excludedPatches, 'excluded')
             );
 
             array_walk($patches, function (array &$group) {

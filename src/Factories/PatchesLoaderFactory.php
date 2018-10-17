@@ -41,11 +41,16 @@ class PatchesLoaderFactory
         $composerConfig = clone $composer->getConfig();
         $patcherConfig = $pluginConfig->getPatcherConfig();
 
+        $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
+
         $composerConfig->merge(array(
             'config' => array('secure-http' => $patcherConfig[PluginConfig::PATCHER_SECURE_HTTP])
         ));
 
-        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver($installationManager);
+        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
+            $installationManager, 
+            $vendorRoot
+        );
 
         $loaders = array(
             PluginConfig::DEFINITIONS_LIST => new SourceLoaders\PatchList(),

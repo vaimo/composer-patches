@@ -5,12 +5,10 @@
  */
 namespace Vaimo\ComposerPatches\Factories;
 
-use Vaimo\ComposerPatches\Repository\ResetsResolvers;
 use Vaimo\ComposerPatches\Patch\PackageResolvers;
 use Vaimo\ComposerPatches\Config as Config;
-use Vaimo\ComposerPatches\Repository\PatchesApplier;
 
-class QueueGeneratorFactory
+class RepositoryStateAnalyserFactory
 {
     /**
      * @var \Composer\Composer
@@ -26,14 +24,12 @@ class QueueGeneratorFactory
         $this->composer = $composer;
     }
 
-    public function create(Config $pluginConfig, \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver)
+    public function create(Config $pluginConfig)
     {
         $resetsResolver = $pluginConfig->shouldResetEverything()
             ? new PackageResolvers\FullResetResolver()
             : new PackageResolvers\MissingPatchesResolver();
         
-        $repositoryAnalyser = new \Vaimo\ComposerPatches\Repository\Analyser($resetsResolver);
-        
-        return new PatchesApplier\QueueGenerator($listResolver, $repositoryAnalyser);
+        return new \Vaimo\ComposerPatches\Repository\State\Analyser($resetsResolver);
     }
 }

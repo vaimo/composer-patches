@@ -5,6 +5,9 @@
  */
 namespace Vaimo\ComposerPatches\Package;
 
+use Composer\Package\PackageInterface;
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
+
 class InfoResolver
 {
     const DEFAULT_PATH = '.';
@@ -15,15 +18,28 @@ class InfoResolver
     private $installationManager;
 
     /**
+     * @var string
+     */
+    private $vendorRoot;
+
+    /**
+     * @var array
+     */
+    private $installPathCache = array();
+    
+    /**
      * @param \Composer\Installer\InstallationManager $installationManager
+     * @param string $vendorRoot
      */
     public function __construct(
-        \Composer\Installer\InstallationManager $installationManager
+        \Composer\Installer\InstallationManager $installationManager,
+        $vendorRoot
     ) {
         $this->installationManager = $installationManager;
+        $this->vendorRoot = $vendorRoot;
     }
     
-    public function getSourcePath(\Composer\Package\PackageInterface $package)
+    public function getSourcePath(PackageInterface $package)
     {
         return !$package instanceof \Composer\Package\RootPackage
             ? $this->installationManager->getInstallPath($package)
@@ -57,5 +73,32 @@ class InfoResolver
         }
         
         return $names;
+    }
+    
+    public function getInstallPath(PackageInterface $package, $resolveMode)
+    {
+        $key = $package->getName() . '|' . $resolveMode;
+
+        if (!isset($this->installPathCache[$key])) {
+            switch ($resolveMode) {
+                case Patch::CWD_VENDOR:
+                    $this->installPathCache[$key] = $this->vendorRoot;
+                    break;
+                case Patch::CWD_PROJECT:
+                    $this->installPathCache[$key] = getcwd();
+                    break;
+                case Patch::CWD_INSTALL:
+                default:
+                    if ($package instanceof \Composer\Package\RootPackage) {
+                        $this->installPathCache[$key] = $this->vendorRoot;
+                    } else {
+                        $this->installPathCache[$key] = $this->getSourcePath($package);
+                    }
+
+                    break;
+            }
+        }
+
+        return $this->installPathCache[$key];
     }
 }
