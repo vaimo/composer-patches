@@ -79,13 +79,17 @@ class Bootstrap
         \Composer\IO\IOInterface $io,
         \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver = null,
         \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy = null,
-        $config = array(),
-        $explicitMode = false
+        $config = array()
+//        , $explicitMode = false
     ) {
         $this->composer = $composer;
         $this->config = $config;
 
-        $logger = new \Vaimo\ComposerPatches\Logger($io, !$explicitMode);
+//        !$explicitMode
+        
+        $logger = new \Vaimo\ComposerPatches\Logger($io
+//            , !$explicitMode
+        );
 
         $this->listResolver = $listResolver;
         $this->outputStrategy = $outputStrategy;

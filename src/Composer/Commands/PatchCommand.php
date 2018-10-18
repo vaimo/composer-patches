@@ -142,7 +142,9 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $outputTriggerFlags = array(
             Patch::STATUS_NEW => !$hasFilers, 
             Patch::STATUS_CHANGED => !$hasFilers, 
-            Patch::STATUS_MATCH => true
+            Patch::STATUS_MATCH => true,
+            Patch::SOURCE => $isExplicit,
+            Patch::URL => $isExplicit
         );
 
         $outputTriggers = array_keys(
@@ -151,7 +153,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         
         $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
         
-        $bootstrap = $bootstrapFactory->create($listResolver, $outputStrategy, $config, $isExplicit);
+        $bootstrap = $bootstrapFactory->create($listResolver, $outputStrategy, $config);
 
         $runtimeUtils->setEnvironmentValues(array(
             Environment::FORCE_RESET => (int)(bool)$input->getOption('force')

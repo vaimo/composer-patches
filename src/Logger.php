@@ -13,11 +13,6 @@ class Logger
      * @var \Composer\IO\IOInterface $io
      */
     private $io;
-
-    /**
-     * @var bool
-     */
-    private $allowMuting;
     
     /**
      * @var array
@@ -31,14 +26,11 @@ class Logger
     
     /**
      * @param \Composer\IO\IOInterface $io
-     * @param bool $allowMuting
      */
     public function __construct(
-        \Composer\IO\IOInterface $io,
-        $allowMuting = true
+        \Composer\IO\IOInterface $io
     ) {
         $this->io = $io;
-        $this->allowMuting = $allowMuting;
     }
 
     /**
@@ -51,14 +43,14 @@ class Logger
 
     public function mute()
     {
-        return $this->allowMuting ? $this->muteDepth++ : null;
+        return $this->muteDepth++;
     }
 
     public function unMute($muteDepth = null)
     {
-        $this->muteDepth = $this->allowMuting 
-            ? ($muteDepth ? $muteDepth : max(--$this->muteDepth, 0)) 
-            : 0;
+        $this->muteDepth = $muteDepth 
+            ? $muteDepth 
+            : max(--$this->muteDepth, 0);
     }
     
     public function writeRaw($message, array $args = array())

@@ -37,8 +37,7 @@ class BootstrapFactory
     public function create(
         ListResolver $listResolver = null,
         OutputStrategy $outputStrategy = null,
-        array $config = array(), 
-        $isExplicit = false
+        array $config = array()
     ) {
         if ($listResolver === null) {
             $listResolver = new ListResolvers\DirectListResolver();
@@ -55,8 +54,7 @@ class BootstrapFactory
             $this->io, 
             $listResolver,
             $outputStrategy,
-            $config, 
-            $isExplicit
+            $config
         );
     }    
 }

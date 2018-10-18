@@ -25,10 +25,13 @@ class OutputStrategy
     {
         $muteTriggersMatcher = array_flip($this->outputTriggers);
 
-        return (bool)array_filter($patches, function (array $patch) use ($muteTriggersMatcher) {
-            return array_filter(
-                array_intersect_key($patch, $muteTriggersMatcher)
-            );
-        });
+        return (bool)array_filter(
+            $patches,
+            function (array $patch) use ($muteTriggersMatcher) {
+                return array_filter(
+                    array_intersect_key($patch, $muteTriggersMatcher)
+                );
+            }
+        );
     }
 }
