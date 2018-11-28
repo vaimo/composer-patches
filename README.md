@@ -735,6 +735,9 @@ Some things to point out on patcher configuration:
 8. By default, the patcher will halt when encountering a package that has local changes to avoid developer
    losing their work by accident. the 'force-reset' flag will force the patcher to continue resetting the 
    package code even when there are changes.
+9. The key 'operation-failures' provides developer an opportunity to fail an operation based on custom 
+   output assessment (even when the original command returns with an exit code that seems to indicate that 
+   the execution was successful).
 
 Appliers are executed in the sequence dictated by sequence where several path levels are used with 
 validation until validation success is hit. Note that each applier will be visited before moving on to 
