@@ -690,8 +690,8 @@ _Note that by default, user does not really have to declare any of this, but eve
         },
         "PATCH": {
           "bin": ["which custom-patcher", "which patch"],
-          "check": "[[bin]] -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
-          "patch": "[[bin]] -p{{level}} --no-backup-if-mismatch < {{file}}"
+          "check": "[[bin]] -t --verbose -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
+          "patch": "[[bin]] -t -p{{level}} --no-backup-if-mismatch < {{file}}"
         }
       },
       "operations": {
@@ -737,7 +737,8 @@ Some things to point out on patcher configuration:
    package code even when there are changes.
 9. The key 'operation-failures' provides developer an opportunity to fail an operation based on custom 
    output assessment (even when the original command returns with an exit code that seems to indicate that 
-   the execution was successful).
+   the execution was successful). Operation failures are defined separately for each operation and can be
+   customised in root package configuration;   
 
 Appliers are executed in the sequence dictated by sequence where several path levels are used with 
 validation until validation success is hit. Note that each applier will be visited before moving on to 
