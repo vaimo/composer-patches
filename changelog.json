@@ -1,4 +1,25 @@
 {
+    "DEV.4.8.0": {
+        "overview": "all features and fixes in this release are forward-ported from 3.39.0",
+        "feature": [
+            "added --brief to list command (skips over description, etc)",
+            "when using --filter or targeting a specific package with 'redo', 'undo' or 'apply', show only those patches that match with the filter; other patches still applied, just not reported (all actions can still be made visible when using --explicit flag)",
+            "show information about patches that are removed (when patches are re-applied, show which items were applied, but no longer listed/queued)"
+        ],
+        "fix": [
+            "rework on fix done in 3.37.1 for patches that applied half-way while 'patch' command still returned SUCCESS exit code; perform patch command dry-apply output analysis to detect edge-cases that should be considered as failures",
+            "the command 'list' listing removals even when --filter used",
+            "the command 'list' --excluded option not properly dealing with filter when --filter used",
+            "the command 'list' not listing removals when every patch against some package gets removed",
+            "the command 'list' always listing removed items, even when they do not match with used filter",
+            "allow both 'undo' and 'redo' command to finish even when there are errors encountered while re-applying some patches (bundled patches might get re-applied; encountered when doing partial/targeted command call); suppress environment flags that tell otherwise (apply still stops on first failure when required)",
+            "queue resolver re-introducing undo'd patches when patches targeting a package that had bundled patches defined against it",
+            "show all applied patches when running 'redo' command without a filter (otherwise only matched patches are shown)",
+            "hide NEW patches (that might be failing) when doing filtered redo/undo calls to avoid too much noise in output where it's pretty clear that developer is working with a sub-selection of patches (all shown when doing explicit call)",
+            "... patch apply failure not shown correctly when failure caused by a new patch (patches targeting same area of a file; conflicting)",
+            "... composer lock still modified when applying patches (leaves empty EXTRA key behind where there previously wasn't one present)"
+        ]
+    },
     "4.7.0": {
         "feature": [
             "forward-port(3.38.0): hide all information on previously applied patches by default (when patches for certain package are re-applied) and only show the ones that changed, are new or got matches with a filter (--explicit flag added for commands to use old output that shows every patch that gets re-applied)"
