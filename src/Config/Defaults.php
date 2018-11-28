@@ -12,6 +12,9 @@ class Defaults
     public function getPatcherConfig()
     {
         return array(
+            Config::PATCHER_GRACEFUL => false,
+            Config::PATCHER_FROM_SOURCE => false,
+            Config::PATCHER_FORCE_REAPPLY => false,
             Config::PATCHER_SECURE_HTTP => true,
             Config::PATCHER_FORCE_RESET => false,
             Config::PATCHER_SOURCES => array(

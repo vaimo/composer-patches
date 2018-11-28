@@ -8,7 +8,9 @@ namespace Vaimo\ComposerPatches\Composer\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
+use Vaimo\ComposerPatches\Config;
 
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
@@ -35,12 +37,12 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $composer = $this->getComposer();
         $io = $this->getIO();
 
+
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+        $defaults = $configDefaults->getPatcherConfig();
+
         $config = array(
-            \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
-                'project' => true,
-                'packages' => true,
-                'vendors' => true
-            )
+            Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)
         );
 
         $loaderComponentsPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
@@ -48,7 +50,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $io
         );
 
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
+            Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source')
+        ));
+
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
 
         $repository = $composer->getRepositoryManager()->getLocalRepository();
