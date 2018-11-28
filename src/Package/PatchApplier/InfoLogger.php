@@ -43,8 +43,7 @@ class InfoLogger
 
         $label = $labelMatches ? vsprintf(' [<info>%s</info>]', $labelMatches) : '';
 
-        $isOwnerUnknown = !$patch[Patch::OWNER]
-            || $patch[Patch::OWNER] === Patch::OWNER_UNKNOWN;
+        $isOwnerUnknown = !$patch[Patch::OWNER] || $patch[Patch::OWNER] === Patch::OWNER_UNKNOWN;
 
         if ($isOwnerUnknown) {
             $this->logger->writeRaw('%s%s', array($patch[Patch::SOURCE], $label));

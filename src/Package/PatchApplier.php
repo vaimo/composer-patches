@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Package;
 
 use Composer\Package\PackageInterface;
+
 use Vaimo\ComposerPatches\Patch\Event;
 use Vaimo\ComposerPatches\Events;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
@@ -83,9 +84,7 @@ class PatchApplier
                 ? $this->logger->mute() 
                 : null;
 
-            $patchInfo = array_replace($info, array(
-                Patch::SOURCE => $source
-            ));
+            $patchInfo = array_replace($info, array(Patch::SOURCE => $source));
             
             $this->patchInfoLogger->outputPatchSource($patchInfo);
 
@@ -95,14 +94,14 @@ class PatchApplier
 
             try {
                 $result = $this->processPackagePatch($package, $patchInfo);
-            } catch (\Exception $e) {
+            } catch (\Exception $exception) {
                 $this->logger->reset($loggerIndentation);
                 
                 if ($muteDepth !== null) {
                     $this->logger->unMute($muteDepth);
                 }
 
-                throw $e;
+                throw $exception;
             }
 
             $this->logger->reset($loggerIndentation);

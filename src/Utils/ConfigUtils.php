@@ -70,6 +70,7 @@ class ConfigUtils
     public function sortApplierConfig(array $config)
     {
         $sequences = $config[Config::PATCHER_SEQUENCE];
+        
         $sequencedConfigItems = array_keys($sequences);
 
         foreach ($sequencedConfigItems as $item) {
@@ -87,5 +88,35 @@ class ConfigUtils
         }
 
         return $config;
+    }
+    
+    public function validateConfig(array $config)
+    {
+        $patchers = $this->extractArrayValue($config, Config::PATCHER_APPLIERS);
+        
+        $sequenceConfig = $config[Config::PATCHER_SEQUENCE];
+
+        $patcherSequence = array_filter(
+            $this->extractArrayValue($sequenceConfig, Config::PATCHER_APPLIERS)
+        );
+        
+        if ((!$patcherSequence || array_intersect_key($patchers, array_flip($patcherSequence))) 
+            && is_array($patchers) && array_filter($patchers)
+        ) {
+            return;
+        }
+        
+        if ($patcherSequence) {
+            $message = sprintf('No valid patchers found for sequence: %s', implode(',', $patcherSequence));
+        } else {
+            $message = 'No valid patchers defined';
+        }
+        
+        throw new \Vaimo\ComposerPatches\Exceptions\ConfigValidationException($message);
+    }
+
+    private function extractArrayValue($data, $key)
+    {
+        return isset($data[$key]) ? $data[$key] : array();
     }
 }

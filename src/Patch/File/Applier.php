@@ -56,51 +56,35 @@ class Applier
         
         list($type, $patchLevel, $operationName) = array_fill(0, 3, 'UNKNOWN');
 
-        $applierConfig = $this->applierUtils->mergeApplierConfig(
-            $this->config, 
-            array_filter($config)
-        );
-
+        $applierConfig = $this->applierUtils->mergeApplierConfig($this->config, array_filter($config));
+        
         $applierConfig = $this->applierUtils->sortApplierConfig($applierConfig);
-        
-        $patchers = isset($applierConfig[PluginConfig::PATCHER_APPLIERS]) 
-            ? array_filter($applierConfig[PluginConfig::PATCHER_APPLIERS]) 
-            : array();
-        
-        $operations = isset($applierConfig[PluginConfig::PATCHER_OPERATIONS]) 
-            ? array_filter($applierConfig[PluginConfig::PATCHER_OPERATIONS]) 
-            : array();
-        
-        $levels = isset($applierConfig[PluginConfig::PATCHER_LEVELS]) 
-            ? $applierConfig[PluginConfig::PATCHER_LEVELS] 
-            : array();
 
-        $patcherSequence = $applierConfig[PluginConfig::PATCHER_SEQUENCE][PluginConfig::PATCHER_APPLIERS];
-
-        $failureMessages = isset($applierConfig[PluginConfig::PATCHER_FAILURES])
-            ? array_filter($applierConfig[PluginConfig::PATCHER_FAILURES])
-            : array();
+        $patchers = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_APPLIERS);
+        $operations = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_OPERATIONS);
+        $levels = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_LEVELS);
+        $failureMessages = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_FAILURES);
         
-        if (!$patchers) {
-            $this->logger->writeVerbose(
-                'error',
-                sprintf(
-                    'No valid patchers found with sequence: %s', 
-                    implode(',', $patcherSequence)
-                )
-            );
+        try {
+            $this->applierUtils->validateConfig($applierConfig);
+        } catch (\Vaimo\ComposerPatches\Exceptions\ConfigValidationException $exception) {
+            $this->logger->writeVerbose('error', $exception->getMessage());
         }
         
-        $patters = array(
+        $variableEscapers = array(
             '{{%s}}' => 'escapeshellarg',
             '[[%s]]' => false
         );
 
         $resultCache = array();
         
-        foreach ($levels as $sequenceIndex => $patchLevel) {
+        foreach ($levels as $patchLevel) {
             foreach ($patchers as $type => $patcher) {
                 $result = true;
+                
+                if (!$patcher) {
+                    continue;
+                }
                 
                 $operationResults[$type] = array_fill_keys(array_keys($operations), '');
                 
@@ -119,11 +103,11 @@ class Applier
                         ? $patcher[$operationCode] 
                         : array($patcher[$operationCode]);
                     
-                    foreach ($applierOperations as $applierOperation) {
-                        $passOnFailure = substr($applierOperation, 0, 1) === '!';
-                        $applierOperation = ltrim($applierOperation, '!');
+                    foreach ($applierOperations as $operation) {
+                        $passOnFailure = substr($operation, 0, 1) === '!';
+                        $operation = ltrim($operation, '!');
                         
-                        $command = $this->templateUtils->compose($applierOperation, $arguments, $patters);
+                        $command = $this->templateUtils->compose($operation, $arguments, $variableEscapers);
 
                         $resultKey = $cwd . '|' . $command;
 
@@ -136,31 +120,17 @@ class Applier
                             );
                         }
 
-                        if (!isset($resultCache[$command])) {
+                        if (!isset($resultCache[$resultKey])) {
                             $resultCache[$resultKey] = $this->shell->execute($command, $cwd);
                         }
 
                         list($result, $output) = $resultCache[$resultKey];
                         
-                        if ($result && isset($failureMessages[$operationCode])) {
-                            foreach ($failureMessages[$operationCode] as $patternCode => $pattern) {
-                                if (!$pattern || !preg_match($pattern, $output)) {
-                                    continue;
-                                }
-
-                                $this->logger->writeVerbose(
-                                    'warning',
-                                    sprintf(
-                                        'Success changed to FAILURE due to match (%s): %s', 
-                                        $patternCode, 
-                                        $pattern
-                                    )
-                                );
-
-                                $result = false;
-
-                                break;
-                            }
+                        if ($result) {
+                            $result = $this->scanOutputForFailures(
+                                $output, 
+                                $this->extractArrayValue($failureMessages, $operationCode)
+                            );
                         }
                         
                         if ($passOnFailure) {
@@ -206,5 +176,32 @@ class Applier
                 sprintf('Cannot apply patch %s', $filename)
             );
         }
+    }
+    
+    private function scanOutputForFailures($output, array $failureMessages)
+    {
+        foreach ($failureMessages as $patternCode => $pattern) {
+            if (!$pattern || !preg_match($pattern, $output)) {
+                continue;
+            }
+
+            $this->logger->writeVerbose(
+                'warning',
+                sprintf(
+                    'Success changed to FAILURE due to output analysis (%s): %s',
+                    $patternCode,
+                    $pattern
+                )
+            );
+
+            return false;
+        }
+        
+        return true;
+    }
+
+    private function extractArrayValue($data, $key)
+    {
+        return isset($data[$key]) ? $data[$key] : array();
     }
 }
