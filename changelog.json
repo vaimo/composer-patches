@@ -6,6 +6,7 @@
             "show information about patches that are removed (when patches are re-applied, show which items were applied, but no longer listed/queued)"
         ],
         "fix": [
+            "rework on fix done in 3.37.1 for patches that applied half-way while 'patch' command still returned SUCCESS exit code; perform patch command dry-apply output analysis to detect edge-cases that should be considered as failures",
             "the command 'list' listing removals even when --filter used",
             "the command 'list' --excluded option not properly dealing with filter when --filter used",
             "the command 'list' not listing removals when every patch against some package gets removed",
@@ -14,8 +15,7 @@
             "queue resolver re-introducing undo'd patches when patches targeting a package that had bundled patches defined against it",
             "show all applied patches when running 'redo' command without a filter (otherwise only matched patches are shown)",
             "hide NEW patches (that might be failing) when doing filtered redo/undo calls to avoid too much noise in output where it's pretty clear that developer is working with a sub-selection of patches (all shown when doing explicit call)",
-            "... patch apply failure not shown correctly when failure caused by a new patch (patches targeting same area of a file; conflicting)",
-            "... rework on fix done in 3.37.1 for patches that applied half-way while 'patch' command still returned SUCCESS exit code; restoring the use of --posix, but also dealing with issue where the file-creation patch fails when target folder does not exist"
+            "... patch apply failure not shown correctly when failure caused by a new patch (patches targeting same area of a file; conflicting)"
         ],
         "branch": "release/3"
     },
