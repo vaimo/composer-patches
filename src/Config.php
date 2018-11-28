@@ -28,6 +28,7 @@ class Config
     const PATCHER_CONFIG_ROOT = 'patcher';
     const PATCHER_APPLIERS = 'appliers';
     const PATCHER_OPERATIONS = 'operations';
+    const PATCHER_FAILURES = 'operation-failures';
     const PATCHER_SEQUENCE = 'sequence';
     const PATCHER_LEVELS = 'levels';
     const PATCHER_SOURCES = 'sources';

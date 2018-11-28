@@ -700,6 +700,11 @@ _Note that by default, user does not really have to declare any of this, but eve
         "check": "Patch validation",
         "patch": "Patching"
       },
+      "operation-failures": {
+        "check": {
+          "garbage": "/(\\n|^)Hmm\\.\\.\\.  Ignoring the trailing garbage/"
+        }
+      },
       "sequence": {
         "appliers": ["PATCH", "GIT"],
         "operations": ["bin", "ping", "check", "patch"]

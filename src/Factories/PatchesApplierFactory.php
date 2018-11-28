@@ -39,17 +39,19 @@ class PatchesApplierFactory
     {
         $composer = $this->composer;
 
-        $installationManager = $composer->getInstallationManager();
-        $downloadManager = $composer->getDownloadManager();
+        $installer = $composer->getInstallationManager();
+        $downloader = $composer->getDownloadManager();
 
         $eventDispatcher = $composer->getEventDispatcher();
         $rootPackage = $composer->getPackage();
         $composerConfig = $composer->getConfig();
 
+        $output = $this->logger->getOutputInstance();
+
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
 
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
-            $installationManager, 
+            $installer, 
             $vendorRoot
         );
 
@@ -94,15 +96,12 @@ class PatchesApplierFactory
         if ($pluginConfig->shouldForcePackageReset()) {
             $packageResetStrategy = new Strategies\Package\ForcedResetStrategy();
         } else {
-            $packageResetStrategy = new Strategies\Package\DefaultResetStrategy(
-                $installationManager,
-                $downloadManager
-            );
+            $packageResetStrategy = new Strategies\Package\DefaultResetStrategy($installer, $downloader);
         }
 
         $repositoryManager = new \Vaimo\ComposerPatches\Managers\RepositoryManager(
-            $this->logger->getOutputInstance(),
-            $installationManager,
+            $output,
+            $installer,
             $packageResetStrategy
         );
 

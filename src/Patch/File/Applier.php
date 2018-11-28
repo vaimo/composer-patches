@@ -77,6 +77,10 @@ class Applier
 
         $patcherSequence = $applierConfig[PluginConfig::PATCHER_SEQUENCE][PluginConfig::PATCHER_APPLIERS];
 
+        $failureMessages = isset($applierConfig[PluginConfig::PATCHER_FAILURES])
+            ? array_filter($applierConfig[PluginConfig::PATCHER_FAILURES])
+            : array();
+        
         if (!$patchers) {
             $this->logger->writeVerbose(
                 'error',
@@ -137,6 +141,27 @@ class Applier
                         }
 
                         list($result, $output) = $resultCache[$resultKey];
+                        
+                        if ($result && isset($failureMessages[$operationCode])) {
+                            foreach ($failureMessages[$operationCode] as $patternCode => $pattern) {
+                                if (!$pattern || !preg_match($pattern, $output)) {
+                                    continue;
+                                }
+
+                                $this->logger->writeVerbose(
+                                    'warning',
+                                    sprintf(
+                                        'Success changed to FAILURE due to match (%s): %s', 
+                                        $patternCode, 
+                                        $pattern
+                                    )
+                                );
+
+                                $result = false;
+
+                                break;
+                            }
+                        }
                         
                         if ($passOnFailure) {
                             $result = !$result;

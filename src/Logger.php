@@ -41,6 +41,11 @@ class Logger
         return $this->io;
     }
 
+    public function isMuted()
+    {
+        return (bool)$this->muteDepth;
+    }
+    
     public function mute()
     {
         return $this->muteDepth++;
@@ -80,7 +85,7 @@ class Logger
         if (!$this->io->isVerbose()) {
             return;
         }
-
+        
         $this->write($type, $message, $args);
     }
     

@@ -22,7 +22,7 @@ class RepositoryManager
     /**
      * @var \Composer\Installer\InstallationManager
      */
-    private $installationManager;
+    private $installer;
 
     /**
      * @var \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface
@@ -31,16 +31,16 @@ class RepositoryManager
 
     /**
      * @param \Composer\IO\ConsoleIO $io
-     * @param \Composer\Installer\InstallationManager $installationManager
+     * @param \Composer\Installer\InstallationManager $installer
      * @param \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface $packageResetStrategy
      */
     public function __construct(
         \Composer\IO\ConsoleIO $io,
-        \Composer\Installer\InstallationManager $installationManager,
+        \Composer\Installer\InstallationManager $installer,
         \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface $packageResetStrategy
     ) {
         $this->io = $io;
-        $this->installationManager = $installationManager;
+        $this->installer = $installer;
         $this->packageResetStrategy = $packageResetStrategy;
     }
 
@@ -59,7 +59,7 @@ class RepositoryManager
         }
 
         try {
-            $this->installationManager->install($repository, $operation);
+            $this->installer->install($repository, $operation);
         } catch (\Exception $exception) {
             OutputUtils::resetVerbosity($this->io, $verbosityLevel);
 

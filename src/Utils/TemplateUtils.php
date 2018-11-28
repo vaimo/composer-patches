@@ -70,7 +70,11 @@ class TemplateUtils
                 )
             );
         }
-
-        return str_replace(array_keys($variables), $variables, $template);
+        
+        return str_replace(
+            array_keys($variables), 
+            array_map('trim', $variables), 
+            $template
+        );
     }
 }

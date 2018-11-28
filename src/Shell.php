@@ -13,9 +13,9 @@ class Shell
     private $logger;
 
     /**
-     * @var \Composer\Util\ProcessExecutor
+     * @var \Composer\Util\ProcessExecutor[]
      */
-    private $processExecutor;
+    private $processExecutors = array();
 
     /**
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -24,18 +24,18 @@ class Shell
         \Vaimo\ComposerPatches\Logger $logger
     ) {
         $this->logger = $logger;
-
-        $this->processExecutor =  new \Composer\Util\ProcessExecutor($logger->getOutputInstance());
     }
 
     public function execute($command, $cwd = null)
     {
+        $processExecutor = $this->getProcessExecutor();
+
         $logger = $this->logger;
 
         $output = '';
         
         $outputHandler = function ($type, $data) use ($logger, &$output) {
-            $output = $output . trim($data);
+            $output = $output . $data;
             
             $logger->writeVerbose('comment', trim($data));
         };
@@ -44,8 +44,23 @@ class Shell
             $this->logger->writeIndentation();
         }
         
-        $result = $this->processExecutor->execute($command, $outputHandler, $cwd);
+        $result = $processExecutor->execute($command, $outputHandler, $cwd);
 
         return array($result == 0, $output);
+    }
+    
+    private function getProcessExecutor()
+    {
+        $output = $this->logger->getOutputInstance();
+
+        $isMutedFlag = (int)$this->logger->isMuted();
+        
+        if (!isset($this->processExecutors[$isMutedFlag])) {
+            $this->processExecutors[$isMutedFlag] = new \Composer\Util\ProcessExecutor(
+                $isMutedFlag ? null : $output
+            );
+        }
+
+        return $this->processExecutors[$isMutedFlag];
     }
 }

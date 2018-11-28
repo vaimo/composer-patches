@@ -46,6 +46,15 @@ class ConfigUtils
             }
         }
 
+        if (isset($updates[Config::PATCHER_FAILURES])) {
+            foreach ($updates[Config::PATCHER_FAILURES] as $code => $patterns) {
+                $config[Config::PATCHER_FAILURES][$code] = array_replace(
+                    $config[Config::PATCHER_FAILURES][$code], 
+                    $patterns
+                );
+            }
+        }
+        
         $config[Config::PATCHER_OPERATIONS] = array_replace(
             $config[Config::PATCHER_OPERATIONS],
             isset($updates[Config::PATCHER_OPERATIONS]) ? $updates[Config::PATCHER_OPERATIONS] : array()

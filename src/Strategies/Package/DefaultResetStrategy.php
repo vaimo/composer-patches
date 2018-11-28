@@ -5,41 +5,41 @@
  */
 namespace Vaimo\ComposerPatches\Strategies\Package;
 
-use \Composer\Downloader\VcsCapableDownloaderInterface as VcsCapable;
-use \Composer\Downloader\ChangeReportInterface as ChangeReportCapable;
+use Composer\Downloader\VcsCapableDownloaderInterface as VcsCapable;
+use Composer\Downloader\ChangeReportInterface as ChangeReportCapable;
 
 class DefaultResetStrategy implements \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface
 {
     /**
      * @var \Composer\Installer\InstallationManager
      */
-    private $installationManager;
+    private $installer;
 
     /**
      * @var \Composer\Downloader\DownloadManager
      */
-    private $downloadManager;
+    private $downloader;
 
     /**
-     * @param \Composer\Installer\InstallationManager $installationManager
-     * @param \Composer\Downloader\DownloadManager $downloadManager
+     * @param \Composer\Installer\InstallationManager $installer
+     * @param \Composer\Downloader\DownloadManager $downloader
      */
     public function __construct(
-        \Composer\Installer\InstallationManager $installationManager,
-        \Composer\Downloader\DownloadManager $downloadManager
+        \Composer\Installer\InstallationManager $installer,
+        \Composer\Downloader\DownloadManager $downloader
     ) {
-        $this->installationManager = $installationManager;
-        $this->downloadManager = $downloadManager;
+        $this->installer = $installer;
+        $this->downloader = $downloader;
     }
 
     public function shouldAllowReset(\Composer\Package\PackageInterface $package)
     {
-        $downloader = $this->downloadManager->getDownloaderForInstalledPackage($package);
+        $downloader = $this->downloader->getDownloaderForInstalledPackage($package);
 
         if ($downloader instanceof ChangeReportCapable && $downloader instanceof VcsCapable) {
-            $installPath = $this->installationManager->getInstallPath($package);
+            $installPath = $this->installer->getInstallPath($package);
 
-            return !(bool)$downloader->getLocalChanges($package , $installPath);
+            return !(bool)$downloader->getLocalChanges($package, $installPath);
         }
 
         return true;

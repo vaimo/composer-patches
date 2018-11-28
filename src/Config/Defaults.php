@@ -28,8 +28,8 @@ class Defaults
                 ),
                 'PATCH' => array(
                     'bin' => 'which patch',
-                    'check' => '[[bin]] -t --posix -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
-                    'patch' => '[[bin]] -t --posix -p{{level}} --no-backup-if-mismatch < {{file}}'
+                    'check' => '[[bin]] -t --verbose -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
+                    'patch' => '[[bin]] -t -p{{level}} --no-backup-if-mismatch < {{file}}'
                 )
             ),
             Config::PATCHER_OPERATIONS => array(
@@ -37,6 +37,11 @@ class Defaults
                 'bin' => 'Availability test',
                 'check' => 'Validation',
                 'patch' => 'Patching'
+            ),
+            Config::PATCHER_FAILURES => array(
+                'check' => array(
+                    'garbage' => '/(\n|^)Hmm\.\.\.  Ignoring the trailing garbage/'
+                )
             ),
             Config::PATCHER_SEQUENCE => array(
                 Config::PATCHER_APPLIERS => array('PATCH', 'GIT'),
