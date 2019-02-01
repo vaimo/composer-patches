@@ -74,6 +74,23 @@ Alternatively the patch can be targeted with configuring it via [providing the d
 
 #### 4. make sure the patch actually applies
 
+Check that the new patch is visible to the applier
+
+```shell
+composer patch:list --from-source --status new
+```
+
+The output should be something similar to this:
+
+```shell
+some/package-name
+  ~ vaimo/patch-owner: patches/path/hatever-your-patch-is-called.patch [NEW]
+    This patch changes... 
+    absolutely everything
+```
+
+#### 5. make sure the patch actually applies
+
 Test out the added patch (in project root).
 
 ```shell
@@ -96,7 +113,7 @@ Processing patches configuration
 All patches are applied when after all packages are installed to allow any package to provide patches for 
 any other package.
 
-#### 5. (demo) simulate normal flow of applying the patch
+#### 6. (demo) simulate normal flow of applying the patch
 
 ```shell
 composer patch:undo # remove the patch that we added at the last step
