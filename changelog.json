@@ -15,8 +15,7 @@
             "queue resolver re-introducing undo'd patches when patches targeting a package that had bundled patches defined against it",
             "show all applied patches when running 'redo' command without a filter (otherwise only matched patches are shown)",
             "hide NEW patches (that might be failing) when doing filtered redo/undo calls to avoid too much noise in output where it's pretty clear that developer is working with a sub-selection of patches (all shown when doing explicit call)",
-            "... patch apply failure not shown correctly when failure caused by a new patch (patches targeting same area of a file; conflicting)",
-            "... composer lock still modified when applying patches (leaves empty EXTRA key behind where there previously wasn't one present)"
+            "composer lock still modified when applying patches (leaves empty EXTRA key behind where there previously wasn't one present)"
         ],
         "branch": "release/3"
     },

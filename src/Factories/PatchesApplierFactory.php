@@ -111,7 +111,6 @@ class PatchesApplierFactory
             $packagePatchApplier,
             $queueGenerator,
             $patcherStateManager,
-            $repositoryStateAnalyser,
             $patchInfoLogger,
             $outputStrategy,
             $this->logger

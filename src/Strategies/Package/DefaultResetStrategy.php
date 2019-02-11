@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches\Strategies\Package;
 
 use Composer\Downloader\VcsCapableDownloaderInterface as VcsCapable;
 use Composer\Downloader\ChangeReportInterface as ChangeReportCapable;
+use Composer\Downloader\PathDownloader;
 
 class DefaultResetStrategy implements \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface
 {
@@ -36,7 +37,10 @@ class DefaultResetStrategy implements \Vaimo\ComposerPatches\Interfaces\PackageR
     {
         $downloader = $this->downloader->getDownloaderForInstalledPackage($package);
 
-        if ($downloader instanceof ChangeReportCapable && $downloader instanceof VcsCapable) {
+        if ($downloader instanceof ChangeReportCapable 
+            && $downloader instanceof VcsCapable 
+            && !$downloader instanceof PathDownloader
+        ) {
             $installPath = $this->installer->getInstallPath($package);
 
             return !(bool)$downloader->getLocalChanges($package, $installPath);

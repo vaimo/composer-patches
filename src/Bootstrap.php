@@ -8,6 +8,7 @@ namespace Vaimo\ComposerPatches;
 use Vaimo\ComposerPatches\Composer\ConfigKeys as Config;
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Factories;
+use Vaimo\ComposerPatches\Composer\Constraint;
 
 class Bootstrap
 {
@@ -72,7 +73,6 @@ class Bootstrap
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
      * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy
      * @param array $config
-     * @param bool $explicitMode
      */
     public function __construct(
         \Composer\Composer $composer,
@@ -80,16 +80,11 @@ class Bootstrap
         \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver = null,
         \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy = null,
         $config = array()
-//        , $explicitMode = false
     ) {
         $this->composer = $composer;
         $this->config = $config;
-
-//        !$explicitMode
         
-        $logger = new \Vaimo\ComposerPatches\Logger($io
-//            , !$explicitMode
-        );
+        $logger = new \Vaimo\ComposerPatches\Logger($io);
 
         $this->listResolver = $listResolver;
         $this->outputStrategy = $outputStrategy;
@@ -149,26 +144,33 @@ class Bootstrap
     
     public function sanitizeLocker()
     {
-        if (!$lock = $this->lockerManager->readLockData()) {
+        if (!$lockData = $this->lockerManager->readLockData()) {
             return;
         }
-
-        $lockBefore = serialize($lock);
         
-        $nodes = $this->dataUtils->getNodeReferencesByPaths($lock, array(
-            implode('/', array(Config::PACKAGES, '*', Config::CONFIG_ROOT)),
-            implode('/', array(Config::PACKAGES_DEV, '*', Config::CONFIG_ROOT))
-        ));
+        $queriedPaths = array(
+            implode('/', array(Config::PACKAGES, Constraint::ANY)),
+            implode('/', array(Config::PACKAGES_DEV, Constraint::ANY))
+        );
+        
+        $nodes = $this->dataUtils->getNodeReferencesByPaths($lockData, $queriedPaths);
 
         foreach ($nodes as &$node) {
-            unset($node[PluginConfig::APPLIED_FLAG]);
-            unset($node);
+            if (!isset($node[Config::CONFIG_ROOT][PluginConfig::APPLIED_FLAG])) {
+                continue;
+            }
+            
+            unset($node[Config::CONFIG_ROOT][PluginConfig::APPLIED_FLAG]);
+
+            if ($node[Config::CONFIG_ROOT]) {
+                continue;
+            }
+
+            unset($node[Config::CONFIG_ROOT]);
         }
         
-        if (serialize($lock) === $lockBefore) {
-            return;
-        }
+        unset($node);
         
-        $this->lockerManager->writeLockData($lock);
+        $this->lockerManager->writeLockData($lockData);
     }
 }

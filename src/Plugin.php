@@ -26,7 +26,7 @@ class Plugin implements \Composer\Plugin\PluginInterface,
     /**
      * @var \Vaimo\ComposerPatches\Bootstrap
      */
-    private $bootstrap; 
+    private $bootstrap;
     
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
     {
