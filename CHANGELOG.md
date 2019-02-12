@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.9.0
+
+### Feature
+
+* forward-port (3.40.0): allow patch to target the autoloader root (instead of targeting package root) by configuring 'cwd' key to 'autoload'
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.9.0) [diff](https://github.com/vaimo/composer-patches/compare/4.8.2...4.9.0)
+
 ## 4.8.2 (2019-02-12)
 
 ### Maintenance
@@ -200,7 +208,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.39.2...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.40.0...4.0.0)
+
+## 3.40.0
+
+### Feature
+
+* allow patch to target the autoloader root (instead of targeting package root) by configuring 'cwd' key to 'autoload'
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.40.0) [diff](https://github.com/vaimo/composer-patches/compare/3.39.2...3.40.0)
 
 ## 3.39.2 (2019-02-12)
 
