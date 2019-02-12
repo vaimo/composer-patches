@@ -141,7 +141,7 @@
         "maintenance": [
             "follow-up to incorrectly released version (3.39.1); no extra changes done"
         ],
-        "branch": "release/3",
+        "branch": "release/3"
     },
     "3.39.1": {
         "fix": [
