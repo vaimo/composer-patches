@@ -53,7 +53,13 @@ class Collector
 
         foreach ($packages as $package) {
             $ownerName = $package->getName();
-            $config = $this->infoExtractor->getConfig($package);
+            
+            $config = array_filter(
+                (array)$this->infoExtractor->getConfig(
+                    $package, 
+                    \Vaimo\ComposerPatches\Config::CONFIG_ROOT
+                )
+            );
 
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
             $sourceLoaders = array_intersect_key($this->sourceLoaders, $config);

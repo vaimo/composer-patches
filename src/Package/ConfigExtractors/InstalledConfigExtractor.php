@@ -7,8 +7,21 @@ namespace Vaimo\ComposerPatches\Package\ConfigExtractors;
 
 class InstalledConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
 {
-    public function getConfig(\Composer\Package\PackageInterface $package)
+    public function getConfig(\Composer\Package\PackageInterface $package, $configKey)
     {
-        return $package->getExtra();
+        $methodName = sprintf(
+            'get%s', 
+            str_replace(
+                ' ', 
+                '', 
+                ucwords(
+                    str_replace('_', ' ', $configKey)
+                )
+            )
+        );
+        
+        return call_user_func(
+            array($package, $methodName)
+        );
     }
 }

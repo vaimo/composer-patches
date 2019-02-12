@@ -63,6 +63,10 @@ class ComponentPool
             $vendorRoot
         );
 
+        $configExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\VendorConfigExtractor(
+            $packageInfoResolver
+        );
+        
         $defaults = array(
             'bundle' => new LoaderComponents\BundleComponent($rootPackage),
             'global-exclude' => $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,
@@ -71,7 +75,7 @@ class ComponentPool
                 $pluginConfig->getSkippedPackages()
             ),
             'path-normalizer' => new LoaderComponents\PathNormalizerComponent($packageInfoResolver),
-            'constraints' => new LoaderComponents\ConstraintsComponent(),
+            'constraints' => new LoaderComponents\ConstraintsComponent($configExtractor),
             'downloader' => new LoaderComponents\DownloaderComponent($rootPackage, $downloader),
             'validator' => new LoaderComponents\ValidatorComponent(),
             'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver),

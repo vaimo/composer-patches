@@ -9,7 +9,8 @@ interface PackageConfigExtractorInterface
 {
     /**
      * @param \Composer\Package\PackageInterface $package
+     * @param string $configKey
      * @return array
      */
-    public function getConfig(\Composer\Package\PackageInterface $package);
+    public function getConfig(\Composer\Package\PackageInterface $package, $configKey);
 }
