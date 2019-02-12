@@ -2,7 +2,7 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## DEV.3.39.0
+## 3.39.0 (2019-02-12)
 
 ### Feature
 
@@ -23,7 +23,7 @@ _This file has been auto-generated from the contents of changelog.json_
 * hide NEW patches (that might be failing) when doing filtered redo/undo calls to avoid too much noise in output where it's pretty clear that developer is working with a sub-selection of patches (all shown when doing explicit call)
 * composer lock still modified when applying patches (leaves empty EXTRA key behind where there previously wasn't one present)
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/DEV.3.39.0) [diff](https://github.com/vaimo/composer-patches/compare/3.38.0...DEV.3.39.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.0) [diff](https://github.com/vaimo/composer-patches/compare/3.38.0...3.39.0)
 
 ## 3.38.0 (2018-09-27)
 
