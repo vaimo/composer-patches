@@ -2,6 +2,22 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.39.2
+
+### Maintenance
+
+* follow-up to incorrectly released version (3.39.1); no extra changes done
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.2) [diff](https://github.com/vaimo/composer-patches/compare/3.39.1...3.39.2)
+
+## 3.39.1 (2019-02-12)
+
+### Fix
+
+* patches not applied when dealing with requires that use dev branches (even when version available in package config or when dev branch aliased as proper version)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.1) [diff](https://github.com/vaimo/composer-patches/compare/3.39.0...3.39.1)
+
 ## 3.39.0 (2019-02-12)
 
 ### Feature
