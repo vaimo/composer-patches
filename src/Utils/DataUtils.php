@@ -53,14 +53,12 @@ class DataUtils
             foreach ($item[0] as &$node) {
                 if ($segment === null) {
                     $result[] = &$node;
-                } else {
-                    if ($segment === '*') {
-                        $stack[] = array(&$node, $item[1]);
-                    } else if (isset($node[$segment])) {
-                        $stack[] = array(array(&$node[$segment]), $item[1]);
-                    }
+                } else if ($segment === '*') {
+                    $stack[] = array(&$node, $item[1]);
+                } else if (isset($node[$segment])) {
+                    $stack[] = array(array(&$node[$segment]), $item[1]);
                 }
-
+                
                 unset($node);
             }
         }

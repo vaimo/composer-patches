@@ -37,11 +37,6 @@ class PatchesApplier
     private $patcherStateManager;
 
     /**
-     * @var \Vaimo\ComposerPatches\Repository\State\Analyser
-     */
-    private $repositoryStateAnalyser;
-
-    /**
      * @var \Vaimo\ComposerPatches\Repository\StateGenerator 
      */
     private $repositoryStateGenerator;
@@ -70,19 +65,13 @@ class PatchesApplier
      * \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Utils\PackageListUtils 
-     */
-    private $packageListUtils;
-
+    
     /**
      * @param \Vaimo\ComposerPatches\Package\Collector $packageCollector
      * @param \Vaimo\ComposerPatches\Managers\RepositoryManager $repositoryManager
      * @param \Vaimo\ComposerPatches\Package\PatchApplier $patchApplier
      * @param \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator $queueGenerator
      * @param \Vaimo\ComposerPatches\Managers\PatcherStateManager $patcherStateManager
-     * @param \Vaimo\ComposerPatches\Repository\State\Analyser $repositoryStateAnalyser
      * @param \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $patchInfoLogger
      * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -93,7 +82,6 @@ class PatchesApplier
         \Vaimo\ComposerPatches\Package\PatchApplier $patchApplier,
         \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator $queueGenerator,
         \Vaimo\ComposerPatches\Managers\PatcherStateManager $patcherStateManager,
-        \Vaimo\ComposerPatches\Repository\State\Analyser $repositoryStateAnalyser,
         \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $patchInfoLogger,
         \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy,
         \Vaimo\ComposerPatches\Logger $logger
@@ -103,7 +91,6 @@ class PatchesApplier
         $this->packagePatchApplier = $patchApplier;
         $this->queueGenerator = $queueGenerator;
         $this->patcherStateManager = $patcherStateManager;
-        $this->repositoryStateAnalyser = $repositoryStateAnalyser;
         $this->patchInfoLogger = $patchInfoLogger;
         $this->logger = $logger;
 
@@ -115,7 +102,6 @@ class PatchesApplier
         
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
-        $this->packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
     }
     
     public function apply(Repository $repository, array $patches)

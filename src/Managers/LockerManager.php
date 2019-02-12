@@ -48,7 +48,7 @@ class LockerManager
         $composerFile = \Composer\Factory::getComposerFile();
 
         $lockFile = 'json' === pathinfo($composerFile, PATHINFO_EXTENSION)
-            ? substr($composerFile, 0, -4).'lock'
+            ? substr($composerFile, 0, -4) . 'lock'
             : $composerFile . '.lock';
 
         return new \Composer\Json\JsonFile($lockFile, null, $this->io);
