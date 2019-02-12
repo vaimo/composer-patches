@@ -1,5 +1,5 @@
 {
-    "DEV.3.39.0": {
+    "3.39.0": {
         "feature": [
             "added --brief to list command (skips over description, etc)",
             "when using --filter or targeting a specific package with 'redo', 'undo' or 'apply', show only those patches that match with the filter; other patches still applied, just not reported (all actions can still be made visible when using --explicit flag)",
