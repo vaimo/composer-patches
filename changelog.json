@@ -2,7 +2,8 @@
     "3.39.1": {
         "fix": [
             "patches not applied when dealing with requires that use dev branches (even when version available in package config or when dev branch aliased as proper version)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.39.0": {
         "feature": [
