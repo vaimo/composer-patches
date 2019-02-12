@@ -340,8 +340,9 @@ Multiple dependencies can be defined when after/before value given as an array.
 
 ## Patches: version restriction
 
-There are several ways a version restriction for a patch can be defined, the choice on which one to use usually 
-depends on a situation and how much extra information needs to be configured for the patch to apply correctly. 
+There are several ways a version restriction for a patch can be defined, the choice on which one to use 
+usually depends on a situation and how much extra information needs to be configured for the patch to 
+apply correctly. 
 
 ```json
 {
