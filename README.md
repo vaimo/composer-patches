@@ -616,9 +616,11 @@ This will tell the patch applier to: (a) reset targeted/package; (b) apply 'exam
 
 Available cwd options:
 
-1. install (default) - uses package install folder 
-2. vendor - uses vendor path
-3. project - uses project path
+1. **install** - (default) uses package install folder 
+2. **vendor** - uses vendor path
+3. **project** - uses project path
+4. **autoload** - uses path that the package has configured as autoloader root (will use first path when multiple
+   paths defined). Falls back to using 'install' path when autoloader config not found.
 
 ## Patches Exclude: configuration
 
@@ -856,7 +858,7 @@ to the user when patch is being applied.
 @version <value> (optional) >=1.1.0 <1.4.0
 @after <value> (optional) Used in case a patch should be added after another branch
 @skip (optional) If this tag is present, then the patch will not be applied
-@cwd <value> (optional) Specify in which root pathc the patch is applied (install,vendor,project)
+@cwd <value> (optional) Specify in which root path the patch is applied (install, vendor, project, autoload)
 @type <value> (optional) Options: dev, bundle (Using multiple: dev+bundle)
 @level <value> (optional) 0 (forces/locks the patch applier to use certain patch path strip level)
 @category <value> (optional) free-form value to explain what the patch is (fix/feature/enhancement)

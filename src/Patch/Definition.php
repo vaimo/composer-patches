@@ -32,6 +32,7 @@ class Definition
     const CWD_INSTALL = 'install';
     const CWD_VENDOR = 'vendor';
     const CWD_PROJECT = 'project';
+    const CWD_AUTOLOAD = 'autoload';
 
     const BEFORE = 'before';
     const AFTER = 'after';

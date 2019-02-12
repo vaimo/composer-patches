@@ -1,4 +1,9 @@
 {
+    "3.40.0": {
+        "feature": [
+            "allow patch to target the autoloader root (instead of targeting package root) by configuring 'cwd' key to 'autoload'"
+        ]
+    },
     "3.39.2": {
         "maintenance": [
             "follow-up to incorrectly released version (3.39.1); no extra changes done"
