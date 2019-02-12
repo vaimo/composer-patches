@@ -6,6 +6,8 @@
 namespace Vaimo\ComposerPatches\Package;
 
 use Composer\Package\PackageInterface;
+
+use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class InfoResolver
@@ -86,6 +88,19 @@ class InfoResolver
                     break;
                 case Patch::CWD_PROJECT:
                     $this->installPathCache[$key] = getcwd();
+                    break;
+                case Patch::CWD_AUTOLOAD:
+                    $autoloadConfig = $package->getAutoload();
+
+                    $installPath = $this->getInstallPath($package, Patch::CWD_INSTALL);
+                    
+                    if (!isset($autoloadConfig[ConfigKeys::PSR4_CONFIG])) {
+                        return $installPath;
+                    }
+
+                    $this->installPathCache[$key] = $installPath . DIRECTORY_SEPARATOR . 
+                        reset($autoloadConfig[ConfigKeys::PSR4_CONFIG]);
+                    
                     break;
                 case Patch::CWD_INSTALL:
                 default:

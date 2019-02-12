@@ -4,7 +4,8 @@ Applies a patch from a local or remote file to any package that is part of a giv
 project. Patches can be defined both on project and on package level in package config or 
 separate JSON file. Declaration-free mode (using embedded info within patch files) is available as well.
 
-The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable (including the actual commands that are executed to apply the patch) from the composer.json of the project.
+The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable (including the 
+actual commands that are executed to apply the patch) from the composer.json of the project.
 
 [![GitHub release](https://img.shields.io/github/release/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/releases/latest)
 [![Total Downloads](https://img.shields.io/packagist/dt/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
@@ -339,7 +340,8 @@ Multiple dependencies can be defined when after/before value given as an array.
 
 ## Patches: version restriction
 
-There are several ways a version restriction for a patch can be defined, the choice on which one to use usually depends on a situation and how much extra information needs to be configured for the patch to apply correctly. 
+There are several ways a version restriction for a patch can be defined, the choice on which one to use usually 
+depends on a situation and how much extra information needs to be configured for the patch to apply correctly. 
 
 ```json
 {
@@ -640,7 +642,8 @@ of the resolve patch path.
 ## Patches: patch applier cwd options
 
 In cases where there's a need to apply a patch on a file that is mapped to the project root or vendor bin
-root, a patch applier working directory resolver mode can be defined (which technically would mean that the applier works off of custom root/directory when applying certain patch):
+root, a patch applier working directory resolver mode can be defined (which technically would mean that the 
+applier works off of custom root/directory when applying certain patch):
 
 ```json
   {
@@ -657,15 +660,19 @@ root, a patch applier working directory resolver mode can be defined (which tech
   }
 ```
 
-This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root. That means that the targeted file paths within example.patch should also target files relative to project root. 
+This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root. 
+That means that the targeted file paths within example.patch should also target files relative to project root. 
 
 Available cwd options:
 
-1. install - uses package install folder (used by default)
-2. vendor - uses vendor path
-3. project - uses project path
+1. **install** - (default) uses package install folder 
+2. **vendor** - uses vendor path
+3. **project** - uses project path
+4. **autoload** - uses path that the package has configured as autoloader root (will use first path when multiple
+   paths defined). Falls back to using 'install' path when autoloader config not found.
 
-This is particulary useful when `targeted/package` introduces it's own file mapper mechanism that is triggered by composer events (which might mean that files are copied away from the re-install package before patch applier kicks in).
+This is particulary useful when `targeted/package` introduces it's own file mapper mechanism that is triggered 
+by composer events (which might mean that files are copied away from the re-install package before patch applier kicks in).
 
 ## Patches Exclude: configuration
 
@@ -906,7 +913,7 @@ to the user when patch is being applied.
 @version <value> (optional) >=1.1.0 <1.4.0
 @after <value> (optional) Used in case a patch should be added after another branch
 @skip (optional) If this tag is present, then the patch will not be applied
-@cwd <value> (optional) Specify in which root pathc the patch is applied (install,vendor,project)
+@cwd <value> (optional) Specify in which root path the patch is applied (install, vendor, project, autoload)
 @type <value> (optional) Options: dev, bundle (Using multiple: dev+bundle)
 @level <value> (optional) 0 (forces/locks the patch applier to use certain patch path strip level)
 @category <value> (optional) free-form value to explain what the patch is (fix/feature/enhancement)
@@ -1066,7 +1073,8 @@ So in this case package B would have the following in it's composer.json
     }
 }
 ```
-... where the patch is placed to <package B root>/patches/compatibility-with-dependency-a.patch and paths withing the patch file are relative to the root of package A.
+... where the patch is placed to <package B root>/patches/compatibility-with-dependency-a.patch and paths 
+withing the patch file are relative to the root of package A.
 
 This can be tested out with...
 
@@ -1074,7 +1082,9 @@ This can be tested out with...
 composer patch --redo --from-source --filter compatibility-with-pack
 ```
 
-_The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
+_The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' 
+makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested 
+before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
 
 ## Changelog 
 

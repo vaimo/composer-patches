@@ -1,4 +1,9 @@
 {
+    "4.9.0": {
+        "feature": [
+            "forward-port (3.40.0): allow patch to target the autoloader root (instead of targeting package root) by configuring 'cwd' key to 'autoload'"
+        ]
+    },
     "4.8.2": {
         "maintenance": [
             "follow-up to incorrectly released version (4.8.1); no extra changes done"
@@ -135,6 +140,11 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
+    "3.40.0": {
+        "feature": [
+            "allow patch to target the autoloader root (instead of targeting package root) by configuring 'cwd' key to 'autoload'"
         ]
     },
     "3.39.2": {
