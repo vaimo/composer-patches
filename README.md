@@ -298,7 +298,9 @@ Multiple dependencies can be defined when after/before value given as an array.
 
 ## Patches: version restriction
 
-There are several ways a version restriction for a patch can be defined, the choice on which one to use usually depends on a situation and how much extra information needs to be configured for the patch to apply correctly. 
+There are several ways a version restriction for a patch can be defined, the choice on which one to use 
+usually depends on a situation and how much extra information needs to be configured for the patch to 
+apply correctly. 
 
 ```json
 {
@@ -612,7 +614,8 @@ root, a custom applier patch target installation path resolver mode can be defin
   }
 ```
 
-This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root. That means that the targeted file paths within example.patch should also target files relative to project root.
+This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root. 
+That means that the targeted file paths within example.patch should also target files relative to project root.
 
 Available cwd options:
 
@@ -1015,7 +1018,8 @@ So in this case package B would have the following in it's composer.json
     }
 }
 ```
-... where the patch is placed to <package B root>/patches/compatibility-with-dependency-a.patch and paths withing the patch file are relative to the root of package A.
+... where the patch is placed to <package B root>/patches/compatibility-with-dependency-a.patch and paths 
+withing the patch file are relative to the root of package A.
 
 This can be tested out with...
 
@@ -1023,7 +1027,9 @@ This can be tested out with...
 composer patch --redo --from-source --filter compatibility-with-pack
 ```
 
-_The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
+_The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' 
+makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested 
+before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
 
 ## Changelog 
 
