@@ -1,4 +1,10 @@
 {
+    "4.8.1": {
+        "fix": [
+            "forward-port (3.39.1): patches not applied when dealing with requires that use dev branches (even when version available in package config or when dev branch aliased as proper version)"
+        ],
+        "branch": "release/3"
+    },
     "4.8.0": {
         "overview": "all features and fixes in this release are forward-ported from 3.39.0",
         "feature": [
@@ -21,96 +27,96 @@
     },
     "4.7.0": {
         "feature": [
-            "forward-port(3.38.0): hide all information on previously applied patches by default (when patches for certain package are re-applied) and only show the ones that changed, are new or got matches with a filter (--explicit flag added for commands to use old output that shows every patch that gets re-applied)"
+            "forward-port (3.38.0): hide all information on previously applied patches by default (when patches for certain package are re-applied) and only show the ones that changed, are new or got matches with a filter (--explicit flag added for commands to use old output that shows every patch that gets re-applied)"
         ],
         "fix": [
-            "forward-port(3.38.0): rollback to fix in 3.37.1 (caused errors for patches that created new files, new solution needed)"
+            "forward-port (3.38.0): rollback to fix in 3.37.1 (caused errors for patches that created new files, new solution needed)"
         ]
     },
     "4.6.1": {
         "fix": [
-            "forward-port(3.37.1): some patches that patched multiple files applied only half-way through on certain OS's without returning with proper exit code on failure (or failed hunks considered as ignoreable junk)"
+            "forward-port (3.37.1): some patches that patched multiple files applied only half-way through on certain OS's without returning with proper exit code on failure (or failed hunks considered as ignoreable junk)"
         ]
     },
     "4.6.0": {
         "feature": [
-            "forward-port(3.37.0): new flag introduced for patch:list to allow including patches that have been ruled out due to mismatch with certain constraint: --excluded"
+            "forward-port (3.37.0): new flag introduced for patch:list to allow including patches that have been ruled out due to mismatch with certain constraint: --excluded"
         ],
         "fix": [
-            "forward-port(3.37.0): embedded targeting info for bundled patches that declares constrains not processed correctly (@depends,@version)"
+            "forward-port (3.37.0): embedded targeting info for bundled patches that declares constrains not processed correctly (@depends,@version)"
         ]
     },
     "4.5.0": {
         "feature": [
-            "forward-port(3.36.0): allow '@type bundle' to be used for bundle package instead of using somewhat cryptic '@package *'",
-            "forward-port(3.36.0): allow multiple types to be combined in embedded info (@type dev+bundle)"
+            "forward-port (3.36.0): allow '@type bundle' to be used for bundle package instead of using somewhat cryptic '@package *'",
+            "forward-port (3.36.0): allow multiple types to be combined in embedded info (@type dev+bundle)"
         ],
         "fix": [
-            "forward-port(3.36.0): multi-line description not presented properly when using composer patch:list command",
-            "forward-port(3.36.0): bundled patches not included as expected when using embedded patch target info"
+            "forward-port (3.36.0): multi-line description not presented properly when using composer patch:list command",
+            "forward-port (3.36.0): bundled patches not included as expected when using embedded patch target info"
         ]
     },
     "4.4.3": {
         "fix": [
-            "forward-port(3.35.3): backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)"
+            "forward-port (3.35.3): backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)"
         ]
     },
     "4.4.2": {
         "fix": [
-            "forward-port(3.35.2): lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock"
+            "forward-port (3.35.2): lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock"
         ]
     },
     "4.4.1": {
         "fix": [
-            "forward-port(3.35.1): lock management reworked to use built-in methods for locating a package to avoid issues with potential aliases, etc"
+            "forward-port (3.35.1): lock management reworked to use built-in methods for locating a package to avoid issues with potential aliases, etc"
         ]
     },
     "4.4.0": {
         "feature": [
-            "forward-port(3.35.0): list command added (allows listing all registered patches and their state)"
+            "forward-port (3.35.0): list command added (allows listing all registered patches and their state)"
         ],
         "fix": [
-            "forward-port(3.35.0): bundled patch targets not properly reset when using patch:redo in case patches applied on packages, but installed.json reset to provide no information about applied patches",
-            "forward-port(3.35.0): patches for packages that are covered with certain bundle patch do not get re-applied when running patch:redo with filter (redo should not leave any patch uninstalled even when executed with a filter)"
+            "forward-port (3.35.0): bundled patch targets not properly reset when using patch:redo in case patches applied on packages, but installed.json reset to provide no information about applied patches",
+            "forward-port (3.35.0): patches for packages that are covered with certain bundle patch do not get re-applied when running patch:redo with filter (redo should not leave any patch uninstalled even when executed with a filter)"
         ]
     },
     "4.3.0": {
         "feature": [
-            "forward-port(3.34.0): allow patch path strip level to be defined in patch's embedded target-info declaration (@level <int>)"
+            "forward-port (3.34.0): allow patch path strip level to be defined in patch's embedded target-info declaration (@level <int>)"
         ],
         "fix": [
-            "forward-port(3.34.0): patches queue generator sometimes generated lists that did not queue proper re-applying of patches when dealing with bundles and indirect targets so that 'patch:redo' == 'patch:undo' + 'patch:apply'",
-            "forward-port(3.34.0): make sure that the removal of 'dev' bundle (or any other type with indirect targets) patches cause proper re-patching of related targets when running with --no-dev",
-            "forward-port(3.34.1): conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that"
+            "forward-port (3.34.0): patches queue generator sometimes generated lists that did not queue proper re-applying of patches when dealing with bundles and indirect targets so that 'patch:redo' == 'patch:undo' + 'patch:apply'",
+            "forward-port (3.34.0): make sure that the removal of 'dev' bundle (or any other type with indirect targets) patches cause proper re-patching of related targets when running with --no-dev",
+            "forward-port (3.34.1): conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that"
         ]
     },
     "4.2.1": {
         "fix": [
-            "forward-port(3.33.1): improved error reporting when encountering issues on composer lock cleanup"
+            "forward-port (3.33.1): improved error reporting when encountering issues on composer lock cleanup"
         ]
     },
     "4.2.0": {
         "feature": [
-            "forward-port(3.33.0): allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: patch applier cwd options')"
+            "forward-port (3.33.0): allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: patch applier cwd options')"
         ],
         "fix": [
-            "forward-port(3.33.0): switched away from using a class constant name that on older php versions is reserved (new)",
-            "forward-port(3.33.0): avoid reporting non-vcs package differences as reason for halting the patch applying (which requires package reset)",
-            "forward-port(3.33.0): full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)",
-            "forward-port(3.33.0): multiple dependencies on patches with embedded target info not respected"
+            "forward-port (3.33.0): switched away from using a class constant name that on older php versions is reserved (new)",
+            "forward-port (3.33.0): avoid reporting non-vcs package differences as reason for halting the patch applying (which requires package reset)",
+            "forward-port (3.33.0): full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)",
+            "forward-port (3.33.0): multiple dependencies on patches with embedded target info not respected"
         ]
     },
     "4.1.1": {
         "fix": [
-            "forward-port(3.32.1): definition list validation command returning with false failures when using #skip on patch paths"
+            "forward-port (3.32.1): definition list validation command returning with false failures when using #skip on patch paths"
         ],
         "maintenance": [
-            "forward-port(3.32.1): removing #skip flag from path when encountered (previously it remained in the path)"
+            "forward-port (3.32.1): removing #skip flag from path when encountered (previously it remained in the path)"
         ]
     },
     "4.1.0": {
         "feature": [
-            "forward-port(3.32.0): allow comments on any level and with any keyword as long as it starts with underscore (_)"
+            "forward-port (3.32.0): allow comments on any level and with any keyword as long as it starts with underscore (_)"
         ]
     },
     "4.0.0": {
@@ -126,6 +132,12 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.39.1": {
+        "fix": [
+            "patches not applied when dealing with requires that use dev branches (even when version available in package config or when dev branch aliased as proper version)"
+        ],
+        "branch": "release/3"
     },
     "3.39.0": {
         "feature": [

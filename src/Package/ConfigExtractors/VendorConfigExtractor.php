@@ -29,8 +29,8 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
         
         $this->configLoader = new \Vaimo\ComposerPatches\Package\ConfigReader();
     }
-    
-    public function getConfig(\Composer\Package\PackageInterface $package)
+
+    public function getConfig(\Composer\Package\PackageInterface $package, $configKey)
     {
         $source = $this->packageInfoResolver->getSourcePath($package) 
             . DIRECTORY_SEPARATOR 
@@ -39,11 +39,11 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
         if (file_exists($source)) {
             $fileContents = $this->configLoader->readToArray($source);
             
-            if (isset($fileContents[Config::CONFIG_ROOT])) {
-                return $fileContents[Config::CONFIG_ROOT];
+            if (isset($fileContents[$configKey])) {
+                return $fileContents[$configKey];
             }
         }
         
-        return array();
+        return null;
     }
 }
