@@ -2,7 +2,7 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 4.8.2
+## 4.8.2 (2019-02-12)
 
 ### Maintenance
 
