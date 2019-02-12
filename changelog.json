@@ -1,9 +1,13 @@
 {
+    "4.8.2": {
+        "maintenance": [
+            "follow-up to incorrectly released version (4.8.1); no extra changes done"
+        ]
+    },
     "4.8.1": {
         "fix": [
             "forward-port (3.39.1): patches not applied when dealing with requires that use dev branches (even when version available in package config or when dev branch aliased as proper version)"
-        ],
-        "branch": "release/3"
+        ]
     },
     "4.8.0": {
         "overview": "all features and fixes in this release are forward-ported from 3.39.0",
@@ -131,7 +135,13 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
-        ]
+        ],
+    },
+    "3.39.2": {
+        "maintenance": [
+            "follow-up to incorrectly released version (3.39.1); no extra changes done"
+        ],
+        "branch": "release/3",
     },
     "3.39.1": {
         "fix": [
