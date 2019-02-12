@@ -16,7 +16,7 @@
         "marcj/topsort": "^1.0"
     },
     "require-dev": {
-        "vaimo/composer-changelogs": "^0.6.2"
+        "vaimo/composer-changelogs": "^0.13.1"
     },
     "support": {
         "source": "https://github.com/vaimo/composer-patches",
@@ -71,7 +71,10 @@
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "patcher_plugin": true,
         "changelog": {
-            "source": "changelog.json"
+            "source": "changelog.json",
+            "output": {
+                "md": "CHANGELOG.md"
+            }
         }
     },
     "autoload": {
