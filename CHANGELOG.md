@@ -2,7 +2,191 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## DEV.3.39.0
+## 4.8.0 (2019-02-12)
+
+all features and fixes in this release are forward-ported from 3.39.0
+
+### Feature
+
+* added --brief to list command (skips over description, etc)
+* when using --filter or targeting a specific package with 'redo', 'undo' or 'apply', show only those patches that match with the filter; other patches still applied, just not reported (all actions can still be made visible when using --explicit flag)
+* show information about patches that are removed (when patches are re-applied, show which items were applied, but no longer listed/queued)
+
+
+### Fix
+
+* rework on fix done in 3.37.1 for patches that applied half-way while 'patch' command still returned SUCCESS exit code; perform patch command dry-apply output analysis to detect edge-cases that should be considered as failures
+* the command 'list' listing removals even when --filter used
+* the command 'list' --excluded option not properly dealing with filter when --filter used
+* the command 'list' not listing removals when every patch against some package gets removed
+* the command 'list' always listing removed items, even when they do not match with used filter
+* allow both 'undo' and 'redo' command to finish even when there are errors encountered while re-applying some patches (bundled patches might get re-applied; encountered when doing partial/targeted command call); suppress environment flags that tell otherwise (apply still stops on first failure when required)
+* queue resolver re-introducing undo'd patches when patches targeting a package that had bundled patches defined against it
+* show all applied patches when running 'redo' command without a filter (otherwise only matched patches are shown)
+* hide NEW patches (that might be failing) when doing filtered redo/undo calls to avoid too much noise in output where it's pretty clear that developer is working with a sub-selection of patches (all shown when doing explicit call)
+* composer lock still modified when applying patches (leaves empty EXTRA key behind where there previously wasn't one present)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.8.0) [diff](https://github.com/vaimo/composer-patches/compare/4.7.0...4.8.0)
+
+## 4.7.0 (2018-09-27)
+
+### Feature
+
+* forward-port(3.38.0): hide all information on previously applied patches by default (when patches for certain package are re-applied) and only show the ones that changed, are new or got matches with a filter (--explicit flag added for commands to use old output that shows every patch that gets re-applied)
+
+### Fix
+
+* forward-port(3.38.0): rollback to fix in 3.37.1 (caused errors for patches that created new files, new solution needed)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.7.0) [diff](https://github.com/vaimo/composer-patches/compare/4.6.1...4.7.0)
+
+## 4.6.1 (2018-09-26)
+
+### Fix
+
+* forward-port(3.37.1): some patches that patched multiple files applied only half-way through on certain OS's without returning with proper exit code on failure (or failed hunks considered as ignoreable junk)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.6.1) [diff](https://github.com/vaimo/composer-patches/compare/4.6.0...4.6.1)
+
+## 4.6.0 (2018-09-18)
+
+### Feature
+
+* forward-port(3.37.0): new flag introduced for patch:list to allow including patches that have been ruled out due to mismatch with certain constraint: --excluded
+
+### Fix
+
+* forward-port(3.37.0): embedded targeting info for bundled patches that declares constrains not processed correctly (@depends,@version)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.6.0) [diff](https://github.com/vaimo/composer-patches/compare/4.5.0...4.6.0)
+
+## 4.5.0 (2018-09-18)
+
+### Feature
+
+* forward-port(3.36.0): allow '@type bundle' to be used for bundle package instead of using somewhat cryptic '@package *'
+* forward-port(3.36.0): allow multiple types to be combined in embedded info (@type dev+bundle)
+
+### Fix
+
+* forward-port(3.36.0): multi-line description not presented properly when using composer patch:list command
+* forward-port(3.36.0): bundled patches not included as expected when using embedded patch target info
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.5.0) [diff](https://github.com/vaimo/composer-patches/compare/4.4.3...4.5.0)
+
+## 4.4.3 (2018-09-14)
+
+### Fix
+
+* forward-port(3.35.3): backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.3) [diff](https://github.com/vaimo/composer-patches/compare/4.4.2...4.4.3)
+
+## 4.4.2 (2018-09-11)
+
+### Fix
+
+* forward-port(3.35.2): lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.2) [diff](https://github.com/vaimo/composer-patches/compare/4.4.1...4.4.2)
+
+## 4.4.1 (2018-09-10)
+
+### Fix
+
+* forward-port(3.35.1): lock management reworked to use built-in methods for locating a package to avoid issues with potential aliases, etc
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.1) [diff](https://github.com/vaimo/composer-patches/compare/4.4.0...4.4.1)
+
+## 4.4.0 (2018-09-10)
+
+### Feature
+
+* forward-port(3.35.0): list command added (allows listing all registered patches and their state)
+
+### Fix
+
+* forward-port(3.35.0): bundled patch targets not properly reset when using patch:redo in case patches applied on packages, but installed.json reset to provide no information about applied patches
+* forward-port(3.35.0): patches for packages that are covered with certain bundle patch do not get re-applied when running patch:redo with filter (redo should not leave any patch uninstalled even when executed with a filter)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.0) [diff](https://github.com/vaimo/composer-patches/compare/4.3.0...4.4.0)
+
+## 4.3.0 (2018-09-02)
+
+### Feature
+
+* forward-port(3.34.0): allow patch path strip level to be defined in patch's embedded target-info declaration (@level <int>)
+
+### Fix
+
+* forward-port(3.34.0): patches queue generator sometimes generated lists that did not queue proper re-applying of patches when dealing with bundles and indirect targets so that 'patch:redo' == 'patch:undo' + 'patch:apply'
+* forward-port(3.34.0): make sure that the removal of 'dev' bundle (or any other type with indirect targets) patches cause proper re-patching of related targets when running with --no-dev
+* forward-port(3.34.1): conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.3.0) [diff](https://github.com/vaimo/composer-patches/compare/4.2.1...4.3.0)
+
+## 4.2.1 (2018-08-30)
+
+### Fix
+
+* forward-port(3.33.1): improved error reporting when encountering issues on composer lock cleanup
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.2.1) [diff](https://github.com/vaimo/composer-patches/compare/4.2.0...4.2.1)
+
+## 4.2.0 (2018-08-22)
+
+### Feature
+
+* forward-port(3.33.0): allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: patch applier cwd options')
+
+### Fix
+
+* forward-port(3.33.0): switched away from using a class constant name that on older php versions is reserved (new)
+* forward-port(3.33.0): avoid reporting non-vcs package differences as reason for halting the patch applying (which requires package reset)
+* forward-port(3.33.0): full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)
+* forward-port(3.33.0): multiple dependencies on patches with embedded target info not respected
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.2.0) [diff](https://github.com/vaimo/composer-patches/compare/4.1.1...4.2.0)
+
+## 4.1.1 (2018-08-16)
+
+### Fix
+
+* forward-port(3.32.1): definition list validation command returning with false failures when using #skip on patch paths
+
+### Maintenance
+
+* forward-port(3.32.1): removing #skip flag from path when encountered (previously it remained in the path)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.1) [diff](https://github.com/vaimo/composer-patches/compare/4.1.0...4.1.1)
+
+## 4.1.0 (2018-08-16)
+
+### Feature
+
+* forward-port(3.32.0): allow comments on any level and with any keyword as long as it starts with underscore (_)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https://github.com/vaimo/composer-patches/compare/4.0.0...4.1.0)
+
+## 4.0.0 (2018-08-15)
+
+### Breaking
+
+* logic: installation/update/applying patches fails on first patch failure (used to be activated by COMPOSER_PATCHES_FATAL_FAIL); old default behaviour usable via COMPOSER_PATCHES_GRACEFUL or using --graceful flag
+* config: removed COMPOSER_PATCHES_REAPPLY_ALL, COMPOSER_FORCE_PATCH_REAPPLY; replaced by 'composer patch:redo'
+* config: removed COMPOSER_PATCHES_FATAL_FAIL, COMPOSER_EXIT_ON_PATCH_FAILURE; replaceb by COMPOSER_PATCHES_GRACEFUL
+* config: removed COMPOSER_PATCHES_FROM_SOURCE, COMPOSER_PATCHES_PREFER_OWNER; replaced with --from-source flag on commands (was meant for testing out a patch)
+* config: removed COMPOSER_SKIP_PATCH_PACKAGES, COMPOSER_PATCHES_SKIP_PACKAGES; never really used for anything, could be achieved via using patcher configuration
+
+### Feature
+
+* allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands
+* allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
+* allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.39.0...4.0.0)
+
+## 3.39.0 (2019-02-12)
 
 ### Feature
 
@@ -23,7 +207,7 @@ _This file has been auto-generated from the contents of changelog.json_
 * hide NEW patches (that might be failing) when doing filtered redo/undo calls to avoid too much noise in output where it's pretty clear that developer is working with a sub-selection of patches (all shown when doing explicit call)
 * composer lock still modified when applying patches (leaves empty EXTRA key behind where there previously wasn't one present)
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/DEV.3.39.0) [diff](https://github.com/vaimo/composer-patches/compare/3.38.0...DEV.3.39.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.0) [diff](https://github.com/vaimo/composer-patches/compare/3.38.0...3.39.0)
 
 ## 3.38.0 (2018-09-27)
 
@@ -141,7 +325,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.33.1) [diff](https
 
 ### Feature
 
-* allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: custom applier cwd)'
+* allow patch applied root to be configured per patch to allow patching of files that are mapped by other composer plugins to project root (see more at 'Patches: patch applier cwd options')
 
 ### Fix
 
