@@ -1,5 +1,11 @@
 # Vaimo Composer Patches
-     
+
+[![GitHub release](https://img.shields.io/github/release/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/releases/latest)
+[![Total Downloads](https://img.shields.io/packagist/dt/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
+[![Daily Downloads](https://img.shields.io/packagist/dd/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
+[![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
+[![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
+
 Applies a patch from a local or remote file to any package that is part of a given composer 
 project. Patches can be defined both on project and on package level in package config or 
 separate JSON file. Declaration-free mode (using embedded info within patch files) is available as well.
@@ -7,11 +13,7 @@ separate JSON file. Declaration-free mode (using embedded info within patch file
 The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable (including the 
 actual commands that are executed to apply the patch) from the composer.json of the project.
 
-[![GitHub release](https://img.shields.io/github/release/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/releases/latest)
-[![Total Downloads](https://img.shields.io/packagist/dt/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
-[![Daily Downloads](https://img.shields.io/packagist/dd/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
-[![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
-[![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
+More information on recent changes [HERE](/.CHANGELOG.md).
 
 ## Quick Start
 
@@ -1089,7 +1091,3 @@ composer patch --redo --from-source --filter compatibility-with-pack
 _The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' 
 makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested 
 before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
-
-## Changelog 
-
-_Changelog included in the changelog.json of the package_
