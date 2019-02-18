@@ -18,8 +18,8 @@ actual commands that are executed to apply the patch) from the composer.json of 
 This example uses the simplest way that the plugin allows you to include a patch in your project and 
 relies on embedded patch target information within the patch file. 
 
-Alternatvely, same information can be provided in a JSON format either directly in package's composer.json 
-or in a separate file that composer.json refers to
+Alternatvely, same information can be provided in a [JSON format](#basic-usage-configuring-a-patch-via-composerjson) 
+either directly in package's composer.json or in a separate file that composer.json refers to.
 
 #### 1. composer.json
 
@@ -73,7 +73,7 @@ All available/usable tags listed in [patch declaration with embedded target info
 
 Alternatively the patch can be targeted with configuring it via [providing the declaration in composer.json](#basic-usage-configuring-a-patch-via-composerjson).
 
-#### 4. make sure the patch actually applies
+#### 4. make sure the patch is configured to target correct package
 
 Check that the new patch is visible to the applier
 
@@ -90,12 +90,15 @@ some/package-name
     absolutely everything
 ```
 
-#### 5. make sure the patch actually applies
+#### 5. make sure the patch actually applies properly
 
 Test out the added patch (in project root).
 
 ```shell
 composer patch:apply --from-source some/package-name
+
+# Alternative to 'patch:apply' way of testing it repeatedly
+composer patch:redo --from-source some/package-name 
 ```
 
 The patch will be automatically applied on every composer install, update when required (when it's found 
