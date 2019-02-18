@@ -13,7 +13,7 @@ separate JSON file. Declaration-free mode (using embedded info within patch file
 The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable (including the 
 actual commands that are executed to apply the patch) from the composer.json of the project.
 
-More information on recent changes [HERE](/.CHANGELOG.md).
+More information on recent changes [HERE](./CHANGELOG.md).
 
 ## Quick Start
 
