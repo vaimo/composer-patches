@@ -1,11 +1,4 @@
 # Vaimo Composer Patches
-     
-Applies a patch from a local or remote file to any package that is part of a given composer 
-project. Patches can be defined both on project and on package level in package config or 
-separate JSON file. Declaration-free mode (using embedded info within patch files) is available as well.
-
-The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable (including the 
-actual commands that are executed to apply the patch) from the composer.json of the project.
 
 [![GitHub release](https://img.shields.io/github/release/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/releases/latest)
 [![Total Downloads](https://img.shields.io/packagist/dt/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
@@ -13,13 +6,22 @@ actual commands that are executed to apply the patch) from the composer.json of 
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
 [![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
 
+Applies a patch from a local or remote file to any package that is part of a given composer 
+project. Patches can be defined both on project and on package level in package config or 
+separate JSON file. Declaration-free mode (using embedded info within patch files) is available as well.
+
+The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable (including the 
+actual commands that are executed to apply the patch) from the composer.json of the project.
+
+More information on recent changes [HERE](./CHANGELOG.md).
+
 ## Quick Start
 
 This example uses the simplest way that the plugin allows you to include a patch in your project and 
 relies on embedded patch target information within the patch file. 
 
-Alternatvely, same information can be provided in a JSON format either directly in package's composer.json 
-or in a separate file that composer.json refers to
+Alternatvely, same information can be provided in a [JSON format](#basic-usage-configuring-a-patch-via-composerjson) 
+either directly in package's composer.json or in a separate file that composer.json refers to.
 
 #### 1. composer.json
 
@@ -73,7 +75,7 @@ All available/usable tags listed in [patch declaration with embedded target info
 
 Alternatively the patch can be targeted with configuring it via [providing the declaration in composer.json](#basic-usage-configuring-a-patch-via-composerjson).
 
-#### 4. make sure the patch actually applies
+#### 4. make sure the patch is configured to target correct package
 
 Check that the new patch is visible to the applier
 
@@ -90,12 +92,15 @@ some/package-name
     absolutely everything
 ```
 
-#### 5. make sure the patch actually applies
+#### 5. make sure the patch actually applies properly
 
 Test out the added patch (in project root).
 
 ```shell
 composer patch:apply --from-source some/package-name
+
+# Alternative to 'patch:apply' way of testing it repeatedly
+composer patch:redo --from-source some/package-name 
 ```
 
 The patch will be automatically applied on every composer install, update when required (when it's found 
@@ -1127,7 +1132,3 @@ composer patch --redo --from-source --filter compatibility-with-pack
 _The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' 
 makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested 
 before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
-
-## Changelog 
-
-_Changelog included in the changelog.json of the package_
