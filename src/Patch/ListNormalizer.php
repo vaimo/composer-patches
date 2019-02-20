@@ -41,7 +41,9 @@ class ListNormalizer
     {
         $result = array();
 
-        foreach ($this->patchListSanitizer->getSanitizedList($list) as $target => $packagePatches) {
+        $sanitizedList = $this->patchListSanitizer->getSanitizedList($list);
+        
+        foreach ($sanitizedList as $target => $packagePatches) {
             $patches = array();
 
             foreach ($packagePatches as $patchLabel => $patchConfig) {

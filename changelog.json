@@ -1,8 +1,15 @@
 {
+    "3.41.0": {
+        "feature": [
+            "allow patcher config overrides per package instead of allowing it only per patch definition (reserved key: '_config'). More on this under the topic of 'Patches: shared config' in the README"
+        ],
+        "branch": "release/3"
+    },
     "3.40.0": {
         "feature": [
             "allow patch to target the autoloader root (instead of targeting package root) by configuring 'cwd' key to 'autoload'"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.39.2": {
         "maintenance": [

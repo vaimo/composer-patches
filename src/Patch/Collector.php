@@ -8,6 +8,7 @@ namespace Vaimo\ComposerPatches\Patch;
 use Composer\Package\RootPackage;
 use Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Composer\Package\PackageInterface;
 
 class Collector
 {
@@ -27,6 +28,11 @@ class Collector
     private $sourceLoaders;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils 
+     */
+    private $patchListUtils;
+
+    /**
      * @param \Vaimo\ComposerPatches\Patch\ListNormalizer $listNormalizer
      * @param \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor
      * @param PatchSourceLoaderInterface[] $sourceLoaders
@@ -39,6 +45,8 @@ class Collector
         $this->listNormalizer = $listNormalizer;
         $this->infoExtractor = $infoExtractor;
         $this->sourceLoaders = $sourceLoaders;
+
+        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     /**
@@ -47,9 +55,7 @@ class Collector
      */
     public function collect(array $packages)
     {
-        $collection = array();
-
-        $normalizer = $this->listNormalizer;
+        $patchesByOwner = array();
 
         foreach ($packages as $package) {
             $ownerName = $package->getName();
@@ -64,32 +70,78 @@ class Collector
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
             $sourceLoaders = array_intersect_key($this->sourceLoaders, $config);
             $ownerConfig = array_diff_key($config, $this->sourceLoaders);
-
-            $patchListCollection = array();
-
+            
+            $loadedPatches = array();
+            
+            if (!$sourceLoaders) {
+                continue;
+            }
+            
             foreach ($sourceLoaders as $loaderName => $source) {
-                $groups = $source->load($package, $config[$loaderName]);
+                $resultGroups = $source->load($package, $config[$loaderName]);
 
-                $patchListCollection = array_merge(
-                    $patchListCollection,
-                    array_map(function (array $group) use ($ownerConfig, $normalizer) {
-                        return $normalizer->normalize($group, $ownerConfig);
-                    }, $groups)
+                $loadedPatches[$loaderName] = $this->applyListManipulators(
+                    $resultGroups, 
+                    $ownerConfig
                 );
             }
-
-            $patches = array_reduce($patchListCollection, 'array_merge_recursive', array());
-
-            foreach ($patches as $target => $items) {
-                foreach ($items as $index => $patch) {
-                    $collection[$target][] = array_replace($patch, array(
-                        PatchDefinition::OWNER => $ownerName,
-                        PatchDefinition::OWNER_IS_ROOT => ($package instanceof RootPackage),
-                    ));
-                }
-            }
+            
+            $patches = array_reduce(
+                array_reduce($loadedPatches, 'array_merge', array()),
+                'array_merge_recursive', 
+                array()
+            );
+            
+            $patchesByOwner[$ownerName] = $this->updatePackagePatchesConfig($package, $patches);
         }
+        
+        return array_reduce($patchesByOwner, 'array_merge_recursive', array());
+    }
+    
+    private function applyListManipulators(array $resultGroups, array $ownerConfig)
+    {
+        $normalizer = $this->listNormalizer;
 
-        return $collection;
+        return array_map(
+            function (array $results) use ($ownerConfig, $normalizer) {
+                $normalizedList = $normalizer->normalize($results, $ownerConfig);
+
+                return $this->applySharedConfig($results, $normalizedList);
+            },
+            $resultGroups
+        );
+    }
+    
+    private function applySharedConfig(array $configOrigin, array $patches)
+    {
+        $baseConfig = isset($configOrigin['_config']) ? $configOrigin['_config'] : array();
+
+        foreach ($configOrigin as $target => $items) {
+            $updates = array_replace(
+                $baseConfig,
+                isset($items['_config']) ? $items['_config'] : array()
+            );
+
+            if (!$updates || !isset($patches[$target])) {
+                continue;
+            }
+            
+            $patches[$target] = array_map(
+                function ($config) use ($updates) {
+                    return array_replace($config, $updates);
+                },
+                $patches[$target]
+            );
+        }
+        
+        return $patches;
+    }
+    
+    private function updatePackagePatchesConfig(PackageInterface $package, array $patches)
+    {
+        return $this->patchListUtils->embedInfoToItems($patches, array(
+            PatchDefinition::OWNER => $package->getName(),
+            PatchDefinition::OWNER_IS_ROOT => $package instanceof RootPackage
+        ));
     }
 }
