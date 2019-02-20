@@ -2,7 +2,15 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 4.9.0
+## 4.10.0
+
+### Feature
+
+* forward-port (3.41.0): allow patcher config overrides per package instead of allowing it only per patch definition (reserved key: '_config'). More on this under the topic of 'Patches: shared config' in the README
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.10.0) [diff](https://github.com/vaimo/composer-patches/compare/4.9.0...4.10.0)
+
+## 4.9.0 (2019-02-12)
 
 ### Feature
 
@@ -208,9 +216,17 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.40.0...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.41.0...4.0.0)
 
-## 3.40.0
+## 3.41.0 (2019-02-20)
+
+### Feature
+
+* allow patcher config overrides per package instead of allowing it only per patch definition (reserved key: '_config'). More on this under the topic of 'Patches: shared config' in the README
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.41.0) [diff](https://github.com/vaimo/composer-patches/compare/3.40.0...3.41.0)
+
+## 3.40.0 (2019-02-12)
 
 ### Feature
 

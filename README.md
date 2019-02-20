@@ -672,8 +672,49 @@ Available cwd options:
 4. **autoload** - uses path that the package has configured as autoloader root (will use first path when multiple
    paths defined). Falls back to using 'install' path when autoloader config not found.
 
-This is particulary useful when `targeted/package` introduces it's own file mapper mechanism that is triggered 
+This is particularly useful when `targeted/package` introduces it's own file mapper mechanism that is triggered 
 by composer events (which might mean that files are copied away from the re-install package before patch applier kicks in).
+
+## Patches: shared config
+
+In case all patches from certain owner package (the package where the patches originate from) require same
+setup for every one of them - a shared configuration could be defined (which will be used for all the patches).
+
+```json
+  {
+    "extra": {
+      "patches": {  
+        "_config": {
+          "cwd": "autoload"
+        }
+        "targeted/package": {
+          "_config": {
+            "version": ">2.0.0"
+          }
+          "This patch downloads a file to project root": "example.patch",
+          "More information about the patch": "another.patch"
+        }    
+      }
+    }
+  }
+```  
+
+This particular example will allow you to skip from having to define the exact same thing for all the patches
+that target **targeted/package** and just define it once under the key **_config**. The information put there
+will be made available for all the patches.
+
+Note that different config items will be merged (lower scope overwriting the higher) so that what actually 
+applies in this case for all the patches is:
+
+```json
+{
+  "cwd": "autoload",
+  "version": ">2.0.0"
+}
+```
+
+If you have patches tucked away under different patches definitions files, then the config will not be 
+shared between them (will apply only to the patches in that particular patches definition file). 
 
 ## Patches Exclude: configuration
 
