@@ -636,11 +636,11 @@ setup for every one of them - a shared configuration could be defined (which wil
       "patches": {  
         "_config": {
           "cwd": "autoload"
-        }
+        },
         "targeted/package": {
           "_config": {
             "version": ">2.0.0"
-          }
+          },
           "This patch downloads a file to project root": "example.patch",
           "More information about the patch": "another.patch"
         }    
