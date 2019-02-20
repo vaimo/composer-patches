@@ -2,7 +2,23 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 3.39.2
+## 3.41.0
+
+### Feature
+
+* allow patcher config overrides per package instead of allowing it only per patch definition (reserved key: '_config'). More on this under the topic of 'Patches: shared config' in the README
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.41.0) [diff](https://github.com/vaimo/composer-patches/compare/3.40.0...3.41.0)
+
+## 3.40.0 (2019-02-12)
+
+### Feature
+
+* allow patch to target the autoloader root (instead of targeting package root) by configuring 'cwd' key to 'autoload'
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.40.0) [diff](https://github.com/vaimo/composer-patches/compare/3.39.2...3.40.0)
+
+## 3.39.2 (2019-02-12)
 
 ### Maintenance
 
