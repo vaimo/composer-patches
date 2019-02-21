@@ -1064,7 +1064,7 @@ composer patch:redo --from-source
 composer patch:validate --from-source
 
 # List registered with their current status (with optional filter(s))
-copmposer patch:list --status new --status removed
+composer patch:list --status new --status removed
 
 # List all patches that have either changed, are new or got removed 
 composer patch:list --status '!applied'
