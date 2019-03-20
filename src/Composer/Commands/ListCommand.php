@@ -106,6 +106,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         $configInstance = $configFactory->create(array($config));
         
         $filteredPool = $this->createLoaderPool();
+        
         $unfilteredPool = $this->createLoaderPool(array('constraints', 'local-exclude', 'global-exclude'));
 
         $listResolver = new ListResolvers\FilteredListResolver($filters);

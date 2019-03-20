@@ -36,14 +36,16 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
             . DIRECTORY_SEPARATOR 
             . Config::PACKAGE_CONFIG_FILE;
         
-        if (file_exists($source)) {
-            $fileContents = $this->configLoader->readToArray($source);
-            
-            if (isset($fileContents[$configKey])) {
-                return $fileContents[$configKey];
-            }
+        if (!file_exists($source)) {
+            return null;
         }
-        
-        return null;
+
+        $fileContents = $this->configLoader->readToArray($source);
+
+        if (!isset($fileContents[$configKey])) {
+            return null;
+        }
+
+        return $fileContents[$configKey];
     }
 }

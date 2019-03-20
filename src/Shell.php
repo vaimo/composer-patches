@@ -35,7 +35,7 @@ class Shell
         $output = '';
         
         $outputHandler = function ($type, $data) use ($logger, &$output) {
-            $output = $output . $data;
+            $output .= $data;
             
             $logger->writeVerbose('comment', trim($data));
         };
@@ -46,7 +46,7 @@ class Shell
         
         $result = $processExecutor->execute($command, $outputHandler, $cwd);
 
-        return array($result == 0, $output);
+        return array($result === 0, $output);
     }
     
     private function getProcessExecutor()

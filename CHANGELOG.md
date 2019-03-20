@@ -2,7 +2,19 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 3.41.0
+## DEV.3.42.0
+
+### Feature
+
+* added more informative patches configuration JSON validation (that gives exact details on what's wrong with the JSON file)
+
+### Maintenance
+
+* made plugin commands available within the plugin itself (not currently used for anything)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/DEV.3.42.0) [diff](https://github.com/vaimo/composer-patches/compare/3.41.0...DEV.3.42.0)
+
+## 3.41.0 (2019-02-20)
 
 ### Feature
 

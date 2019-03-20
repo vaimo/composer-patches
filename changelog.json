@@ -1,4 +1,17 @@
 {
+    "_readme": [
+        "The contents of this file are used to generate CHANGELOG.md; It's kept in JSON/parsable format to make it",
+        "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
+        "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
+    ],
+    "DEV.3.42.0": {
+        "feature": [
+            "added more informative patches configuration JSON validation (that gives exact details on what's wrong with the JSON file)"
+        ],
+        "maintenance": [
+            "made plugin commands available within the plugin itself (not currently used for anything, potentially used in integration tests in the near future)"
+        ]
+    },
     "3.41.0": {
         "feature": [
             "allow patcher config overrides per package instead of allowing it only per patch definition (reserved key: '_config'). More on this under the topic of 'Patches: shared config' in the README"
