@@ -65,16 +65,12 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
 
-        $patchesWithTargets = array_reduce($patches, function (array $result, array $items) {
-            return array_merge(
-                $result,
-                array_values(
-                    array_map(function ($item) {
-                        return $item['path'];
-                    }, $items)
-                )
-            );
-        }, array());
+        $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
+
+        $patchDefines = \array_combine(
+            $patchListUtils->extractValue($patches, 'path'),
+            $patchListUtils->extractValue($patches, 'owner')
+        );
 
         $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
         $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
@@ -128,59 +124,94 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $installPaths[$packageName] = $installPath;
         }
 
+        $dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
+        
         foreach ($matches as $packageName => $package) {
             $installPath = $installPaths[$packageName];
 
-            $skippedPaths = array(
-                $installPath . DIRECTORY_SEPARATOR . $vendorPath,
-                $installPath . DIRECTORY_SEPARATOR . '.hg',
-                $installPath . DIRECTORY_SEPARATOR . '.git'
+            $skippedPaths = $dataUtils->prefixArrayValues(
+                array($vendorPath, '.hg', '.git'), 
+                $installPath . DIRECTORY_SEPARATOR
             );
 
-            $filter = $filterUtils->composeRegex($filterUtils->invertRules($skippedPaths), '/');
+            $filter = $filterUtils->composeRegex(
+                $filterUtils->invertRules($skippedPaths), 
+                '/'
+            );
 
-            $filter = rtrim($filter, '/') . '.+\.patch' . '/i';
+            $filter = sprintf('%s.+\.patch/i', rtrim($filter, '/'));
 
             $result = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
 
-            $fileMatches = array_replace($fileMatches, array_fill_keys($result, $packageName));
+            $fileMatches = array_replace(
+                $fileMatches, 
+                array_fill_keys($result, $packageName)
+            );
         }
+        
+        $groups = array_filter(
+            $this->collectOrphans($fileMatches, $patchDefines, $installPaths)
+        );
+        
+        $this->outputOrphans($output, $groups);
 
-        $groups = $this->collectOrphans($fileMatches, $patchesWithTargets, $installPaths);
-
-        $this->generateOutput($output, $groups);
+        if ($groups) {
+            $output->writeln('<error>Orphans found!</error>');
+        } else {
+            $output->writeln('<info>Validation completed successfully</info>');
+        }
+        
+        return (int)(bool)$groups;
     }
 
     private function collectOrphans($fileMatches, $patchesWithTargets, $installPaths)
     {
-        $orphanFiles = array_diff_key($fileMatches, array_flip($patchesWithTargets));
+        $orphanFiles = array_diff_key($fileMatches, $patchesWithTargets);
+        $orphanConfig = array_diff_key($patchesWithTargets, $fileMatches);
 
         $groups = array_fill_keys(array_keys($installPaths), array());
 
         foreach ($orphanFiles as $path => $ownerName)  {
             $installPath = $installPaths[$ownerName];
-            $groups[$ownerName][] = ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR);
+            
+            $groups[$ownerName][] = [
+                'issue' => 'NO CONFIG',
+                'path' => ltrim(
+                    substr($path, strlen($installPath)),
+                    DIRECTORY_SEPARATOR
+                )
+            ];
+        }
+        
+        foreach ($orphanConfig as $path => $ownerName) {
+            $installPath = $installPaths[$ownerName];
+
+            $groups[$ownerName][] = [
+                'issue' => 'NO FILE',
+                'path' => ltrim(
+                    substr($path, strlen($installPath)),
+                    DIRECTORY_SEPARATOR
+                )
+            ];
         }
 
         return $groups;
     }
 
-    private function generateOutput(OutputInterface $output, array $groups)
+    private function outputOrphans(OutputInterface $output, array $groups)
     {
-        if ($groups = array_filter($groups)) {
-            foreach ($groups as $packageName => $paths) {
-                $output->writeln(sprintf('  - <info>%s</info>', $packageName));
+        $lines = array();
+        
+        foreach ($groups as $packageName => $items) {
+            $lines[] = sprintf('  - <info>%s</info>', $packageName);
 
-                foreach ($paths as $path) {
-                    $output->writeln(sprintf('    ~ %s', $path));
-                }
+            foreach ($items as $item) {
+                $lines[] = sprintf('    ~ %s [<fg=red>%s</>]', $item['path'], $item['issue']);
             }
-
-            $output->writeln('<error>Orphans found!</error>');
-
-            exit(1);
-        } else {
-            $output->writeln('<info>Validation completed successfully</info>');
+        }
+        
+        foreach ($lines as $line) {
+            $output->writeln($line);
         }
     }
 }

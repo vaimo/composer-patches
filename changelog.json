@@ -4,9 +4,17 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
-    "DEV.3.42.0": {
+    "3.42.0": {
         "feature": [
-            "added more informative patches configuration JSON validation (that gives exact details on what's wrong with the JSON file)"
+            "added more informative patches configuration JSON validation (that gives exact details on what's wrong with the JSON file)",
+            "added alias for --excluded argument: --with-excludes for more intuitive usage and to move towards more self-documenting arguments",
+            "added alias for --explicit argument: --show-reapplies for more intuitive usage and to move towards more self-documenting arguments",
+            "added reason to patch:validation errors (either 'NO FILE' or 'NO CONFIG')"
+        ],
+        "fix": [
+            "crash when running patch:list in situation where none of bundled patches dependencies is directly available (expectation: should be able to list all patches even when none of the targets are installed)",
+            "the patch:validate not catching situations where there's a patch JSON declaration that has no corresponding file at the place where the declaration targets",
+            "incorrect TMP path on Windows [git:22]"
         ],
         "maintenance": [
             "made plugin commands available within the plugin itself (not currently used for anything, potentially used in integration tests in the near future)"

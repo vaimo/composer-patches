@@ -392,4 +392,21 @@ class PatchListUtils
             }, $group);
         }, $patches);
     }
+    
+    public function extractValue($patches, $key)
+    {
+        return array_reduce(
+            $patches,
+            function (array $result, array $items) use ($key) {
+                $values = array_values(
+                    array_map(function ($item) use ($key) {
+                        return $item[$key];
+                    }, $items)
+                );
+
+                return array_merge($result, $values);
+            },
+            array()
+        );
+    }    
 }

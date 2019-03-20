@@ -46,7 +46,8 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                 $source = $patchData[PatchDefinition::URL];
                 
                 $filename = sprintf(
-                    '/tmp/composer-patches-%s.patch', 
+                    '%s/composer-patches-%s.patch',
+                    sys_get_temp_dir(),
                     md5($this->rootPackage->getName() . '|' . $source)
                 );
                 

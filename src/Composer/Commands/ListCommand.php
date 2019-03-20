@@ -12,6 +12,7 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
+use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 
 class ListCommand extends \Composer\Command\BaseCommand
 {
@@ -52,6 +53,13 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
 
         $this->addOption(
+            '--with-excludes',
+            null,
+            InputOption::VALUE_NONE,
+            'Alias for \'excluded\' argument'
+        );
+        
+        $this->addOption(
             '--brief',
             null,
             InputOption::VALUE_NONE,
@@ -76,9 +84,9 @@ class ListCommand extends \Composer\Command\BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $composer = $this->getComposer();
-        
+
         $isDevMode = !$input->getOption('no-dev');
-        $withExcluded = $input->getOption('excluded');
+        $withExcluded = $input->getOption('excluded') || $input->getOption('with-excludes');
         $beBrief = $input->getOption('brief');
 
         $filters = array(
@@ -106,8 +114,23 @@ class ListCommand extends \Composer\Command\BaseCommand
         $configInstance = $configFactory->create(array($config));
         
         $filteredPool = $this->createLoaderPool();
+
+        $installationManager = $composer->getInstallationManager();
+        $composerConfig = clone $composer->getConfig();
+
+        $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
+
+        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
+            $installationManager,
+            $vendorRoot
+        );
         
-        $unfilteredPool = $this->createLoaderPool(array('constraints', 'local-exclude', 'global-exclude'));
+        $unfilteredPool = $this->createLoaderPool(array(
+            'constraints' => false, 
+            'local-exclude' => false, 
+            'global-exclude' => false, 
+            'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver, true)
+        ));
 
         $listResolver = new ListResolvers\FilteredListResolver($filters);
 
@@ -142,13 +165,13 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         if ($shouldIncludeExcludedPatches) {
             $patchesLoader = $loaderFactory->create($unfilteredPool, $configInstance, $isDevMode);
+
+            $allPatches = $patchesLoader->loadFromPackagesRepository($repository);
             
-            $allPatches = $listResolver->resolvePatchesQueue(
-                $patchesLoader->loadFromPackagesRepository($repository)
-            );
+            $patchesQueue = $listResolver->resolvePatchesQueue($allPatches);
             
             $excludedPatches = $patchListUtils->updateStatuses(
-                array_filter($patchListUtils->diffListsByPath($allPatches, $filteredPatches)),
+                array_filter($patchListUtils->diffListsByPath($patchesQueue, $filteredPatches)),
                 'excluded'
             );
 
@@ -172,7 +195,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         $this->generateOutput($output, $patches);
     }
     
-    private function createLoaderPool(array $excludedComponentNames = array())
+    private function createLoaderPool(array $componentUpdates = array())
     {
         $composer = $this->getComposer();
         $io = $this->getIO();
@@ -182,8 +205,8 @@ class ListCommand extends \Composer\Command\BaseCommand
             $io
         );
 
-        foreach ($excludedComponentNames as $componentName) {
-            $componentPool->registerComponent($componentName, false);
+        foreach ($componentUpdates as $componentName => $replacement) {
+            $componentPool->registerComponent($componentName, $replacement);
         }
         
         return $componentPool;
