@@ -80,7 +80,7 @@ class PatchApplier
         $appliedPatches = array();
         
         foreach ($patchesQueue as $source => $info) {
-            $muteDepth = !$this->outputStrategy->shouldAllowForPatches([$info]) 
+            $muteDepth = !$this->outputStrategy->shouldAllowForPatches(array($info)) 
                 ? $this->logger->mute() 
                 : null;
 

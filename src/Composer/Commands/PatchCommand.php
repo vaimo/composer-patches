@@ -110,7 +110,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $behaviourFlags = $this->getBehaviourFlags($input);
         $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
 
-        if (!array_filter($filters) && $behaviourFlags['redo']) {
+        if ($behaviourFlags['redo'] && !array_filter($filters)) {
             $isExplicit = true;
         } 
         
