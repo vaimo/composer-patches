@@ -18,16 +18,25 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
      * @var \Composer\Util\RemoteFilesystem
      */
     private $remoteFilesystem;
+    
+    /**
+     * @var bool 
+     */
+    private $graceful;
 
     /**
+     * @param \Composer\Package\RootPackageInterface $rootPackage
      * @param \Composer\Util\RemoteFilesystem $remoteFilesystem
+     * @param bool $graceful
      */
     public function __construct(
         \Composer\Package\RootPackageInterface $rootPackage,
-        \Composer\Util\RemoteFilesystem $remoteFilesystem
+        \Composer\Util\RemoteFilesystem $remoteFilesystem,
+        $graceful = false
     ) {
         $this->rootPackage = $rootPackage;
         $this->remoteFilesystem = $remoteFilesystem;
+        $this->graceful = $graceful;
     }
 
     /**
@@ -53,7 +62,34 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                 
                 if (!file_exists($filename)) {
                     $hostname = parse_url($source, PHP_URL_HOST);
-                    $this->remoteFilesystem->copy($hostname, $source, $filename, false);   
+                    
+                    try {
+                        $this->remoteFilesystem->copy($hostname, $source, $filename, false);
+                    } catch (\Composer\Downloader\TransportException $exception) {
+                        if (strpos($exception->getMessage(), 'configuration does not allow connections') !== false) {
+                            $exception = new \Composer\Downloader\TransportException(
+                                sprintf(
+                                    'Your configuration does not allow connections to %s. ' .
+                                    'Override the \'secure-http\' to allow: ' .
+                                    'https://github.com/vaimo/composer-patches#patcher-configuration', 
+                                    $source
+                                ),
+                                $exception->getCode()
+                            );
+
+                            $patchData[PatchDefinition::STATUS_LABEL] = 'UNSECURE';
+                        }
+                        
+                        if ($exception->getCode() === 404) {
+                            $patchData[PatchDefinition::STATUS_LABEL] = 'ERROR 404';
+                        }
+                        
+                        if ($this->graceful) {
+                            continue;
+                        }
+
+                        throw $exception;
+                    }
                 }
 
                 $patchData[PatchDefinition::PATH] = $filename;

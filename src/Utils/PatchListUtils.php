@@ -393,14 +393,26 @@ class PatchListUtils
         }, $patches);
     }
     
-    public function extractValue($patches, $key)
+    public function extractValue($patches, array $keys)
     {
         return array_reduce(
             $patches,
-            function (array $result, array $items) use ($key) {
+            function (array $result, array $items) use ($keys) {
                 $values = array_values(
-                    array_map(function ($item) use ($key) {
-                        return $item[$key];
+                    array_map(function ($item) use ($keys) {
+                        foreach ($keys as $key) {
+                            if (!isset($item[$key])) {
+                                continue;
+                            }
+                            
+                            if (!$item[$key]) {
+                                continue;
+                            }
+                            
+                            return $item[$key];
+                        }
+                        
+                        return null;
                     }, $items)
                 );
 

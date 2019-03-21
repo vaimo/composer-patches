@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
+use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
@@ -27,13 +29,12 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             'Apply patches based on information directly from packages in vendor folder'
         );
     }
-
+    
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Scanning packages for orphan patches</info>');
 
         $composer = $this->getComposer();
-        $io = $this->getIO();
 
         $config = array(
             \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
@@ -42,12 +43,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
                 'vendors' => true
             )
         );
-
-        $loaderComponentsPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
-            $composer,
-            $io
-        );
-
+        
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
 
@@ -55,23 +51,41 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $config = $configFactory->create(array($config));
 
-        $skippedComponents = array('constraints', 'targets-resolver', 'local-exclude', 'global-exclude');
-
-        foreach ($skippedComponents as $componentName) {
-            $loaderComponentsPool->registerComponent($componentName, false);
-        }
-
+        $composerConfig = clone $composer->getConfig();
+        $downloader = new \Composer\Util\RemoteFilesystem($this->getIO(), $composerConfig);
+        
+        $loaderComponentsPool = $this->createLoaderPool(array(
+            'constraints' => false, 
+            'targets-resolver' => false, 
+            'local-exclude' => false, 
+            'global-exclude' => false,
+            'downloader' => new LoaderComponents\DownloaderComponent(
+                $composer->getPackage(), 
+                $downloader,
+                true
+            )
+        ));
+        
         $patchesLoader = $loaderFactory->create($loaderComponentsPool, $config, true);
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
 
         $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
 
-        $patchDefines = \array_combine(
-            $patchListUtils->extractValue($patches, 'path'),
-            $patchListUtils->extractValue($patches, 'owner')
+        $patchPaths = $patchListUtils->extractValue($patches, array(Patch::PATH, Patch::SOURCE));
+        
+        $patchDefines = array_combine(
+            $patchPaths, 
+            $patchListUtils->extractValue($patches, array(Patch::OWNER))
         );
-
+        
+        $patchStatuses = array_filter(
+            array_combine(
+                $patchPaths, 
+                $patchListUtils->extractValue($patches, array(Patch::STATUS_LABEL))
+            )
+        );
+        
         $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
         $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
 
@@ -104,7 +118,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
 
         $projectRoot = getcwd();
-        $vendorRoot = $composer->getConfig()->get(ConfigKeys::VENDOR_DIR);
+        $vendorRoot = $composerConfig->get(ConfigKeys::VENDOR_DIR);
         $vendorPath = ltrim(
             substr($vendorRoot, strlen($projectRoot)),
             DIRECTORY_SEPARATOR
@@ -150,7 +164,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         }
         
         $groups = array_filter(
-            $this->collectOrphans($fileMatches, $patchDefines, $installPaths)
+            $this->collectOrphans($fileMatches, $patchDefines, $installPaths, $patchStatuses)
         );
         
         $this->outputOrphans($output, $groups);
@@ -164,35 +178,67 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         return (int)(bool)$groups;
     }
 
-    private function collectOrphans($fileMatches, $patchesWithTargets, $installPaths)
+    private function createLoaderPool(array $componentUpdates = array())
+    {
+        $composer = $this->getComposer();
+        $io = $this->getIO();
+
+        $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
+            $composer,
+            $io
+        );
+
+        foreach ($componentUpdates as $componentName => $replacement) {
+            $componentPool->registerComponent($componentName, $replacement);
+        }
+
+        return $componentPool;
+    }
+    
+    private function collectOrphans($fileMatches, $patchesWithTargets, $installPaths, $patchStatuses)
     {
         $orphanFiles = array_diff_key($fileMatches, $patchesWithTargets);
+        
         $orphanConfig = array_diff_key($patchesWithTargets, $fileMatches);
+
+        /**
+         * Make sure that downloaded patches are not perceived as missing files
+         */
+        $orphanConfig = array_diff_key(
+            $orphanConfig, 
+            array_flip(
+                array_filter(array_keys($orphanConfig), 'file_exists')
+            )
+        );
 
         $groups = array_fill_keys(array_keys($installPaths), array());
 
         foreach ($orphanFiles as $path => $ownerName)  {
             $installPath = $installPaths[$ownerName];
             
-            $groups[$ownerName][] = [
+            $groups[$ownerName][] = array(
                 'issue' => 'NO CONFIG',
                 'path' => ltrim(
                     substr($path, strlen($installPath)),
                     DIRECTORY_SEPARATOR
                 )
-            ];
+            );
         }
         
         foreach ($orphanConfig as $path => $ownerName) {
             $installPath = $installPaths[$ownerName];
 
-            $groups[$ownerName][] = [
-                'issue' => 'NO FILE',
-                'path' => ltrim(
-                    substr($path, strlen($installPath)),
-                    DIRECTORY_SEPARATOR
-                )
-            ];
+            $sourcePathInfo = parse_url($path);
+            $sourceIncludesUrlScheme = isset($sourcePathInfo['scheme']) && $sourcePathInfo['scheme'];
+
+            $groups[$ownerName][] = array(
+                'issue' => isset($patchStatuses[$path]) && $patchStatuses[$path] 
+                    ? $patchStatuses[$path] 
+                    : 'NO FILE',
+                'path' => !$sourceIncludesUrlScheme 
+                    ? ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR) 
+                    : $path
+            );
         }
 
         return $groups;
