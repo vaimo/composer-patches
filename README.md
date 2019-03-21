@@ -75,7 +75,7 @@ All available/usable tags listed in [patch declaration with embedded target info
 
 Alternatively the patch can be targeted with configuring it via [providing the declaration in composer.json](#basic-usage-configuring-a-patch-via-composerjson).
 
-#### 4. make sure the patch is configured to target correct package
+#### 4. (optional) make sure the patch is configured to target correct package
 
 Check that the new patch is visible to the applier
 
@@ -92,7 +92,7 @@ some/package-name
     absolutely everything
 ```
 
-#### 5. make sure the patch actually applies properly
+#### 5. (optional) make sure the patch actually applies properly
 
 Test out the added patch (in project root).
 
@@ -122,7 +122,7 @@ any other package.
 #### 6. (demo) simulate normal flow of applying the patch
 
 ```shell
-composer patch:undo # remove the patch that we added at the last step
+composer patch:undo # remove all patches (in case optional steps were followed)
 composer install # will trigger install AND re-apply the patch
 composer install # second run; just to illustrate that already applied patches remain applied
 ```
