@@ -42,9 +42,7 @@ class ComponentPool
     {
         $rootPackage = $this->composer->getPackage();
         $extra = $rootPackage->getExtra();
-
-        $installationManager = $this->composer->getInstallationManager();
-
+        
         if (isset($extra['excluded-patches']) && !isset($extra[PluginConfig::EXCLUDED_PATCHES])) {
             $extra[PluginConfig::EXCLUDED_PATCHES] = $extra['excluded-patches'];
         }
@@ -53,9 +51,9 @@ class ComponentPool
             ? $extra[PluginConfig::EXCLUDED_PATCHES]
             : array();
 
+        $installationManager = $this->composer->getInstallationManager();
         $composerConfig = clone $this->composer->getConfig();
-        $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
-
+        
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
 
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
@@ -66,7 +64,9 @@ class ComponentPool
         $configExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\VendorConfigExtractor(
             $packageInfoResolver
         );
-        
+
+        $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
+
         $defaults = array(
             'bundle' => new LoaderComponents\BundleComponent($rootPackage),
             'global-exclude' => $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,

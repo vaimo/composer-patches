@@ -20,12 +20,19 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
     private $patchFileAnalyser;
 
     /**
+     * @var bool 
+     */
+    private $gracefulMode;
+
+    /**
      * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
      */
     public function __construct(
-        \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
+        \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver,
+        $gracefulMode = false
     ) {
         $this->packageInfoResolver = $packageInfoResolver;
+        $this->gracefulMode = $gracefulMode;
 
         $this->patchFileAnalyser = new \Vaimo\ComposerPatches\Patch\File\Analyser();
     }
@@ -44,15 +51,20 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                     ? $info[PatchDefinition::TARGETS]
                     : array();
 
-                if (count($targets) > 1 || reset($targets) != PatchDefinition::BUNDLE_TARGET) {
+                if (!in_array(PatchDefinition::BUNDLE_TARGET, $targets, true)) {
+                    continue;
+                }
+                
+                if (count($targets) > 1) {
                     continue;
                 }
 
                 $path = $info[PatchDefinition::PATH];
+                $source = $info[PatchDefinition::SOURCE];
 
                 if (!file_exists($path)) {
                     throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
-                        sprintf('Could not resolve targets (file not found): %s ',  $info[PatchDefinition::SOURCE])
+                        sprintf('Could not resolve targets (patch file not found): %s ',  $source)
                     );
 
                     continue;
@@ -62,13 +74,15 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                     file_get_contents($path)
                 );
 
-                if (!$targets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths)) {
+                $bundleTargets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths);
+                
+                if (!$bundleTargets && !$this->gracefulMode) {
                     throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
-                        sprintf('Could not resolve targets (zero matches): %s ',  $info[PatchDefinition::SOURCE])
+                        sprintf('Could not resolve targets (zero matches): %s ',  $source)
                     );
                 }
 
-                $patches[$patchTarget][$index][PatchDefinition::TARGETS] = array_unique($targets);
+                $patches[$patchTarget][$index][PatchDefinition::TARGETS] = array_unique($bundleTargets);
             }
         }
 

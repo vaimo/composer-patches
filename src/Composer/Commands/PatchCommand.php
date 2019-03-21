@@ -66,6 +66,13 @@ class PatchCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Show information for every patch that gets re-applied (due to package reset)'
         );
+
+        $this->addOption(
+            '--show-reapplies',
+            null,
+            InputOption::VALUE_NONE,
+            'Alias for \'explicit\' argument'
+        );
         
         $this->addOption(
             '--from-source',

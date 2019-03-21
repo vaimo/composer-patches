@@ -7,12 +7,28 @@ namespace Vaimo\ComposerPatches\Json;
 
 class Decoder
 {
+    /**
+     * @var \Seld\JsonLint\JsonParser
+     */
+    private $jsonLinter;
+
+    public function __construct()
+    {
+        $this->jsonLinter = new \Seld\JsonLint\JsonParser();
+    }
+
     public function decode($json)
     {
+        $error = $this->jsonLinter->lint($json);
+
+        if ($error) {
+            throw $error;
+        }
+
         $decodedJson = json_decode($json, true);
         $errorCode = json_last_error();
 
-        if ($errorCode != 0) {
+        if ($errorCode !== 0) {
             $errorMessage = 'Unknown error';
 
             $jsonErrorMessages = array(
@@ -27,8 +43,8 @@ class Decoder
                 $errorMessage = $jsonErrorMessages[$errorCode];
             }
 
-            throw new \Vaimo\ComposerPatches\Exceptions\DecoderException(
-                sprintf('There was an error in the supplied patches file: - %s', $errorMessage)
+            throw new \Vaimo\ComposerChangelogs\Exceptions\DecoderException(
+                sprintf('Error encountered while decoding JSON: - %s', $errorMessage)
             );
         }
 

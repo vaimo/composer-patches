@@ -7,6 +7,15 @@ namespace Vaimo\ComposerPatches\Utils;
 
 class DataUtils
 {
+    public function prefixArrayValues(array $data, $prefix)
+    {
+        return array_map(
+            function ($value) use ($prefix) {
+                return $prefix . $value;
+            }, $data
+        );
+    }
+    
     public function removeKeysByPrefix(array $data, $prefix)
     {
         return array_intersect_key(

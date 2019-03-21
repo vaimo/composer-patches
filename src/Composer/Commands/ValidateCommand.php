@@ -11,6 +11,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Config;
+use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
@@ -29,13 +31,12 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             'Apply patches based on information directly from packages in vendor folder'
         );
     }
-
+    
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Scanning packages for orphan patches</info>');
 
         $composer = $this->getComposer();
-        $io = $this->getIO();
 
 
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
@@ -44,12 +45,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $config = array(
             Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)
         );
-
-        $loaderComponentsPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
-            $composer,
-            $io
-        );
-
+        
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
             Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source')
         ));
@@ -60,27 +56,41 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $config = $configFactory->create(array($config));
 
-        $skippedComponents = array('constraints', 'targets-resolver', 'local-exclude', 'global-exclude');
-
-        foreach ($skippedComponents as $componentName) {
-            $loaderComponentsPool->registerComponent($componentName, false);
-        }
-
+        $composerConfig = clone $composer->getConfig();
+        $downloader = new \Composer\Util\RemoteFilesystem($this->getIO(), $composerConfig);
+        
+        $loaderComponentsPool = $this->createLoaderPool(array(
+            'constraints' => false, 
+            'targets-resolver' => false, 
+            'local-exclude' => false, 
+            'global-exclude' => false,
+            'downloader' => new LoaderComponents\DownloaderComponent(
+                $composer->getPackage(), 
+                $downloader,
+                true
+            )
+        ));
+        
         $patchesLoader = $loaderFactory->create($loaderComponentsPool, $config, true);
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
 
-        $patchesWithTargets = array_reduce($patches, function (array $result, array $items) {
-            return array_merge(
-                $result,
-                array_values(
-                    array_map(function ($item) {
-                        return $item['path'];
-                    }, $items)
-                )
-            );
-        }, array());
+        $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
 
+        $patchPaths = $patchListUtils->extractValue($patches, array(Patch::PATH, Patch::SOURCE));
+        
+        $patchDefines = array_combine(
+            $patchPaths, 
+            $patchListUtils->extractValue($patches, array(Patch::OWNER))
+        );
+        
+        $patchStatuses = array_filter(
+            array_combine(
+                $patchPaths, 
+                $patchListUtils->extractValue($patches, array(Patch::STATUS_LABEL))
+            )
+        );
+        
         $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
         $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
 
@@ -88,9 +98,14 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $sources = $sourcesResolver->resolvePackages($repository);
 
+        $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
+            [$composer->getPackage()]
+        );
+        
         $repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
 
-        $pluginPackage = $repositoryUtils->resolveForNamespace($repository, __NAMESPACE__);
+        $pluginPackage = $packageResolver->resolveForNamespace($repository, __NAMESPACE__);
+        
         $pluginName = $pluginPackage->getName();
 
         $pluginUsers = array_merge(
@@ -108,7 +123,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
 
         $projectRoot = getcwd();
-        $vendorRoot = $composer->getConfig()->get(ConfigKeys::VENDOR_DIR);
+        $vendorRoot = $composerConfig->get(ConfigKeys::VENDOR_DIR);
         $vendorPath = ltrim(
             substr($vendorRoot, strlen($projectRoot)),
             DIRECTORY_SEPARATOR
@@ -128,59 +143,126 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $installPaths[$packageName] = $installPath;
         }
 
+        $dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
+        
         foreach ($matches as $packageName => $package) {
             $installPath = $installPaths[$packageName];
 
-            $skippedPaths = array(
-                $installPath . DIRECTORY_SEPARATOR . $vendorPath,
-                $installPath . DIRECTORY_SEPARATOR . '.hg',
-                $installPath . DIRECTORY_SEPARATOR . '.git'
+            $skippedPaths = $dataUtils->prefixArrayValues(
+                array($vendorPath, '.hg', '.git'), 
+                $installPath . DIRECTORY_SEPARATOR
             );
 
-            $filter = $filterUtils->composeRegex($filterUtils->invertRules($skippedPaths), '/');
+            $filter = $filterUtils->composeRegex(
+                $filterUtils->invertRules($skippedPaths), 
+                '/'
+            );
 
-            $filter = rtrim($filter, '/') . '.+\.patch' . '/i';
+            $filter = sprintf('%s.+\.patch/i', rtrim($filter, '/'));
 
             $result = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
 
-            $fileMatches = array_replace($fileMatches, array_fill_keys($result, $packageName));
+            $fileMatches = array_replace(
+                $fileMatches, 
+                array_fill_keys($result, $packageName)
+            );
         }
+        
+        $groups = array_filter(
+            $this->collectOrphans($fileMatches, $patchDefines, $installPaths, $patchStatuses)
+        );
+        
+        $this->outputOrphans($output, $groups);
 
-        $groups = $this->collectOrphans($fileMatches, $patchesWithTargets, $installPaths);
-
-        $this->generateOutput($output, $groups);
+        if ($groups) {
+            $output->writeln('<error>Orphans found!</error>');
+        } else {
+            $output->writeln('<info>Validation completed successfully</info>');
+        }
+        
+        return (int)(bool)$groups;
     }
 
-    private function collectOrphans($fileMatches, $patchesWithTargets, $installPaths)
+    private function createLoaderPool(array $componentUpdates = array())
     {
-        $orphanFiles = array_diff_key($fileMatches, array_flip($patchesWithTargets));
+        $composer = $this->getComposer();
+        $io = $this->getIO();
+
+        $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
+            $composer,
+            $io
+        );
+
+        foreach ($componentUpdates as $componentName => $replacement) {
+            $componentPool->registerComponent($componentName, $replacement);
+        }
+
+        return $componentPool;
+    }
+    
+    private function collectOrphans($fileMatches, $patchesWithTargets, $installPaths, $patchStatuses)
+    {
+        $orphanFiles = array_diff_key($fileMatches, $patchesWithTargets);
+        
+        $orphanConfig = array_diff_key($patchesWithTargets, $fileMatches);
+
+        /**
+         * Make sure that downloaded patches are not perceived as missing files
+         */
+        $orphanConfig = array_diff_key(
+            $orphanConfig, 
+            array_flip(
+                array_filter(array_keys($orphanConfig), 'file_exists')
+            )
+        );
 
         $groups = array_fill_keys(array_keys($installPaths), array());
 
         foreach ($orphanFiles as $path => $ownerName)  {
             $installPath = $installPaths[$ownerName];
-            $groups[$ownerName][] = ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR);
+            
+            $groups[$ownerName][] = array(
+                'issue' => 'NO CONFIG',
+                'path' => ltrim(
+                    substr($path, strlen($installPath)),
+                    DIRECTORY_SEPARATOR
+                )
+            );
+        }
+        
+        foreach ($orphanConfig as $path => $ownerName) {
+            $installPath = $installPaths[$ownerName];
+
+            $sourcePathInfo = parse_url($path);
+            $sourceIncludesUrlScheme = isset($sourcePathInfo['scheme']) && $sourcePathInfo['scheme'];
+
+            $groups[$ownerName][] = array(
+                'issue' => isset($patchStatuses[$path]) && $patchStatuses[$path] 
+                    ? $patchStatuses[$path] 
+                    : 'NO FILE',
+                'path' => !$sourceIncludesUrlScheme 
+                    ? ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR) 
+                    : $path
+            );
         }
 
         return $groups;
     }
 
-    private function generateOutput(OutputInterface $output, array $groups)
+    private function outputOrphans(OutputInterface $output, array $groups)
     {
-        if ($groups = array_filter($groups)) {
-            foreach ($groups as $packageName => $paths) {
-                $output->writeln(sprintf('  - <info>%s</info>', $packageName));
+        $lines = array();
+        
+        foreach ($groups as $packageName => $items) {
+            $lines[] = sprintf('  - <info>%s</info>', $packageName);
 
-                foreach ($paths as $path) {
-                    $output->writeln(sprintf('    ~ %s', $path));
-                }
+            foreach ($items as $item) {
+                $lines[] = sprintf('    ~ %s [<fg=red>%s</>]', $item['path'], $item['issue']);
             }
-
-            $output->writeln('<error>Orphans found!</error>');
-
-            exit(1);
-        } else {
-            $output->writeln('<info>Validation completed successfully</info>');
+        }
+        
+        foreach ($lines as $line) {
+            $output->writeln($line);
         }
     }
 }

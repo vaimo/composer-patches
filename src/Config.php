@@ -23,7 +23,6 @@ class Config
     const EXCLUDED_PATCHES = 'patches-exclude';
 
     const APPLIED_FLAG = 'patches_applied';
-    const PATCHER_PLUGIN_MARKER = 'patcher_plugin';
 
     const PATCHER_CONFIG_ROOT = 'patcher';
     const PATCHER_APPLIERS = 'appliers';

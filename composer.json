@@ -11,12 +11,16 @@
     ],
     "require": {
         "php": ">=5.3.0",
+        "ext-json": "*",
         "composer-plugin-api": "^1.0",
         "tivie/php-os-detector": "^1.0",
-        "marcj/topsort": "^1.0"
+        "marcj/topsort": "^1.0",
+        "seld/jsonlint": "^1.7.1"
     },
     "require-dev": {
-        "vaimo/composer-changelogs": "^0.13.1"
+        "composer/composer": "^1.0.0",
+        "vaimo/composer-patches-proxy": "*",
+        "vaimo/composer-changelogs": "^0.15.0"
     },
     "support": {
         "source": "https://github.com/vaimo/composer-patches",
@@ -69,7 +73,6 @@
     "minimum-stability": "dev",
     "extra": {
         "class": "Vaimo\\ComposerPatches\\Plugin",
-        "patcher_plugin": true,
         "changelog": {
             "source": "changelog.json",
             "output": {
@@ -81,5 +84,11 @@
         "psr-4": {
             "Vaimo\\ComposerPatches\\": "src"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "modules/proxy-plugin"
+        }
+    ]
 }
