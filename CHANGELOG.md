@@ -2,7 +2,15 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 3.42.1
+## 3.42.2
+
+### Fix
+
+* additional rollbacks on newer array declaration usage (broke compatibility with 5.3)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.2) [diff](https://github.com/vaimo/composer-patches/compare/3.42.1...3.42.2)
+
+## 3.42.1 (2019-03-21)
 
 ### Fix
 
