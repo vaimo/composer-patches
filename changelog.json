@@ -19,7 +19,7 @@
             "patch validation not properly issues that one can have with remote patches (report UNSECURE and ERROR 404 patches)"
         ],
         "maintenance": [
-            "made plugin commands available within the plugin itself (not currently used for anything, potentially used in integration tests in the near future)"
+            "made patch commands available within the plugin itself (not currently used for anything, potentially used in integration tests in the near future)"
         ]
     },
     "3.41.0": {

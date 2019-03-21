@@ -2,17 +2,28 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## DEV.3.42.0
+## 3.42.0
 
 ### Feature
 
 * added more informative patches configuration JSON validation (that gives exact details on what's wrong with the JSON file)
+* added alias for --excluded argument: --with-excludes for more intuitive usage and to move towards more self-documenting arguments
+* added alias for --explicit argument: --show-reapplies for more intuitive usage and to move towards more self-documenting arguments
+* added reason to patch:validation errors (either 'NO FILE' or 'NO CONFIG')
+
+### Fix
+
+* incorrect TMP path on Windows [git:22]
+* crash when running patch:list in situation where none of bundled patches dependencies is directly available (expectation: should be able to list all patches even when none of the targets are installed)
+* the patch:validate not catching situations where there's a patch JSON declaration that has no corresponding file at the place where the declaration targets
+* better error message when wanting to download patches from unsecure URLs by referring to documentation of the plugin rather than to documentation of Composer (the module has it's own 'secure-http' config option that only affects patches)
+* patch validation not properly issues that one can have with remote patches (report UNSECURE and ERROR 404 patches)
 
 ### Maintenance
 
-* made plugin commands available within the plugin itself (not currently used for anything)
+* made patch commands available within the plugin itself (not currently used for anything, potentially used in integration tests in the near future)
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/DEV.3.42.0) [diff](https://github.com/vaimo/composer-patches/compare/3.41.0...DEV.3.42.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.0) [diff](https://github.com/vaimo/composer-patches/compare/3.41.0...3.42.0)
 
 ## 3.41.0 (2019-02-20)
 
