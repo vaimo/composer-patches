@@ -20,7 +20,12 @@ class Analyser
                 continue;
             }
 
-            $paths[] = trim(substr(strtok($line, chr(9)), strlen($prefix)));
+            $paths[] = trim(
+                substr(
+                    strtok($line, chr(9)), 
+                    strlen($prefix)
+                )
+            );
         }
 
         return $paths;

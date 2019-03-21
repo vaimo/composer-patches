@@ -15,22 +15,26 @@ class SourceResolver
             return array(
                 PatchDefinition::SOURCE => (string)$data
             );
-        } elseif (isset($data[PatchDefinition::SOURCE])) {
+        } 
+        
+        if (isset($data[PatchDefinition::SOURCE])) {
             unset($data[PatchDefinition::URL]);
 
             return $data;
-        } elseif (isset($data[PatchDefinition::URL])) {
+        } 
+        
+        if (isset($data[PatchDefinition::URL])) {
             $data[PatchDefinition::SOURCE] = $data[PatchDefinition::URL];
 
             unset($data[PatchDefinition::URL]);
 
             return $data;
-        } else {
-            $data[PatchDefinition::SOURCE] = strtolower(
-                str_replace(' ', '-', preg_replace('/[^A-Za-z0-9- ]/', '', $label))
-            );
-
-            return $data;
         }
+
+        $data[PatchDefinition::SOURCE] = strtolower(
+            str_replace(' ', '-', preg_replace('/[^A-Za-z0-9- ]/', '', $label))
+        );
+
+        return $data;
     }
 }

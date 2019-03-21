@@ -104,7 +104,7 @@ class Applier
                         : array($patcher[$operationCode]);
                     
                     foreach ($applierOperations as $operation) {
-                        $passOnFailure = substr($operation, 0, 1) === '!';
+                        $passOnFailure = strpos($operation, '!') === 0;
                         $operation = ltrim($operation, '!');
                         
                         $command = $this->templateUtils->compose($operation, $arguments, $variableEscapers);
