@@ -26,6 +26,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
 
     /**
      * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
+     * @param bool $gracefulMode
      */
     public function __construct(
         \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver,
