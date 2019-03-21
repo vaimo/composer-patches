@@ -94,7 +94,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $sources = $sourcesResolver->resolvePackages($repository);
 
         $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
-            [$composer->getPackage()]
+            array($composer->getPackage())
         );
         
         $repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
