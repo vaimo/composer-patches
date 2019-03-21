@@ -132,8 +132,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
             Config::PATCHER_GRACEFUL => (bool)$input->getOption('graceful') || $behaviourFlags['redo'] || $behaviourFlags['undo'],
             Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)
         ));
-        
-        if (!array_filter($filters) && $behaviourFlags['redo']) {
+
+        if ($behaviourFlags['redo'] && !array_filter($filters)) {
             $isExplicit = true;
         } 
         

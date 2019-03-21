@@ -5,7 +5,7 @@
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
     "4.11.0": {
-        "overview": "all features and fixes in this release are forward-ported from 3.42.0",
+        "overview": "all features and fixes in this release are forward-ported from 3.42.0 & 3.42.1",
         "feature": [
             "added more informative patches configuration JSON validation (that gives exact details on what's wrong with the JSON file)",
             "added alias for --excluded argument: --with-excludes for more intuitive usage and to move towards more self-documenting arguments",
@@ -17,7 +17,8 @@
             "crash when running patch:list in situation where none of bundled patches dependencies is directly available (expectation: should be able to list all patches even when none of the targets are installed)",
             "the patch:validate not catching situations where there's a patch JSON declaration that has no corresponding file at the place where the declaration targets",
             "better error message when wanting to download patches from unsecure URLs by referring to documentation of the plugin rather than to documentation of Composer (the module has it's own 'secure-http' config option that only affects patches)",
-            "patch validation not properly issues that one can have with remote patches (report UNSECURE and ERROR 404 patches)"
+            "patch validation not properly issues that one can have with remote patches (report UNSECURE and ERROR 404 patches)",
+            "rollback on newer array declaration usage (broke compatibility with 5.3)"
         ],
         "maintenance": [
             "made patch commands available within the plugin itself (not currently used for anything, potentially used in integration tests in the near future)"
@@ -169,6 +170,11 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
+    "3.42.1": {
+        "fix": [
+            "rollback on newer array declaration usage (broke compatibility with 5.3)"
         ]
     },
     "3.42.0": {
