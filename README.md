@@ -223,7 +223,7 @@ in front of all file-path based patch definitions.
 In this case you can define patches without having to repeatedly use the same base-path for every patch 
 definition.
 
-## Basic Usage: configuring a separet patches file
+## Basic Usage: configuring a separate patches file
 
 The way of defining the patches works for:
 
