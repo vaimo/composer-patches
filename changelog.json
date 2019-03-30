@@ -4,6 +4,14 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "DEV.3.43.0": {
+        "feature": [
+            "allow patch file paths, etc to be defined under extra/patcher key to make sure that they don't hog up too much main level keys of 'extra' config for given package (old keys are also still supported)"
+        ],
+        "fix": [
+            "some path processing functions did not use proper directory separator constant"
+        ]
+    },
     "3.42.2": {
         "fix": [
             "additional rollbacks on newer array declaration usage (broke compatibility with 5.3)"

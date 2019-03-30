@@ -28,6 +28,11 @@ class Collector
     private $sourceLoaders;
 
     /**
+     * @var \Vaimo\ComposerPatches\Patcher\ConfigReader 
+     */
+    private $patcherConfigReader;
+
+    /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils 
      */
     private $patchListUtils;
@@ -46,6 +51,8 @@ class Collector
         $this->infoExtractor = $infoExtractor;
         $this->sourceLoaders = $sourceLoaders;
 
+        $this->patcherConfigReader = new \Vaimo\ComposerPatches\Patcher\ConfigReader($this->infoExtractor);
+        
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
@@ -59,13 +66,8 @@ class Collector
 
         foreach ($packages as $package) {
             $ownerName = $package->getName();
-            
-            $config = array_filter(
-                (array)$this->infoExtractor->getConfig(
-                    $package, 
-                    \Vaimo\ComposerPatches\Config::CONFIG_ROOT
-                )
-            );
+
+            $config = $this->patcherConfigReader->readFromPackage($package);
 
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
             $sourceLoaders = array_intersect_key($this->sourceLoaders, $config);

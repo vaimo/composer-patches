@@ -153,7 +153,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
                 '/'
             );
 
-            $filter = sprintf('%s.+\.patch/i', rtrim($filter, '/'));
+            $filter = sprintf('%s.+\.patch/i', rtrim($filter, DIRECTORY_SEPARATOR));
 
             $result = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
 

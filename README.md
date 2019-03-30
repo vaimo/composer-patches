@@ -720,6 +720,16 @@ _Note that by default, user does not really have to declare any of this, but eve
 {
   "extra": {
     "patcher": {
+      "search": "patches",
+      "search-dev": "patches-dev",
+      "file": "patches.json",
+      "file-dev": "development.json",
+      "depends": {
+        "*": "magento/magetno2-base"
+      },
+      "paths": {
+        "*": "src/Bundled/{{file}}/version-{{version}}.patch"
+      },
       "secure-http": true,
       "force-reset": true,
       "sources": {
@@ -763,25 +773,28 @@ _Note that by default, user does not really have to declare any of this, but eve
 
 Some things to point out on patcher configuration:
  
-1. Sequence dictates everything. If applier code or operation is not mentioned in sequence configuration, 
+1. The options search, search-dev, file, file-dev, depends and paths can be declared on main level 
+   of 'extra' config as well, but users are encouraged to keep every configuration option of the module
+   in under one key that would allow the 'extra' not to be littered with multiple configuration key options. 
+2. Sequence dictates everything. If applier code or operation is not mentioned in sequence configuration, 
    it's not going to be taken into account. This means that users can easily override the whole standard
    configuration.
-2. Multiple alternative commands can be defined for each operation. Operation itself is considered to be 
+3. Multiple alternative commands can be defined for each operation. Operation itself is considered to be 
    success when at least one command call results in a SUCCESS return code 
-3. Patch is considered to be applied when all operations can be completed with SUCCESS return code.
-4. Exclamation mark in the beginning of an operation will be translated as 'failure is expected'.
-5. The values of 'level', 'file' and 'cwd' variables are populated by the plugin, rest of the variables 
+4. Patch is considered to be applied when all operations can be completed with SUCCESS return code.
+5. Exclamation mark in the beginning of an operation will be translated as 'failure is expected'.
+6. The values of 'level', 'file' and 'cwd' variables are populated by the plugin, rest of the variables 
    get their value from the response of the operations that have already been processed. This means 
    that 'bin' value will be the result of 'bin' operation. Note that if sequence places 'bin' after 'check' 
    or 'patch', then the former will be just removed from the template.
-6. The [[]] will indicate the value is used as-is, {{}} will make the value be shell-escaped.
-7. The remote patches are downloaded with same configuration as Composer packages, in case some patches are 
+7. The [[]] will indicate the value is used as-is, {{}} will make the value be shell-escaped.
+8. The remote patches are downloaded with same configuration as Composer packages, in case some patches are 
    served over HTTPS, developer can change the 'secure-http' key under patcher configuration to false. This
    will NOT affect the configuration of the package downloader (which has similar setting for package downloader).
-8. By default, the patcher will halt when encountering a package that has local changes to avoid developer
+9. By default, the patcher will halt when encountering a package that has local changes to avoid developer
    losing their work by accident. the 'force-reset' flag will force the patcher to continue resetting the 
    package code even when there are changes.
-9. The key 'operation-failures' provides developer an opportunity to fail an operation based on custom 
+10. The key 'operation-failures' provides developer an opportunity to fail an operation based on custom 
    output assessment (even when the original command returns with an exit code that seems to indicate that 
    the execution was successful). Operation failures are defined separately for each operation and can be
    customised in root package configuration;   

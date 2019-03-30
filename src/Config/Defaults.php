@@ -12,6 +12,10 @@ class Defaults
     public function getPatcherConfig()
     {
         return array(
+            Config::PATCHER_TARGETS => [],
+            Config::PATCHER_BASE_PATHS => [],
+            Config::PATCHER_FILE_DEV => [],
+            Config::PATCHER_FILE => [],
             Config::PATCHER_SECURE_HTTP => true,
             Config::PATCHER_FORCE_RESET => false,
             Config::PATCHER_SOURCES => array(
