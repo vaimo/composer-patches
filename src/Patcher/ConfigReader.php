@@ -30,12 +30,12 @@ class ConfigReader
         );
         
         return $this->mirrorConfigValues($config, array(
-            Keys::PATCHER_TARGETS => Keys::PATCHES_DEPENDS,
-            Keys::PATCHER_BASE_PATHS => Keys::PATCHES_BASE,
             Keys::PATCHER_FILE_DEV => Keys::DEV_DEFINITIONS_FILE,
             Keys::PATCHER_FILE => Keys::DEFINITIONS_FILE,
             Keys::PATCHER_SEARCH => Keys::DEFINITIONS_SEARCH,
-            Keys::PATCHER_SEARCH_DEV => Keys::DEV_DEFINITIONS_SEARCH
+            Keys::PATCHER_SEARCH_DEV => Keys::DEV_DEFINITIONS_SEARCH,
+            Keys::PATCHER_TARGETS => Keys::PATCHES_DEPENDS,
+            Keys::PATCHER_BASE_PATHS => Keys::PATCHES_BASE,
         ));
     }
     
