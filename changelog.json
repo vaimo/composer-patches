@@ -4,12 +4,15 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
-    "DEV.3.43.0": {
+    "3.43.0": {
         "feature": [
-            "allow patch file paths, etc to be defined under extra/patcher key to make sure that they don't hog up too much main level keys of 'extra' config for given package (old keys are also still supported)"
+            "allow patch file paths, etc to be defined under extra/patcher key to make sure that they don't hog up too much main level keys of 'extra' config for given package (old keys are also still supported)",
+            "allow some patches to be ignored when running patch:validate by providing list of path ignores in package's configuration: extra/patcher/ignore (takes array of ignored paths)",
+            "allow patcher operations to be split to have separate sub-operation per OS type"
         ],
         "fix": [
-            "some path processing functions did not use proper directory separator constant"
+            "some path processing functions did not use proper directory separator constant",
+            "patches not applied properly on Windows due to using 'which' instead of 'where' when resolving the patch applier absolute path"
         ]
     },
     "3.42.2": {
