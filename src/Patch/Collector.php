@@ -16,12 +16,7 @@ class Collector
      * @var \Vaimo\ComposerPatches\Patch\ListNormalizer
      */
     private $listNormalizer;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
-     */
-    private $infoExtractor;
-
+    
     /**
      * @var PatchSourceLoaderInterface[]
      */
@@ -39,19 +34,18 @@ class Collector
 
     /**
      * @param \Vaimo\ComposerPatches\Patch\ListNormalizer $listNormalizer
-     * @param \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor
+     * @param \Vaimo\ComposerPatches\Patcher\ConfigReader $patcherConfigReader
      * @param PatchSourceLoaderInterface[] $sourceLoaders
      */
     public function __construct(
         \Vaimo\ComposerPatches\Patch\ListNormalizer $listNormalizer,
-        \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor,
+        \Vaimo\ComposerPatches\Patcher\ConfigReader $patcherConfigReader,
         array $sourceLoaders
     ) {
         $this->listNormalizer = $listNormalizer;
-        $this->infoExtractor = $infoExtractor;
         $this->sourceLoaders = $sourceLoaders;
 
-        $this->patcherConfigReader = new \Vaimo\ComposerPatches\Patcher\ConfigReader($this->infoExtractor);
+        $this->patcherConfigReader = $patcherConfigReader;
         
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }

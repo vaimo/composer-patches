@@ -141,7 +141,9 @@ class ListCommand extends \Composer\Command\BaseCommand
         $repositoryStateAnalyser = $repositoryStateAnalyserFactory->create($configInstance);
         
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
-        $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(array($composer->getPackage()));
+        $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(
+            array($composer->getPackage())
+        );
 
         $repositoryAnalyser = new \Vaimo\ComposerPatches\Repository\Analyser(
             $packageCollector,

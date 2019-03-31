@@ -96,13 +96,13 @@ class ConfigFactory
             array($this->configUtils, 'mergeApplierConfig'),
             $defaults
         );
-
-        $config = $this->establishValidSubOperations($config, $subConfigKeys);
         
-        return new PluginConfig($config);
+        return new PluginConfig(
+            $this->resolveValidSubOperations($config, $subConfigKeys)
+        );
     }
     
-    private function establishValidSubOperations(array $config, array $subConfigKeys)
+    private function resolveValidSubOperations(array $config, array $subConfigKeys)
     {
         $subOperationKeys = array_merge(
             array_filter($subConfigKeys),
@@ -116,10 +116,7 @@ class ConfigFactory
                 continue;
             }
 
-            $operations = array_replace(
-                $defaultApplierOperations,
-                $operations
-            );
+            $operations = array_replace($defaultApplierOperations, $operations);
 
             foreach ($operations as $opCode => $operation) {
                 if (!is_array($operation)) {

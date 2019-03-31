@@ -724,6 +724,7 @@ _Note that by default, user does not really have to declare any of this, but eve
       "search-dev": "patches-dev",
       "file": "patches.json",
       "file-dev": "development.json",
+      "ignore": ["node_modules"],
       "depends": {
         "*": "magento/magetno2-base"
       },
@@ -797,7 +798,10 @@ Some things to point out on patcher configuration:
 10. The key 'operation-failures' provides developer an opportunity to fail an operation based on custom 
    output assessment (even when the original command returns with an exit code that seems to indicate that 
    the execution was successful). Operation failures are defined separately for each operation and can be
-   customised in root package configuration;   
+   customised in root package configuration;
+11. In case your package includes other patches other than just the ones that are applied with this plugin, consider
+    using patcher/ignore to exclude those the folders that contain such patches. Otherwise false failures will
+    be encountered when running `patch:validate`.
 
 Appliers are executed in the sequence dictated by sequence where several path levels are used with 
 validation until validation success is hit. Note that each applier will be visited before moving on to 
@@ -961,7 +965,9 @@ patches to be searched for from the root of the owner.
 Note that "search" can point to the same folder where you have the patches that have a proper declaration
 in a JSON file. 
 
-Note that patches-base, etc are not mandatory to be declared when using patches-search as the exact path
+Multiple values can be also used in the declaration by providing them as array of strings. 
+
+The key "patches-base", etc are not mandatory to be declared when using patches-search as the exact path
 of the patches will already be known.
 
 ## Patch Commands

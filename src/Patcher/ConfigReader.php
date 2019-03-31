@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Patcher;
 
 use Vaimo\ComposerPatches\Config as Keys;
+use Composer\Package\PackageInterface;
 
 class ConfigReader
 {
@@ -23,7 +24,7 @@ class ConfigReader
         $this->infoExtractor = $infoExtractor;
     }
     
-    public function readFromPackage(\Composer\Package\PackageInterface $package)
+    public function readFromPackage(PackageInterface $package)
     {
         $config = array_filter(
             (array)$this->infoExtractor->getConfig($package, Keys::CONFIG_ROOT)

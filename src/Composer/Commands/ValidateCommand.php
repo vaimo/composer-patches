@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
+use Vaimo\ComposerPatches\Config as PatcherConfigKeys;
 
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
@@ -36,7 +37,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $composer = $this->getComposer();
 
-        $config = array(
+        $pluginConfig = array(
             \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
                 'project' => true,
                 'packages' => true,
@@ -49,7 +50,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $repository = $composer->getRepositoryManager()->getLocalRepository();
 
-        $config = $configFactory->create(array($config));
+        $pluginConfig = $configFactory->create(array($pluginConfig));
 
         $composerConfig = clone $composer->getConfig();
         $downloader = new \Composer\Util\RemoteFilesystem($this->getIO(), $composerConfig);
@@ -66,7 +67,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             )
         ));
         
-        $patchesLoader = $loaderFactory->create($loaderComponentsPool, $config, true);
+        $patchesLoader = $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
 
@@ -89,7 +90,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
         $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
 
-        $sourcesResolver = $sourcesResolverFactory->create($config);
+        $sourcesResolver = $sourcesResolverFactory->create($pluginConfig);
 
         $sources = $sourcesResolver->resolvePackages($repository);
 
@@ -139,12 +140,28 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         }
 
         $dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
+
+        $defaultIgnores = array($vendorPath, '.hg', '.git', '.idea');
+
+        $patcherConfigReaderFactory = new \Vaimo\ComposerPatches\Factories\PatcherConfigReaderFactory(
+            $this->getComposer()
+        );
+        
+        $patcherConfigReader = $patcherConfigReaderFactory->create($pluginConfig);
         
         foreach ($matches as $packageName => $package) {
+            $patcherConfig = $patcherConfigReader->readFromPackage($package);
+            
+            $ignores = $dataUtils->getValueByPath(
+                $patcherConfig, 
+                array(PatcherConfigKeys::PATCHER_CONFIG_ROOT, PatcherConfigKeys::PATCHES_IGNORE),
+                array()
+            );
+            
             $installPath = $installPaths[$packageName];
-
+            
             $skippedPaths = $dataUtils->prefixArrayValues(
-                array($vendorPath, '.hg', '.git'), 
+                array_merge($defaultIgnores, $ignores), 
                 $installPath . DIRECTORY_SEPARATOR
             );
 
@@ -155,10 +172,6 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
             $filter = sprintf('%s.+\.patch/i', rtrim($filter, '/'));
 
-            // @todo: this function collects patches that do not belong to it. Basically it should only take patches that:
-            // @todo: ... a) are in the same folder structure that is targeted by the EXPLICIT patch declarations
-            // @todo: ... b) are in the root folder that is targeted by 'patches-search'
-            
             $result = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
 
             $fileMatches = array_replace(

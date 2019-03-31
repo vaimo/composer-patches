@@ -43,6 +43,7 @@ class Config
     const PATCHER_FILE = 'file';
     const PATCHER_FILE_DEV = 'file-dev';
     const PATCHER_SEARCH = 'search';
+    const PATCHES_IGNORE = 'ignore';
     const PATCHER_SEARCH_DEV = 'search-dev';
 
     const PATCHES_DEPENDS = 'patches-depend';

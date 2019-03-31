@@ -9,14 +9,18 @@ class FileSystemUtils
 {
     public function collectPathsRecursively($rootPath, $pattern)
     {
-        $directory = new \RecursiveDirectoryIterator($rootPath);
-        $iterator = new \RecursiveIteratorIterator($directory);
+        $directoryIterator = new \RecursiveDirectoryIterator($rootPath);
+        $recursiveIterator = new \RecursiveIteratorIterator($directoryIterator);
 
-        $regexIterator = new \RegexIterator($iterator, $pattern, \RecursiveRegexIterator::GET_MATCH);
+        $filesIterator = new \RegexIterator(
+            $recursiveIterator, 
+            $pattern, 
+            \RecursiveRegexIterator::GET_MATCH
+        );
 
         $files = array();
 
-        foreach ($regexIterator as $info) {
+        foreach ($filesIterator as $info) {
             $files[] = reset($info);
         }
 

@@ -84,4 +84,21 @@ class DataUtils
         
         return $result;
     }
+
+    public function getValueByPath(array $data, $path, $default = null)
+    {
+        if (!is_array($path)) {
+            $path = explode('/', $path);
+        }
+
+        foreach ($path as $key) {
+            if (is_array($data) && array_key_exists($key, $data)) {
+                $data = $data[$key];
+            } else {
+                return $default;
+            }
+        }
+
+        return $data;
+    }
 }
