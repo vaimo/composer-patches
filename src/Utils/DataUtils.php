@@ -7,6 +7,16 @@ namespace Vaimo\ComposerPatches\Utils;
 
 class DataUtils
 {
+    public function extractOrderedItems(array $items, array $targets)
+    {
+        $targets = array_flip($targets);
+
+        return array_replace(
+            array_intersect_key($targets, $items),
+            array_intersect_key($items, $targets)
+        );
+    }
+    
     public function prefixArrayValues(array $data, $prefix)
     {
         return array_map(

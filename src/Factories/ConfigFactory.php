@@ -29,6 +29,11 @@ class ConfigFactory
      */
     private $context;
 
+    /**
+     * @var \Vaimo\ComposerPatches\Utils\DataUtils 
+     */
+    private $dataUtils;
+
     public function __construct(
         \Composer\Composer $composer
     ) {
@@ -37,6 +42,7 @@ class ConfigFactory
         $this->defaults = new \Vaimo\ComposerPatches\Config\Defaults();
         $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
         $this->context = new \Vaimo\ComposerPatches\Config\Context();
+        $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
 
     public function create(array $configSources)
@@ -117,7 +123,7 @@ class ConfigFactory
                     continue;
                 }
 
-                $subOperations = array_intersect_key($operation, array_flip($subOperationKeys));
+                $subOperations = $this->dataUtils->extractOrderedItems($operation, $subOperationKeys);
 
                 if (!$subOperations) {
                     continue;
