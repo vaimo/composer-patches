@@ -91,6 +91,42 @@ class ConfigFactory
             $defaults
         );
 
+        $subOperationKeys = array_merge(
+            array_filter($subConfigKeys), 
+            array(PluginConfig::OS_DEFAULT)
+        );
+
+        $defaultApplierOperations = $config[PluginConfig::PATCHER_APPLIERS][PluginConfig::APPLIER_DEFAULT];
+        
+        foreach ($config[PluginConfig::PATCHER_APPLIERS] as $applierCode => $operations) {
+            if ($applierCode === PluginConfig::APPLIER_DEFAULT) {
+                continue;
+            }
+            
+            $operations = array_replace(
+                $defaultApplierOperations, 
+                $operations
+            );
+            
+            foreach ($operations as $opCode => $operation) {
+                if (!is_array($operation)) {
+                    continue;
+                }
+                
+                if (array_filter($operation, 'is_numeric')) {
+                    continue;
+                }
+
+                $subOperations = array_intersect_key($operation, array_flip($subOperationKeys));
+
+                if (!$subOperations) {
+                    continue;
+                }
+
+                $config[PluginConfig::PATCHER_APPLIERS][$applierCode][$opCode] = reset($subOperations);   
+            }
+        }
+        
         return new PluginConfig($config);
     }
 }

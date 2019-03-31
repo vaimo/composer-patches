@@ -155,6 +155,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
             $filter = sprintf('%s.+\.patch/i', rtrim($filter, '/'));
 
+            // @todo: this function collects patches that do not belong to it. Basically it should only take patches that:
+            // @todo: ... a) are in the same folder structure that is targeted by the EXPLICIT patch declarations
+            // @todo: ... b) are in the root folder that is targeted by 'patches-search'
+            
             $result = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
 
             $fileMatches = array_replace(

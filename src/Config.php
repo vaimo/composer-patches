@@ -33,6 +33,9 @@ class Config
     const PATCHER_SOURCES = 'sources';
     const PATCHER_SECURE_HTTP = 'secure-http';
     
+    const OS_DEFAULT = 'default';
+    const APPLIER_DEFAULT = 'DEFAULT';
+    
     const PATCHER_FORCE_RESET = 'force-reset';
 
     const PATCHER_TARGETS = 'depends';

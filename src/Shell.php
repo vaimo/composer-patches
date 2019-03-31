@@ -28,6 +28,10 @@ class Shell
 
     public function execute($command, $cwd = null)
     {
+        if (strpos($command, '<') === 0) {
+            return array(true, trim($command, '< '));
+        }
+        
         $processExecutor = $this->getProcessExecutor();
 
         $logger = $this->logger;

@@ -26,14 +26,20 @@ class Defaults
                 'vendors' => true,
             ),
             Config::PATCHER_APPLIERS => array(
+                'DEFAULT' => array(
+                    'resolver' => array(
+                        'default' => '< which',
+                        'windows' => '< where'
+                    )
+                ),
                 'GIT' => array(
-                    'bin' => 'which git',
+                    'bin' => '[[resolver]] git',
                     'ping' => '!cd .. && [[bin]] rev-parse --is-inside-work-tree',
                     'check' => '[[bin]] apply -p{{level}} --check {{file}}',
                     'patch' => '[[bin]] apply -p{{level}} {{file}}'
                 ),
                 'PATCH' => array(
-                    'bin' => 'which patch',
+                    'bin' => '[[resolver]] patch',
                     'check' => '[[bin]] -t --verbose -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
                     'patch' => '[[bin]] -t -p{{level}} --no-backup-if-mismatch < {{file}}'
                 )
@@ -51,7 +57,7 @@ class Defaults
             ),
             Config::PATCHER_SEQUENCE => array(
                 Config::PATCHER_APPLIERS => array('PATCH', 'GIT'),
-                Config::PATCHER_OPERATIONS => array('bin', 'ping', 'check', 'patch')
+                Config::PATCHER_OPERATIONS => array('resolver', 'bin', 'ping', 'check', 'patch')
             ),
             Config::PATCHER_LEVELS => array('0', '1', '2')
         );
