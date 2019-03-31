@@ -36,7 +36,10 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             $label = $data[PatchDefinition::LABEL];
         }
 
-        if (strpos($data[PatchDefinition::PATH], '/') === 0 && file_exists($data[PatchDefinition::PATH])) {
+        if (
+            strpos($data[PatchDefinition::PATH], DIRECTORY_SEPARATOR) === 0 
+            && file_exists($data[PatchDefinition::PATH])
+        ) {
             return array(
                 PatchDefinition::LABEL => $label,
                 PatchDefinition::SOURCE => $source
@@ -49,7 +52,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
 
         $sourceTags = '';
 
-        if (strstr($source, '#') !== false) {
+        if (strpos($source, '#') !== false) {
             $sourceSegments = explode('#', $source);
             $sourceTags = array_pop($sourceSegments);
             $source = implode('#', $sourceSegments);
@@ -146,7 +149,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
     {
         $templates = $ownerConfig[PluginConfig::PATCHES_BASE];
 
-        list($vendorName, ) = explode('/', $packageName);
+        $vendorName = strtok($packageName, '/');
 
         if (is_array($templates)) {
             if (isset($templates[$packageName])) {

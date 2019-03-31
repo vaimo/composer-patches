@@ -10,7 +10,6 @@ use Vaimo\ComposerPatches\Patch;
 use Vaimo\ComposerPatches\Patch\Definition\ExploderComponents;
 use Vaimo\ComposerPatches\Patch\Definition\NormalizerComponents;
 use Vaimo\ComposerPatches\Patch\SourceLoaders;
-use Vaimo\ComposerPatches\Package\ConfigExtractors;
 use Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool as LoaderComponents;
 
 class PatchesLoaderFactory
@@ -40,17 +39,10 @@ class PatchesLoaderFactory
 
         $composerConfig = clone $composer->getConfig();
         $patcherConfig = $pluginConfig->getPatcherConfig();
-
-        $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
-
+        
         $composerConfig->merge(array(
             'config' => array('secure-http' => $patcherConfig[PluginConfig::PATCHER_SECURE_HTTP])
         ));
-
-        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
-            $installationManager, 
-            $vendorRoot
-        );
 
         $loaders = array(
             PluginConfig::DEFINITIONS_LIST => new SourceLoaders\PatchList(),
@@ -66,12 +58,6 @@ class PatchesLoaderFactory
                 PluginConfig::DEV_DEFINITIONS_LIST => $loaders[PluginConfig::DEFINITIONS_LIST],
                 PluginConfig::DEV_DEFINITIONS_FILE => $loaders[PluginConfig::DEFINITIONS_FILE]
             ));
-        }
-
-        if ($pluginConfig->shouldPreferOwnerPackageConfig()) {
-            $infoExtractor = new ConfigExtractors\VendorConfigExtractor($packageInfoResolver);
-        } else {
-            $infoExtractor = new ConfigExtractors\InstalledConfigExtractor();
         }
 
         $exploderComponents = array(
@@ -105,9 +91,15 @@ class PatchesLoaderFactory
             $definitionNormalizer
         );
 
+        $configReaderFactory = new \Vaimo\ComposerPatches\Factories\PatcherConfigReaderFactory(
+            $this->composer
+        );
+
+        $configReader = $configReaderFactory->create($pluginConfig);
+        
         $patchesCollector = new Patch\Collector(
             $listNormalizer,
-            $infoExtractor,
+            $configReader,
             $loaders
         );
 

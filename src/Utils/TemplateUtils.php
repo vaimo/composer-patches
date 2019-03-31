@@ -57,23 +57,29 @@ class TemplateUtils
 
     public function compose($template, array $arguments, array $patterns)
     {
-        $variables = array();
-
+        $updateGroups = array();
+        
         foreach ($patterns as $format => $escaper) {
-            $variables = array_replace(
-                $variables,
-                array_combine(
-                    array_map(function ($item) use ($format) {
-                        return sprintf($format, $item);
-                    }, array_keys($arguments)),
-                    $escaper ? array_map($escaper, $arguments) : $arguments
-                )
+            $updateGroups[] = array_combine(
+                array_map(function ($item) use ($format) {
+                    return sprintf($format, $item);
+                }, array_keys($arguments)),
+                $escaper ? array_map($escaper, $arguments) : $arguments
             );
         }
+
+        $variables = array_reduce($updateGroups, 'array_replace', array());
+        
+        $names = array_keys($variables);
+        $values = array_map(function ($value) {
+            return trim(
+                strtok($value, PHP_EOL)
+            );
+        }, $variables);
         
         return str_replace(
-            array_keys($variables), 
-            array_map('trim', $variables), 
+            $names,
+            $values, 
             $template
         );
     }

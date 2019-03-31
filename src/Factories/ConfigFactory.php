@@ -34,7 +34,12 @@ class ConfigFactory
      * @var array
      */
     private $defaults;
-
+    
+    /**
+     * @var \Vaimo\ComposerPatches\Utils\DataUtils
+     */
+    private $dataUtils;
+    
     /**
      * @param \Composer\Composer $composer
      * @param array $defaults
@@ -49,6 +54,7 @@ class ConfigFactory
         $this->defaultsProvider = new \Vaimo\ComposerPatches\Config\Defaults();
         $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
         $this->context = new \Vaimo\ComposerPatches\Config\Context();
+        $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
 
     public function create(array $configSources = array())
@@ -107,7 +113,47 @@ class ConfigFactory
             array($this->configUtils, 'mergeApplierConfig'),
             $defaults
         );
+        
+        return new PluginConfig(
+            $this->resolveValidSubOperations($config, $subConfigKeys)
+        );
+    }
+    
+    private function resolveValidSubOperations(array $config, array $subConfigKeys)
+    {
+        $subOperationKeys = array_merge(
+            array_filter($subConfigKeys),
+            array(PluginConfig::OS_DEFAULT)
+        );
 
-        return new PluginConfig($config);
+        $defaultApplierOperations = $config[PluginConfig::PATCHER_APPLIERS][PluginConfig::APPLIER_DEFAULT];
+
+        foreach ($config[PluginConfig::PATCHER_APPLIERS] as $applierCode => $operations) {
+            if ($applierCode === PluginConfig::APPLIER_DEFAULT) {
+                continue;
+            }
+
+            $operations = array_replace($defaultApplierOperations, $operations);
+
+            foreach ($operations as $opCode => $operation) {
+                if (!is_array($operation)) {
+                    continue;
+                }
+
+                if (array_filter($operation, 'is_numeric')) {
+                    continue;
+                }
+
+                $subOperations = $this->dataUtils->extractOrderedItems($operation, $subOperationKeys);
+
+                if (!$subOperations) {
+                    continue;
+                }
+
+                $config[PluginConfig::PATCHER_APPLIERS][$applierCode][$opCode] = reset($subOperations);
+            }
+        }
+        
+        return $config;
     }
 }

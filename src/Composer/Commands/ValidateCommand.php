@@ -13,6 +13,7 @@ use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
+use Vaimo\ComposerPatches\Config as PatcherConfigKeys;
 
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
@@ -38,12 +39,14 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $composer = $this->getComposer();
 
-
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
         $defaults = $configDefaults->getPatcherConfig();
 
-        $config = array(
-            Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)
+        $pluginConfig = array(
+            Config::PATCHER_SOURCES => array_fill_keys(
+                array_keys($defaults[Config::PATCHER_SOURCES]), 
+                true
+            )
         );
         
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
@@ -54,7 +57,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $repository = $composer->getRepositoryManager()->getLocalRepository();
 
-        $config = $configFactory->create(array($config));
+        $pluginConfig = $configFactory->create(array($pluginConfig));
 
         $composerConfig = clone $composer->getConfig();
         $downloader = new \Composer\Util\RemoteFilesystem($this->getIO(), $composerConfig);
@@ -71,7 +74,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             )
         ));
         
-        $patchesLoader = $loaderFactory->create($loaderComponentsPool, $config, true);
+        $patchesLoader = $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
 
@@ -94,7 +97,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
         $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
 
-        $sourcesResolver = $sourcesResolverFactory->create($config);
+        $sourcesResolver = $sourcesResolverFactory->create($pluginConfig);
 
         $sources = $sourcesResolver->resolvePackages($repository);
 
@@ -144,12 +147,28 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         }
 
         $dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
+
+        $defaultIgnores = array($vendorPath, '.hg', '.git', '.idea');
+
+        $patcherConfigReaderFactory = new \Vaimo\ComposerPatches\Factories\PatcherConfigReaderFactory(
+            $this->getComposer()
+        );
+        
+        $patcherConfigReader = $patcherConfigReaderFactory->create($pluginConfig);
         
         foreach ($matches as $packageName => $package) {
+            $patcherConfig = $patcherConfigReader->readFromPackage($package);
+            
+            $ignores = $dataUtils->getValueByPath(
+                $patcherConfig, 
+                array(PatcherConfigKeys::PATCHER_CONFIG_ROOT, PatcherConfigKeys::PATCHES_IGNORE),
+                array()
+            );
+            
             $installPath = $installPaths[$packageName];
-
+            
             $skippedPaths = $dataUtils->prefixArrayValues(
-                array($vendorPath, '.hg', '.git'), 
+                array_merge($defaultIgnores, $ignores), 
                 $installPath . DIRECTORY_SEPARATOR
             );
 

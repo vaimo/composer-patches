@@ -12,6 +12,12 @@ class Defaults
     public function getPatcherConfig()
     {
         return array(
+            Config::PATCHER_FILE => array(),
+            Config::PATCHER_FILE_DEV => array(),
+            Config::PATCHER_SEARCH => array(),
+            Config::PATCHER_SEARCH_DEV => array(),
+            Config::PATCHER_TARGETS => array(),
+            Config::PATCHER_BASE_PATHS => array(),
             Config::PATCHER_GRACEFUL => false,
             Config::PATCHER_FROM_SOURCE => false,
             Config::PATCHER_FORCE_REAPPLY => false,
@@ -23,14 +29,20 @@ class Defaults
                 'vendors' => true,
             ),
             Config::PATCHER_APPLIERS => array(
+                'DEFAULT' => array(
+                    'resolver' => array(
+                        'default' => '< which',
+                        'windows' => '< where'
+                    )
+                ),
                 'GIT' => array(
-                    'bin' => 'which git',
+                    'bin' => '[[resolver]] git',
                     'ping' => '!cd .. && [[bin]] rev-parse --is-inside-work-tree',
                     'check' => '[[bin]] apply -p{{level}} --check {{file}}',
                     'patch' => '[[bin]] apply -p{{level}} {{file}}'
                 ),
                 'PATCH' => array(
-                    'bin' => 'which patch',
+                    'bin' => '[[resolver]] patch',
                     'check' => '[[bin]] -t --verbose -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
                     'patch' => '[[bin]] -t -p{{level}} --no-backup-if-mismatch < {{file}}'
                 )
@@ -48,7 +60,7 @@ class Defaults
             ),
             Config::PATCHER_SEQUENCE => array(
                 Config::PATCHER_APPLIERS => array('PATCH', 'GIT'),
-                Config::PATCHER_OPERATIONS => array('bin', 'ping', 'check', 'patch')
+                Config::PATCHER_OPERATIONS => array('resolver', 'bin', 'ping', 'check', 'patch')
             ),
             Config::PATCHER_LEVELS => array('0', '1', '2')
         );

@@ -54,7 +54,7 @@ class Applier
     {
         $result = false;
         
-        list($type, $patchLevel, $operationName) = array_fill(0, 3, 'UNKNOWN');
+        list($type, $patchLevel, $operationName, $operationCode) = array_fill(0, 4, 'UNKNOWN');
 
         $applierConfig = $this->applierUtils->mergeApplierConfig($this->config, array_filter($config));
         
@@ -158,7 +158,11 @@ class Applier
                 $this->logger->writeVerbose(
                     'warning',
                     '%s (type=%s) failed with p=%s',
-                    array($operationName, $type, $patchLevel)
+                    array(
+                        is_string($operationName) ? $operationName : $operationCode, 
+                        $type, 
+                        $patchLevel
+                    )
                 );
             }
         }

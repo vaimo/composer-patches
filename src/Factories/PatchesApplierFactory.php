@@ -78,7 +78,9 @@ class PatchesApplierFactory
             $this->logger
         );
 
-        $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(array($rootPackage));
+        $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(
+            array($rootPackage)
+        );
         
         $repositoryStateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
             $composer

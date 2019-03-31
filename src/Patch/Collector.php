@@ -16,16 +16,16 @@ class Collector
      * @var \Vaimo\ComposerPatches\Patch\ListNormalizer
      */
     private $listNormalizer;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
-     */
-    private $infoExtractor;
-
+    
     /**
      * @var PatchSourceLoaderInterface[]
      */
     private $sourceLoaders;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patcher\ConfigReader 
+     */
+    private $patcherConfigReader;
 
     /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils 
@@ -34,18 +34,19 @@ class Collector
 
     /**
      * @param \Vaimo\ComposerPatches\Patch\ListNormalizer $listNormalizer
-     * @param \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor
+     * @param \Vaimo\ComposerPatches\Patcher\ConfigReader $patcherConfigReader
      * @param PatchSourceLoaderInterface[] $sourceLoaders
      */
     public function __construct(
         \Vaimo\ComposerPatches\Patch\ListNormalizer $listNormalizer,
-        \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $infoExtractor,
+        \Vaimo\ComposerPatches\Patcher\ConfigReader $patcherConfigReader,
         array $sourceLoaders
     ) {
         $this->listNormalizer = $listNormalizer;
-        $this->infoExtractor = $infoExtractor;
         $this->sourceLoaders = $sourceLoaders;
 
+        $this->patcherConfigReader = $patcherConfigReader;
+        
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
@@ -59,13 +60,8 @@ class Collector
 
         foreach ($packages as $package) {
             $ownerName = $package->getName();
-            
-            $config = array_filter(
-                (array)$this->infoExtractor->getConfig(
-                    $package, 
-                    \Vaimo\ComposerPatches\Config::CONFIG_ROOT
-                )
-            );
+
+            $config = $this->patcherConfigReader->readFromPackage($package);
 
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
             $sourceLoaders = array_intersect_key($this->sourceLoaders, $config);
