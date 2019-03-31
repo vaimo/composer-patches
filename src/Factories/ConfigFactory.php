@@ -97,28 +97,35 @@ class ConfigFactory
             $defaults
         );
 
+        $config = $this->establishValidSubOperations($config, $subConfigKeys);
+        
+        return new PluginConfig($config);
+    }
+    
+    private function establishValidSubOperations(array $config, array $subConfigKeys)
+    {
         $subOperationKeys = array_merge(
-            array_filter($subConfigKeys), 
+            array_filter($subConfigKeys),
             array(PluginConfig::OS_DEFAULT)
         );
 
         $defaultApplierOperations = $config[PluginConfig::PATCHER_APPLIERS][PluginConfig::APPLIER_DEFAULT];
-        
+
         foreach ($config[PluginConfig::PATCHER_APPLIERS] as $applierCode => $operations) {
             if ($applierCode === PluginConfig::APPLIER_DEFAULT) {
                 continue;
             }
-            
+
             $operations = array_replace(
-                $defaultApplierOperations, 
+                $defaultApplierOperations,
                 $operations
             );
-            
+
             foreach ($operations as $opCode => $operation) {
                 if (!is_array($operation)) {
                     continue;
                 }
-                
+
                 if (array_filter($operation, 'is_numeric')) {
                     continue;
                 }
@@ -129,10 +136,10 @@ class ConfigFactory
                     continue;
                 }
 
-                $config[PluginConfig::PATCHER_APPLIERS][$applierCode][$opCode] = reset($subOperations);   
+                $config[PluginConfig::PATCHER_APPLIERS][$applierCode][$opCode] = reset($subOperations);
             }
         }
         
-        return new PluginConfig($config);
+        return $config;
     }
 }
