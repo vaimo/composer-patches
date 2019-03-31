@@ -2,7 +2,22 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 3.42.2
+## 3.43.0 (2019-03-31)
+
+### Feature
+
+* allow patch file paths, etc to be defined under extra/patcher key to make sure that they don't hog up too much main level keys of 'extra' config for given package (old keys are also still supported)
+* allow some patches to be ignored when running patch:validate by providing list of path ignores in package's configuration: extra/patcher/ignore (takes array of ignored paths)
+* allow patcher operations to be split to have separate sub-operation per OS type
+
+### Fix
+
+* some path processing functions did not use proper directory separator constant
+* patches not applied properly on Windows due to using 'which' instead of 'where' when resolving the patch applier absolute path
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.43.0) [diff](https://github.com/vaimo/composer-patches/compare/3.42.2...3.43.0)
+
+## 3.42.2 (2019-03-21)
 
 ### Fix
 
