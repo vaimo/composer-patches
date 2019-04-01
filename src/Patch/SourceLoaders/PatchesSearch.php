@@ -109,12 +109,20 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             echo 'Search results:' . PHP_EOL;
             
             foreach ($paths as $path) {
-                $definition = $this->createDefinitionItem(file_get_contents($path), array(
+                $content = file_get_contents($path);
+                
+                echo '========================================' . PHP_EOL;
+                echo 'PATH: ' . $path . PHP_EOL;
+                echo 'CONTENT:' . PHP_EOL;
+                echo $content . PHP_EOL;
+
+                $definition = $this->createDefinitionItem($content, array(
                     PatchDefinition::PATH => $path,
                     PatchDefinition::SOURCE => trim(substr($path, $basePathLength), DIRECTORY_SEPARATOR)
                 ));
                 
-                echo $path . PHP_EOL;
+                echo '========================================' . PHP_EOL;
+
                 echo json_encode($definition, JSON_PRETTY_PRINT) . PHP_EOL;
                 
                 if (!isset($definition[PatchDefinition::TARGET])) {
@@ -152,12 +160,22 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     {
         $header = $this->fileAnalyser->getHeader($contents);
 
+        echo 'HEADER:' . PHP_EOL;
+        
         $data = $this->applyAliases(
             $this->patchHeaderParser->parseContents($header),
             $this->tagAliases
         );
 
+        echo json_encode($data, JSON_PRETTY_PRINT) . PHP_EOL;
+
+        echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' . PHP_EOL;
+        
         list($target, $depends, $flags) = $this->resolveBaseInfo($data);
+
+        echo 'TARGET:' . $target . PHP_EOL;
+        echo 'DEPENDS:' . implode(',', $depends) . PHP_EOL;
+        echo 'FLAGS:' . implode(',' , array_keys($flags)) . PHP_EOL;
         
         if (array_intersect_key($flags, array_flip($this->bundledModeTypes))) {
             $target = PatchDefinition::BUNDLE_TARGET;
@@ -255,14 +273,15 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             ),
             true
         );
-        
-        return array(
-            $target,
-            array_filter(
-                array_replace($dependsConfig, array(PatchDefinition::BUNDLE_TARGET => false, '' => false))
-            ),
-            $patchTypeFlags
+
+        $flags = array_filter(
+            array_replace(
+                $dependsConfig,
+                array(PatchDefinition::BUNDLE_TARGET => false, '' => false)
+            )
         );
+        
+        return array($target, $flags, $patchTypeFlags);
     }
 
     private function extractValueList(array $data, $name, $default = array())
