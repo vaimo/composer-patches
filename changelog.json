@@ -7,7 +7,8 @@
     "3.44.0": {
         "feature": [
             "Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.43.0": {
         "feature": [
@@ -18,17 +19,20 @@
         "fix": [
             "some path processing functions did not use proper directory separator constant",
             "patches not applied properly on Windows due to using 'which' instead of 'where' when resolving the patch applier absolute path"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.42.2": {
         "fix": [
             "additional rollbacks on newer array declaration usage (broke compatibility with 5.3)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.42.1": {
         "fix": [
             "rollback on newer array declaration usage (broke compatibility with 5.3)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.42.0": {
         "feature": [
