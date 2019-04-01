@@ -41,17 +41,17 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     private $tagAliases = array();
 
     /**
-     * @var array
+     * @var array 
      */
     private $localTypes;
-
+    
     /**
      * @var array
      */
     private $devModeTypes;
 
     /**
-     * @var array
+     * @var array 
      */
     private $bundledModeTypes;
 
@@ -95,7 +95,10 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
 
         $results = array();
 
+        echo 'Scanning search sources:' . PHP_EOL;
         foreach ($source as $item) {
+            echo '> ' . $item . PHP_EOL;
+            
             $paths = $this->fileSystemUtils->collectPathsRecursively(
                 $basePath . DIRECTORY_SEPARATOR . $item,
                 PluginConfig::PATCH_FILE_REGEX_MATCHER
@@ -103,15 +106,23 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
 
             $groups = array();
 
+            echo 'Search results:' . PHP_EOL;
+            
             foreach ($paths as $path) {
                 $definition = $this->createDefinitionItem(file_get_contents($path), array(
                     PatchDefinition::PATH => $path,
                     PatchDefinition::SOURCE => trim(substr($path, $basePathLength), DIRECTORY_SEPARATOR)
                 ));
-
+                
+                echo $path . PHP_EOL;
+                echo json_encode($definition, JSON_PRETTY_PRINT) . PHP_EOL;
+                
                 if (!isset($definition[PatchDefinition::TARGET])) {
                     continue;
                 }
+
+                echo 'RESULT: REGISTERED' . PHP_EOL;
+                echo '--------------------------------------------' . PHP_EOL;
 
                 $target = $definition[PatchDefinition::TARGET];
 

@@ -58,9 +58,11 @@ class Collector
     {
         $patchesByOwner = array();
 
+        echo "Scanning packages for patches:" . PHP_EOL;
+        
         foreach ($packages as $package) {
             $ownerName = $package->getName();
-
+            
             $config = $this->patcherConfigReader->readFromPackage($package);
 
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
@@ -71,6 +73,12 @@ class Collector
             
             if (!$sourceLoaders) {
                 continue;
+            }
+
+            echo $ownerName . PHP_EOL;
+
+            foreach (array_keys($sourceLoaders) as $loaderName) {
+                echo "> " . $loaderName . PHP_EOL;
             }
             
             foreach ($sourceLoaders as $loaderName => $source) {

@@ -56,10 +56,17 @@ class Loader
 
         $patches = $this->patchesCollector->collect($sources);
         
+        echo 'Apply loaders:' . PHP_EOL;
         $processedPatches = array_reduce(
             $this->listLoaders,
             function (array $patches, ListLoader $listLoader) use ($packages) {
-                return $listLoader->process($patches, $packages);
+                echo get_class($listLoader) . PHP_EOL;
+
+                $result = $listLoader->process($patches, $packages);
+                
+                echo 'Patches: ' . count(array_reduce($result, 'array_merge', [])) . PHP_EOL;
+                
+                return $result;
             },
             $patches
         );
