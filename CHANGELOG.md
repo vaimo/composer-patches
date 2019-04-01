@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.44.0 (2019-04-01)
+
+### Feature
+
+* Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.44.0) [diff](https://github.com/vaimo/composer-patches/compare/3.43.0...3.44.0)
+
 ## 3.43.0 (2019-03-31)
 
 ### Feature
