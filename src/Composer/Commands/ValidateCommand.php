@@ -58,7 +58,8 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $loaderComponentsPool = $this->createLoaderPool(array(
             'constraints' => false, 
             'targets-resolver' => false, 
-            'local-exclude' => false, 
+            'local-exclude' => false,
+            'root-patch' => false,
             'global-exclude' => false,
             'downloader' => new LoaderComponents\DownloaderComponent(
                 $composer->getPackage(), 

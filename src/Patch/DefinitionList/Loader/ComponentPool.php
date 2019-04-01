@@ -71,6 +71,7 @@ class ComponentPool
             'bundle' => new LoaderComponents\BundleComponent($rootPackage),
             'global-exclude' => $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,
             'local-exclude' => new LoaderComponents\LocalExcludeComponent(),
+            'root-patch' => new LoaderComponents\RootPatchComponent($rootPackage),
             'custom-exclude' => new LoaderComponents\CustomExcludeComponent(
                 $pluginConfig->getSkippedPackages()
             ),
