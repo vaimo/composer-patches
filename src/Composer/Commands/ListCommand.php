@@ -128,6 +128,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         $unfilteredPool = $this->createLoaderPool(array(
             'constraints' => false, 
             'local-exclude' => false, 
+            'root-patch' => false,
             'global-exclude' => false, 
             'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver, true)
         ));

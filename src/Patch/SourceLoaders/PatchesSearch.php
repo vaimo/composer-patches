@@ -43,10 +43,15 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     /**
      * @var array
      */
+    private $localTypes;
+
+    /**
+     * @var array
+     */
     private $devModeTypes;
 
     /**
-     * @var array 
+     * @var array
      */
     private $bundledModeTypes;
 
@@ -74,6 +79,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             PatchDefinition::TYPE => array('mode')
         );
 
+        $this->localTypes = array('local', 'root');
         $this->devModeTypes = array('developer', 'dev', 'development', 'develop');
         $this->bundledModeTypes = array('bundle', 'bundled', 'merged', 'multiple', 'multi', 'group');
     }
@@ -150,6 +156,10 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             return array();
         }
 
+        if (array_intersect_key($flags, array_flip($this->localTypes))) {
+            $values[PatchDefinition::LOCAL] = true;
+        }
+        
         if (!$this->devMode && array_intersect_key($flags, array_flip($this->devModeTypes))) {
             $data[PatchDefinition::SKIP] = true;
         }

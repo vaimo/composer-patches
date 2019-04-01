@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.13.0": {
+        "overview": "all features and fixes in this release are forward-ported from 3.44.0",
+        "feature": [
+            "Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)"
+        ]
+    },
     "4.12.0": {
         "overview": "all features and fixes in this release are forward-ported from 3.43.0",
         "feature": [
@@ -184,6 +190,12 @@
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
     },
+    "3.44.0": {
+        "feature": [
+            "Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)"
+        ],
+        "branch": "release/3"
+    },
     "3.43.0": {
         "feature": [
             "allow patch file paths, etc to be defined under extra/patcher key to make sure that they don't hog up too much main level keys of 'extra' config for given package (old keys are also still supported)",
@@ -193,17 +205,20 @@
         "fix": [
             "some path processing functions did not use proper directory separator constant",
             "patches not applied properly on Windows due to using 'which' instead of 'where' when resolving the patch applier absolute path"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.42.2": {
         "fix": [
             "additional rollbacks on newer array declaration usage (broke compatibility with 5.3)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.42.1": {
         "fix": [
             "rollback on newer array declaration usage (broke compatibility with 5.3)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.42.0": {
         "feature": [

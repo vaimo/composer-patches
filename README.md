@@ -625,6 +625,34 @@ settings, it's possible to define custom ones for just one patch.
 }
 ```
 
+## Patches: local patch
+
+In case you would like a patch only to apply when working with some package directly (where the package 
+itself is ROOT package), a special flag can be defined to indicate such a thing.
+
+```json
+{
+  "extra": {
+    "patches": {  
+      "targeted/package": {
+        "Some patch description": {
+          "source": "example.patch",
+          "local": true
+        }
+      }    
+    }
+  }
+}
+```
+
+Note that this is somewhat conflicting on how Composer deals with this where the case with composer is that 
+when you declare something as require-dev, it'll only get installed when the package is ROOT.
+
+In the context of this plugin, this flag will allow similar situation to be achieved:
+
+* When installing the owner of the patch as a dependency: patch is not applied
+* When cloning the owner separately and running composer install: patch will be applied
+
 ## Patches: skipping patches
 
 In case there's a need to temporarily skip patches which is usually the case when going through
@@ -979,7 +1007,7 @@ to the user when patch is being applied.
 @after <value> (optional) Used in case a patch should be added after another branch
 @skip (optional) If this tag is present, then the patch will not be applied
 @cwd <value> (optional) Specify in which root path the patch is applied (install, vendor, project, autoload)
-@type <value> (optional) Options: dev, bundle (Using multiple: dev+bundle)
+@type <value> (optional) Options: dev, bundle, local (Using multiple: dev+bundle)
 @level <value> (optional) 0 (forces/locks the patch applier to use certain patch path strip level)
 @category <value> (optional) free-form value to explain what the patch is (fix/feature/enhancement)
 

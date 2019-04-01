@@ -37,6 +37,9 @@ class BaseComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNorma
                 PatchDefinition::CATEGORY => isset($data[PatchDefinition::CATEGORY])
                     ? $data[PatchDefinition::CATEGORY]
                     : null,
+                PatchDefinition::LOCAL => isset($data[PatchDefinition::LOCAL])
+                    ? $data[PatchDefinition::LOCAL]
+                    : false
             );
     }
 }

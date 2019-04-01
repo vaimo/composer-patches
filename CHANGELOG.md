@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.13.0
+
+all features and fixes in this release are forward-ported from 3.44.0
+
+### Feature
+
+* Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.13.0) [diff](https://github.com/vaimo/composer-patches/compare/4.12.0...4.13.0)
+
 ## 4.12.0 (2019-03-31)
 
 all features and fixes in this release are forward-ported from 3.43.0
@@ -262,7 +272,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.43.0...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.44.0...4.0.0)
+
+## 3.44.0 (2019-04-01)
+
+### Feature
+
+* Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.44.0) [diff](https://github.com/vaimo/composer-patches/compare/3.43.0...3.44.0)
 
 ## 3.43.0 (2019-03-31)
 
