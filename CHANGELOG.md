@@ -2,6 +2,18 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.45.0 (2019-04-02)
+
+### Feature
+
+* allow patch:validate to use only patches that the root package owns: --local
+
+### Fix
+
+* patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.45.0) [diff](https://github.com/vaimo/composer-patches/compare/3.44.0...3.45.0)
+
 ## 3.44.0 (2019-04-01)
 
 ### Feature
