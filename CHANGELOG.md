@@ -2,6 +2,25 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.46.0 (2019-04-03)
+
+This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports
+
+### Feature
+
+* added --with-affected argument option for path:list command to list patches that indirectly are affected by the new/changed patches (would be re-applied on actually patch:apply due to package resets caused by new/changed statuses)
+* patch owner embedded in applied patch registry to provide proper REMOVED information when patch gets removed
+
+
+### Fix
+
+* bundled patches partially reset when removing some dev-only (with --no-dev option) patches that targeted same packages as bundles did; Issue caused by only partially recursive lookup on an impact of re-installing certain composer package
+* the alias argument for --explicit, --show-reapplies did not trigger explicit output
+* make sure that repeated patch:undo calls don't reinstall previously undo'd patches
+* make sure that patch:list uses same functionality that the main patch applier uses, thus guaranteeing that path:list will list the things as they'd be processed in actual patch apply run
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.46.0) [diff](https://github.com/vaimo/composer-patches/compare/3.45.0...3.46.0)
+
 ## 3.45.0 (2019-04-02)
 
 ### Feature
@@ -10,7 +29,7 @@ _This file has been auto-generated from the contents of changelog.json_
 
 ### Fix
 
-* patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines
+* patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines [github/26]
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.45.0) [diff](https://github.com/vaimo/composer-patches/compare/3.44.0...3.45.0)
 
@@ -28,12 +47,12 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.44.0) [diff](https
 
 * allow patch file paths, etc to be defined under extra/patcher key to make sure that they don't hog up too much main level keys of 'extra' config for given package (old keys are also still supported)
 * allow some patches to be ignored when running patch:validate by providing list of path ignores in package's configuration: extra/patcher/ignore (takes array of ignored paths)
-* allow patcher operations to be split to have separate sub-operation per OS type
+* allow patcher operations to be split to have separate sub-operation per OS type [github/26]
 
 ### Fix
 
 * some path processing functions did not use proper directory separator constant
-* patches not applied properly on Windows due to using 'which' instead of 'where' when resolving the patch applier absolute path
+* patches not applied properly on Windows due to using 'which' instead of 'where' when resolving the patch applier absolute path [gitdhub/26]
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.43.0) [diff](https://github.com/vaimo/composer-patches/compare/3.42.2...3.43.0)
 
@@ -64,7 +83,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.1) [diff](https
 
 ### Fix
 
-* incorrect TMP path on Windows [git:22]
+* incorrect TMP path on Windows [github/22]
 * crash when running patch:list in situation where none of bundled patches dependencies is directly available (expectation: should be able to list all patches even when none of the targets are installed)
 * the patch:validate not catching situations where there's a patch JSON declaration that has no corresponding file at the place where the declaration targets
 * better error message when wanting to download patches from unsecure URLs by referring to documentation of the plugin rather than to documentation of Composer (the module has it's own 'secure-http' config option that only affects patches)
