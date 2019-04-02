@@ -20,18 +20,19 @@ class Analyser
     public function collectPatchRemovals(array $repositoryState, array $patches)
     {
         $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
-        $patchesFootprints = $this->patchListUtils->createSimplifiedList($patchesByTarget);
 
         $result = array();
 
-        foreach ($repositoryState as $target => $items) {
+        $unpackedState = $this->patchListUtils->createDetailedList($repositoryState);
+        
+        foreach ($unpackedState as $target => $items) {
             $result[$target] = array_diff_key(
                 $items,
-                isset($patchesFootprints[$target]) ? $patchesFootprints[$target] : array()
+                isset($patchesByTarget[$target]) ? $patchesByTarget[$target] : array()
             );
         }
         
-        return $this->patchListUtils->createDetailedList($result);
+        return $result;
     }
 
     public function collectPatchIncludes(array $repositoryState, array $patches)

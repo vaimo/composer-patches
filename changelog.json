@@ -4,14 +4,17 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
-    "DEV.3.45.1": {
+    "3.46.0": {
+        "overview": "This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports",
+        "feature": [
+            "added --with-affected argument option for path:list command to list patches that indirectly are affected by the new/changed patches (would be re-applied on actually patch:apply due to package resets caused by new/changed statuses)",
+            "patch owner embedded in applied patch registry to provide proper REMOVED information when patch gets removed"
+        ],
         "fix": [
             "bundled patches partially reset when removing some dev-only (with --no-dev option) patches that targeted same packages as bundles did; Issue caused by only partially recursive lookup on an impact of re-installing certain composer package",
             "the alias argument for --explicit, --show-reapplies did not trigger explicit output",
-            "make sure that patches that have exact same name but source from different owners don't end up rewriting each-other in apply-state",
             "make sure that repeated patch:undo calls don't reinstall previously undo'd patches",
-            "make sure that patch:list uses same functionality that the main patch applier uses, thus guaranteeing that path:list will list the things as they'd be processed in actual patch apply run",
-            "added --with-affected argument option for path:list command to list patches that indirectly are affected by the new/changed patches (would be re-applied on actualy patch:apply due to package resets caused by new/changed statuses)"
+            "make sure that patch:list uses same functionality that the main patch applier uses, thus guaranteeing that path:list will list the things as they'd be processed in actual patch apply run"
         ]
     },
     "3.45.0": {
