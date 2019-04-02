@@ -50,12 +50,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $defaultValues = $configDefaults->getPatcherConfig();
 
+        $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+        
         $patchSources = $localOnly
-            ? array('project' => true)
-            : array_fill_keys(
-                array_keys($defaultValues[Config::PATCHER_SOURCES]),
-                true
-            );
+            ? array_replace(array_fill_keys($sourceKeys, false), array('project' => true))
+            : array_fill_keys($sourceKeys, true);
 
         $pluginConfig = array(
             Config::PATCHER_SOURCES => $patchSources

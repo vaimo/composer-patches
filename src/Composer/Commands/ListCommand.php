@@ -79,13 +79,6 @@ class ListCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Apply patches based on information directly from packages in vendor folder'
         );
-
-        $this->addOption(
-            '--local',
-            null,
-            InputOption::VALUE_NONE,
-            'Only list patches that are owned by the ROOT package'
-        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -102,22 +95,15 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
 
         $statusFilters = array_map('strtolower', $input->getOption('status'));
-
-        $localOnly = $input->getOption('local');
-
+        
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
 
         $defaultValues = $configDefaults->getPatcherConfig();
 
-        $patchSources = $localOnly 
-            ? array('project' => true) 
-            : array_fill_keys(
-                array_keys($defaultValues[Config::PATCHER_SOURCES]),
-                true
-            );
+        $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
 
         $pluginConfig = array(
-            Config::PATCHER_SOURCES => $patchSources
+            Config::PATCHER_SOURCES => array_fill_keys($sourceKeys, true)
         );
 
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();

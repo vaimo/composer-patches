@@ -6,7 +6,7 @@
     ],
     "3.45.0": {
         "feature": [
-            "allow patch:validate, patch:list to use only patches that the root package owns: --local"
+            "allow patch:validate to use only patches that the root package owns: --local"
         ],
         "fix": [
             "patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines"
