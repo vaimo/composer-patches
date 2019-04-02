@@ -21,6 +21,11 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     private $devMode;
 
     /**
+     * @var \Vaimo\ComposerPatches\Patch\File\Loader 
+     */
+    private $patchFileLoader;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Patch\File\Analyser
      */
     private $fileAnalyser;
@@ -66,7 +71,9 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         $this->installationManager = $installationManager;
         $this->devMode = $devMode;
 
+        $this->patchFileLoader = new \Vaimo\ComposerPatches\Patch\File\Loader();
         $this->fileAnalyser = new \Vaimo\ComposerPatches\Patch\File\Analyser();
+        
         $this->patchHeaderParser = new \Vaimo\ComposerPatches\Patch\File\Header\Parser();
         $this->fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
 
@@ -104,9 +111,14 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $groups = array();
 
             foreach ($paths as $path) {
-                $definition = $this->createDefinitionItem(file_get_contents($path), array(
+                $contents = $this->patchFileLoader->loadWithNormalizedLineEndings($path);
+                
+                $definition = $this->createDefinitionItem($contents, array(
                     PatchDefinition::PATH => $path,
-                    PatchDefinition::SOURCE => trim(substr($path, $basePathLength), DIRECTORY_SEPARATOR)
+                    PatchDefinition::SOURCE => trim(
+                        substr($path, $basePathLength), 
+                        DIRECTORY_SEPARATOR
+                    )
                 ));
 
                 if (!isset($definition[PatchDefinition::TARGET])) {

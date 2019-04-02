@@ -2,6 +2,21 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.14.0
+
+all features and fixes in this release are forward-ported from 3.45.0
+
+### Feature
+
+* allow patch:validate to use only patches that the root package owns: --local
+
+
+### Fix
+
+* patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.14.0) [diff](https://github.com/vaimo/composer-patches/compare/4.13.0...4.14.0)
+
 ## 4.13.0 (2019-04-01)
 
 all features and fixes in this release are forward-ported from 3.44.0
@@ -272,7 +287,19 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.44.0...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.45.0...4.0.0)
+
+## 3.45.0 (2019-04-02)
+
+### Feature
+
+* allow patch:validate to use only patches that the root package owns: --local
+
+### Fix
+
+* patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.45.0) [diff](https://github.com/vaimo/composer-patches/compare/3.44.0...3.45.0)
 
 ## 3.44.0 (2019-04-01)
 

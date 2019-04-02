@@ -88,30 +88,29 @@ class ListCommand extends \Composer\Command\BaseCommand
         $isDevMode = !$input->getOption('no-dev');
         $withExcluded = $input->getOption('excluded') || $input->getOption('with-excludes');
         $beBrief = $input->getOption('brief');
-
+        
         $filters = array(
             PatchDefinition::SOURCE => $input->getOption('filter'),
             PatchDefinition::TARGETS => $input->getArgument('targets')
         );
 
         $statusFilters = array_map('strtolower', $input->getOption('status'));
-
+        
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
 
         $defaultValues = $configDefaults->getPatcherConfig();
-        
-        $config = array(
-            Config::PATCHER_SOURCES => array_fill_keys(
-                array_keys($defaultValues[Config::PATCHER_SOURCES]),
-                true
-            )
+
+        $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+
+        $pluginConfig = array(
+            Config::PATCHER_SOURCES => array_fill_keys($sourceKeys, true)
         );
-        
+
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
         $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
 
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
-        $configInstance = $configFactory->create(array($config));
+        $configInstance = $configFactory->create(array($pluginConfig));
         
         $filteredPool = $this->createLoaderPool();
 

@@ -13,7 +13,6 @@ use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
-use Vaimo\ComposerPatches\Config as PatcherConfigKeys;
 
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
@@ -29,7 +28,14 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             '--from-source',
             null,
             InputOption::VALUE_NONE,
-            'Apply patches based on information directly from packages in vendor folder'
+            'Use latest information from package configurations in vendor folder'
+        );
+
+        $this->addOption(
+            '--local',
+            null,
+            InputOption::VALUE_NONE,
+            'Only validate patches that are owned by the ROOT package'
         );
     }
     
@@ -38,15 +44,21 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $output->writeln('<info>Scanning packages for orphan patches</info>');
 
         $composer = $this->getComposer();
+        
+        $localOnly = $input->getOption('local');
 
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
-        $defaults = $configDefaults->getPatcherConfig();
+
+        $defaultValues = $configDefaults->getPatcherConfig();
+
+        $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+        
+        $patchSources = $localOnly
+            ? array_replace(array_fill_keys($sourceKeys, false), array('project' => true))
+            : array_fill_keys($sourceKeys, true);
 
         $pluginConfig = array(
-            Config::PATCHER_SOURCES => array_fill_keys(
-                array_keys($defaults[Config::PATCHER_SOURCES]), 
-                true
-            )
+            Config::PATCHER_SOURCES => $patchSources
         );
         
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
@@ -162,7 +174,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             
             $ignores = $dataUtils->getValueByPath(
                 $patcherConfig, 
-                array(PatcherConfigKeys::PATCHER_CONFIG_ROOT, PatcherConfigKeys::PATCHES_IGNORE),
+                array(Config::PATCHER_CONFIG_ROOT, Config::PATCHES_IGNORE),
                 array()
             );
             

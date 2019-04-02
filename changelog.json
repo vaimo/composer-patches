@@ -4,6 +4,15 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.14.0": {
+        "overview": "all features and fixes in this release are forward-ported from 3.45.0",
+        "feature": [
+            "allow patch:validate to use only patches that the root package owns: --local"
+        ],
+        "fix": [
+            "patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines"
+        ]
+    },
     "4.13.0": {
         "overview": "all features and fixes in this release are forward-ported from 3.44.0",
         "feature": [
@@ -188,6 +197,14 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
+    "3.45.0": {
+        "feature": [
+            "allow patch:validate to use only patches that the root package owns: --local"
+        ],
+        "fix": [
+            "patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines"
         ]
     },
     "3.44.0": {

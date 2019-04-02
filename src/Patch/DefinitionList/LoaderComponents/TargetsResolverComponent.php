@@ -15,6 +15,11 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
     private $packageInfoResolver;
 
     /**
+     * @var \Vaimo\ComposerPatches\Patch\File\Loader 
+     */
+    private $patchFileLoader;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Patch\File\Analyser
      */
     private $patchFileAnalyser;
@@ -35,6 +40,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
         $this->packageInfoResolver = $packageInfoResolver;
         $this->gracefulMode = $gracefulMode;
 
+        $this->patchFileLoader = new \Vaimo\ComposerPatches\Patch\File\Loader();
         $this->patchFileAnalyser = new \Vaimo\ComposerPatches\Patch\File\Analyser();
     }
 
@@ -72,8 +78,9 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                 }
 
                 $paths = $this->patchFileAnalyser->getAllPaths(
-                    file_get_contents($path)
+                    $this->patchFileLoader->loadWithNormalizedLineEndings($path)
                 );
+                
 
                 $bundleTargets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths);
                 

@@ -1111,6 +1111,9 @@ composer patch:redo --from-source
 # Check that all patches have valid target package info (using info from vendor)
 composer patch:validate --from-source
 
+# Check that patches that are owner by ROOT package are all defined correctly
+composer patch:validate --local
+
 # List registered with their current status (with optional filter(s))
 composer patch:list --status new --status removed
 
