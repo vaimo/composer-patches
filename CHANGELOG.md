@@ -5,6 +5,7 @@ _This file has been auto-generated from the contents of changelog.json_
 ## 4.15.0 (2019-04-03)
 
 This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports
+
 All features and fixes in this release are forward-ported from 3.46.0
 
 ### Feature
