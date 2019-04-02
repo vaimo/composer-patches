@@ -42,7 +42,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             '--filter',
             null,
             InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-            'Apply only those patch files/sources that match with provided filter'
+            'Mark certain patches with MATCH in the output list'
         );
 
         $this->addOption(
@@ -57,6 +57,13 @@ class ListCommand extends \Composer\Command\BaseCommand
             null,
             InputOption::VALUE_NONE,
             'Alias for \'excluded\' argument'
+        );
+
+        $this->addOption(
+            '--with-affected',
+            null,
+            InputOption::VALUE_NONE,
+            'Mark patches that would get re-applied when changed/new patches are added (due to package reinstall)'
         );
         
         $this->addOption(
@@ -77,7 +84,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             '--from-source',
             null,
             InputOption::VALUE_NONE,
-            'Apply patches based on information directly from packages in vendor folder'
+            'Use latest information from package configurations in vendor folder'
         );
     }
 
@@ -87,6 +94,7 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $isDevMode = !$input->getOption('no-dev');
         $withExcluded = $input->getOption('excluded') || $input->getOption('with-excludes');
+        $withAffected = $input->getOption('with-affected');
         $beBrief = $input->getOption('brief');
         
         $filters = array(
@@ -132,7 +140,10 @@ class ListCommand extends \Composer\Command\BaseCommand
             'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver, true)
         ));
 
+        $hasFilers = (bool)array_filter($filters);
+        
         $listResolver = new ListResolvers\FilteredListResolver($filters);
+        $changesListResolver = new ListResolvers\ChangesListResolver($listResolver);
 
         $repositoryStateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
             $composer
@@ -144,23 +155,66 @@ class ListCommand extends \Composer\Command\BaseCommand
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(
             array($composer->getPackage())
         );
-
-        $repositoryAnalyser = new \Vaimo\ComposerPatches\Repository\Analyser(
-            $packageCollector,
-            $repositoryStateAnalyser,
-            $listResolver
-        );
         
         $repository = $composer->getRepositoryManager()->getLocalRepository();
         
         $filteredPatchesLoader = $loaderFactory->create($filteredPool, $configInstance, $isDevMode);
         $filteredPatches = $filteredPatchesLoader->loadFromPackagesRepository($repository);
-        
-        $patches = $repositoryAnalyser->getPatchesWithStatuses(
-            $repository,
-            $filteredPatches, 
-            $statusFilters
+
+        $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
+            $changesListResolver,
+            $repositoryStateAnalyser
         );
+
+        $repositoryStateGenerator = new \Vaimo\ComposerPatches\Repository\StateGenerator(
+            $packageCollector
+        );
+        
+        $repositoryState = $repositoryStateGenerator->generate($repository);
+        
+        $applyQueue = $queueGenerator->generateApplyQueue($filteredPatches, $repositoryState);
+        $removeQueue = $queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);
+        $applyQueue = array_map('array_filter', $applyQueue);
+
+        $filteredPatches = $patchListUtils->mergeLists(
+            $filteredPatches,
+            $removeQueue
+        );
+
+        if ($withAffected) {
+            $applyQueue = $patchListUtils->embedInfoToItems(
+                $applyQueue,
+                array(PatchDefinition::STATUS => 'affected'),
+                true
+            );
+        }
+        
+        $filteredPatches = $patchListUtils->mergeLists(
+            $filteredPatches,
+            $patchListUtils->intersectListsByName($applyQueue, $filteredPatches)
+        );
+        
+        $filteredPatches = $patchListUtils->embedInfoToItems(
+            $filteredPatches, 
+            array(PatchDefinition::STATUS => 'applied'),
+            true
+        );
+        
+        if ($hasFilers) {
+            $filteredPatches = $listResolver->resolvePatchesQueue($filteredPatches);
+        }
+        
+        if ($statusFilters) {
+            $statusFilter = $filterUtils->composeRegex($statusFilters, '/');
+
+            $filteredPatches = $patchListUtils->applyDefinitionFilter(
+                $filteredPatches, 
+                $statusFilter,
+                PatchDefinition::STATUS
+            );
+        }
+        
+        $patches = array_filter($filteredPatches);
         
         $shouldIncludeExcludedPatches = $withExcluded 
             && (!$statusFilters || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded'));

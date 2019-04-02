@@ -8,7 +8,10 @@
         "fix": [
             "bundled patches partially reset when removing some dev-only (with --no-dev option) patches that targeted same packages as bundles did; Issue caused by only partially recursive lookup on an impact of re-installing certain composer package",
             "the alias argument for --explicit, --show-reapplies did not trigger explicit output",
-            "make sure that patches that have exact same name but source from different owners don't end up rewriting each-other in apply-state"
+            "make sure that patches that have exact same name but source from different owners don't end up rewriting each-other in apply-state",
+            "make sure that repeated patch:undo calls don't reinstall previously undo'd patches",
+            "make sure that patch:list uses same functionality that the main patch applier uses, thus guaranteeing that path:list will list the things as they'd be processed in actual patch apply run",
+            "added --with-affected argument option for path:list command to list patches that indirectly are affected by the new/changed patches (would be re-applied on actualy patch:apply due to package resets caused by new/changed statuses)"
         ]
     },
     "3.45.0": {
