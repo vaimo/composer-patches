@@ -253,12 +253,15 @@ class PatchListUtils
         return $result;
     }
     
-    public function embedInfoToItems(array $patches, $update)
+    public function embedInfoToItems(array $patches, $update, $onlyNew = false)
     {
         foreach ($patches as $target => $group) {
             foreach ($group as $path => $item) {
                 $patches[$target][$path] = is_array($update) 
-                    ? array_replace($patches[$target][$path], $update) 
+                    ? array_replace(
+                        $patches[$target][$path],
+                        $onlyNew ? array_diff_key($update, array_filter($patches[$target][$path])) : $update
+                    ) 
                     : $update;
             }
         }

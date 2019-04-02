@@ -5,8 +5,6 @@
  */
 namespace Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 
-use Vaimo\ComposerPatches\Patch\Definition as Patch;
-
 class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
 {
     /**
@@ -47,6 +45,29 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
 
     public function resolveInitialState(array $patches, array $state)
     {
-        return $state;
+        $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
+        
+        $unpackedState = $this->patchListUtils->createDetailedList($state);
+
+        $updates = array();
+        
+        foreach ($patchesByTarget as $target => $group) {
+            foreach ($group as $path => $item) {
+                if (isset($unpackedState[$target][$path])) {
+                    continue;
+                }
+
+                if (!isset($updates[$target])) {
+                    $updates[$target] = array();
+                }
+                
+                $updates[$target][$path] = $item;
+            }
+        }
+        
+        return $this->patchListUtils->mergeLists(
+            $state, 
+            $this->patchListUtils->createSimplifiedList($updates)
+        );
     }
 }

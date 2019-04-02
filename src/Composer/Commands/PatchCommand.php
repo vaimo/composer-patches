@@ -138,7 +138,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             $isExplicit = true;
         }
 
-        $hasFilers = array_filter($filters);
+        $hasFilers = (bool)array_filter($filters);
 
         if (!$hasFilers && $behaviourFlags['redo']) {
             $filters[Patch::SOURCE] = array('*');

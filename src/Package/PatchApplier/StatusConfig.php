@@ -12,6 +12,7 @@ class StatusConfig
         return array(
             'new' => '<info>NEW</info>',
             'match' => '<info>MATCH</info>',
+            'affected' => '<fg=cyan>AFFECTED</>',
             'changed' => '<fg=yellow>CHANGED</>',
             'applied' => '<fg=white;options=bold>APPLIED</>',
             'removed' => '<fg=red>REMOVED</>',
