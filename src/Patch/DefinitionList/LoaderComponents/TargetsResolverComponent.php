@@ -72,7 +72,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                 }
 
                 $paths = $this->patchFileAnalyser->getAllPaths(
-                    implode(PHP_EOL, file($path))
+                    implode(PHP_EOL, array_map('rtrim', file($path)))
                 );
 
                 $bundleTargets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths);

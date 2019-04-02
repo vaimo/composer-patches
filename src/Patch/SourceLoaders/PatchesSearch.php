@@ -109,7 +109,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             echo 'Search results:' . PHP_EOL;
             
             foreach ($paths as $path) {
-                $content = implode(PHP_EOL, file($path));
+                $content = implode(PHP_EOL, array_map('rtrim', file($path)));
                 
                 echo '========================================' . PHP_EOL;
                 echo 'PATH: ' . $path . PHP_EOL;
