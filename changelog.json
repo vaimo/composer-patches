@@ -9,7 +9,7 @@
             "allow patch:validate to use only patches that the root package owns: --local"
         ],
         "fix": [
-            "patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines"
+            "patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines [github/26]"
         ]
     },
     "3.44.0": {
@@ -22,11 +22,11 @@
         "feature": [
             "allow patch file paths, etc to be defined under extra/patcher key to make sure that they don't hog up too much main level keys of 'extra' config for given package (old keys are also still supported)",
             "allow some patches to be ignored when running patch:validate by providing list of path ignores in package's configuration: extra/patcher/ignore (takes array of ignored paths)",
-            "allow patcher operations to be split to have separate sub-operation per OS type"
+            "allow patcher operations to be split to have separate sub-operation per OS type [github/26]"
         ],
         "fix": [
             "some path processing functions did not use proper directory separator constant",
-            "patches not applied properly on Windows due to using 'which' instead of 'where' when resolving the patch applier absolute path"
+            "patches not applied properly on Windows due to using 'which' instead of 'where' when resolving the patch applier absolute path [gitdhub/26]"
         ],
         "branch": "release/3"
     },
@@ -50,7 +50,7 @@
             "added reason to patch:validation errors (either 'NO FILE' or 'NO CONFIG')"
         ],
         "fix": [
-            "incorrect TMP path on Windows [git:22]",
+            "incorrect TMP path on Windows [github/22]",
             "crash when running patch:list in situation where none of bundled patches dependencies is directly available (expectation: should be able to list all patches even when none of the targets are installed)",
             "the patch:validate not catching situations where there's a patch JSON declaration that has no corresponding file at the place where the declaration targets",
             "better error message when wanting to download patches from unsecure URLs by referring to documentation of the plugin rather than to documentation of Composer (the module has it's own 'secure-http' config option that only affects patches)",
