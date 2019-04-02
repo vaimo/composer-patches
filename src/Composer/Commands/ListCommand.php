@@ -79,6 +79,13 @@ class ListCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Apply patches based on information directly from packages in vendor folder'
         );
+
+        $this->addOption(
+            '--local',
+            null,
+            InputOption::VALUE_NONE,
+            'Only list patches that are owned by the ROOT package'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -88,7 +95,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         $isDevMode = !$input->getOption('no-dev');
         $withExcluded = $input->getOption('excluded') || $input->getOption('with-excludes');
         $beBrief = $input->getOption('brief');
-
+        
         $filters = array(
             PatchDefinition::SOURCE => $input->getOption('filter'),
             PatchDefinition::TARGETS => $input->getArgument('targets')
@@ -96,22 +103,28 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $statusFilters = array_map('strtolower', $input->getOption('status'));
 
+        $localOnly = $input->getOption('local');
+
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
 
         $defaultValues = $configDefaults->getPatcherConfig();
-        
-        $config = array(
-            Config::PATCHER_SOURCES => array_fill_keys(
+
+        $patchSources = $localOnly 
+            ? array('project' => true) 
+            : array_fill_keys(
                 array_keys($defaultValues[Config::PATCHER_SOURCES]),
                 true
-            )
+            );
+
+        $pluginConfig = array(
+            Config::PATCHER_SOURCES => $patchSources
         );
-        
+
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
         $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
 
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
-        $configInstance = $configFactory->create(array($config));
+        $configInstance = $configFactory->create(array($pluginConfig));
         
         $filteredPool = $this->createLoaderPool();
 

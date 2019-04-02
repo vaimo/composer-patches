@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
-use Vaimo\ComposerPatches\Config as PatcherConfigKeys;
+use Vaimo\ComposerPatches\Config;
 
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
@@ -27,7 +27,14 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             '--from-source',
             null,
             InputOption::VALUE_NONE,
-            'Apply patches based on information directly from packages in vendor folder'
+            'Use latest information from package configurations in vendor folder'
+        );
+
+        $this->addOption(
+            '--local',
+            null,
+            InputOption::VALUE_NONE,
+            'Only validate patches that are owned by the ROOT package'
         );
     }
     
@@ -37,12 +44,21 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $composer = $this->getComposer();
 
+        $localOnly = $input->getOption('local');
+
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+
+        $defaultValues = $configDefaults->getPatcherConfig();
+
+        $patchSources = $localOnly
+            ? array('project' => true)
+            : array_fill_keys(
+                array_keys($defaultValues[Config::PATCHER_SOURCES]),
+                true
+            );
+
         $pluginConfig = array(
-            \Vaimo\ComposerPatches\Config::PATCHER_SOURCES => array(
-                'project' => true,
-                'packages' => true,
-                'vendors' => true
-            )
+            Config::PATCHER_SOURCES => $patchSources
         );
         
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
@@ -155,7 +171,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             
             $ignores = $dataUtils->getValueByPath(
                 $patcherConfig, 
-                array(PatcherConfigKeys::PATCHER_CONFIG_ROOT, PatcherConfigKeys::PATCHES_IGNORE),
+                array(Config::PATCHER_CONFIG_ROOT, Config::PATCHES_IGNORE),
                 array()
             );
             
