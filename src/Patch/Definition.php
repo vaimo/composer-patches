@@ -56,5 +56,7 @@ class Definition
     
     const OWNER_UNKNOWN = 'unknown';
     
+    const SOURCE_INFO_SEPARATOR = '::::';
+    
     const STATUS = 'state';
 }

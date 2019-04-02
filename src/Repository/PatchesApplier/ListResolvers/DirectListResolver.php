@@ -16,4 +16,9 @@ class DirectListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResolv
     {
         return $patches;
     }
+
+    public function resolveInitialState(array $patches, array $state)
+    {
+        return $state;
+    }
 }

@@ -33,34 +33,20 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
     public function resolvePatchesQueue(array $patches)
     {
         $exclusions = $this->baseResolver->resolvePatchesQueue($patches);
-        $targets = $this->patchListUtils->getAllTargets($patches);
-
-        $matches = array();
-
-        foreach ($exclusions as $target => $items) {
-            $matches[$target] = array_diff_key($patches[$target], $items);
-        }
         
-        foreach ($targets as $target) {
-            if (isset($matches[$target])) {
-                continue;
-            }
-            
-            $items = isset($patches[$target]) ? $patches[$target] : array();
-
-            $matches[$target] = array_filter($items, function ($item) use ($targets) {
-                return array_intersect_key($item[Patch::TARGETS], $targets);
-            });
+        foreach ($exclusions as $target => $items) {
+            $patches[$target] = array_diff_key($patches[$target], $items);
         }
-
-        return array_replace(
-            array_fill_keys($targets, array()),
-            $this->patchListUtils->filterListByTargets($matches, $targets)
-        );
+        return $patches;
     }
 
     public function resolveRelevantPatches(array $patches, array $subset)
     {
         return $this->patchListUtils->intersectListsByPath($patches, $subset);
+    }
+
+    public function resolveInitialState(array $patches, array $state)
+    {
+        return $state;
     }
 }

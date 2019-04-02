@@ -34,59 +34,138 @@ class QueueGenerator
     ) {
         $this->listResolver = $listResolver;
         $this->repositoryStateAnalyser = $repositoryStateAnalyser;
-
+        
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     public function generateApplyQueue(array $patches, array $repositoryState)
     {
         $patchesQueue = $this->listResolver->resolvePatchesQueue($patches);
-        $patches = $this->listResolver->resolveRelevantPatches($patches, $patchesQueue);
-        
-        $queueTargets = $this->patchListUtils->getAllTargets($patchesQueue);
-        
-        $relatedQueue = $this->patchListUtils->getRelatedPatches($patches, $queueTargets);
-        $relatedQueueTargets = $this->patchListUtils->getAllTargets($relatedQueue);
 
-        $hardResetStubs = array_diff_key($patchesQueue, array_filter($patchesQueue));
+        $initialState = $this->listResolver->resolveInitialState($patchesQueue, $repositoryState);
+
+        list($includes, $removals) = $this->resolveChangesInState($patches, $patchesQueue, $initialState);
         
-        $patchesQueue = $this->patchListUtils->filterListByTargets(
-            array_replace($patches, $patchesQueue),
-            array_merge($relatedQueueTargets, $queueTargets)
+        list($includesQueue, $removalsQueue) = $this->buildChangeQueues($includes, $removals, $patchesQueue);
+        
+        $affectedPatches = $this->resolveAffectedPatches($includes, $removals, $patches);
+
+        $queue = array_reduce(
+            array($affectedPatches, $includesQueue, $removalsQueue),
+            array($this->patchListUtils, 'mergeLists'),
+            array()
+        );
+        
+        return $this->updateStatusMarkers($queue, $repositoryState);
+    }
+    
+    private function updateStatusMarkers($patches, $repositoryState)
+    {
+        $patchesByTarget = $this->patchListUtils->createTargetsList(array_map('array_filter', $patches));
+        $patchFootprints = $this->patchListUtils->createSimplifiedList($patchesByTarget);
+
+        $staticItems = array();
+        $changedItems = array();
+        
+        foreach ($patchFootprints as $target => $footprints) {
+            if (!isset($repositoryState[$target])) {
+                continue;
+            }
+            
+            $staticItems[$target] = array_intersect_assoc($footprints, $repositoryState[$target]);
+            $changedItems[$target] = array_diff_key(
+                array_intersect_key($footprints, $repositoryState[$target]), 
+                $staticItems[$target]
+            );
+        }
+
+        $changedItems = $this->patchListUtils->createDetailedList($changedItems);
+        $staticItems = $this->patchListUtils->createDetailedList($staticItems);
+        
+        foreach ($patchesByTarget as $target => $items) {
+            foreach ($items as $path => $item) {
+                $updates = array(
+                    Patch::STATUS_NEW => !isset($staticItems[$target][$path]) && !isset($changedItems[$target][$path]),
+                    Patch::STATUS_CHANGED => isset($changedItems[$target][$path])
+                );
+
+                $updates[Patch::STATUS] = isset($item[Patch::STATUS]) 
+                    ? $item[Patch::STATUS] 
+                    : '';
+
+                if ($updates[Patch::STATUS_NEW] && !$updates[Patch::STATUS]) {
+                    $updates[Patch::STATUS] = 'new';
+                }
+                
+                if ($updates[Patch::STATUS_CHANGED] && !$updates[Patch::STATUS]) {
+                    $updates[Patch::STATUS] = 'changed';
+                }
+                
+                $patchesByTarget[$target][$path] = array_replace($item, $updates);
+            }
+        }
+        
+        return $this->patchListUtils->mergeLists(
+            $patches,
+            $this->patchListUtils->createOriginList($patchesByTarget)
+        );
+    }
+    
+    private function resolveAffectedPatches($includes, $removals, $patches)
+    {
+        $queueTargets = $this->patchListUtils->getAllTargets(
+            $this->patchListUtils->mergeLists($includes, $removals)
         );
 
-        $resetQueue = $this->repositoryStateAnalyser->collectPackageResets(
-            $repositoryState, 
-            $patchesQueue
+        $affectedPatches = $this->patchListUtils->getRelatedPatches($patches, $queueTargets);
+
+        $patchesByTarget = $this->patchListUtils->createTargetsList($affectedPatches);
+        
+        return $this->patchListUtils->createOriginList(
+            $this->patchListUtils->diffListsByName($patchesByTarget, $removals)
+        );
+    }
+    
+    private function resolveChangesInState($patches, $patchesQueue, $repositoryState)
+    {
+        $relevantPatches = $this->listResolver->resolveRelevantPatches($patches, $patchesQueue);
+
+        $removals = $this->repositoryStateAnalyser->collectPatchRemovals($repositoryState, $relevantPatches);
+        $includes = $this->repositoryStateAnalyser->collectPatchIncludes($repositoryState, $relevantPatches);
+        
+        return array(array_filter($includes), array_filter($removals));
+    }
+    
+    private function buildChangeQueues($includes, $removals, $patchesQueue)
+    {
+        $patchesQueueByTarget = $this->patchListUtils->createTargetsList($patchesQueue);
+        
+        $includesQueue = $this->patchListUtils->createOriginList(
+            $this->patchListUtils->intersectListsByName($patchesQueueByTarget, $includes)
         );
 
-        $hardResetItems = array_diff(
-            $resetQueue,
-            array_keys(
-                array_filter($this->patchListUtils->groupItemsByTarget($patches))
-            )
-        );
-
-        $hardResetStubs = array_replace($hardResetStubs, array_fill_keys($hardResetItems, array()));
+        $removalsQueue = $this->patchListUtils->embedInfoToItems($removals, false);
         
-        $patchesQueue = $this->patchListUtils->filterListByTargets($patchesQueue, $resetQueue);
-        $queueTargets = $this->patchListUtils->getAllTargets($patchesQueue);
-        
-        $otherItems = array_intersect_key($patches, array_flip($queueTargets));
-        
-        return array_replace($hardResetStubs, $otherItems, $patchesQueue);
+        return array($includesQueue, $removalsQueue);
     }
     
     public function generateRemovalQueue(array $patches, array $repositoryState)
     {
-        $removals = array_filter(
-            $this->repositoryStateAnalyser->collectPatchRemovals($repositoryState, $patches)
+        $state = $this->patchListUtils->createDetailedList($repositoryState);
+
+        $stateMatches = $this->patchListUtils->intersectListsByName($state, $patches);
+
+        $state = $this->patchListUtils->createSimplifiedList($stateMatches);
+        
+        $removals = $this->repositoryStateAnalyser->collectPatchRemovals(
+            $state,
+            array_map('array_filter', $patches)
         );
         
         return $this->patchListUtils->embedInfoToItems(
-            $removals,
+            array_filter($removals),
             array(
-                Patch::STATE_LABEL => '<fg=red>REMOVED</>',
+                Patch::STATUS => 'removed',
                 Patch::STATUS_MATCH => true
             )
         );

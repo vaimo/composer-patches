@@ -15,33 +15,23 @@ class InfoLogger
     private $logger;
     
     /**
-     * @var array
-     */
-    private $stateLabels;
-
-    /**
      * @param \Vaimo\ComposerPatches\Logger $logger
      */
     public function __construct(
         \Vaimo\ComposerPatches\Logger $logger
     ) {
         $this->logger = $logger;
-        
-        $this->stateLabels = array(
-            Patch::STATUS_NEW => 'NEW',
-            Patch::STATUS_CHANGED => 'CHANGED'
-        );
     }
     
     public function outputPatchSource(array $patch)
     {
+        $label = '';
+        
         if (isset($patch[Patch::STATUS_LABEL]) && $patch[Patch::STATUS_LABEL]) {
-            $labelMatches = array($patch[Patch::STATUS_LABEL]);
-        } else {
-            $labelMatches = array_intersect_key($this->stateLabels, array_filter($patch));
-        }
+            $label = $patch[Patch::STATUS_LABEL];
+        } 
 
-        $label = $labelMatches ? vsprintf(' [<info>%s</info>]', $labelMatches) : '';
+        $label = $label ? sprintf(' [<info>%s</info>]', $label) : '';
 
         $isOwnerUnknown = !$patch[Patch::OWNER] || $patch[Patch::OWNER] === Patch::OWNER_UNKNOWN;
 

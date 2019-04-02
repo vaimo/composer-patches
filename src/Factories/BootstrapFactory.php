@@ -40,7 +40,9 @@ class BootstrapFactory
         array $config = array()
     ) {
         if ($listResolver === null) {
-            $listResolver = new ListResolvers\DirectListResolver();
+            $listResolver = new ListResolvers\ChangesListResolver(
+                new ListResolvers\DirectListResolver()
+            );
         }
         
         if ($outputStrategy === null) {

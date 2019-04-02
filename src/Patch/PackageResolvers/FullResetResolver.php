@@ -11,16 +11,10 @@ class FullResetResolver implements \Vaimo\ComposerPatches\Interfaces\PatchPackag
      * @var \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils 
      */
     private $packagePatchDataUtils;
-    
-    /**
-     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
-     */
-    private $packageUtils;
 
     public function __construct()
     {
         $this->packagePatchDataUtils = new \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils();
-        $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 
     public function resolve(array $patches, array $repositoryState)

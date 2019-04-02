@@ -29,7 +29,8 @@ class ValidatorComponent implements \Vaimo\ComposerPatches\Interfaces\Definition
                     md5($data['source']),
                     serialize($data[PatchDefinition::DEPENDS]),
                     serialize($data[PatchDefinition::TARGETS]),
-                    serialize($data[PatchDefinition::CONFIG])
+                    serialize($data[PatchDefinition::CONFIG]),
+                    $data[PatchDefinition::LABEL]
                 );
                 
                 $data[PatchDefinition::HASH] = md5(implode('|', $uidSources));

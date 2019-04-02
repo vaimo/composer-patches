@@ -15,8 +15,15 @@ interface ListResolverInterface
 
     /**
      * @param array $patches
-     * @param array $subset
+     * @param array $state
      * @return array
      */
-    public function resolveRelevantPatches(array $patches, array $subset);
+    public function resolveRelevantPatches(array $patches, array $state);
+
+    /**
+     * @param array $patches
+     * @param array $state
+     * @return mixed
+     */
+    public function resolveInitialState(array $patches, array $state);
 }

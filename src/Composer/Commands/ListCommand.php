@@ -216,14 +216,9 @@ class ListCommand extends \Composer\Command\BaseCommand
     
     private function generateOutput(OutputInterface $output, array $list)
     {
-        $statusDecorators = array(
-            'new' => '<info>NEW</info>',
-            'changed' => '<info>CHANGED</info>',
-            'applied' => '<fg=white;options=bold>APPLIED</>',
-            'removed' => '<fg=red>REMOVED</>',
-            'excluded' => '<fg=black>EXCLUDED</>',
-            'unknown' => 'UNKNOWN'
-        );
+        $statusConfig = new \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig();
+
+        $statusDecorators = $statusConfig->getLabels();
         
         foreach ($list as $packageName => $patches) {
             $output->writeln(sprintf('<info>%s</info>', $packageName));

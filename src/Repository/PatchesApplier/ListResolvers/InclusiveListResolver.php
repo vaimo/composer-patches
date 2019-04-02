@@ -43,4 +43,9 @@ class InclusiveListResolver implements \Vaimo\ComposerPatches\Interfaces\ListRes
     {
         return $patches;
     }
+
+    public function resolveInitialState(array $patches, array $state)
+    {
+        return $this->baseResolver->resolveInitialState($patches, $state);
+    }
 }

@@ -4,6 +4,13 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "DEV.3.45.1": {
+        "fix": [
+            "bundled patches partially reset when removing some dev-only (with --no-dev option) patches that targeted same packages as bundles did; Issue caused by only partially recursive lookup on an impact of re-installing certain composer package",
+            "the alias argument for --explicit, --show-reapplies did not trigger explicit output",
+            "make sure that patches that have exact same name but source from different owners don't end up rewriting each-other in apply-state"
+        ]
+    },
     "3.45.0": {
         "feature": [
             "allow patch:validate to use only patches that the root package owns: --local"

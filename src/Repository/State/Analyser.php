@@ -8,32 +8,13 @@ namespace Vaimo\ComposerPatches\Repository\State;
 class Analyser
 {
     /**
-     * @var \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface
-     */
-    private $packagesResolver;
-
-    /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
 
-    /**
-     * @param \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface $packagesResolver
-     */
-    public function __construct(
-        \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface $packagesResolver
-    ) {
-        $this->packagesResolver = $packagesResolver;
-
-        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
-    }
-
-    public function collectPackageResets(array $repositoryState, array $patches)
+    public function __construct() 
     {
-        $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
-        $patchFootprints = $this->patchListUtils->createSimplifiedList($patchesByTarget);
-
-        return $this->packagesResolver->resolve($patchFootprints, $repositoryState);
+        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
     
     public function collectPatchRemovals(array $repositoryState, array $patches)
@@ -41,15 +22,32 @@ class Analyser
         $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
         $patchesFootprints = $this->patchListUtils->createSimplifiedList($patchesByTarget);
 
-        $removedItems = array();
+        $result = array();
 
         foreach ($repositoryState as $target => $items) {
-            $removedItems[$target] = array_diff_key(
+            $result[$target] = array_diff_key(
                 $items,
                 isset($patchesFootprints[$target]) ? $patchesFootprints[$target] : array()
             );
         }
         
-        return $this->patchListUtils->createDetailedList($removedItems);
+        return $this->patchListUtils->createDetailedList($result);
+    }
+
+    public function collectPatchIncludes(array $repositoryState, array $patches)
+    {
+        $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
+        $patchesFootprints = $this->patchListUtils->createSimplifiedList($patchesByTarget);
+
+        $result = array();
+
+        foreach ($patchesFootprints as $target => $items) {
+            $result[$target] = array_diff_key(
+                $items,
+                isset($repositoryState[$target]) ? $repositoryState[$target] : array()
+            );
+        }
+
+        return $this->patchListUtils->createDetailedList($result);
     }
 }

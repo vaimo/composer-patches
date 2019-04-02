@@ -14,13 +14,21 @@ class PatchListUtils
         $groups = $this->createTargetsList($patches);
 
         $result = array_map(function ($group) {
-            return array_map(function($item) {
+            $fingerprints = array_map(function($item) {
                 return sprintf(
                     '%s, %s:%s',
                     isset($item[Patch::LABEL]) ? $item[Patch::LABEL] : '{no label}',
-                    Patch::HASH, isset($item[Patch::HASH]) ? $item[Patch::HASH] : '{no hash}'
+                    Patch::HASH, 
+                    isset($item[Patch::HASH]) && $item[Patch::HASH] ? $item[Patch::HASH] : '{no hash}'
                 );
             }, $group);
+            
+            $keys = array_map(function ($key, $item) {
+                return sprintf('%s%s%s', $item[Patch::OWNER], Patch::SOURCE_INFO_SEPARATOR, $key);
+            }, array_keys($group), $group);
+            
+            return array_combine($keys, $fingerprints);
+            
         }, $groups);
 
         return $result;
@@ -29,21 +37,33 @@ class PatchListUtils
     public function createDetailedList(array $patches)
     {
         $result = array();
+
+        $labelInfoMatcher = sprintf('/%s:(?P<hash>.*)/', Patch::HASH);
         
-        foreach ($patches as $owner => $group) {
-            $result[$owner] = array();
+        foreach ($patches as $target => $group) {
+            $result[$target] = array();
             
             if (!is_array($group)) {
                 continue;
             }
             
-            foreach ($group as $path => $label) {
-                $result[$owner][$path] = array(
+            foreach ($group as $sourceInfo => $label) {
+                $sourceConfig = explode(Patch::SOURCE_INFO_SEPARATOR, $sourceInfo);
+
+                $path = array_pop($sourceConfig);
+                $owner = array_pop($sourceConfig);
+
+                $labelConfig = explode(',', $label);
+
+                preg_match($labelInfoMatcher, trim(end($labelConfig)), $matches);
+                
+                $result[$target][$path] = array(
                     'path' => $path,
-                    'targets' => array($owner),
+                    'targets' => array($target),
                     'source' => $path,
-                    'owner' => Patch::OWNER_UNKNOWN,
-                    'label' => implode(',', array_slice(explode(',', $label), 0, -1))
+                    'owner' => $owner ? $owner : Patch::OWNER_UNKNOWN,
+                    'label' => implode(',', array_slice($labelConfig, 0, -1)),
+                    'md5' => is_array($matches) && isset($matches['hash']) ? $matches['hash'] : null
                 );
             }
         }
@@ -95,6 +115,29 @@ class PatchListUtils
                         array(Patch::ORIGIN => $origin)
                     );
                 }
+            }
+        }
+
+        return array_filter($result);
+    }
+
+    public function createOriginList(array $patchesList)
+    {
+        $result = array();
+
+        foreach ($patchesList as $target => $group) {
+            foreach ($group as $path => $patch) {
+                $origin = $patch[Patch::ORIGIN];
+                
+                if (!isset($result[$origin])) {
+                    $result[$origin] = array();
+                }
+                
+                if (isset($result[$origin][$path])) {
+                    continue;
+                }
+                
+                $result[$origin][$path] = array_diff_key($patch, array(Patch::ORIGIN => true));
             }
         }
 
@@ -172,127 +215,51 @@ class PatchListUtils
             array_map('array_filter', $patches)
         );
     }
-    
+
     public function getRelatedPatches(array $patchesList, array $targets)
     {
-        $result = $targets;
+        $scanTargets = $targets;
 
-        $relatedPatches = array();
+        $targetsStack = array();
+
+        $result = array();
 
         do {
-            $scanQueue = array_diff_key($patchesList, array_flip($result));
+            $targetsUpdates = array();
 
-            $resets = array();
-
-            foreach ($scanQueue as $owner => $patches) {
+            foreach ($patchesList as $owner => $patches) {
                 foreach ($patches as $patchPath => $patchInfo) {
-                    if (!array_intersect($patchInfo[Patch::TARGETS], $result)) {
+                    if (!array_intersect($patchInfo[Patch::TARGETS], $scanTargets)) {
                         continue;
                     }
-                    
-                    if (!isset($relatedPatches[$owner])) {
-                        $relatedPatches[$owner] = array();
+
+                    if (!isset($result[$owner])) {
+                        $result[$owner] = array();
                     }
 
-                    $relatedPatches[$owner][$patchPath] = $patchInfo;
+                    $result[$owner][$patchPath] = $patchInfo;
 
-                    $resets = array_merge(
-                        $resets, 
-                        array_diff($patchInfo[Patch::TARGETS], $result)
-                    );
+                    $targetsUpdates = array_merge($targetsUpdates, $patchInfo[Patch::TARGETS]);
                 }
             }
 
-            $result = array_merge($result, array_unique($resets));
-        } while ($resets);
+            $targetsStack = array_unique(
+                array_merge($targetsStack, $scanTargets)
+            );
 
-        return $relatedPatches;
+            $scanTargets = array_diff($targetsUpdates, $targetsStack, $scanTargets);
+        } while ($scanTargets);
+
+        return $result;
     }
-
-    public function generateKnownPatchFlagUpdates($ownerName, array $resetPatchesList, array $infoList)
-    {
-        $updates = array();
-
-        if (!isset($resetPatchesList[$ownerName])) {
-            $resetPatchesList[$ownerName] = array_reduce($resetPatchesList, 'array_replace', array());
-        }
-
-        $resetInfoList = array_replace(
-            $infoList,
-            array(
-                $ownerName => array_reduce(
-                    array_intersect_key($infoList, $resetPatchesList),
-                    'array_replace',
-                    array()
-                )
-            )
-        );
-
-        foreach ($resetPatchesList as $targetName => $resetPatches) {
-            if (!isset($resetInfoList[$targetName])) {
-                continue;
-            }
-
-            $knownPatches = array_intersect_assoc($resetInfoList[$targetName], $resetPatches);
-
-            $changedPatches = array_diff_key(
-                array_intersect_key($resetInfoList[$targetName], $resetPatches),
-                $knownPatches
-            );
-
-            $patchDefinitionUpdates = array_replace(
-                array_fill_keys(
-                    array_keys($changedPatches),
-                    array(Patch::STATUS_NEW => false)
-                ),
-                array_fill_keys(
-                    array_keys($knownPatches),
-                    array(Patch::STATUS_NEW => false, Patch::STATUS_CHANGED => false)
-                )
-            );
-
-            $updates = array_replace_recursive(
-                $updates,
-                array($targetName => $patchDefinitionUpdates)
-            );
-        }
-
-        return $updates;
-    }
-
-    public function updateList(array $patches, array $updates)
+    
+    public function embedInfoToItems(array $patches, $update)
     {
         foreach ($patches as $target => $group) {
             foreach ($group as $path => $item) {
-                $patches[$target][$path] = array_replace(
-                    $patches[$target][$path], 
-                    isset($updates[$target][$path]) ? $updates[$target][$path] : array() 
-                );
-            }
-        }
-
-        $patches = array_map(
-            function ($items) {
-                return array_filter($items, function ($item) {
-                    return array_filter($item);
-                });
-            },
-            $patches
-        );
-
-        return array_filter(
-            array_map('array_filter', $patches)
-        );
-    }
-
-    public function embedInfoToItems(array $patches, array $updates)
-    {
-        foreach ($patches as $target => $group) {
-            foreach ($group as $path => $item) {
-                $patches[$target][$path] = array_replace(
-                    $patches[$target][$path], 
-                    $updates
-                );
+                $patches[$target][$path] = is_array($update) 
+                    ? array_replace($patches[$target][$path], $update) 
+                    : $update;
             }
         }
 
@@ -365,7 +332,7 @@ class PatchListUtils
             );
         }, $listA);
     }
-
+    
     public function intersectListsByPath(array $listA, array $listB)
     {
         $pathFlags = array_fill_keys($this->getAllPaths($listB), true);
@@ -382,6 +349,34 @@ class PatchListUtils
         }, $listA);
     }
 
+    public function diffListsByName(array $listA, array $listB)
+    {
+        foreach ($listB as $target => $group) {
+            if (!isset($listA[$target])) {
+                $listA[$target] = array();
+            }
+
+            $listA[$target] = array_diff_key($listA[$target], $group);
+        }
+
+        return $listA;
+    }
+
+    public function intersectListsByName(array $listA, array $listB)
+    {
+        $result = array();
+        
+        foreach ($listB as $target => $group) {
+            if (!isset($listA[$target])) {
+                continue;
+            }
+            
+            $result[$target] = array_intersect_key($listA[$target], $group);
+        }
+
+        return $result;
+    }
+    
     public function updateStatuses(array $patches, $status)
     {
         return array_map(function (array $group) use ($status) {

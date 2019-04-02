@@ -99,7 +99,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $composer = $this->getComposer();
         $io = $this->getIO();
         
-        $isExplicit = $input->getOption('explicit');
+        $isExplicit = $input->getOption('explicit') || $input->getOption('show-reapplies');
         $isDevMode = !$input->getOption('no-dev');
 
         $filters = array(
@@ -112,7 +112,13 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         if ($behaviourFlags['redo'] && !array_filter($filters)) {
             $isExplicit = true;
-        } 
+        }
+
+        $hasFilers = array_filter($filters);
+
+        if (!$hasFilers && $behaviourFlags['redo']) {
+            $filters[Patch::SOURCE] = array('*');
+        }
         
         $listResolver = new ListResolvers\FilteredListResolver($filters);
         
@@ -121,7 +127,11 @@ class PatchCommand extends \Composer\Command\BaseCommand
         } else {
             $listResolver = new ListResolvers\InclusiveListResolver($listResolver);
         }
-
+        
+        if (!$behaviourFlags['redo'] && !$behaviourFlags['undo']) {
+            $listResolver = new ListResolvers\ChangesListResolver($listResolver);
+        }
+        
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
 
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
@@ -143,8 +153,6 @@ class PatchCommand extends \Composer\Command\BaseCommand
         }
 
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
-
-        $hasFilers = array_filter($filters);
         
         $outputTriggerFlags = array(
             Patch::STATUS_NEW => !$hasFilers, 

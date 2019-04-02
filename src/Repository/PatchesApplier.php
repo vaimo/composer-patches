@@ -55,6 +55,11 @@ class PatchesApplier
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig 
+     */
+    private $statusConfig;
     
     /**
      * @var \Vaimo\ComposerPatches\Utils\PackageUtils
@@ -99,9 +104,27 @@ class PatchesApplier
         );
 
         $this->outputStrategy = $outputStrategy;
-        
+
+        $this->statusConfig = new \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig();
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
+    }
+    
+    private function updateStatusLabels(array $queue, array $labels)
+    {
+        foreach ($queue as $target => $group) {
+            foreach ($group as $path => $item) {
+                $status = isset($item[Patch::STATUS]) ? $item[Patch::STATUS] : 'unknown';
+                
+                if (!isset($labels[$status])) {
+                    continue;
+                }
+                
+                $queue[$target][$path][Patch::STATUS_LABEL] = $labels[$status]; 
+            }
+        }
+        
+        return $queue;
     }
     
     public function apply(Repository $repository, array $patches)
@@ -112,25 +135,24 @@ class PatchesApplier
 
         $repositoryState = $this->repositoryStateGenerator->generate($repository);
         
-        $patchQueue = $this->queueGenerator->generateApplyQueue($patches, $repositoryState);
+        $applyQueue = $this->queueGenerator->generateApplyQueue($patches, $repositoryState);
+        $removeQueue = $this->queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);
+        $resetQueue = array_keys($applyQueue);
+
+        $applyQueue = array_map('array_filter', $applyQueue);
         
-        $resetQueue = array_keys($patchQueue);
+        $patchQueueFootprints = $this->patchListUtils->createSimplifiedList($applyQueue);
 
-        $patchQueueFootprints = $this->patchListUtils->createSimplifiedList($patchQueue);
+        $labels = array_diff_key($this->statusConfig->getLabels(), array('unknown' => true));
 
-        $patchRemovals = array_replace(
-            array_fill_keys(array_keys($packages), array()),
-            $this->queueGenerator->generateRemovalQueue(
-                array_replace($patches, $patchQueue), 
-                $repositoryState
-            )
-        );
+        $applyQueue = $this->updateStatusLabels($applyQueue, $labels);
+        $removeQueue = $this->updateStatusLabels($removeQueue, $labels);
         
         foreach ($packages as $packageName => $package) {
-            $hasPatches = !empty($patchQueue[$packageName]);
+            $hasPatches = !empty($applyQueue[$packageName]);
 
             if ($hasPatches) {
-                $patchTargets = $this->patchListUtils->getAllTargets(array($patchQueue[$packageName]));
+                $patchTargets = $this->patchListUtils->getAllTargets(array($applyQueue[$packageName]));
             } else {
                 $patchTargets = array($packageName);
             }
@@ -145,9 +167,9 @@ class PatchesApplier
                 $resetPatches = $this->packageUtils->resetAppliedPatches($resetTarget);
                 $resetResult[$targetName] = is_array($resetPatches) ? $resetPatches : array();
 
-                if (!$hasPatches && !isset($patchQueueFootprints[$targetName]) && $resetPatches) {
+                if (!$hasPatches && $resetPatches && !isset($patchQueueFootprints[$targetName])) {
                     $this->logger->writeRaw(
-                        'Resetting patched package <info>%s</info> (%s)',
+                        'Resetting patched for <info>%s</info> (%s)',
                         array($targetName, count($resetResult[$targetName]))
                     );
                 }
@@ -156,14 +178,6 @@ class PatchesApplier
 
                 $packagesUpdated = $packagesUpdated || (bool)$resetResult[$targetName];
             }
-
-            $updates = $this->patchListUtils->generateKnownPatchFlagUpdates(
-                $packageName, 
-                $resetResult, 
-                $patchQueueFootprints
-            );
-            
-            $patchQueue = $this->patchListUtils->updateList($patchQueue, $updates);
             
             $resetQueue = array_diff($resetQueue, $patchTargets);
 
@@ -174,10 +188,12 @@ class PatchesApplier
             $changesMap = array();
             
             foreach ($patchTargets as $targetName) {
-                $targetQueue = isset($patchQueueFootprints[$targetName])
-                    ? $patchQueueFootprints[$targetName]
-                    : array();
-
+                $targetQueue = array();
+                
+                if (isset($patchQueueFootprints[$targetName])) {
+                    $targetQueue = $patchQueueFootprints[$targetName];
+                }
+    
                 if (!isset($packages[$targetName])) {
                     throw new \Vaimo\ComposerPatches\Exceptions\PackageNotFound(
                         sprintf(
@@ -201,7 +217,7 @@ class PatchesApplier
             }
 
             $queuedPatches = array_filter(
-                $patchQueue[$packageName],
+                $applyQueue[$packageName],
                 function ($data) use ($changedTargets) {
                     return array_intersect($data[Patch::TARGETS], $changedTargets);
                 }
@@ -209,7 +225,11 @@ class PatchesApplier
             
             $muteDepth = null;
             
-            if (!$this->shouldAllowOutput($queuedPatches, $patchRemovals[$packageName])) {
+            $patchRemovals = isset($removeQueue[$packageName]) 
+                ? $removeQueue[$packageName] 
+                : array(); 
+            
+            if (!$this->shouldAllowOutput($queuedPatches, $patchRemovals)) {
                 $muteDepth = $this->logger->mute();
             } 
             
@@ -219,10 +239,10 @@ class PatchesApplier
                     array($packageName, count($queuedPatches))
                 );
                 
-                if ($patchRemovals[$packageName]) {
+                if ($patchRemovals) {
                     $processIndentation = $this->logger->push('~');
 
-                    foreach ($patchRemovals[$packageName] as $item) {
+                    foreach ($patchRemovals as $item) {
                         $this->patchInfoLogger->outputPatchInfo($item);
                     }
 
