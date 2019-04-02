@@ -15,6 +15,10 @@ class ConfigUtils
             $config[Config::PATCHER_SECURE_HTTP] = $updates[Config::PATCHER_SECURE_HTTP];
         }
 
+        if (isset($updates[Config::PATCHER_GRACEFUL])) {
+            $config[Config::PATCHER_GRACEFUL] = $updates[Config::PATCHER_GRACEFUL];
+        }
+
         if (isset($updates[Config::PATCHER_FORCE_RESET])) {
             $config[Config::PATCHER_FORCE_RESET] = $updates[Config::PATCHER_FORCE_RESET];
         }
