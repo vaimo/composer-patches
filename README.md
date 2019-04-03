@@ -832,7 +832,7 @@ _Note that by default, user does not really have to declare any of this, but eve
         },
         "GIT": {
           "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
-          "bin" => "[[resolver]] git",
+          "bin": "[[resolver]] git",
           "check": "[[bin]] apply -p{{level}} --check {{file}}",
           "patch": "[[bin]] apply -p{{level}} {{file}}"
         },
