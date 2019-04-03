@@ -824,10 +824,10 @@ _Note that by default, user does not really have to declare any of this, but eve
         "vendors": true
       },
       "appliers": {
-        "DEFAULT" => {
-          "resolver" => {
-            "default" => "< which",
-            "windows' => "< where"
+        "DEFAULT": {
+          "resolver": {
+            "default": "< which",
+            "windows": "< where"
           }
         },
         "GIT": {
