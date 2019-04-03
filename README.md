@@ -824,14 +824,20 @@ _Note that by default, user does not really have to declare any of this, but eve
         "vendors": true
       },
       "appliers": {
+        "DEFAULT" => {
+          "resolver" => {
+            "default" => "< which",
+            "windows' => "< where"
+          }
+        },
         "GIT": {
           "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
-          "bin": "which git",
+          "bin" => "[[resolver]] git",
           "check": "[[bin]] apply -p{{level}} --check {{file}}",
           "patch": "[[bin]] apply -p{{level}} {{file}}"
         },
         "PATCH": {
-          "bin": ["which custom-patcher", "which patch"],
+          "bin": ["[[resolver]] custom-patcher", "[[resolver]] patch"],
           "check": "[[bin]] -t --verbose -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
           "patch": "[[bin]] -t -p{{level}} --no-backup-if-mismatch < {{file}}"
         }
@@ -849,7 +855,7 @@ _Note that by default, user does not really have to declare any of this, but eve
       },
       "sequence": {
         "appliers": ["PATCH", "GIT"],
-        "operations": ["bin", "ping", "check", "patch"]
+        "operations": ["resolver", "bin", "ping", "check", "patch"]
       },
       "levels": [0, 1, 2]    
     }
