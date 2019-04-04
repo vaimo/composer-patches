@@ -1099,8 +1099,8 @@ composer patch:redo --filter '!some*description' my/package
 # Reset all patched packages
 composer patch:undo 
 
-# Reset one specific patched package
-composer patch:undo my/package 
+# Reset patches for specified packages (path:apply will restore them)
+composer patch:undo my/package other/package
 
 # Reset one specific patch on package
 composer patch:undo --filter some-fix my/package
