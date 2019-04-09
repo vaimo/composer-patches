@@ -2,7 +2,7 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 4.16.0
+## 4.16.0 (2019-04-09)
 
 all features and fixes in this release are forward-ported from 3.47.0
 
