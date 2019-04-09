@@ -107,6 +107,28 @@ class Bootstrap
         $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
 
+    public function preloadPluginClasses()
+    {
+        $installationManager = $this->composer->getInstallationManager();
+        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
+        $composerConfig = $this->composer->getConfig();
+        
+        $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
+            array($this->composer->getPackage())
+        );
+
+        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
+            $installationManager,
+            $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR)
+        );
+
+        $sourcesPreloader = new \Vaimo\ComposerPatches\Package\SourcesPreloader($packageInfoResolver);
+        
+        $sourcesPreloader->preload(
+            $packageResolver->resolveForNamespace($repository, __NAMESPACE__)
+        );
+    }
+    
     public function applyPatches($devMode = false)
     {
         $this->applyPatchesWithConfig(
@@ -133,6 +155,7 @@ class Bootstrap
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();
 
         $patchesLoader = $this->loaderFactory->create($this->loaderComponents, $config, $devMode);
+        
         $patchesApplier = $this->applierFactory->create(
             $config, 
             $this->listResolver,

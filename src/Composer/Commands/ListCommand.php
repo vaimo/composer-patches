@@ -133,7 +133,8 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
         
         $unfilteredPool = $this->createLoaderPool(array(
-            'constraints' => false, 
+            'constraints' => false,
+            'platform' => false,
             'local-exclude' => false, 
             'root-patch' => false,
             'global-exclude' => false, 

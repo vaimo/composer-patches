@@ -71,7 +71,8 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $downloader = new \Composer\Util\RemoteFilesystem($this->getIO(), $composerConfig);
         
         $loaderComponentsPool = $this->createLoaderPool(array(
-            'constraints' => false, 
+            'constraints' => false,
+            'platform' => false,
             'targets-resolver' => false, 
             'local-exclude' => false,
             'root-patch' => false,
