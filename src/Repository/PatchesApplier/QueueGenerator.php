@@ -170,4 +170,17 @@ class QueueGenerator
             )
         );
     }
+    
+    public function generateResetQueue(array $patches)
+    {
+        $directTargets = array_keys($patches);
+        
+        $declaredTargets = $this->patchListUtils->getAllTargets(
+            array_map('array_filter', $patches)
+        );
+        
+        return array_unique(
+            array_merge($directTargets, $declaredTargets)
+        );
+    }
 }

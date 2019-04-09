@@ -176,11 +176,16 @@ class PatchListUtils
 
         foreach ($patches as $patchGroup) {
             foreach ($patchGroup as $patchInfo) {
-                $targetList = array_merge($targetList, $patchInfo[Patch::TARGETS]);
+                $targetList = array_merge(
+                    $targetList, 
+                    $patchInfo[Patch::TARGETS]
+                );
             }
         }
 
-        return array_values(array_unique($targetList));
+        return array_values(
+            array_unique($targetList)
+        );
     }
 
     public function applyDefinitionFilter(array $patches, $filter, $key)

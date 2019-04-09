@@ -72,7 +72,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                     $package = $packagesByName[$constraintTarget];
 
                     $packageVersion = $package->getVersion();
-                    $packageVersions = [$package->getVersion()];
+                    $packageVersions = array($package->getVersion());
                     
                     if (isset($rootRequires[$constraintTarget])) {
                         /** @var \Composer\Package\CompletePackageInterface $targetRootPackage */
@@ -84,7 +84,6 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                             $packageVersions[] = $matches[1];   
                         }
                     }
-                    
                     
                     if ($this->constraintUtils->isDevConstraint($packageVersion)) {
                         $definedVersion = $this->configExtractor->getConfig(

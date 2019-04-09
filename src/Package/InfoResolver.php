@@ -116,4 +116,24 @@ class InfoResolver
 
         return $this->installPathCache[$key];
     }
+    
+    public function getAutoLoadPaths(PackageInterface $package)
+    {
+        $autoloadConfig = $package->getAutoload();
+
+        $installPath = $this->getInstallPath($package, Patch::CWD_INSTALL);
+
+        if (!isset($autoloadConfig[ConfigKeys::PSR4_CONFIG])) {
+            return array();
+        }
+
+        $sourcePaths = array_map(
+            function ($path) use ($installPath) {
+                return $installPath . DIRECTORY_SEPARATOR . $path;
+            }, 
+            $autoloadConfig[ConfigKeys::PSR4_CONFIG]
+        );
+        
+        return array_values($sourcePaths);
+    }
 }

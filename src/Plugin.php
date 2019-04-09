@@ -36,8 +36,10 @@ class Plugin implements \Composer\Plugin\PluginInterface,
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
 
         $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
-        
+
         $this->bootstrap = $this->bootstrapFactory->create($configFactory);
+        
+        $this->bootstrap->preloadPluginClasses();
     }
 
     public function getCapabilities()

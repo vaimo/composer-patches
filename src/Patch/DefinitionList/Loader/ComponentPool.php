@@ -67,12 +67,15 @@ class ComponentPool
 
         $downloader = new \Composer\Util\RemoteFilesystem($this->io, $composerConfig);
 
+        $platformPackages = $this->resolveConstraintPackages($composerConfig);
+        
         $defaults = array(
             'bundle' => new LoaderComponents\BundleComponent($rootPackage),
             'global-exclude' => $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,
             'local-exclude' => new LoaderComponents\LocalExcludeComponent(),
             'root-patch' => new LoaderComponents\RootPatchComponent($rootPackage),
             'path-normalizer' => new LoaderComponents\PathNormalizerComponent($packageInfoResolver),
+            'platform' => new LoaderComponents\PlatformComponent($platformPackages),
             'constraints' => new LoaderComponents\ConstraintsComponent($configExtractor),
             'downloader' => new LoaderComponents\DownloaderComponent($rootPackage, $downloader),
             'validator' => new LoaderComponents\ValidatorComponent(),
@@ -88,6 +91,28 @@ class ComponentPool
         );
     }
 
+    private function resolveConstraintPackages(\Composer\Config $composerConfig)
+    {
+        $platformOverrides = $composerConfig->get('platform');
+
+        if ($platformOverrides) {
+            $platformOverrides = array();
+        }
+
+        $platformRepo = new \Composer\Repository\PlatformRepository(
+            array(),
+            $platformOverrides ? $platformOverrides : array()
+        );
+
+        $platformPackages = array();
+
+        foreach ($platformRepo->getPackages() as $package) {
+            $platformPackages[$package->getName()] = $package;
+        }
+        
+        return $platformPackages;
+    }
+    
     public function registerComponent($name, $instance)
     {
         $this->components[$name] = $instance;

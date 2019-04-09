@@ -4,6 +4,16 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.16.0": {
+        "overview": "all features and fixes in this release are forward-ported from 3.47.0",
+        "feature": [
+            "allow platform requirement dependencies on patches a'la php:>=7.2 (previously only package dependencies could be declared); usable with \"depends\" config or @depends tag"
+        ],
+        "fix": [
+            "malformed package reset queue in some edge cases when using bundled patches which targets packages that have no direct patches applying on them",
+            "load all the plugin classes on startup (to avoid crashes on patch apply); the old plugin logic will be used til the end of the particular Composer call that upgraded the plugin [github/28]"
+        ]
+    },
     "4.15.0": {
         "overview": [
             "This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports",
@@ -214,6 +224,15 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
+    "3.47.0": {
+        "feature": [
+            "allow platform requirement dependencies on patches a'la php:>=7.2 (previously only package dependencies could be declared); usable with \"depends\" config or @depends tag"
+        ],
+        "fix": [
+            "malformed package reset queue in some edge cases when using bundled patches which targets packages that have no direct patches applying on them",
+            "load all the plugin classes on startup (to avoid crashes on patch apply); the old plugin logic will be used til the end of the particular Composer call that upgraded the plugin [github/28]"
         ]
     },
     "3.46.0": {

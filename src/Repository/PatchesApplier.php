@@ -137,8 +137,8 @@ class PatchesApplier
         
         $applyQueue = $this->queueGenerator->generateApplyQueue($patches, $repositoryState);
         $removeQueue = $this->queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);
-        $resetQueue = array_keys($applyQueue);
-
+        $resetQueue = $this->queueGenerator->generateResetQueue($applyQueue);
+        
         $applyQueue = array_map('array_filter', $applyQueue);
         
         $patchQueueFootprints = $this->patchListUtils->createSimplifiedList($applyQueue);
