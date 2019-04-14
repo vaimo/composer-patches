@@ -156,19 +156,6 @@ class PatchListUtils
             }
         }
     }
-
-    public function createFlatList(array $patches)
-    {
-        $result = array();
-
-        foreach ($patches as $patchGroup) {
-            foreach ($patchGroup as $patchInfo) {
-                $result[] = $patchInfo;
-            }
-        }
-
-        return $result;
-    }
     
     public function getAllTargets(array $patches)
     {
