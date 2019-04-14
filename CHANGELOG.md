@@ -2,27 +2,36 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.47.1
+
+### Fix
+
+* wrong path used for pre-loading classes while running composer commands when the plugin package used as ROOT
+* removed all syntax/code that was not compatible with 5.3
+* removed/replaced all dependencies that were not compatible with 5.3
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.1) [diff](https://github.com/vaimo/composer-patches/compare/3.47.0...3.47.1)
+
 ## 3.47.0 (2019-04-09)
 
 ### Feature
 
-* allow platform requirement dependencies on patches a'la php:>=7.2 (previously only package dependencies could be declared); usable with "depends" config or @depends tag
+* allow platform requirement dependencies on patches a'la php:&gt;=7.2 (previously only package dependencies could be declared); usable with &quot;depends&quot; config or @depends tag
 
 ### Fix
 
 * malformed package reset queue in some edge cases when using bundled patches which targets packages that have no direct patches applying on them
 * load all the plugin classes on startup (to avoid crashes on patch apply); the old plugin logic will be used til the end of the particular Composer call that upgraded the plugin [github/28]
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.0) [diff](https://github.com/vaimo/composer-patches/compare/3.46.0...3.47.0)
 
 ## 3.46.0 (2019-04-03)
 
 This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports
-
 ### Feature
 
 * added --with-affected argument option for path:list command to list patches that indirectly are affected by the new/changed patches (would be re-applied on actually patch:apply due to package resets caused by new/changed statuses)
 * patch owner embedded in applied patch registry to provide proper REMOVED information when patch gets removed
-
 
 ### Fix
 
@@ -31,6 +40,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * make sure that repeated patch:undo calls don't reinstall previously undo'd patches
 * make sure that patch:list uses same functionality that the main patch applier uses, thus guaranteeing that path:list will list the things as they'd be processed in actual patch apply run
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.46.0) [diff](https://github.com/vaimo/composer-patches/compare/3.45.0...3.46.0)
 
 ## 3.45.0 (2019-04-02)
 
@@ -42,6 +52,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines [github/26]
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.45.0) [diff](https://github.com/vaimo/composer-patches/compare/3.44.0...3.45.0)
 
 ## 3.44.0 (2019-04-01)
 
@@ -49,6 +60,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.44.0) [diff](https://github.com/vaimo/composer-patches/compare/3.43.0...3.44.0)
 
 ## 3.43.0 (2019-03-31)
 
@@ -63,6 +75,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * some path processing functions did not use proper directory separator constant
 * patches not applied properly on Windows due to using 'which' instead of 'where' when resolving the patch applier absolute path [gitdhub/26]
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.43.0) [diff](https://github.com/vaimo/composer-patches/compare/3.42.2...3.43.0)
 
 ## 3.42.2 (2019-03-21)
 
@@ -70,6 +83,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * additional rollbacks on newer array declaration usage (broke compatibility with 5.3)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.2) [diff](https://github.com/vaimo/composer-patches/compare/3.42.1...3.42.2)
 
 ## 3.42.1 (2019-03-21)
 
@@ -77,6 +91,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * rollback on newer array declaration usage (broke compatibility with 5.3)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.1) [diff](https://github.com/vaimo/composer-patches/compare/3.42.0...3.42.1)
 
 ## 3.42.0 (2019-03-21)
 
@@ -99,6 +114,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * made patch commands available within the plugin itself (not currently used for anything, potentially used in integration tests in the near future)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.0) [diff](https://github.com/vaimo/composer-patches/compare/3.41.0...3.42.0)
 
 ## 3.41.0 (2019-02-20)
 
@@ -106,6 +122,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * allow patcher config overrides per package instead of allowing it only per patch definition (reserved key: '_config'). More on this under the topic of 'Patches: shared config' in the README
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.41.0) [diff](https://github.com/vaimo/composer-patches/compare/3.40.0...3.41.0)
 
 ## 3.40.0 (2019-02-12)
 
@@ -113,6 +130,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * allow patch to target the autoloader root (instead of targeting package root) by configuring 'cwd' key to 'autoload'
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.40.0) [diff](https://github.com/vaimo/composer-patches/compare/3.39.2...3.40.0)
 
 ## 3.39.2 (2019-02-12)
 
@@ -120,6 +138,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * follow-up to incorrectly released version (3.39.1); no extra changes done
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.2) [diff](https://github.com/vaimo/composer-patches/compare/3.39.1...3.39.2)
 
 ## 3.39.1 (2019-02-12)
 
@@ -127,6 +146,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * patches not applied when dealing with requires that use dev branches (even when version available in package config or when dev branch aliased as proper version)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.1) [diff](https://github.com/vaimo/composer-patches/compare/3.39.0...3.39.1)
 
 ## 3.39.0 (2019-02-12)
 
@@ -149,6 +169,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * hide NEW patches (that might be failing) when doing filtered redo/undo calls to avoid too much noise in output where it's pretty clear that developer is working with a sub-selection of patches (all shown when doing explicit call)
 * composer lock still modified when applying patches (leaves empty EXTRA key behind where there previously wasn't one present)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.0) [diff](https://github.com/vaimo/composer-patches/compare/3.38.0...3.39.0)
 
 ## 3.38.0 (2018-09-27)
 
@@ -160,6 +181,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * rollback to fix in 3.37.1 (caused errors for patches that created new files, new solution needed)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.38.0) [diff](https://github.com/vaimo/composer-patches/compare/3.37.1...3.38.0)
 
 ## 3.37.1 (2018-09-26)
 
@@ -167,6 +189,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * some patches that patched multiple files applied only half-way through on certain OS's without returning with proper exit code on failure (or failed hunks considered as ignoreable junk)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.37.1) [diff](https://github.com/vaimo/composer-patches/compare/3.37.0...3.37.1)
 
 ## 3.37.0 (2018-09-18)
 
@@ -178,6 +201,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * embedded targeting info for bundled patches that declares constrains not processed correctly (@depends,@version)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.37.0) [diff](https://github.com/vaimo/composer-patches/compare/3.36.0...3.37.0)
 
 ## 3.36.0 (2018-09-18)
 
@@ -191,6 +215,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * multi-line description not presented properly when using composer patch:list command
 * bundled patches not included as expected when using embedded patch target info
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.36.0) [diff](https://github.com/vaimo/composer-patches/compare/3.35.3...3.36.0)
 
 ## 3.35.3 (2018-09-14)
 
@@ -198,6 +223,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.3) [diff](https://github.com/vaimo/composer-patches/compare/3.35.2...3.35.3)
 
 ## 3.35.2 (2018-09-11)
 
@@ -205,6 +231,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * lock management reworked (again) to make sure that under no circumstances does the plugin crash while sanitizing the lock
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.2) [diff](https://github.com/vaimo/composer-patches/compare/3.35.1...3.35.2)
 
 ## 3.35.1 (2018-09-10)
 
@@ -212,6 +239,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * lock management reworked to use built-in methods for locating a package to avoid issues with potential aliases, etc
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.1) [diff](https://github.com/vaimo/composer-patches/compare/3.35.0...3.35.1)
 
 ## 3.35.0 (2018-09-10)
 
@@ -224,6 +252,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * bundled patch targets not properly reset when using patch:redo in case patches applied on packages, but installed.json reset to provide no information about applied patches
 * patches for packages that are covered with certain bundle patch do not get re-applied when running patch:redo with filter (redo should not leave any patch uninstalled even when executed with a filter)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.0) [diff](https://github.com/vaimo/composer-patches/compare/3.34.1...3.35.0)
 
 ## 3.34.1 (2018-09-02)
 
@@ -231,18 +260,20 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * conflicting project applied patches state when doing a --no-dev call and a filtered undo/redo after that
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.34.1) [diff](https://github.com/vaimo/composer-patches/compare/3.34.0...3.34.1)
 
 ## 3.34.0 (2018-09-01)
 
 ### Feature
 
-* allow patch path strip level to be defined in patch's embedded target-info declaration (@level <int>)
+* allow patch path strip level to be defined in patch's embedded target-info declaration (@level &lt;int&gt;)
 
 ### Fix
 
 * patches queue generator sometimes generated lists that did not queue proper re-applying of patches when dealing with bundles and indirect targets so that 'patch:redo' == 'patch:undo' + 'patch:apply'
 * make sure that the removal od 'dev' bundle (or any other type with indirect targets) patches cause proper re-patching of related targets when running with --no-dev
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.34.0) [diff](https://github.com/vaimo/composer-patches/compare/3.33.1...3.34.0)
 
 ## 3.33.1 (2018-08-30)
 
@@ -250,6 +281,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * improved error reporting when encountering issues on composer lock cleanup
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.33.1) [diff](https://github.com/vaimo/composer-patches/compare/3.33.0...3.33.1)
 
 ## 3.33.0 (2018-08-22)
 
@@ -264,6 +296,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * full list of applied patches ended up in composer.lock (new: none added, not even 'true' flag)
 * multiple dependencies on patches with embedded target info not respected
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.33.0) [diff](https://github.com/vaimo/composer-patches/compare/3.32.1...3.33.0)
 
 ## 3.32.1 (2018-08-16)
 
@@ -275,6 +308,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * removing #skip flag from path when encountered (previously it remained in the path)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.32.1) [diff](https://github.com/vaimo/composer-patches/compare/3.32.0...3.32.1)
 
 ## 3.32.0 (2018-08-16)
 
@@ -282,6 +316,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * allow comments on any level and with any keyword as long as it starts with underscore (_)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.32.0) [diff](https://github.com/vaimo/composer-patches/compare/3.31.0...3.32.0)
 
 ## 3.31.0 (2018-08-15)
 
@@ -289,6 +324,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * halt applying patches when encountering package with local changes to avoid developer from losing their work (allow override with env flag or command --force flag)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.31.0) [diff](https://github.com/vaimo/composer-patches/compare/3.30.1...3.31.0)
 
 ## 3.30.1 (2018-08-15)
 
@@ -297,6 +333,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * patch apply failure on fresh projects under certain conditions when loading the 'patches-applied' from .lock file (which in-between the run is set to 'true')
 * skip initiating the patches in case composer update is only targeting composer.lock (running update with --lock) and not really installing/updating any modules
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.30.1) [diff](https://github.com/vaimo/composer-patches/compare/3.30.0...3.30.1)
 
 ## 3.30.0 (2018-08-14)
 
@@ -309,6 +346,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * patch:redo not re-applying patches correctly for targeted package when empty patch list provided (in situations where previously patches were applied)
 * when testing bundled packages with --filter, consider all bundle patch targets as full reset candidates (used to produce inconsistent behaviour)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.30.0) [diff](https://github.com/vaimo/composer-patches/compare/3.29.1...3.30.0)
 
 ## 3.29.1 (2018-08-12)
 
@@ -316,6 +354,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * patch validation command failing on bundle patches when owned by non-root package
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.29.1) [diff](https://github.com/vaimo/composer-patches/compare/3.29.0...3.29.1)
 
 ## 3.29.0 (2018-08-12)
 
@@ -337,6 +376,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * change towards not passing composer instance into functions and using it as dependency instead
 * make it possible to manipulate composer loader work by toggling or replacing loader components
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.29.0) [diff](https://github.com/vaimo/composer-patches/compare/3.28.1...3.29.0)
 
 ## 3.28.1 (2018-08-10)
 
@@ -344,6 +384,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * patch link/issue moved to be presented after the label/description
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.28.1) [diff](https://github.com/vaimo/composer-patches/compare/3.28.0...3.28.1)
 
 ## 3.28.0 (2018-08-10)
 
@@ -359,6 +400,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * undo having confusing semantic meaning when used. targeting a specific package now always just targets the package, path filter gets negated on undo command
 * work towards restoring compatibility with 5.3
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.28.0) [diff](https://github.com/vaimo/composer-patches/compare/3.27.0...3.28.0)
 
 ## 3.27.0 (2018-05-18)
 
@@ -367,6 +409,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * allow multiple 'patches-depend' declarations for different kind of patches (bundle VS normal patch)
 * allow wildcards to be used in target names when defining multiple patches-depends items
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.27.0) [diff](https://github.com/vaimo/composer-patches/compare/3.26.0...3.27.0)
 
 ## 3.26.0 (2018-05-08)
 
@@ -374,6 +417,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * allow multiple patch-base's to be defined based on vendor or full package name
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.26.0) [diff](https://github.com/vaimo/composer-patches/compare/3.25.3...3.26.0)
 
 ## 3.25.3 (2018-03-07)
 
@@ -381,6 +425,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * missing file added
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.3) [diff](https://github.com/vaimo/composer-patches/compare/3.25.2...3.25.3)
 
 ## 3.25.2 (2018-03-06)
 
@@ -388,6 +433,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * array-based values ended up being treated as version constraints (issue with label-version exploder)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.2) [diff](https://github.com/vaimo/composer-patches/compare/3.25.1...3.25.2)
 
 ## 3.25.1 (2018-03-06)
 
@@ -395,6 +441,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * label-version definition exploder not handling a list of multiple versions correctly
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.1) [diff](https://github.com/vaimo/composer-patches/compare/3.25.0...3.25.1)
 
 ## 3.25.0 (2018-03-06)
 
@@ -412,6 +459,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * don't append the base-path pattern with custom extras and expect users to take charge of making sure that the file name is part of the path
 * trim whitespace, slash, colon when patch source starts with space
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.0) [diff](https://github.com/vaimo/composer-patches/compare/3.24.1...3.25.0)
 
 ## 3.24.1 (2018-02-28)
 
@@ -419,6 +467,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * debug code removed (shame!)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.24.1) [diff](https://github.com/vaimo/composer-patches/compare/3.24.0...3.24.1)
 
 ## 3.24.0 (2018-02-28)
 
@@ -437,6 +486,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * composer lock removed; readme mic statistics badges added
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.24.0) [diff](https://github.com/vaimo/composer-patches/compare/3.23.5...3.24.0)
 
 ## 3.23.5 (2018-02-13)
 
@@ -444,6 +494,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * wrong error message when bundle patch is not found from defined path
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.5) [diff](https://github.com/vaimo/composer-patches/compare/3.23.4...3.23.5)
 
 ## 3.23.4 (2018-02-13)
 
@@ -451,6 +502,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * minor modifications to patch filtering logic
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.4) [diff](https://github.com/vaimo/composer-patches/compare/3.23.3...3.23.4)
 
 ## 3.23.3 (2018-02-13)
 
@@ -463,6 +515,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * definition normalizer split into separate components
 * patch applier partially split into smaller components
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.3) [diff](https://github.com/vaimo/composer-patches/compare/3.23.2...3.23.3)
 
 ## 3.23.2 (2018-02-12)
 
@@ -476,6 +529,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * log messages updated to include applied patch count when resetting package
 * showing [NEW] flag when re-applying patches for a package and patch file was previously not applied
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.2) [diff](https://github.com/vaimo/composer-patches/compare/3.23.1...3.23.2)
 
 ## 3.23.1 (2018-02-12)
 
@@ -483,6 +537,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * bundled patches reset mechanism targeting wrong packages (where root package as owner was being sent to 'patches reset' which caused a crash)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.1) [diff](https://github.com/vaimo/composer-patches/compare/3.23.0...3.23.1)
 
 ## 3.23.0 (2018-02-12)
 
@@ -496,6 +551,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * renamed constants that conflicted with constant names that were reserved in PHP5.3.X
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.0) [diff](https://github.com/vaimo/composer-patches/compare/3.22.4...3.23.0)
 
 ## 3.22.4 (2018-02-08)
 
@@ -503,6 +559,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * package meta-data fixes. syntax error in composer.json
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.4) [diff](https://github.com/vaimo/composer-patches/compare/3.22.3...3.22.4)
 
 ## 3.22.3 (2018-02-08)
 
@@ -512,6 +569,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * package not reset when using --filter (without --redo), even when targeted patches were a subset of what was applied
 * the --filter flag not properly respected when running 'patch' command with --undo
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.3) [diff](https://github.com/vaimo/composer-patches/compare/3.22.2...3.22.3)
 
 ## 3.22.2 (2018-02-08)
 
@@ -519,6 +577,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * bundled patch targets resolver failing due to patch info loaders being re-arranged and certain array values no longer being available (patch path not available as array keys)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.2) [diff](https://github.com/vaimo/composer-patches/compare/3.22.1...3.22.2)
 
 ## 3.22.1 (2018-02-08)
 
@@ -526,6 +585,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * minor architecture changes around filtering patch files / packages
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.1) [diff](https://github.com/vaimo/composer-patches/compare/3.22.0...3.22.1)
 
 ## 3.22.0 (2018-02-08)
 
@@ -538,6 +598,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * patch exclusion failed to kick in due to bad configuration pass-down from factory to the component that is responsible for the exclusion
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.0) [diff](https://github.com/vaimo/composer-patches/compare/3.21.0...3.22.0)
 
 ## 3.21.0 (2018-02-08)
 
@@ -551,6 +612,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * the --filter argument to work similarly to how package filter narrows down on what is being targeted
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.21.0) [diff](https://github.com/vaimo/composer-patches/compare/3.20.0...3.21.0)
 
 ## 3.20.0 (2018-02-05)
 
@@ -563,6 +625,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * fail early when some of the remote patches fail to download (only for patches that are actually required)
 * make sure that same patch file is not downloaded twice (might happen with bundled patches)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.20.0) [diff](https://github.com/vaimo/composer-patches/compare/3.19.5...3.20.0)
 
 ## 3.19.5 (2018-02-04)
 
@@ -576,6 +639,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * moved patch downloading to be done before any patches are applied
 * documentation simplified. Using comments in examples to explain what certain config does
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.5) [diff](https://github.com/vaimo/composer-patches/compare/3.19.4...3.19.5)
 
 ## 3.19.4 (2018-02-03)
 
@@ -583,6 +647,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * documentation re-organized and simplified
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.4) [diff](https://github.com/vaimo/composer-patches/compare/3.19.3...3.19.4)
 
 ## 3.19.3 (2018-02-03)
 
@@ -590,6 +655,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * minor readme and package description updates
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.3) [diff](https://github.com/vaimo/composer-patches/compare/3.19.2...3.19.3)
 
 ## 3.19.2 (2018-02-03)
 
@@ -597,6 +663,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * documentation changes. Some explanations re-written. Added example for bundle-patch
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.2) [diff](https://github.com/vaimo/composer-patches/compare/3.19.1...3.19.2)
 
 ## 3.19.1 (2018-02-03)
 
@@ -605,6 +672,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * documentation re-organized to prioritize quick comprehension on the basics of the module's functionality
 * minor code restyle changes
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.1) [diff](https://github.com/vaimo/composer-patches/compare/3.19.0...3.19.1)
 
 ## 3.19.0 (2018-02-02)
 
@@ -619,16 +687,18 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * removed references to $this within closures (as it's not supported in 5.3.X)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.0) [diff](https://github.com/vaimo/composer-patches/compare/3.18.0...3.19.0)
 
 ## 3.18.0 (2018-02-02)
 
 ### Feature
 
-* several config keys renamed (patchers => appliers, patcher-config => patcher). Backwards compatible
+* several config keys renamed (patchers =&gt; appliers, patcher-config =&gt; patcher). Backwards compatible
 * patch enabling moved under patcher/sources (project:bool, packages:bool|array, vendors:bool|array). Backwards compatible
 * allow granular patch sources inclusion (so that only some vendors would be included)
 * allow some providers to have special extra operations (before this change, every applier was expected to have every listed operation declared)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.18.0) [diff](https://github.com/vaimo/composer-patches/compare/3.17.3...3.18.0)
 
 ## 3.17.3 (2018-02-01)
 
@@ -641,6 +711,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * switched to using constants for each free-text array key value + reduced code repetition
 * logger indentation reworked not to be hardcoded in log messages in text form to open up the chance to switch to different logging methods/formats in the future
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.3) [diff](https://github.com/vaimo/composer-patches/compare/3.17.2...3.17.3)
 
 ## 3.17.2 (2018-02-01)
 
@@ -648,6 +719,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * patches not registered for patch target packages when 'COMPOSER_PATCHES_FATAL_FAIL' enabled and error is encountered
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.2) [diff](https://github.com/vaimo/composer-patches/compare/3.17.1...3.17.2)
 
 ## 3.17.1 (2018-02-01)
 
@@ -657,6 +729,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * composer patch command option 'redo' not working correctly when patching explicitly set to be enabled in composer.json of the project
 * using 'undo' and 'redo' together still triggers 'undo' functionality
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.1) [diff](https://github.com/vaimo/composer-patches/compare/3.17.0...3.17.1)
 
 ## 3.17.0 (2018-01-31)
 
@@ -670,6 +743,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * code split into smaller classes where applicable to move towards single-responsibility entities in design
 * reduced the mess around re-using same terminology in too many different contexts
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.0) [diff](https://github.com/vaimo/composer-patches/compare/3.16.0...3.17.0)
 
 ## 3.16.0 (2018-01-31)
 
@@ -686,6 +760,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * patches-dev and patches-file not enabling patching by default when defined on project level
 * having patcher enabled only on project level did not compile patch queue correctly when disabling the option of including patches from packages
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.16.0) [diff](https://github.com/vaimo/composer-patches/compare/3.15.0...3.16.0)
 
 ## 3.15.0 (2018-01-29)
 
@@ -697,6 +772,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * patch files not loaded from relative path even when they belong to a package rather than being referred directly from the project
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.15.0) [diff](https://github.com/vaimo/composer-patches/compare/3.14.1...3.15.0)
 
 ## 3.14.1 (2018-01-29)
 
@@ -704,6 +780,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * crash when trying to declare path stripping level for version-branched sources
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.14.1) [diff](https://github.com/vaimo/composer-patches/compare/3.14.0...3.14.1)
 
 ## 3.14.0 (2018-01-28)
 
@@ -721,6 +798,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * changed the 'validate' in patcher configuration key to 'check'. Support for 'validate' kept
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.14.0) [diff](https://github.com/vaimo/composer-patches/compare/3.13.2...3.14.0)
 
 ## 3.13.2 (2018-01-26)
 
@@ -728,6 +806,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * updated lock to latest due to composer validate error
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.13.2) [diff](https://github.com/vaimo/composer-patches/compare/3.13.1...3.13.2)
 
 ## 3.13.1 (2018-01-26)
 
@@ -735,6 +814,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * roll-back with 'undo' to reset package when used with specific targets
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.13.1) [diff](https://github.com/vaimo/composer-patches/compare/3.13.0...3.13.1)
 
 ## 3.13.0 (2018-01-26)
 
@@ -750,6 +830,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * preferring standard patcher instead of starting with GIT
 * patches not being reset when removing all patches from patch provider in vendor folder and running '--from-source --redo my/package'
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.13.0) [diff](https://github.com/vaimo/composer-patches/compare/3.12.1...3.13.0)
 
 ## 3.12.1
 
@@ -761,6 +842,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * properly re-apply all patches when using 'from-source' nad 'redo' arguments together
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.12.1) [diff](https://github.com/vaimo/composer-patches/compare/3.12.0...3.12.1)
 
 ## 3.12.0 (2017-12-21)
 
@@ -768,6 +850,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * introduced a new composer command to make it easier to re-apply all patches and give newly defined patches a quick test-run (composer patch)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.12.0) [diff](https://github.com/vaimo/composer-patches/compare/3.11.0...3.12.0)
 
 ## 3.11.0 (2017-12-21)
 
@@ -780,6 +863,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * avoid crashing at the end of a composer operation when vaimo/composer-patches was removed while it was executing, but it's plugin class remains loaded and triggers an action after all install/uninstall actions are done
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.11.0) [diff](https://github.com/vaimo/composer-patches/compare/3.10.4...3.11.0)
 
 ## 3.10.4 (2017-12-18)
 
@@ -787,6 +871,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * changes to package meta-data
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.4) [diff](https://github.com/vaimo/composer-patches/compare/3.10.3...3.10.4)
 
 ## 3.10.3 (2017-12-18)
 
@@ -794,6 +879,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * crash due to 'missing array key' that's caused by bad comparison in code when using only 'depends' on certain patch declarations
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.3) [diff](https://github.com/vaimo/composer-patches/compare/3.10.2...3.10.3)
 
 ## 3.10.2 (2017-10-09)
 
@@ -802,6 +888,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * declaration of 'depends' was overriding 'version'. Constraints defined on those keys are now merged
 * patch applied when single version constraint was matched even when multiple ones defined
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.2) [diff](https://github.com/vaimo/composer-patches/compare/3.10.1...3.10.2)
 
 ## 3.10.1 (2017-10-08)
 
@@ -809,6 +896,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * changes to package metadata
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.1) [diff](https://github.com/vaimo/composer-patches/compare/3.10.0...3.10.1)
 
 ## 3.10.0 (2017-10-08)
 
@@ -825,6 +913,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * code re-organized to centralize the access to env flags
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.0) [diff](https://github.com/vaimo/composer-patches/compare/3.9.0...3.10.0)
 
 ## 3.9.0 (2017-10-06)
 
@@ -832,6 +921,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * added new environment flag to force patcher to extract the patch info from vendor folder instead of using the information from installed.json (mainly for patch maintenance)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.9.0) [diff](https://github.com/vaimo/composer-patches/compare/3.8.1...3.9.0)
 
 ## 3.8.1 (2017-10-06)
 
@@ -839,6 +929,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * process every source path and check for 'skip' flag. In certain cases, the source-path flag was ignored
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.8.1) [diff](https://github.com/vaimo/composer-patches/compare/3.8.0...3.8.1)
 
 ## 3.8.0 (2017-10-06)
 
@@ -850,6 +941,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * excluded patches required develop to specify patch owner vendor path instead of just the path that was relative to the patch owner folder
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.8.0) [diff](https://github.com/vaimo/composer-patches/compare/3.7.1...3.8.0)
 
 ## 3.7.1 (2017-09-23)
 
@@ -857,6 +949,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * code cleanup (some debugging code removed)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.7.1) [diff](https://github.com/vaimo/composer-patches/compare/3.7.0...3.7.1)
 
 ## 3.7.0 (2017-09-23)
 
@@ -865,6 +958,7 @@ This release comes basically with re-written logic to the core of the patch appl
 * added version branching for sequenced items
 * added simplified version branching format where json object key is constraint and value the source
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.7.0) [diff](https://github.com/vaimo/composer-patches/compare/3.6.0...3.7.0)
 
 ## 3.6.0 (2017-08-29)
 
@@ -877,6 +971,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * restored backwards compatibility with PHP versions that do not support new new array markup
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.6.0) [diff](https://github.com/vaimo/composer-patches/compare/3.5.2...3.6.0)
 
 ## 3.5.2 (2017-08-29)
 
@@ -884,6 +979,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * make sure that path normalizer does not touch root-level patch declarations
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.5.2) [diff](https://github.com/vaimo/composer-patches/compare/3.5.1...3.5.2)
 
 ## 3.5.1 (2017-07-10)
 
@@ -891,6 +987,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * make sure that 'resetting patched package' is not shown when package is indirectly targeted
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.5.1) [diff](https://github.com/vaimo/composer-patches/compare/3.5.0...3.5.1)
 
 ## 3.5.0 (2017-07-10)
 
@@ -898,9 +995,12 @@ This release comes basically with re-written logic to the core of the patch appl
 
 * allow bundled patches (that target multiple packages) to be declared, tracked, reverted correctly when changed or removed (see: Bundled patches)
 
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.5.0) [diff](https://github.com/vaimo/composer-patches/compare/3.4.0...3.5.0)
 
 ## 3.4.0 (2017-07-09)
 
 ### Feature
 
 * allow dev-only patches to be declared (see: Development patches)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.4.0) [diff](https://github.com/vaimo/composer-patches/compare/d07e6a00af9c7c3a3c93460ea2f024eb0e05c5fd...3.4.0)

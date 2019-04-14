@@ -15,8 +15,8 @@ class SequenceItemComponent implements \Vaimo\ComposerPatches\Interfaces\Definit
             return false;
         }
         
-        return is_numeric($label) 
-            && isset($data[PatchDefinition::LABEL], $data[PatchDefinition::SOURCE]) 
+        return is_numeric($label)
+            && isset($data[PatchDefinition::LABEL], $data[PatchDefinition::SOURCE])
             && is_array($data[PatchDefinition::SOURCE])
             && is_array(reset($data[PatchDefinition::SOURCE]));
     }

@@ -10,12 +10,12 @@ use Composer\Package\PackageInterface;
 class SourcesPreloader
 {
     /**
-     * @var \Vaimo\ComposerPatches\Package\InfoResolver 
+     * @var \Vaimo\ComposerPatches\Package\InfoResolver
      */
     private $infoResolver;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\FileSystemUtils 
+     * @var \Vaimo\ComposerPatches\Utils\FileSystemUtils
      */
     private $fileSystemUtils;
 
@@ -33,9 +33,7 @@ class SourcesPreloader
     public function preload(PackageInterface $package)
     {
         $sourcePaths = $this->infoResolver->getAutoLoadPaths($package);
-
-        $this->fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
-
+        
         $matchGroups = array();
         
         foreach ($sourcePaths as $sourcePath) {

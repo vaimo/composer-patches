@@ -5,8 +5,10 @@
  */
 namespace Vaimo\ComposerPatches;
 
-class Plugin implements \Composer\Plugin\PluginInterface,
-    \Composer\EventDispatcher\EventSubscriberInterface, \Composer\Plugin\Capable
+class Plugin implements
+    \Composer\Plugin\PluginInterface,
+    \Composer\EventDispatcher\EventSubscriberInterface,
+    \Composer\Plugin\Capable
 {
     /**
      * @var \Vaimo\ComposerPatches\Package\OperationAnalyser

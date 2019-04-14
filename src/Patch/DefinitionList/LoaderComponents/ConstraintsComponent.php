@@ -10,7 +10,7 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
     /**
-     * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface 
+     * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
      */
     private $configExtractor;
     
@@ -20,7 +20,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
     private $versionParser;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\ConstraintUtils 
+     * @var \Vaimo\ComposerPatches\Utils\ConstraintUtils
      */
     private $constraintUtils;
 
@@ -50,7 +50,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
         $rootPackage = reset($rootPackages);
 
         $rootRequires = array_replace(
-            $rootPackage->getRequires(), 
+            $rootPackage->getRequires(),
             $rootPackage->getDevRequires()
         );
         
@@ -81,13 +81,13 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                         preg_match('/.* as (.*)$/', $targetRootPackage->getPrettyConstraint(), $matches);
                         
                         if (isset($matches[1])) {
-                            $packageVersions[] = $matches[1];   
+                            $packageVersions[] = $matches[1];
                         }
                     }
                     
                     if ($this->constraintUtils->isDevConstraint($packageVersion)) {
                         $definedVersion = $this->configExtractor->getConfig(
-                            $package, 
+                            $package,
                             'version'
                         );
 
@@ -100,7 +100,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                         $packageConstraint = $this->versionParser->parseConstraints($packageVersion);
                         $patchConstraint = $this->versionParser->parseConstraints($version);
 
-                        $matchResult = $patchConstraint->matches($packageConstraint); 
+                        $matchResult = $patchConstraint->matches($packageConstraint);
                         if ($matchResult) {
                             break;
                         }

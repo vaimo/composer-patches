@@ -23,12 +23,12 @@ class Collector
     private $sourceLoaders;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patcher\ConfigReader 
+     * @var \Vaimo\ComposerPatches\Patcher\ConfigReader
      */
     private $patcherConfigReader;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils 
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
 
@@ -77,14 +77,14 @@ class Collector
                 $resultGroups = $source->load($package, $config[$loaderName]);
 
                 $loadedPatches[$loaderName] = $this->applyListManipulators(
-                    $resultGroups, 
+                    $resultGroups,
                     $ownerConfig
                 );
             }
             
             $patches = array_reduce(
                 array_reduce($loadedPatches, 'array_merge', array()),
-                'array_merge_recursive', 
+                'array_merge_recursive',
                 array()
             );
             
@@ -98,11 +98,13 @@ class Collector
     {
         $normalizer = $this->listNormalizer;
 
+        $that = $this;
+        
         return array_map(
-            function (array $results) use ($ownerConfig, $normalizer) {
+            function (array $results) use ($that, $ownerConfig, $normalizer) {
                 $normalizedList = $normalizer->normalize($results, $ownerConfig);
 
-                return $this->applySharedConfig($results, $normalizedList);
+                return $that->applySharedConfig($results, $normalizedList);
             },
             $resultGroups
         );

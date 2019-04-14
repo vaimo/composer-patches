@@ -15,7 +15,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
     private $packageInfoResolver;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\File\Loader 
+     * @var \Vaimo\ComposerPatches\Patch\File\Loader
      */
     private $patchFileLoader;
     
@@ -25,7 +25,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
     private $patchFileAnalyser;
 
     /**
-     * @var bool 
+     * @var bool
      */
     private $gracefulMode;
 
@@ -71,7 +71,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
 
                 if (!file_exists($path)) {
                     throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
-                        sprintf('Could not resolve targets (patch file not found): %s ',  $source)
+                        sprintf('Could not resolve targets (patch file not found): %s ', $source)
                     );
 
                     continue;
@@ -86,7 +86,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                 
                 if (!$bundleTargets && !$this->gracefulMode) {
                     throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
-                        sprintf('Could not resolve targets (zero matches): %s ',  $source)
+                        sprintf('Could not resolve targets (zero matches): %s ', $source)
                     );
                 }
 

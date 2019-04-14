@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+: <<'COPYRIGHT'
+ Copyright (c) Vaimo Group. All rights reserved.
+ See LICENSE_VAIMO.txt for license details.
+COPYRIGHT
+
+vendor/bin/phpcs --config-set installed_paths 'vendor/phpcompatibility/php-compatibility'
+vendor/bin/phpcs --config-set error_severity 1
+vendor/bin/phpcs --config-set default_standard 'LOCAL'

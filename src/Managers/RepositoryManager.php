@@ -69,4 +69,3 @@ class RepositoryManager
         OutputUtils::resetVerbosity($this->io, $verbosityLevel);
     }
 }
-

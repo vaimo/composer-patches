@@ -14,7 +14,7 @@ class SorterComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
      */
     private $filterUtils;
     
-    public function __construct() 
+    public function __construct()
     {
         $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
     }
@@ -51,11 +51,11 @@ class SorterComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
             
             foreach ($packagePatches as $patchPath => $patchInfo) {
                 $patchDependencies[$patchPath] = array_merge(
-                    $patchDependencies[$patchPath], 
+                    $patchDependencies[$patchPath],
                     $patchInfo[PatchDefinition::AFTER]
                 );
                 
-                foreach ($patchInfo[PatchDefinition::BEFORE] as $beforePath)  {
+                foreach ($patchInfo[PatchDefinition::BEFORE] as $beforePath) {
                     $patchDependencies[$beforePath][] = $patchPath;
                 }
             }
@@ -71,7 +71,7 @@ class SorterComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
             }
             
             $patches[$patchTarget] = array_replace(
-                array_flip($sorter->sort()), 
+                array_flip($sorter->sort()),
                 $packagePatches
             );
         }

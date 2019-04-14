@@ -8,7 +8,7 @@ namespace Vaimo\ComposerPatches\Managers;
 class LockerManager
 {
     /**
-     * @var \Composer\IO\IOInterface 
+     * @var \Composer\IO\IOInterface
      */
     private $io;
 

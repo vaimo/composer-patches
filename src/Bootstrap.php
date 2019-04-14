@@ -53,7 +53,7 @@ class Bootstrap
     private $listResolver;
 
     /**
-     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy 
+     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy
      */
     private $outputStrategy;
     
@@ -134,7 +134,7 @@ class Bootstrap
         $this->applyPatchesWithConfig(
             $this->configFactory->create(array(
                 $this->config
-            )), 
+            )),
             $devMode
         );
     }
@@ -157,7 +157,7 @@ class Bootstrap
         $patchesLoader = $this->loaderFactory->create($this->loaderComponents, $config, $devMode);
         
         $patchesApplier = $this->applierFactory->create(
-            $config, 
+            $config,
             $this->listResolver,
             $this->outputStrategy
         );

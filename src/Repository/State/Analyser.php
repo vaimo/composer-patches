@@ -12,7 +12,7 @@ class Analyser
      */
     private $patchListUtils;
 
-    public function __construct() 
+    public function __construct()
     {
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }

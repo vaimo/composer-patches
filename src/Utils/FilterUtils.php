@@ -17,14 +17,14 @@ class FilterUtils
         $escapeChar = chr('27');
 
         array_map(function ($filter) use ($delimiter, &$negations, &$affirmations, $escapeChar) {
-            $isNegation = substr($filter, 0, 1) == self::NEGATION_PREFIX;
+            $isNegation = substr($filter, 0, 1) == FilterUtils::NEGATION_PREFIX;
 
             $escapedFilter = trim(
                 str_replace(
                     $escapeChar,
                     '.*',
                     preg_quote(
-                        str_replace('*', $escapeChar, ltrim($filter, self::NEGATION_PREFIX)),
+                        str_replace('*', $escapeChar, ltrim($filter, FilterUtils::NEGATION_PREFIX)),
                         $delimiter
                     )
                 )
@@ -53,16 +53,17 @@ class FilterUtils
     public function invertRules(array $filters)
     {
         return array_map(function ($filter) {
-            $isNegation = substr($filter, 0, 1) == self::NEGATION_PREFIX;
+            $isNegation = substr($filter, 0, 1) == FilterUtils::NEGATION_PREFIX;
 
-            return (!$isNegation ? self::NEGATION_PREFIX : '') . ltrim($filter, self::NEGATION_PREFIX);
+            return (!$isNegation ? FilterUtils::NEGATION_PREFIX : '') .
+                ltrim($filter, FilterUtils::NEGATION_PREFIX);
         }, $filters);
     }
 
     public function trimRules(array $filters)
     {
         return array_map(function ($filter) {
-            return ltrim($filter, self::NEGATION_PREFIX);
+            return ltrim($filter, FilterUtils::NEGATION_PREFIX);
         }, $filters);
     }
 }

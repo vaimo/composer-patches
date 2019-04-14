@@ -20,11 +20,11 @@ class SequenceComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         }
 
         return array(
-            PatchDefinition::BEFORE => isset($data[PatchDefinition::BEFORE]) 
-                ? $data[PatchDefinition::BEFORE] 
+            PatchDefinition::BEFORE => isset($data[PatchDefinition::BEFORE])
+                ? $data[PatchDefinition::BEFORE]
                 : array(),
-            PatchDefinition::AFTER => isset($data[PatchDefinition::AFTER]) 
-                ? $data[PatchDefinition::AFTER] 
+            PatchDefinition::AFTER => isset($data[PatchDefinition::AFTER])
+                ? $data[PatchDefinition::AFTER]
                 : array()
         );
     }

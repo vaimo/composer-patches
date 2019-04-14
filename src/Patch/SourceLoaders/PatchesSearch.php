@@ -21,7 +21,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     private $devMode;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\File\Loader 
+     * @var \Vaimo\ComposerPatches\Patch\File\Loader
      */
     private $patchFileLoader;
     
@@ -116,7 +116,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                 $definition = $this->createDefinitionItem($contents, array(
                     PatchDefinition::PATH => $path,
                     PatchDefinition::SOURCE => trim(
-                        substr($path, $basePathLength), 
+                        substr($path, $basePathLength),
                         DIRECTORY_SEPARATOR
                     )
                 ));
@@ -184,8 +184,8 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             PatchDefinition::TARGET => $target,
             PatchDefinition::CWD => $this->extractSingleValue($data, PatchDefinition::CWD),
             PatchDefinition::TARGETS => $this->extractValueList(
-                $data, 
-                PatchDefinition::TARGETS, 
+                $data,
+                PatchDefinition::TARGETS,
                 array($target)
             ),
             PatchDefinition::DEPENDS => $depends,
@@ -242,9 +242,9 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                     trim(array_shift($valueParts)) => trim(implode(':', $valueParts)) ?: '>=0.0.0'
                 );
             }, array_merge(
-                array($depends . ':' . $version), 
-                $this->extractValueList($data, PatchDefinition::DEPENDS))
-            ),
+                array($depends . ':' . $version),
+                $this->extractValueList($data, PatchDefinition::DEPENDS)
+            )),
             'array_replace',
             array()
         );

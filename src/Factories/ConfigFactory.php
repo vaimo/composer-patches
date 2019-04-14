@@ -30,7 +30,7 @@ class ConfigFactory
     private $context;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\DataUtils 
+     * @var \Vaimo\ComposerPatches\Utils\DataUtils
      */
     private $dataUtils;
 
@@ -81,7 +81,7 @@ class ConfigFactory
             if (!isset($patcherConfig[PluginConfig::PATCHER_SOURCES])) {
                 if (isset($extra['enable-patching']) && !$extra['enable-patching']) {
                     $patcherConfig[PluginConfig::PATCHER_SOURCES] = false;
-                } else if (isset($extra['enable-patching-from-packages']) && !$extra['enable-patching-from-packages']) {
+                } elseif (isset($extra['enable-patching-from-packages']) && !$extra['enable-patching-from-packages']) {
                     $patcherConfig[PluginConfig::PATCHER_SOURCES] = array('packages' => false, 'vendors' => false);
                 }
             }

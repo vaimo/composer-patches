@@ -9,8 +9,8 @@ class PackagePatchDataUtils
 {
     public function shouldReinstall(array $applied, array $patches)
     {
-        return $applied === true 
-            || array_diff_assoc($applied, $patches) 
+        return $applied === true
+            || array_diff_assoc($applied, $patches)
             || array_diff_assoc($patches, $applied);
     }
 }

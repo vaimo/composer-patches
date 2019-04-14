@@ -37,8 +37,8 @@ class DefaultResetStrategy implements \Vaimo\ComposerPatches\Interfaces\PackageR
     {
         $downloader = $this->downloader->getDownloaderForInstalledPackage($package);
 
-        if ($downloader instanceof ChangeReportCapable 
-            && $downloader instanceof VcsCapable 
+        if ($downloader instanceof ChangeReportCapable
+            && $downloader instanceof VcsCapable
             && !$downloader instanceof PathDownloader
         ) {
             $installPath = $this->installer->getInstallPath($package);

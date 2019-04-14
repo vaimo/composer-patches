@@ -7,7 +7,7 @@ namespace Vaimo\ComposerPatches\Composer;
 
 class OutputUtils extends \Composer\IO\ConsoleIO
 {
-    static public function resetVerbosity(\Composer\IO\ConsoleIO $io, $verbosity)
+    public static function resetVerbosity(\Composer\IO\ConsoleIO $io, $verbosity)
     {
         $oldValue = $io->output->getVerbosity();
 

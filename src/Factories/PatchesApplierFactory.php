@@ -35,7 +35,7 @@ class PatchesApplierFactory
         $this->logger = $logger;
     }
 
-    public function create(PluginConfig $pluginConfig, ListResolver $listResolver, OutputStrategy $outputStrategy) 
+    public function create(PluginConfig $pluginConfig, ListResolver $listResolver, OutputStrategy $outputStrategy)
     {
         $composer = $this->composer;
 
@@ -51,7 +51,7 @@ class PatchesApplierFactory
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
 
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
-            $installer, 
+            $installer,
             $vendorRoot
         );
 

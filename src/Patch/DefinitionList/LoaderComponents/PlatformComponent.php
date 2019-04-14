@@ -15,7 +15,7 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
     private $versionParser;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\ConstraintUtils 
+     * @var \Vaimo\ComposerPatches\Utils\ConstraintUtils
      */
     private $constraintUtils;
 
@@ -85,7 +85,7 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
                     $patchData[PatchDefinition::DEPENDS] = array_diff_key(
                         $patchData[PatchDefinition::DEPENDS],
                         array_filter($patchConstraintsResults)
-                    );   
+                    );
                 }
             }
 

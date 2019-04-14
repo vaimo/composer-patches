@@ -14,11 +14,11 @@ class PatchListUtils
         $groups = $this->createTargetsList($patches);
 
         $result = array_map(function ($group) {
-            $fingerprints = array_map(function($item) {
+            $fingerprints = array_map(function ($item) {
                 return sprintf(
                     '%s, %s:%s',
                     isset($item[Patch::LABEL]) ? $item[Patch::LABEL] : '{no label}',
-                    Patch::HASH, 
+                    Patch::HASH,
                     isset($item[Patch::HASH]) && $item[Patch::HASH] ? $item[Patch::HASH] : '{no hash}'
                 );
             }, $group);
@@ -177,7 +177,7 @@ class PatchListUtils
         foreach ($patches as $patchGroup) {
             foreach ($patchGroup as $patchInfo) {
                 $targetList = array_merge(
-                    $targetList, 
+                    $targetList,
                     $patchInfo[Patch::TARGETS]
                 );
             }
@@ -262,11 +262,11 @@ class PatchListUtils
     {
         foreach ($patches as $target => $group) {
             foreach ($group as $path => $item) {
-                $patches[$target][$path] = is_array($update) 
+                $patches[$target][$path] = is_array($update)
                     ? array_replace(
                         $patches[$target][$path],
                         $onlyNew ? array_diff_key($update, array_filter($patches[$target][$path])) : $update
-                    ) 
+                    )
                     : $update;
             }
         }
@@ -299,7 +299,7 @@ class PatchListUtils
         
         foreach ($keys as $key) {
             $result[$key] = array_replace(
-                isset($listA[$key]) ? $listA[$key] : array(), 
+                isset($listA[$key]) ? $listA[$key] : array(),
                 isset($listB[$key]) ? $listB[$key] : array()
             );
         }
@@ -423,5 +423,5 @@ class PatchListUtils
             },
             array()
         );
-    }    
+    }
 }

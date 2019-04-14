@@ -29,7 +29,9 @@ class PatchesLoaderFactory
     }
 
     public function create(
-        LoaderComponents $loaderComponentsPool, PluginConfig $pluginConfig, $devMode = false
+        LoaderComponents $loaderComponentsPool,
+        PluginConfig $pluginConfig,
+        $devMode = false
     ) {
         $composer = $this->composer;
 

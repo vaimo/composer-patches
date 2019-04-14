@@ -8,7 +8,7 @@ namespace Vaimo\ComposerPatches\Patch\PackageResolvers;
 class FullResetResolver implements \Vaimo\ComposerPatches\Interfaces\PatchPackagesResolverInterface
 {
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils 
+     * @var \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils
      */
     private $packagePatchDataUtils;
 

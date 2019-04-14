@@ -5,41 +5,30 @@
  */
 namespace Vaimo\ComposerPatches\Patch\Definition\NormalizerComponents;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class BaseComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNormalizerComponentInterface
 {
     public function normalize($target, $label, array $data, array $ownerConfig)
     {
-        return
-            array(
-                PatchDefinition::ISSUE => isset($data[PatchDefinition::ISSUE])
-                    ? $data[PatchDefinition::ISSUE]
-                    : false,
-                PatchDefinition::LINK => isset($data[PatchDefinition::LINK])
-                    ? $data[PatchDefinition::LINK]
-                    : false,
-                PatchDefinition::LABEL => isset($data[PatchDefinition::LABEL])
-                    ? $data[PatchDefinition::LABEL]
-                    : $label,
-                PatchDefinition::TARGETS => isset($data[PatchDefinition::TARGETS]) && $target === PatchDefinition::BUNDLE_TARGET
-                    ? $data[PatchDefinition::TARGETS]
-                    : array($target),
-                PatchDefinition::CWD => isset($data[PatchDefinition::CWD])
-                    ? $data[PatchDefinition::CWD]
-                    : PatchDefinition::CWD_INSTALL,
-                PatchDefinition::LEVEL => isset($data[PatchDefinition::LEVEL])
-                    ? $data[PatchDefinition::LEVEL]
-                    : null,
-                PatchDefinition::LEVEL => isset($data[PatchDefinition::LEVEL])
-                    ? $data[PatchDefinition::LEVEL]
-                    : null,
-                PatchDefinition::CATEGORY => isset($data[PatchDefinition::CATEGORY])
-                    ? $data[PatchDefinition::CATEGORY]
-                    : null,
-                PatchDefinition::LOCAL => isset($data[PatchDefinition::LOCAL])
-                    ? $data[PatchDefinition::LOCAL]
-                    : false
-            );
+        return array(
+            Patch::ISSUE => $this->extractValue($data, Patch::ISSUE, false),
+            Patch::LINK => $this->extractValue($data, Patch::LINK, false),
+            Patch::LABEL => $this->extractValue($data, Patch::LABEL, $label),
+            Patch::CWD => $this->extractValue($data, Patch::CWD, Patch::CWD_INSTALL),
+            Patch::LEVEL => $this->extractValue($data, Patch::LEVEL),
+            Patch::CATEGORY => $this->extractValue($data, Patch::CATEGORY),
+            Patch::LOCAL => $this->extractValue($data, Patch::LOCAL, false),
+            Patch::TARGETS => isset($data[Patch::TARGETS]) && $target === Patch::BUNDLE_TARGET
+                ? $data[Patch::TARGETS]
+                : array($target)
+        );
+    }
+    
+    private function extractValue(array $data, $key, $default = null)
+    {
+        return isset($data[$key])
+            ? $data[$key]
+            : $default;
     }
 }

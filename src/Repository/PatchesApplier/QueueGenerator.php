@@ -74,7 +74,7 @@ class QueueGenerator
             
             $staticItems[$target] = array_intersect_assoc($footprints, $repositoryState[$target]);
             $changedItems[$target] = array_diff_key(
-                array_intersect_key($footprints, $repositoryState[$target]), 
+                array_intersect_key($footprints, $repositoryState[$target]),
                 $staticItems[$target]
             );
         }
@@ -89,8 +89,8 @@ class QueueGenerator
                     Patch::STATUS_CHANGED => isset($changedItems[$target][$path])
                 );
 
-                $updates[Patch::STATUS] = isset($item[Patch::STATUS]) 
-                    ? $item[Patch::STATUS] 
+                $updates[Patch::STATUS] = isset($item[Patch::STATUS])
+                    ? $item[Patch::STATUS]
                     : '';
 
                 if ($updates[Patch::STATUS_NEW] && !$updates[Patch::STATUS]) {

@@ -66,7 +66,7 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
         }
         
         return $this->patchListUtils->mergeLists(
-            $state, 
+            $state,
             $this->patchListUtils->createSimplifiedList($updates)
         );
     }

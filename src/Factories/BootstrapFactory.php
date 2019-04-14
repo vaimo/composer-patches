@@ -52,11 +52,11 @@ class BootstrapFactory
         }
 
         return new \Vaimo\ComposerPatches\Bootstrap(
-            $this->composer, 
-            $this->io, 
+            $this->composer,
+            $this->io,
             $listResolver,
             $outputStrategy,
             $config
         );
-    }    
+    }
 }

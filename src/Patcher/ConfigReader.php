@@ -11,7 +11,7 @@ use Composer\Package\PackageInterface;
 class ConfigReader
 {
     /**
-     * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface 
+     * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
      */
     private $infoExtractor;
 

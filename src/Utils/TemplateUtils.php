@@ -79,7 +79,7 @@ class TemplateUtils
         
         return str_replace(
             $names,
-            $values, 
+            $values,
             $template
         );
     }

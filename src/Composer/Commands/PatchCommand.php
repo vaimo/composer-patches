@@ -140,7 +140,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         
         $config = array(
             Config::PATCHER_SOURCES => array_fill_keys(
-                array_keys($defaultValues[Config::PATCHER_SOURCES]), 
+                array_keys($defaultValues[Config::PATCHER_SOURCES]),
                 true
             )
         );
@@ -155,8 +155,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
         
         $outputTriggerFlags = array(
-            Patch::STATUS_NEW => !$hasFilers, 
-            Patch::STATUS_CHANGED => !$hasFilers, 
+            Patch::STATUS_NEW => !$hasFilers,
+            Patch::STATUS_CHANGED => !$hasFilers,
             Patch::STATUS_MATCH => true,
             Patch::SOURCE => $isExplicit,
             Patch::URL => $isExplicit
