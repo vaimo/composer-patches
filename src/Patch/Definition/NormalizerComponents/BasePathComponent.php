@@ -64,40 +64,15 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             'label' => $label
         );
 
-        $nameParts = array_map(function ($part) {
-            $part = strtolower(
-                preg_replace(
-                    array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'),
-                    array('\\1_\\2', '\\1_\\2'),
-                    str_replace('_', '.', $part)
-                )
-            );
-
-            return preg_replace('/\s{2,}/', ' ', str_replace(array(' ', '_', '-', '.', '/', ':'), ' ', $part));
-        }, $pathVariables);
-
         $mutationNamesMap = array(
             'file' => 'file name',
             'vendor' => 'vendor name',
             'package' => 'module name',
             'label' => 'label value'
         );
-
-        $mutationAppliers = $this->createMutationAppliers();
-
-        $pathVariables = array();
-        $mutatedNames = array_fill_keys(array_keys($mutationNamesMap), array());
-
-        foreach ($nameParts as $name => $value) {
-            $variableName = $mutationNamesMap[$name];
-
-            foreach ($mutationAppliers as $mutationApplier) {
-                $mutationName = $mutationApplier($variableName);
-                $pathVariables[$mutationName] = $mutationApplier($value);
-                $mutatedNames[$name][] = $mutationName;
-            }
-        }
-
+        
+        $pathVariables = $this->expandPathVariables($pathVariables, $mutationNamesMap);
+        
         $extraVariables = array(
             'version' => preg_replace(
                 '/[^A-Za-z0-9.-]/',
@@ -142,6 +117,36 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             PatchDefinition::LABEL => $label,
             PatchDefinition::SOURCE => $source
         );
+    }
+    
+    private function expandPathVariables(array $pathVariables, array $mutationNamesMap)
+    {
+        $nameParts = array_map(function ($part) {
+            $part = strtolower(
+                preg_replace(
+                    array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'),
+                    array('\\1_\\2', '\\1_\\2'),
+                    str_replace('_', '.', $part)
+                )
+            );
+
+            return preg_replace('/\s{2,}/', ' ', str_replace(array(' ', '_', '-', '.', '/', ':'), ' ', $part));
+        }, $pathVariables);
+
+        $mutationAppliers = $this->createMutationAppliers();
+
+        $pathVariables = array();
+
+        foreach ($nameParts as $name => $value) {
+            $variableName = $mutationNamesMap[$name];
+
+            foreach ($mutationAppliers as $mutationApplier) {
+                $mutationName = $mutationApplier($variableName);
+                $pathVariables[$mutationName] = $mutationApplier($value);
+            }
+        }
+        
+        return $pathVariables;
     }
 
     private function resolveTemplate($ownerConfig, $packageName)
