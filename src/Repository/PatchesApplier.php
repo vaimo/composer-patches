@@ -126,7 +126,18 @@ class PatchesApplier
         
         return $queue;
     }
-    
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * @param Repository $repository
+     * @param array $patches
+     * @return bool
+     * @throws \Vaimo\ComposerPatches\Exceptions\PackageNotFound
+     * @throws \Vaimo\ComposerPatches\Exceptions\PackageResetException
+     */
     public function apply(Repository $repository, array $patches)
     {
         $packages = $this->packageCollector->collect($repository);
