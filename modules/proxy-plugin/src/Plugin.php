@@ -9,32 +9,29 @@ require_once 'src/Plugin.php';
 
 class Plugin extends \Vaimo\ComposerPatches\Plugin
 {
-    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
+    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $cliIO)
     {
         $namespacePrefix = implode('\\', array_slice(explode('\\', get_parent_class($this)), 0, 2)) . '\\';
         
-        $composerConfig = $composer->getConfig();
-
-        $vendorDir = $composerConfig->get('vendor-dir');
-
-        $autoloadFilePath = $this->composePath($vendorDir, 'composer', 'autoload_psr4.php');
+        $autoloadFile = $this->composePath(
+            $composer->getConfig()->get('vendor-dir'),
+            'autoload.php'
+        );
 
         /**
-         * When running through the initial installation, make sure that installing the proxy 
-         * command (to get the patch commands) does not result in crashing the whole installation 
-         * process.
+         * When running through the initial installation, make sure that installing the proxy
+         * command (to get the changelog commands) does not result in crashing the whole
+         * installation process.
          */
-        if (!file_exists($autoloadFilePath)) {
+        if (!file_exists($autoloadFile)) {
             return;
         }
-        
-        $this->bootstrapAutoloader(
-            include($autoloadFilePath)
-        );
+
+        include $autoloadFile;
         
         $this->bootstrapFileTree($composer, $namespacePrefix);
 
-        parent::activate($composer, $io);
+        parent::activate($composer, $cliIO);
     }
 
     private function bootstrapFileTree(\Composer\Composer $composer, $namespacePrefix)
@@ -57,36 +54,6 @@ class Plugin extends \Vaimo\ComposerPatches\Plugin
             $this->composePath($vendorDir, $pluginPackage->getName()),
             true
         );
-    }
-
-    private function bootstrapAutoloader($namespaceConfig)
-    {
-        spl_autoload_register(function ($class) use ($namespaceConfig) {
-            foreach ($namespaceConfig as $classPathPrefix => $sources) {
-                if (strpos($class, $classPathPrefix) === false) {
-                    continue;
-                }
-
-                $classPath = str_replace('\\', DIRECTORY_SEPARATOR, substr($class, strlen($classPathPrefix)));
-
-                foreach ($sources as $source) {
-                    $classSourcePath = $this->composePath(
-                        $source,
-                        sprintf('%s.php', $classPath)
-                    );
-                    
-                    if (!file_exists($classSourcePath)) {
-                        continue;
-                    }
-
-                    include $classSourcePath;
-                    
-                    return true;
-                }
-            }
-
-            return false;
-        });
     }
 
     private function createSymlink($fromPath, $toPath, $graceful = false)

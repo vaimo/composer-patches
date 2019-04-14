@@ -11,13 +11,12 @@ class FilterUtils
 
     public function composeRegex(array $filters, $delimiter)
     {
-        $negations = array();
-        $affirmations = array();
+        $semanticGroups = array_fill_keys(array(0, 1), array());
 
         $escapeChar = chr('27');
 
-        array_map(function ($filter) use ($delimiter, &$negations, &$affirmations, $escapeChar) {
-            $isNegation = substr($filter, 0, 1) == FilterUtils::NEGATION_PREFIX;
+        array_map(function ($filter) use ($delimiter, &$semanticGroups, $escapeChar) {
+            $isNegation = strpos($filter, FilterUtils::NEGATION_PREFIX) === 0;
 
             $escapedFilter = trim(
                 str_replace(
@@ -34,20 +33,20 @@ class FilterUtils
                 return;
             }
 
-            if ($isNegation) {
-                $negations[] = $escapedFilter;
-            } else {
-                $affirmations[] = $escapedFilter;
-            }
+            $semanticGroups[(int)$isNegation][] = $escapedFilter;
         }, $filters);
 
         $pattern = '%s';
 
-        if ($negations) {
-            $pattern = sprintf('^((?!.*(%s)).*%s)', implode('|', $negations), $affirmations ? '(%s)' : '');
+        if ($semanticGroups[0]) {
+            $pattern = sprintf(
+                '^((?!.*(%s)).*%s)',
+                implode('|', $semanticGroups[0]),
+                $semanticGroups[1] ? '(%s)' : ''
+            );
         }
 
-        return $delimiter . sprintf($pattern, implode('|', $affirmations)) . $delimiter;
+        return $delimiter . sprintf($pattern, implode('|', $semanticGroups[1])) . $delimiter;
     }
 
     public function invertRules(array $filters)

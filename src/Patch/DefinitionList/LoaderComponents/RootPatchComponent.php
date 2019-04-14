@@ -32,7 +32,7 @@ class RootPatchComponent implements \Vaimo\ComposerPatches\Interfaces\Definition
     {
         $packageName = $this->package->getName();
         
-        foreach ($patches as $targetPackageName => &$packagePatches) {
+        foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
                 if (!$patchData[PatchDefinition::LOCAL]) {
                     continue;

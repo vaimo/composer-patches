@@ -69,7 +69,7 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
         
         $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
         
-        foreach ($patchesByTarget as $target => $items) {
+        foreach ($patchesByTarget as $items) {
             foreach ($items as $path => $item) {
                 if (!$item[Patch::STATUS_MATCH]) {
                     continue;

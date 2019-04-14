@@ -26,6 +26,13 @@ class Shell
         $this->logger = $logger;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     *
+     * @param string $command
+     * @param null|string $cwd
+     * @return array
+     */
     public function execute($command, $cwd = null)
     {
         if (strpos($command, '<') === 0) {

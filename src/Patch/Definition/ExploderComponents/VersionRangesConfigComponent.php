@@ -25,7 +25,7 @@ class VersionRangesConfigComponent implements \Vaimo\ComposerPatches\Interfaces\
             return false;
         }
 
-        if (!isset($data[PatchDefinition::VERSION]) || isset($value[PatchDefinition::DEPENDS])) {
+        if (!isset($data[PatchDefinition::VERSION]) || isset($data[PatchDefinition::DEPENDS])) {
             return false;
         }
 

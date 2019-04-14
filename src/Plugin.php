@@ -30,14 +30,14 @@ class Plugin implements
      */
     private $bootstrap;
     
-    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $io)
+    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $cliIO)
     {
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
         
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
 
-        $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
+        $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $cliIO);
 
         $this->bootstrap = $this->bootstrapFactory->create($configFactory);
         

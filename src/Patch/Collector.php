@@ -110,7 +110,7 @@ class Collector
         );
     }
     
-    private function applySharedConfig(array $configOrigin, array $patches)
+    public function applySharedConfig(array $configOrigin, array $patches)
     {
         $baseConfig = isset($configOrigin['_config']) ? $configOrigin['_config'] : array();
 

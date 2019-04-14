@@ -4,18 +4,24 @@
  See LICENSE_VAIMO.txt for license details.
 COPYRIGHT
 
-vendor/bin/phpcs -p src
+type=${1}
 
-result=${?}
+if [ "${type}" == "" ] || [ "${type}" == "phpcs" ] ; then
+    vendor/bin/phpcs -p src
+    
+    result=${?}
 
-if [ ${result} -gt 0 ] ; then
-    exit 1
+    if [ ${result} -gt 0 ] ; then
+        exit 1
+    fi
 fi
 
-vendor/bin/phpmd src text phpmd.xml --suffixes php
+if [ "${type}" == "" ] || [ "${type}" == "phpmd" ] ; then
+    vendor/bin/phpmd src text phpmd.xml --suffixes php
 
-result=${?}
+    result=${?}
 
-if [ ${result} -gt 0 ] ; then
-    exit 1
+    if [ ${result} -gt 0 ] ; then
+        exit 1
+    fi
 fi

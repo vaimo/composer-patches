@@ -45,7 +45,7 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
         /** @var \Composer\Package\CompletePackageInterface $rootPackage */
         $packages = $this->constraintPackages;
         
-        foreach ($patches as $target => &$packagePatches) {
+        foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
                 $patchConstraints = $patchData[PatchDefinition::DEPENDS];
 

@@ -45,11 +45,13 @@ class TemplateUtils
 
             $argumentName = key($matches);
 
-            if (preg_match_all('/' . reset($matches) . '/i', $arguments[$argumentName], $valueMatches)) {
-                $result[$mutationName] = trim(reset($valueMatches[1]), $trimRules);
-            } else {
-                $result[$mutationName] = trim($arguments[$argumentName], $trimRules);
+            $value = $arguments[$argumentName];
+            
+            if (preg_match_all(sprintf('/%s/i', reset($matches)), $arguments[$argumentName], $valueMatches)) {
+                $value = reset($valueMatches[1]);
             }
+
+            $result[$mutationName] = trim($value, $trimRules);
         }
 
         return $result;
@@ -71,6 +73,7 @@ class TemplateUtils
         $variables = array_reduce($updateGroups, 'array_replace', array());
         
         $names = array_keys($variables);
+        
         $values = array_map(function ($value) {
             return trim(
                 strtok($value, PHP_EOL)

@@ -29,16 +29,16 @@ class DataUtils
     
     public function removeKeysByPrefix(array $data, $prefix)
     {
+        $whitelist = array_filter(
+            array_keys($data),
+            function ($key) use ($prefix) {
+                return strpos($key, $prefix) !== 0;
+            }
+        );
+        
         return array_intersect_key(
             $data,
-            array_flip(
-                array_filter(
-                    array_keys($data),
-                    function ($key) use ($prefix) {
-                        return strpos($key, $prefix) !== 0;
-                    }
-                )
-            )
+            array_flip($whitelist)
         );
     }
 
@@ -95,9 +95,11 @@ class DataUtils
         foreach ($path as $key) {
             if (is_array($data) && array_key_exists($key, $data)) {
                 $data = $data[$key];
-            } else {
-                return $default;
+                
+                continue;
             }
+
+            return $default;
         }
 
         return $data;
