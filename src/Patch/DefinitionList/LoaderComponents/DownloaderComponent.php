@@ -46,7 +46,7 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
      */
     public function process(array $patches, array $packagesByName)
     {
-        foreach ($patches as $targetPackage => &$packagePatches) {
+        foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
                 if (!$patchData[PatchDefinition::URL]) {
                     continue;

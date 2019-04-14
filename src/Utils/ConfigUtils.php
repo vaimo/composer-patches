@@ -19,7 +19,7 @@ class ConfigUtils
             $config[Config::PATCHER_FORCE_RESET] = $updates[Config::PATCHER_FORCE_RESET];
         }
 
-        foreach ($config[Config::PATCHER_APPLIERS] as $code => $applier) {
+        foreach (array_keys($config[Config::PATCHER_APPLIERS]) as $code) {
             if (!isset($updates[Config::PATCHER_APPLIERS][$code])) {
                 continue;
             }
@@ -36,14 +36,9 @@ class ConfigUtils
         );
 
         if (isset($updates[Config::PATCHER_SOURCES])) {
-            if ($updates[Config::PATCHER_SOURCES]) {
-                $config[Config::PATCHER_SOURCES] = array_replace(
-                    $config[Config::PATCHER_SOURCES],
-                    $updates[Config::PATCHER_SOURCES]
-                );
-            } else {
-                $config[Config::PATCHER_SOURCES] = array();
-            }
+            $config[Config::PATCHER_SOURCES] = $updates[Config::PATCHER_SOURCES]
+                ? array_replace($config[Config::PATCHER_SOURCES], $updates[Config::PATCHER_SOURCES])
+                : array();
         }
 
         if (isset($updates[Config::PATCHER_FAILURES])) {
@@ -105,11 +100,11 @@ class ConfigUtils
         ) {
             return;
         }
-        
+
+        $message = 'No valid patchers defined';
+
         if ($patcherSequence) {
             $message = sprintf('No valid patchers found for sequence: %s', implode(',', $patcherSequence));
-        } else {
-            $message = 'No valid patchers defined';
         }
         
         throw new \Vaimo\ComposerPatches\Exceptions\ConfigValidationException($message);

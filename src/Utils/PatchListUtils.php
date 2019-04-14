@@ -125,7 +125,7 @@ class PatchListUtils
     {
         $result = array();
 
-        foreach ($patchesList as $target => $group) {
+        foreach ($patchesList as $group) {
             foreach ($group as $path => $patch) {
                 $origin = $patch[Patch::ORIGIN];
                 
@@ -147,7 +147,7 @@ class PatchListUtils
     public function sanitizeFileSystem(array $patches)
     {
         foreach ($patches as $patchGroup) {
-            foreach ($patchGroup as $patchPath => $patchInfo) {
+            foreach ($patchGroup as $patchInfo) {
                 if (!isset($patchInfo[Patch::TMP]) || !$patchInfo[Patch::TMP]) {
                     continue;
                 }
@@ -197,18 +197,8 @@ class PatchListUtils
                     
                     continue;
                 }
-
-                $value = $patchInfo[$key];
-
-                if (is_array($value) && preg_grep($filter, $value)) {
-                    continue;
-                }
-
-                if (is_string($value) && preg_match($filter, $value)) {
-                    continue;
-                }
                 
-                if (is_bool($filter) && $value === $filter) {
+                if ($this->shouldIncludePatch($patchInfo[$key], $filter)) {
                     continue;
                 }
 
@@ -219,6 +209,23 @@ class PatchListUtils
         return array_filter(
             array_map('array_filter', $patches)
         );
+    }
+    
+    private function shouldIncludePatch($value, $filter)
+    {
+        if (is_array($value) && preg_grep($filter, $value)) {
+            return true;
+        }
+
+        if (is_string($value) && preg_match($filter, $value)) {
+            return true;
+        }
+
+        if (is_bool($filter) && $value === $filter) {
+            return true;
+        }
+        
+        return false;
     }
 
     public function getRelatedPatches(array $patchesList, array $targets)
@@ -257,11 +264,19 @@ class PatchListUtils
 
         return $result;
     }
-    
+
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     *
+     * @param array $patches
+     * @param array|bool|string $update
+     * @param bool $onlyNew
+     * @return array
+     */
     public function embedInfoToItems(array $patches, $update, $onlyNew = false)
     {
         foreach ($patches as $target => $group) {
-            foreach ($group as $path => $item) {
+            foreach (array_keys($group) as $path) {
                 $patches[$target][$path] = is_array($update)
                     ? array_replace(
                         $patches[$target][$path],

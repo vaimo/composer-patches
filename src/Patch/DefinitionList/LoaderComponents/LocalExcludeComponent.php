@@ -16,7 +16,7 @@ class LocalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Definit
      */
     public function process(array $patches, array $packagesByName)
     {
-        foreach ($patches as $targetPackageName => &$packagePatches) {
+        foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
                 if (!$patchData[PatchDefinition::SKIP]) {
                     continue;
