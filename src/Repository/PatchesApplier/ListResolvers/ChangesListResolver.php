@@ -37,7 +37,7 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
     
     public function resolveRelevantPatches(array $patches, array $subset)
     {
-        return $this->baseResolver->resolveRelevantPatches($patches, $subset);    
+        return $this->baseResolver->resolveRelevantPatches($patches, $subset);
     }
 
     public function resolveInitialState(array $patches, array $state)

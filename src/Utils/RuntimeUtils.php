@@ -10,7 +10,7 @@ class RuntimeUtils
     public function setEnvironmentValues($values)
     {
         foreach ($values as $name => $value) {
-            putenv($name . '=' . $value);    
+            putenv($name . '=' . $value);
         }
     }
 }

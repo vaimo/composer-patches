@@ -32,9 +32,9 @@ class SourcesResolverFactory
         if (isset($sourceConfig['packages'], $sourceConfig['vendors'])) {
             if (is_array($sourceConfig['packages']) && !is_array($sourceConfig['vendors'])) {
                 $sourceConfig['vendors'] = false;
-            } else if (is_array($sourceConfig['vendors']) && !is_array($sourceConfig['packages'])) {
+            } elseif (is_array($sourceConfig['vendors']) && !is_array($sourceConfig['packages'])) {
                 $sourceConfig['packages'] = false;
-            } else if ($sourceConfig['packages'] === false || $sourceConfig['vendors'] === false) {
+            } elseif ($sourceConfig['packages'] === false || $sourceConfig['vendors'] === false) {
                 $sourceConfig['packages'] = false;
                 $sourceConfig['vendors'] = false;
             }

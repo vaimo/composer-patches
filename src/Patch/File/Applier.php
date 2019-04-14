@@ -99,8 +99,8 @@ class Applier
                         PluginConfig::PATCHER_ARG_CWD => $cwd
                     ));
 
-                    $applierOperations = is_array($patcher[$operationCode]) 
-                        ? $patcher[$operationCode] 
+                    $applierOperations = is_array($patcher[$operationCode])
+                        ? $patcher[$operationCode]
                         : array($patcher[$operationCode]);
                     
                     foreach ($applierOperations as $operation) {
@@ -113,8 +113,8 @@ class Applier
 
                         if ($passOnFailure) {
                             $this->logger->writeVerbose(
-                                \Vaimo\ComposerPatches\Logger::TYPE_NONE, 
-                                '<comment>***</comment> ' 
+                                \Vaimo\ComposerPatches\Logger::TYPE_NONE,
+                                '<comment>***</comment> '
                                 . 'The expected result to execution is a failure'
                                 . '<comment>***</comment>'
                             );
@@ -128,7 +128,7 @@ class Applier
                         
                         if ($result) {
                             $result = $this->scanOutputForFailures(
-                                $output, 
+                                $output,
                                 $this->extractArrayValue($failureMessages, $operationCode)
                             );
                         }
@@ -159,8 +159,8 @@ class Applier
                     'warning',
                     '%s (type=%s) failed with p=%s',
                     array(
-                        is_string($operationName) ? $operationName : $operationCode, 
-                        $type, 
+                        is_string($operationName) ? $operationName : $operationCode,
+                        $type,
                         $patchLevel
                     )
                 );
@@ -169,8 +169,8 @@ class Applier
 
         if ($result) {
             $this->logger->writeVerbose(
-                'info', 
-                'SUCCESS with type=%s (p=%s)', 
+                'info',
+                'SUCCESS with type=%s (p=%s)',
                 array($type, $patchLevel)
             );
         }

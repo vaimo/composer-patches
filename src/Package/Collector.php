@@ -15,7 +15,7 @@ class Collector
     private $extraPackages;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PackageUtils 
+     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
 

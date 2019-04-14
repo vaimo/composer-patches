@@ -10,7 +10,7 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 class RootPatchComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
     /**
-     * @var \Composer\Package\PackageInterface 
+     * @var \Composer\Package\PackageInterface
      */
     private $package;
 

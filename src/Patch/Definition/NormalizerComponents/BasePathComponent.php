@@ -36,8 +36,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             $label = $data[PatchDefinition::LABEL];
         }
 
-        if (
-            strpos($data[PatchDefinition::PATH], DIRECTORY_SEPARATOR) === 0 
+        if (strpos($data[PatchDefinition::PATH], DIRECTORY_SEPARATOR) === 0
             && file_exists($data[PatchDefinition::PATH])
         ) {
             return array(
@@ -154,9 +153,9 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         if (is_array($templates)) {
             if (isset($templates[$packageName])) {
                 return $templates[$packageName];
-            } else if (isset($templates[$vendorName])) {
+            } elseif (isset($templates[$vendorName])) {
                 return $templates[$vendorName];
-            } else if ($templates[PluginConfig::PATCHES_BASE_DEFAULT]) {
+            } elseif ($templates[PluginConfig::PATCHES_BASE_DEFAULT]) {
                 return $templates[PluginConfig::PATCHES_BASE_DEFAULT];
             } else {
                 return reset($templates);

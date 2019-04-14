@@ -53,7 +53,7 @@ class ConfigUtils
         if (isset($updates[Config::PATCHER_FAILURES])) {
             foreach ($updates[Config::PATCHER_FAILURES] as $code => $patterns) {
                 $config[Config::PATCHER_FAILURES][$code] = array_replace(
-                    $config[Config::PATCHER_FAILURES][$code], 
+                    $config[Config::PATCHER_FAILURES][$code],
                     $patterns
                 );
             }
@@ -104,7 +104,7 @@ class ConfigUtils
             $this->extractArrayValue($sequenceConfig, Config::PATCHER_APPLIERS)
         );
         
-        if ((!$patcherSequence || array_intersect_key($patchers, array_flip($patcherSequence))) 
+        if ((!$patcherSequence || array_intersect_key($patchers, array_flip($patcherSequence)))
             && is_array($patchers) && array_filter($patchers)
         ) {
             return;

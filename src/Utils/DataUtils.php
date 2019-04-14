@@ -22,7 +22,8 @@ class DataUtils
         return array_map(
             function ($value) use ($prefix) {
                 return $prefix . $value;
-            }, $data
+            },
+            $data
         );
     }
     
@@ -72,9 +73,9 @@ class DataUtils
             foreach ($item[0] as &$node) {
                 if ($segment === null) {
                     $result[] = &$node;
-                } else if ($segment === '*') {
+                } elseif ($segment === '*') {
                     $stack[] = array(&$node, $item[1]);
-                } else if (isset($node[$segment])) {
+                } elseif (isset($node[$segment])) {
                     $stack[] = array(array(&$node[$segment]), $item[1]);
                 }
                 

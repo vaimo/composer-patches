@@ -135,9 +135,9 @@ class ListCommand extends \Composer\Command\BaseCommand
         $unfilteredPool = $this->createLoaderPool(array(
             'constraints' => false,
             'platform' => false,
-            'local-exclude' => false, 
+            'local-exclude' => false,
             'root-patch' => false,
-            'global-exclude' => false, 
+            'global-exclude' => false,
             'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver, true)
         ));
 
@@ -196,7 +196,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
         
         $filteredPatches = $patchListUtils->embedInfoToItems(
-            $filteredPatches, 
+            $filteredPatches,
             array(PatchDefinition::STATUS => 'applied'),
             true
         );
@@ -209,7 +209,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             $statusFilter = $filterUtils->composeRegex($statusFilters, '/');
 
             $filteredPatches = $patchListUtils->applyDefinitionFilter(
-                $filteredPatches, 
+                $filteredPatches,
                 $statusFilter,
                 PatchDefinition::STATUS
             );
@@ -217,7 +217,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         $patches = array_filter($filteredPatches);
         
-        $shouldIncludeExcludedPatches = $withExcluded 
+        $shouldIncludeExcludedPatches = $withExcluded
             && (!$statusFilters || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded'));
         
         if ($shouldIncludeExcludedPatches) {
@@ -279,8 +279,8 @@ class ListCommand extends \Composer\Command\BaseCommand
             $output->writeln(sprintf('<info>%s</info>', $packageName));
 
             foreach ($patches as $path => $info) {
-                $status = isset($info[PatchDefinition::STATUS]) 
-                    ? $info[PatchDefinition::STATUS] 
+                $status = isset($info[PatchDefinition::STATUS])
+                    ? $info[PatchDefinition::STATUS]
                     : 'unknown';
 
                 $statusLabel = sprintf(' [%s]', $statusDecorators[$status]);
@@ -288,7 +288,7 @@ class ListCommand extends \Composer\Command\BaseCommand
                 
                 if ($owner === PatchDefinition::OWNER_UNKNOWN) {
                     $patchInfoLabel = sprintf('  ~ %s%s', $path, $statusLabel);
-                } else if ($owner) {
+                } elseif ($owner) {
                     $patchInfoLabel = sprintf('  ~ <info>%s</info>: %s%s', $owner, $path, $statusLabel);
                 } else {
                     $patchInfoLabel = sprintf('%s%s', $path, $statusLabel);

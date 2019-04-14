@@ -20,7 +20,7 @@ class Logger
     private $indentationStack = array();
     
     /**
-     * @var int 
+     * @var int
      */
     private $muteDepth = 0;
     
@@ -53,8 +53,8 @@ class Logger
 
     public function unMute($muteDepth = null)
     {
-        $this->muteDepth = $muteDepth 
-            ? $muteDepth 
+        $this->muteDepth = $muteDepth
+            ? $muteDepth
             : max(--$this->muteDepth, 0);
     }
     
@@ -129,7 +129,7 @@ class Logger
         }
         
         $this->io->write(
-            $this->getIndentationString(), 
+            $this->getIndentationString(),
             false
         );
     }

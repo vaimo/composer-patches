@@ -77,12 +77,12 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $loaderComponentsPool = $this->createLoaderPool(array(
             'constraints' => false,
             'platform' => false,
-            'targets-resolver' => false, 
+            'targets-resolver' => false,
             'local-exclude' => false,
             'root-patch' => false,
             'global-exclude' => false,
             'downloader' => new LoaderComponents\DownloaderComponent(
-                $composer->getPackage(), 
+                $composer->getPackage(),
                 $downloader,
                 true
             )
@@ -97,13 +97,13 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $patchPaths = $patchListUtils->extractValue($patches, array(Patch::PATH, Patch::SOURCE));
         
         $patchDefines = array_combine(
-            $patchPaths, 
+            $patchPaths,
             $patchListUtils->extractValue($patches, array(Patch::OWNER))
         );
         
         $patchStatuses = array_filter(
             array_combine(
-                $patchPaths, 
+                $patchPaths,
                 $patchListUtils->extractValue($patches, array(Patch::STATUS_LABEL))
             )
         );
@@ -174,7 +174,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $patcherConfig = $patcherConfigReader->readFromPackage($package);
             
             $ignores = $dataUtils->getValueByPath(
-                $patcherConfig, 
+                $patcherConfig,
                 array(Config::PATCHER_CONFIG_ROOT, Config::PATCHES_IGNORE),
                 array()
             );
@@ -182,12 +182,12 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $installPath = $installPaths[$packageName];
             
             $skippedPaths = $dataUtils->prefixArrayValues(
-                array_merge($defaultIgnores, $ignores), 
+                array_merge($defaultIgnores, $ignores),
                 $installPath . DIRECTORY_SEPARATOR
             );
 
             $filter = $filterUtils->composeRegex(
-                $filterUtils->invertRules($skippedPaths), 
+                $filterUtils->invertRules($skippedPaths),
                 '/'
             );
 
@@ -196,7 +196,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $result = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
 
             $fileMatches = array_replace(
-                $fileMatches, 
+                $fileMatches,
                 array_fill_keys($result, $packageName)
             );
         }
@@ -243,7 +243,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
          * Make sure that downloaded patches are not perceived as missing files
          */
         $orphanConfig = array_diff_key(
-            $orphanConfig, 
+            $orphanConfig,
             array_flip(
                 array_filter(array_keys($orphanConfig), 'file_exists')
             )
@@ -251,7 +251,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $groups = array_fill_keys(array_keys($installPaths), array());
 
-        foreach ($orphanFiles as $path => $ownerName)  {
+        foreach ($orphanFiles as $path => $ownerName) {
             $installPath = $installPaths[$ownerName];
             
             $groups[$ownerName][] = array(
@@ -270,11 +270,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $sourceIncludesUrlScheme = isset($sourcePathInfo['scheme']) && $sourcePathInfo['scheme'];
 
             $groups[$ownerName][] = array(
-                'issue' => isset($patchStatuses[$path]) && $patchStatuses[$path] 
-                    ? $patchStatuses[$path] 
+                'issue' => isset($patchStatuses[$path]) && $patchStatuses[$path]
+                    ? $patchStatuses[$path]
                     : 'NO FILE',
-                'path' => !$sourceIncludesUrlScheme 
-                    ? ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR) 
+                'path' => !$sourceIncludesUrlScheme
+                    ? ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR)
                     : $path
             );
         }

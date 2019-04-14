@@ -8,7 +8,7 @@ namespace Vaimo\ComposerPatches\Strategies;
 class OutputStrategy
 {
     /**
-     * @var array 
+     * @var array
      */
     private $outputTriggers;
 

@@ -10,13 +10,13 @@ use Composer\DependencyResolver\Operation\OperationInterface;
 class OperationAnalyser
 {
     /**
-     * @var \Vaimo\ComposerPatches\Package\ConfigAnalyser 
+     * @var \Vaimo\ComposerPatches\Package\ConfigAnalyser
      */
     private $configAnalyser;
 
-    public function __construct() 
+    public function __construct()
     {
-        $this->configAnalyser = new \Vaimo\ComposerPatches\Package\ConfigAnalyser(); 
+        $this->configAnalyser = new \Vaimo\ComposerPatches\Package\ConfigAnalyser();
     }
 
     public function isPatcherUninstallOperation(OperationInterface $operation)

@@ -29,7 +29,7 @@ class InfoLogger
         
         if (isset($patch[Patch::STATUS_LABEL]) && $patch[Patch::STATUS_LABEL]) {
             $label = $patch[Patch::STATUS_LABEL];
-        } 
+        }
 
         $label = $label ? sprintf(' [<info>%s</info>]', $label) : '';
 
@@ -85,7 +85,7 @@ class InfoLogger
             ));
         }
 
-        return array(sprintf('%s (<fg=default;options=underscore>%s</>)', reset($lines), $reference));    
+        return array(sprintf('%s (<fg=default;options=underscore>%s</>)', reset($lines), $reference));
     }
     
     private function resolveReferenceInfo(array $patch)

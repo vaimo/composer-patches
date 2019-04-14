@@ -59,14 +59,14 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
 
             if (!is_array($dependsConfig)) {
                 $dependsConfig = array(
-                    PluginConfig::PATCHES_CONFIG_DEFAULT => $dependsConfig 
+                    PluginConfig::PATCHES_CONFIG_DEFAULT => $dependsConfig
                 );
             }
         }
         
         $patterns = array_map(function ($candidate) {
-            return trim($candidate, '*') 
-                ? str_replace(chr(32), '.*', preg_quote(str_replace('*', chr(32), $candidate), '#')) 
+            return trim($candidate, '*')
+                ? str_replace(chr(32), '.*', preg_quote(str_replace('*', chr(32), $candidate), '#'))
                 : preg_quote($candidate);
         }, array_keys($dependsConfig));
 

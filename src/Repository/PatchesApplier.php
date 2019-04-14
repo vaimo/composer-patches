@@ -37,7 +37,7 @@ class PatchesApplier
     private $patcherStateManager;
 
     /**
-     * @var \Vaimo\ComposerPatches\Repository\StateGenerator 
+     * @var \Vaimo\ComposerPatches\Repository\StateGenerator
      */
     private $repositoryStateGenerator;
 
@@ -47,7 +47,7 @@ class PatchesApplier
     private $patchInfoLogger;
 
     /**
-     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy 
+     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy
      */
     private $outputStrategy;
     
@@ -57,7 +57,7 @@ class PatchesApplier
     private $logger;
 
     /**
-     * @var \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig 
+     * @var \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig
      */
     private $statusConfig;
     
@@ -120,7 +120,7 @@ class PatchesApplier
                     continue;
                 }
                 
-                $queue[$target][$path][Patch::STATUS_LABEL] = $labels[$status]; 
+                $queue[$target][$path][Patch::STATUS_LABEL] = $labels[$status];
             }
         }
         
@@ -225,13 +225,13 @@ class PatchesApplier
             
             $muteDepth = null;
             
-            $patchRemovals = isset($removeQueue[$packageName]) 
-                ? $removeQueue[$packageName] 
-                : array(); 
+            $patchRemovals = isset($removeQueue[$packageName])
+                ? $removeQueue[$packageName]
+                : array();
             
             if (!$this->shouldAllowOutput($queuedPatches, $patchRemovals)) {
                 $muteDepth = $this->logger->mute();
-            } 
+            }
             
             try {
                 $this->logger->writeRaw(
@@ -268,7 +268,7 @@ class PatchesApplier
         return $packagesUpdated;
     }
     
-    private function processPatchesForPackage(Repository $repository, Package $package, $patchesQueue) 
+    private function processPatchesForPackage(Repository $repository, Package $package, $patchesQueue)
     {
         $processIndentation = $this->logger->push('~');
 

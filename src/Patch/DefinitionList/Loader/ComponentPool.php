@@ -57,7 +57,7 @@ class ComponentPool
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
 
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
-            $installationManager, 
+            $installationManager,
             $vendorRoot
         );
 

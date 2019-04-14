@@ -39,7 +39,7 @@ class PatchApplier
     private $patchInfoLogger;
 
     /**
-     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy 
+     * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy
      */
     private $outputStrategy;
     
@@ -80,8 +80,8 @@ class PatchApplier
         $appliedPatches = array();
         
         foreach ($patchesQueue as $source => $info) {
-            $muteDepth = !$this->outputStrategy->shouldAllowForPatches(array($info)) 
-                ? $this->logger->mute() 
+            $muteDepth = !$this->outputStrategy->shouldAllowForPatches(array($info))
+                ? $this->logger->mute()
                 : null;
 
             $patchInfo = array_replace($info, array(Patch::SOURCE => $source));

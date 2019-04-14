@@ -10,10 +10,10 @@ class InstalledConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Pack
     public function getConfig(\Composer\Package\PackageInterface $package, $configKey)
     {
         $methodName = sprintf(
-            'get%s', 
+            'get%s',
             str_replace(
-                ' ', 
-                '', 
+                ' ',
+                '',
                 ucwords(
                     str_replace('_', ' ', $configKey)
                 )

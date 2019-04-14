@@ -58,5 +58,5 @@ class BootstrapFactory
             $listResolver,
             $outputStrategy
         );
-    }    
+    }
 }

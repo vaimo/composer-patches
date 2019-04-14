@@ -159,8 +159,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
         
         $outputTriggerFlags = array(
-            Patch::STATUS_NEW => !$hasFilers, 
-            Patch::STATUS_CHANGED => !$hasFilers, 
+            Patch::STATUS_NEW => !$hasFilers,
+            Patch::STATUS_CHANGED => !$hasFilers,
             Patch::STATUS_MATCH => true,
             Patch::SOURCE => $isExplicit,
             Patch::URL => $isExplicit

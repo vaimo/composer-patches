@@ -20,7 +20,7 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
     private $remoteFilesystem;
     
     /**
-     * @var bool 
+     * @var bool
      */
     private $graceful;
 
@@ -71,7 +71,7 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                                 sprintf(
                                     'Your configuration does not allow connections to %s. ' .
                                     'Override the \'secure-http\' to allow: ' .
-                                    'https://github.com/vaimo/composer-patches#patcher-configuration', 
+                                    'https://github.com/vaimo/composer-patches#patcher-configuration',
                                     $source
                                 ),
                                 $exception->getCode()

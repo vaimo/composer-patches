@@ -4,6 +4,18 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.16.1": {
+        "overview": "all features and fixes in this release are forward-ported from 3.47.1",
+        "fix": [
+            "wrong path used for pre-loading classes while running composer commands when the plugin package used as ROOT",
+            "removed all syntax/code that was not compatible with 5.3",
+            "removed/replaced all dependencies that were not compatible with 5.3"
+        ],
+        "maintenance": [
+            "improved early autoloader setup within proxy plugin",
+            "code normalised"
+        ]
+    },
     "4.16.0": {
         "overview": "all features and fixes in this release are forward-ported from 3.47.0",
         "feature": [
@@ -224,6 +236,17 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
+    "3.47.1": {
+        "fix": [
+            "wrong path used for pre-loading classes while running composer commands when the plugin package used as ROOT",
+            "removed all syntax/code that was not compatible with 5.3",
+            "removed/replaced all dependencies that were not compatible with 5.3"
+        ],
+        "maintenance": [
+            "improved early autoloader setup within proxy plugin",
+            "code normalised"
         ]
     },
     "3.47.0": {

@@ -10,7 +10,7 @@ class Loader
     public function loadWithNormalizedLineEndings($path)
     {
         return implode(
-            PHP_EOL, 
+            PHP_EOL,
             array_map('rtrim', file($path))
         );
     }
