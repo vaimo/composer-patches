@@ -81,12 +81,14 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
 
                 if (count(array_filter($comparisonResults)) !== count($comparisonResults)) {
                     $patchData = false;
-                } else {
-                    $patchData[PatchDefinition::DEPENDS] = array_diff_key(
-                        $patchData[PatchDefinition::DEPENDS],
-                        array_filter($comparisonResults)
-                    );
+                    
+                    continue;
                 }
+
+                $patchData[PatchDefinition::DEPENDS] = array_diff_key(
+                    $patchData[PatchDefinition::DEPENDS],
+                    array_filter($comparisonResults)
+                );
             }
 
             $packagePatches = array_filter($packagePatches);

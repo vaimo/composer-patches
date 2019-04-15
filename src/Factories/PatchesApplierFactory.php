@@ -55,11 +55,9 @@ class PatchesApplierFactory
             $vendorRoot
         );
 
-        if ($pluginConfig->shouldExitOnFirstFailure()) {
-            $failureHandler = new FailureHandlers\FatalHandler();
-        } else {
-            $failureHandler = new FailureHandlers\GracefulHandler($this->logger);
-        }
+        $failureHandler = $pluginConfig->shouldExitOnFirstFailure()
+            ? new FailureHandlers\FatalHandler()
+            : new FailureHandlers\GracefulHandler($this->logger);
 
         $patchFileApplier = new \Vaimo\ComposerPatches\Patch\File\Applier(
             $this->logger,
@@ -95,11 +93,9 @@ class PatchesApplierFactory
         
         $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
 
-        if ($pluginConfig->shouldForcePackageReset()) {
-            $packageResetStrategy = new Strategies\Package\ForcedResetStrategy();
-        } else {
-            $packageResetStrategy = new Strategies\Package\DefaultResetStrategy($installer, $downloader);
-        }
+        $packageResetStrategy = $pluginConfig->shouldForcePackageReset()
+            ? new Strategies\Package\ForcedResetStrategy()
+            : new Strategies\Package\DefaultResetStrategy($installer, $downloader);
 
         $repositoryManager = new \Vaimo\ComposerPatches\Managers\RepositoryManager(
             $output,

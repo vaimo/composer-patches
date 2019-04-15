@@ -173,9 +173,9 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
                 return $templates[$vendorName];
             } elseif ($templates[PluginConfig::PATCHES_BASE_DEFAULT]) {
                 return $templates[PluginConfig::PATCHES_BASE_DEFAULT];
-            } else {
-                return reset($templates);
             }
+
+            return reset($templates);
         }
 
         return $templates;
