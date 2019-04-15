@@ -30,12 +30,10 @@ class PatcherConfigReaderFactory
             $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR)
         );
 
-        if ($pluginConfig->shouldPreferOwnerPackageConfig()) {
-            $infoExtractor = new ConfigExtractors\VendorConfigExtractor($packageInfoResolver);
-        } else {
-            $infoExtractor = new ConfigExtractors\InstalledConfigExtractor();
-        }
-
+        $infoExtractor = $pluginConfig->shouldPreferOwnerPackageConfig()
+            ? new ConfigExtractors\VendorConfigExtractor($packageInfoResolver)
+            : new ConfigExtractors\InstalledConfigExtractor();
+        
         return new \Vaimo\ComposerPatches\Patcher\ConfigReader($infoExtractor);
     }
 }

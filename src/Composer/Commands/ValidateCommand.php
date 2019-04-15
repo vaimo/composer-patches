@@ -219,11 +219,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
     private function createLoaderPool(array $componentUpdates = array())
     {
         $composer = $this->getComposer();
-        $io = $this->getIO();
+        $appIO = $this->getIO();
 
         $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
             $composer,
-            $io
+            $appIO
         );
 
         foreach ($componentUpdates as $componentName => $replacement) {

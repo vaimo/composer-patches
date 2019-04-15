@@ -32,17 +32,16 @@ class InfoLogger
         }
 
         $label = $label ? sprintf(' [<info>%s</info>]', $label) : '';
-
-        $isOwnerUnknown = !$patch[Patch::OWNER] || $patch[Patch::OWNER] === Patch::OWNER_UNKNOWN;
-
-        if ($isOwnerUnknown) {
-            $this->logger->writeRaw('%s%s', array($patch[Patch::SOURCE], $label));
-        } else {
-            $this->logger->writeRaw(
-                '<info>%s</info>: %s%s',
-                array($patch[Patch::OWNER], $patch[Patch::SOURCE], $label)
-            );
+        
+        $messageTemplate = '%s%s';
+        $args = array($patch[Patch::SOURCE], $label);
+        
+        if ($patch[Patch::OWNER] && $patch[Patch::OWNER] !== Patch::OWNER_UNKNOWN) {
+            $messageTemplate = '<info>%s</info>: ' . $messageTemplate;
+            array_unshift($args, $patch[Patch::OWNER]);
         }
+
+        $this->logger->writeRaw($messageTemplate, $args);
     }
 
     public function outputPatchDescription(array $patch)

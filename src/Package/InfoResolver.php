@@ -110,11 +110,9 @@ class InfoResolver
                     break;
                 case Patch::CWD_INSTALL:
                 default:
-                    if ($package instanceof \Composer\Package\RootPackage) {
-                        $this->installPathCache[$key] = $this->vendorRoot;
-                    } else {
-                        $this->installPathCache[$key] = $this->getSourcePath($package);
-                    }
+                    $this->installPathCache[$key] = $package instanceof \Composer\Package\RootPackage 
+                        ? $this->vendorRoot
+                        : $this->getSourcePath($package); 
 
                     break;
             }
