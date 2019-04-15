@@ -30,13 +30,13 @@ class PatchesLoaderFactory
 
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
-     * 
+     *
      * @param LoaderComponents $loaderComponentsPool
      * @param PluginConfig $pluginConfig
      * @param bool $devMode
      * @return Patch\DefinitionList\Loader
      */
-    public function create(LoaderComponents $loaderComponentsPool, PluginConfig $pluginConfig, $devMode = false) 
+    public function create(LoaderComponents $loaderComponentsPool, PluginConfig $pluginConfig, $devMode = false)
     {
         $composer = $this->composer;
 

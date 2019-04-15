@@ -43,7 +43,7 @@ class InfoResolver
 
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
-     * 
+     *
      * @param PackageInterface $package
      * @return bool|string
      */
