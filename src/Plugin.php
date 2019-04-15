@@ -35,12 +35,12 @@ class Plugin implements
      */
     private $lockSanitizer;
     
-    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $cliIO)
+    public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
     {
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
 
-        $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $cliIO);
+        $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
 
         $this->bootstrap = $this->bootstrapFactory->create();
 
@@ -48,7 +48,7 @@ class Plugin implements
 
         $pluginBootstrap->preloadPluginClasses();
 
-        $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($cliIO);
+        $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
     }
 
     public function getCapabilities()

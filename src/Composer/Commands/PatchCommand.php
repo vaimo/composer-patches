@@ -94,10 +94,17 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * 
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void|null
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $composer = $this->getComposer();
-        $cliIO = $this->getIO();
+        $appIO = $this->getIO();
         
         $isExplicit = $input->getOption('explicit') || $input->getOption('show-reapplies');
         $isDevMode = !$input->getOption('no-dev');
@@ -152,7 +159,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             ));
         }
 
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $cliIO);
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
         
         $outputTriggerFlags = array(
             Patch::STATUS_NEW => !$hasFilers,
@@ -182,7 +189,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
                 Environment::FORCE_REAPPLY => $behaviourFlags['redo']
             ));
 
-            $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($cliIO);
+            $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
             
             $bootstrap->applyPatches($isDevMode);
             

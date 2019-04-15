@@ -160,11 +160,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $defaultIgnores = array($vendorPath, '.hg', '.git', '.idea');
 
-        $patcherConfigReaderFactory = new \Vaimo\ComposerPatches\Factories\PatcherConfigReaderFactory(
+        $configReaderFactory = new \Vaimo\ComposerPatches\Factories\PatcherConfigReaderFactory(
             $this->getComposer()
         );
         
-        $patcherConfigReader = $patcherConfigReaderFactory->create($pluginConfig);
+        $patcherConfigReader = $configReaderFactory->create($pluginConfig);
         
         foreach ($matches as $packageName => $package) {
             $patcherConfig = $patcherConfigReader->readFromPackage($package);

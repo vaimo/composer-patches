@@ -10,9 +10,9 @@ class Logger
     const TYPE_NONE = 'none';
     
     /**
-     * @var \Composer\IO\IOInterface $cliIO
+     * @var \Composer\IO\IOInterface $appIO
      */
-    private $cliIO;
+    private $appIO;
     
     /**
      * @var array
@@ -25,12 +25,12 @@ class Logger
     private $muteDepth = 0;
     
     /**
-     * @param \Composer\IO\IOInterface $cliIO
+     * @param \Composer\IO\IOInterface $appIO
      */
     public function __construct(
-        \Composer\IO\IOInterface $cliIO
+        \Composer\IO\IOInterface $appIO
     ) {
-        $this->cliIO = $cliIO;
+        $this->appIO = $appIO;
     }
 
     /**
@@ -38,7 +38,7 @@ class Logger
      */
     public function getOutputInstance()
     {
-        return $this->cliIO;
+        return $this->appIO;
     }
 
     public function isMuted()
@@ -70,7 +70,7 @@ class Logger
             return $prefix . $line;
         }, explode(PHP_EOL, $message));
         
-        $this->cliIO->write(
+        $this->appIO->write(
             vsprintf(implode(PHP_EOL, $lines), $args)
         );
     }
@@ -82,7 +82,7 @@ class Logger
 
     public function writeVerbose($type, $message, array $args = array())
     {
-        if (!$this->cliIO->isVerbose()) {
+        if (!$this->appIO->isVerbose()) {
             return;
         }
         
@@ -91,7 +91,7 @@ class Logger
     
     public function writeException(\Exception $exception)
     {
-        if (!$this->cliIO->isVerbose()) {
+        if (!$this->appIO->isVerbose()) {
             return;
         }
         
@@ -105,7 +105,7 @@ class Logger
             return;
         }
         
-        $this->cliIO->write('');
+        $this->appIO->write('');
     }
     
     private function createTag($type, $contents)
@@ -128,7 +128,7 @@ class Logger
             return;
         }
         
-        $this->cliIO->write(
+        $this->appIO->write(
             $this->getIndentationString(),
             false
         );

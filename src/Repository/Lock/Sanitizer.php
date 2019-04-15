@@ -22,12 +22,12 @@ class Sanitizer
     private $dataUtils;
 
     /**
-     * @param \Composer\IO\IOInterface $cliIO
+     * @param \Composer\IO\IOInterface $appIO
      */
     public function __construct(
-        \Composer\IO\IOInterface $cliIO
+        \Composer\IO\IOInterface $appIO
     ) {
-        $this->lockerManager = new \Vaimo\ComposerPatches\Managers\LockerManager($cliIO);
+        $this->lockerManager = new \Vaimo\ComposerPatches\Managers\LockerManager($appIO);
 
         $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }

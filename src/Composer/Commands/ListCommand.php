@@ -5,10 +5,12 @@
  */
 namespace Vaimo\ComposerPatches\Composer\Commands;
 
+use Composer\Composer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
+use Vaimo\ComposerPatches\Interfaces\ListResolverInterface as ListResolver;
 use Symfony\Component\Console\Input\InputOption;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
@@ -144,13 +146,6 @@ class ListCommand extends \Composer\Command\BaseCommand
         $hasFilers = (bool)array_filter($filters);
         
         $listResolver = new ListResolvers\FilteredListResolver($filters);
-        $changesListResolver = new ListResolvers\ChangesListResolver($listResolver);
-
-        $stateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
-            $composer
-        );
-
-        $stateAnalyser = $stateAnalyserFactory->create($configInstance);
         
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(
@@ -161,12 +156,9 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         $filteredLoader = $loaderFactory->create($filteredPool, $configInstance, $isDevMode);
         $filteredPatches = $filteredLoader->loadFromPackagesRepository($repository);
-
-        $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
-            $changesListResolver,
-            $stateAnalyser
-        );
-
+        
+        $queueGenerator = $this->createQueueGenerator($composer, $configInstance, $listResolver);
+        
         $repoStateGenerator = new \Vaimo\ComposerPatches\Repository\StateGenerator(
             $packageCollector
         );
@@ -252,14 +244,27 @@ class ListCommand extends \Composer\Command\BaseCommand
         $this->generateOutput($output, $patches);
     }
     
+    private function createQueueGenerator(Composer $composer, Config $config, ListResolver $listResolver)
+    {
+        $stateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
+            $composer
+        );
+        
+        $changesListResolver = new ListResolvers\ChangesListResolver($listResolver);
+
+        $stateAnalyser = $stateAnalyserFactory->create($config);
+        
+        return new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
+            $changesListResolver,
+            $stateAnalyser
+        );
+    }
+    
     private function createLoaderPool(array $componentUpdates = array())
     {
-        $composer = $this->getComposer();
-        $io = $this->getIO();
-
         $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
-            $composer,
-            $io
+            $this->getComposer(),
+            $this->getIO()
         );
 
         foreach ($componentUpdates as $componentName => $replacement) {

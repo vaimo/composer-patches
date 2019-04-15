@@ -40,7 +40,13 @@ class InfoResolver
         $this->installationManager = $installationManager;
         $this->vendorRoot = $vendorRoot;
     }
-    
+
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * 
+     * @param PackageInterface $package
+     * @return bool|string
+     */
     public function getSourcePath(PackageInterface $package)
     {
         return !$package instanceof \Composer\Package\RootPackage

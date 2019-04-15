@@ -30,6 +30,8 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
     private $gracefulMode;
 
     /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * 
      * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
      * @param bool $gracefulMode
      */
