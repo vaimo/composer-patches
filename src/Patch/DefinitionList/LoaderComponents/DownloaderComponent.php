@@ -22,21 +22,23 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
     /**
      * @var bool
      */
-    private $graceful;
+    private $gracefulMode;
 
     /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * 
      * @param \Composer\Package\RootPackageInterface $rootPackage
      * @param \Composer\Util\RemoteFilesystem $remoteFilesystem
-     * @param bool $graceful
+     * @param bool $gracefulMode
      */
     public function __construct(
         \Composer\Package\RootPackageInterface $rootPackage,
         \Composer\Util\RemoteFilesystem $remoteFilesystem,
-        $graceful = false
+        $gracefulMode = false
     ) {
         $this->rootPackage = $rootPackage;
         $this->remoteFilesystem = $remoteFilesystem;
-        $this->graceful = $graceful;
+        $this->gracefulMode = $gracefulMode;
     }
 
     /**
@@ -84,7 +86,7 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                             $patchData[PatchDefinition::STATUS_LABEL] = 'ERROR 404';
                         }
                         
-                        if ($this->graceful) {
+                        if ($this->gracefulMode) {
                             continue;
                         }
 

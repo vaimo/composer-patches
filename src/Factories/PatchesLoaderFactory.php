@@ -28,11 +28,16 @@ class PatchesLoaderFactory
         $this->composer = $composer;
     }
 
-    public function create(
-        LoaderComponents $loaderComponentsPool,
-        PluginConfig $pluginConfig,
-        $devMode = false
-    ) {
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * 
+     * @param LoaderComponents $loaderComponentsPool
+     * @param PluginConfig $pluginConfig
+     * @param bool $devMode
+     * @return Patch\DefinitionList\Loader
+     */
+    public function create(LoaderComponents $loaderComponentsPool, PluginConfig $pluginConfig, $devMode = false) 
+    {
         $composer = $this->composer;
 
         $installationManager = $composer->getInstallationManager();

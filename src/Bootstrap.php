@@ -8,6 +8,9 @@ namespace Vaimo\ComposerPatches;
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Factories;
 
+/**
+ * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+ */
 class Bootstrap
 {
     /**
@@ -52,14 +55,14 @@ class Bootstrap
 
     /**
      * @param \Composer\Composer $composer
-     * @param \Composer\IO\IOInterface $cliIO
+     * @param \Composer\IO\IOInterface $appIO
      * @param \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
      * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy
      */
     public function __construct(
         \Composer\Composer $composer,
-        \Composer\IO\IOInterface $cliIO,
+        \Composer\IO\IOInterface $appIO,
         \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory,
         \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver = null,
         \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy = null
@@ -67,7 +70,7 @@ class Bootstrap
         $this->composer = $composer;
         $this->configFactory = $configFactory;
         
-        $logger = new \Vaimo\ComposerPatches\Logger($cliIO);
+        $logger = new \Vaimo\ComposerPatches\Logger($appIO);
 
         $this->listResolver = $listResolver;
         
@@ -75,7 +78,7 @@ class Bootstrap
         
         $this->loaderComponents = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
             $composer,
-            $cliIO
+            $appIO
         );
 
         $this->loaderFactory = new Factories\PatchesLoaderFactory($composer);
@@ -84,7 +87,7 @@ class Bootstrap
         
         $this->repositoryProcessor = new \Vaimo\ComposerPatches\Repository\Processor($logger);
     }
-    
+
     public function applyPatches($devMode = false)
     {
         $this->applyPatchesWithConfig(
@@ -104,7 +107,7 @@ class Bootstrap
             $devMode
         );
     }
-
+    
     private function applyPatchesWithConfig(PluginConfig $config, $devMode = false)
     {
         $repository = $this->composer->getRepositoryManager()->getLocalRepository();

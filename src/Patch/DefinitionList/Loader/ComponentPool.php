@@ -19,7 +19,7 @@ class ComponentPool
     /**
      * @var \Composer\IO\IOInterface
      */
-    private $cliIO;
+    private $appIO;
 
     /**
      * @var bool[]|\Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface[]
@@ -28,14 +28,14 @@ class ComponentPool
 
     /**
      * @param \Composer\Composer $composer
-     * @param \Composer\IO\IOInterface $cliIO
+     * @param \Composer\IO\IOInterface $appIO
      */
     public function __construct(
         \Composer\Composer $composer,
-        \Composer\IO\IOInterface $cliIO
+        \Composer\IO\IOInterface $appIO
     ) {
         $this->composer = $composer;
-        $this->cliIO = $cliIO;
+        $this->appIO = $appIO;
     }
 
     public function getList(PluginConfig $pluginConfig)
@@ -65,7 +65,7 @@ class ComponentPool
             $packageInfoResolver
         );
 
-        $downloader = new \Composer\Util\RemoteFilesystem($this->cliIO, $composerConfig);
+        $downloader = new \Composer\Util\RemoteFilesystem($this->appIO, $composerConfig);
 
         $platformPackages = $this->resolveConstraintPackages($composerConfig);
         

@@ -84,19 +84,13 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         );
 
         $variablePattern = '{{%s}}';
-
-        $mutationRules = $this->templateUtils->collectValueMutationRules($template, array($variablePattern));
-
-        $templateVariables = array_replace(
-            $this->templateUtils->applyMutations(
-                array_replace($pathVariables, $extraVariables),
-                $mutationRules,
-                ' :-_.'
-            ),
-            $pathVariables,
-            $extraVariables
+        
+        $templateVariables = $this->prepareTemplateValues(
+            $template, 
+            $variablePattern, 
+            array_replace($pathVariables, $extraVariables)
         );
-
+        
         $source = $this->templateUtils->compose(
             $template . ($sourceTags ? ('#' . $sourceTags) : ''),
             $templateVariables,
@@ -105,7 +99,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
 
         $filename = basename($source);
 
-        if (substr($label, -strlen($filename)) == $filename) {
+        if (substr($label, -strlen($filename)) === $filename) {
             $label = str_replace(
                 $filename,
                 preg_replace('/\s{2,}/', ' ', preg_replace('/[^A-Za-z0-9]/', ' ', strtok($filename, '.'))),
@@ -119,9 +113,26 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         );
     }
     
+    private function prepareTemplateValues($template, $variablePattern, $variableValues)
+    {
+        $mutationRules = $this->templateUtils->collectValueMutationRules(
+            $template, 
+            array($variablePattern)
+        );
+
+        return array_replace(
+            $this->templateUtils->applyMutations(
+                $variableValues,
+                $mutationRules,
+                ' :-_.'
+            ),
+            $variableValues
+        );
+    }
+    
     private function expandPathVariables(array $pathVariables, array $mutationNamesMap)
     {
-        $nameParts = array_map(function ($part) {
+        $normalizedVariables = array_map(function ($part) {
             $part = strtolower(
                 preg_replace(
                     array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'),
@@ -137,7 +148,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
 
         $pathVariables = array();
 
-        foreach ($nameParts as $name => $value) {
+        foreach ($normalizedVariables as $name => $value) {
             $variableName = $mutationNamesMap[$name];
 
             foreach ($mutationAppliers as $mutationApplier) {

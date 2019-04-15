@@ -104,23 +104,30 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * 
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void|null
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
         $defaults = $configDefaults->getPatcherConfig();
 
         $composer = $this->getComposer();
+
+        $appIO = $this->getIO();
         
         $isExplicit = $input->getOption('explicit') || $input->getOption('show-reapplies');
         
         $isDevMode = !$input->getOption('no-dev');
-        
-        $cliIO = $this->getIO();
 
         $behaviourFlags = $this->getBehaviourFlags($input);
         $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
         
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $cliIO);
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
         
         $filters = array(
             Patch::SOURCE => $input->getOption('filter'),
@@ -182,7 +189,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         if ($shouldUndo && !array_filter($filters)) {
             $bootstrap->stripPatches($isDevMode);
         } else {
-            $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($cliIO);
+            $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
 
             $bootstrap->applyPatches($isDevMode);
             

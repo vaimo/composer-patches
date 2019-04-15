@@ -17,7 +17,7 @@ class QueueGenerator
     /**
      * @var \Vaimo\ComposerPatches\Repository\State\Analyser
      */
-    private $repositoryStateAnalyser;
+    private $repoStateAnalyser;
     
     /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
@@ -26,14 +26,14 @@ class QueueGenerator
     
     /**
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver,
-     * @param \Vaimo\ComposerPatches\Repository\State\Analyser $repositoryStateAnalyser
+     * @param \Vaimo\ComposerPatches\Repository\State\Analyser $repoStateAnalyser
      */
     public function __construct(
         \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver,
-        \Vaimo\ComposerPatches\Repository\State\Analyser $repositoryStateAnalyser
+        \Vaimo\ComposerPatches\Repository\State\Analyser $repoStateAnalyser
     ) {
         $this->listResolver = $listResolver;
-        $this->repositoryStateAnalyser = $repositoryStateAnalyser;
+        $this->repoStateAnalyser = $repoStateAnalyser;
         
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
@@ -130,8 +130,8 @@ class QueueGenerator
     {
         $relevantPatches = $this->listResolver->resolveRelevantPatches($patches, $patchesQueue);
 
-        $removals = $this->repositoryStateAnalyser->collectPatchRemovals($repositoryState, $relevantPatches);
-        $includes = $this->repositoryStateAnalyser->collectPatchIncludes($repositoryState, $relevantPatches);
+        $removals = $this->repoStateAnalyser->collectPatchRemovals($repositoryState, $relevantPatches);
+        $includes = $this->repoStateAnalyser->collectPatchIncludes($repositoryState, $relevantPatches);
         
         return array(array_filter($includes), array_filter($removals));
     }
@@ -157,7 +157,7 @@ class QueueGenerator
 
         $state = $this->patchListUtils->createSimplifiedList($stateMatches);
         
-        $removals = $this->repositoryStateAnalyser->collectPatchRemovals(
+        $removals = $this->repoStateAnalyser->collectPatchRemovals(
             $state,
             array_map('array_filter', $patches)
         );

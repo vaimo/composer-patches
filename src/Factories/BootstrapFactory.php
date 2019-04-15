@@ -20,18 +20,18 @@ class BootstrapFactory
     /**
      * @var \Composer\IO\IOInterface
      */
-    private $io;
+    private $appIO;
 
     /**
      * @param \Composer\Composer $composer
-     * @param \Composer\IO\IOInterface $io
+     * @param \Composer\IO\IOInterface $appIO
      */
     public function __construct(
         \Composer\Composer $composer,
-        \Composer\IO\IOInterface $io
+        \Composer\IO\IOInterface $appIO
     ) {
         $this->composer = $composer;
-        $this->io = $io;
+        $this->appIO = $appIO;
     }
 
     public function create(
@@ -53,7 +53,7 @@ class BootstrapFactory
 
         return new \Vaimo\ComposerPatches\Bootstrap(
             $this->composer,
-            $this->io,
+            $this->appIO,
             $configFactory,
             $listResolver,
             $outputStrategy

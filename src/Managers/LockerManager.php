@@ -10,15 +10,15 @@ class LockerManager
     /**
      * @var \Composer\IO\IOInterface
      */
-    private $cliIO;
+    private $appIO;
 
     /**
-     * @param \Composer\IO\IOInterface $cliIO
+     * @param \Composer\IO\IOInterface $appIO
      */
     public function __construct(
-        \Composer\IO\IOInterface $cliIO
+        \Composer\IO\IOInterface $appIO
     ) {
-        $this->cliIO = $cliIO;
+        $this->appIO = $appIO;
     }
     
     public function readLockData()
@@ -43,6 +43,11 @@ class LockerManager
         $lockFile->write($lock);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * 
+     * @return \Composer\Json\JsonFile
+     */
     private function getLockFile()
     {
         $composerFile = \Composer\Factory::getComposerFile();
@@ -51,6 +56,6 @@ class LockerManager
             ? substr($composerFile, 0, -4) . 'lock'
             : $composerFile . '.lock';
 
-        return new \Composer\Json\JsonFile($lockFile, null, $this->cliIO);
+        return new \Composer\Json\JsonFile($lockFile, null, $this->appIO);
     }
 }
