@@ -115,12 +115,12 @@ class PatchCommand extends \Composer\Command\BaseCommand
         
         $isDevMode = !$input->getOption('no-dev');
         
-        $io = $this->getIO();
+        $cliIO = $this->getIO();
 
         $behaviourFlags = $this->getBehaviourFlags($input);
         $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
         
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $cliIO);
         
         $filters = array(
             Patch::SOURCE => $input->getOption('filter'),
@@ -182,8 +182,11 @@ class PatchCommand extends \Composer\Command\BaseCommand
         if ($shouldUndo && !array_filter($filters)) {
             $bootstrap->stripPatches($isDevMode);
         } else {
+            $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($cliIO);
+
             $bootstrap->applyPatches($isDevMode);
-            $bootstrap->sanitizeLocker();
+            
+            $lockSanitizer->sanitize();
         }
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);

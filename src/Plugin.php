@@ -29,6 +29,11 @@ class Plugin implements
      * @var \Vaimo\ComposerPatches\Bootstrap
      */
     private $bootstrap;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Repository\Lock\Sanitizer
+     */
+    private $lockSanitizer;
     
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $cliIO)
     {
@@ -40,8 +45,12 @@ class Plugin implements
         $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $cliIO);
 
         $this->bootstrap = $this->bootstrapFactory->create($configFactory);
-        
-        $this->bootstrap->preloadPluginClasses();
+
+        $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer);
+
+        $pluginBootstrap->preloadPluginClasses();
+
+        $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($cliIO);
     }
 
     public function getCapabilities()
@@ -73,7 +82,7 @@ class Plugin implements
             $this->bootstrap->applyPatches($event->isDevMode());
         }
 
-        $this->bootstrap->sanitizeLocker();
+        $this->lockSanitizer->sanitize();
     }
 
     public function resetPackages(\Composer\Installer\PackageEvent $event)

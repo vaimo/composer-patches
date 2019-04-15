@@ -82,15 +82,15 @@ class PatchesApplierFactory
             array($rootPackage)
         );
         
-        $repositoryStateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
+        $stateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
             $composer
         );
 
-        $repositoryStateAnalyser = $repositoryStateAnalyserFactory->create($pluginConfig);
+        $stateAnalyser = $stateAnalyserFactory->create($pluginConfig);
 
         $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
             $listResolver,
-            $repositoryStateAnalyser
+            $stateAnalyser
         );
         
         $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();

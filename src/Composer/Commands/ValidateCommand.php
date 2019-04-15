@@ -266,14 +266,14 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         foreach ($orphanConfig as $path => $ownerName) {
             $installPath = $installPaths[$ownerName];
 
-            $sourcePathInfo = parse_url($path);
-            $sourceIncludesUrlScheme = isset($sourcePathInfo['scheme']) && $sourcePathInfo['scheme'];
+            $pathInfo = parse_url($path);
+            $pathIncludesScheme = isset($pathInfo['scheme']) && $pathInfo['scheme'];
 
             $groups[$ownerName][] = array(
                 'issue' => isset($patchStatuses[$path]) && $patchStatuses[$path]
                     ? $patchStatuses[$path]
                     : 'NO FILE',
-                'path' => !$sourceIncludesUrlScheme
+                'path' => !$pathIncludesScheme
                     ? ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR)
                     : $path
             );

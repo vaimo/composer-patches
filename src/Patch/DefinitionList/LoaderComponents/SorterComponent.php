@@ -46,36 +46,41 @@ class SorterComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
                     $packagePatches[$patchPath][$sortKey] = preg_grep($filter, $otherPatches);
                 }
             }
-            
-            $patchDependencies = array_fill_keys(array_keys($packagePatches), array());
-            
-            foreach ($packagePatches as $patchPath => $patchInfo) {
-                $patchDependencies[$patchPath] = array_merge(
-                    $patchDependencies[$patchPath],
-                    $patchInfo[PatchDefinition::AFTER]
-                );
-                
-                foreach ($patchInfo[PatchDefinition::BEFORE] as $beforePath) {
-                    $patchDependencies[$beforePath][] = $patchPath;
-                }
-            }
 
-            if (!array_filter($patchDependencies)) {
-                continue;
-            }
-
-            $sorter = new \MJS\TopSort\Implementations\StringSort();
-
-            foreach ($patchDependencies as $path => $depends) {
-                $sorter->add($path, array_unique($depends));
-            }
-            
-            $patches[$patchTarget] = array_replace(
-                array_flip($sorter->sort()),
-                $packagePatches
-            );
+            $patches[$patchTarget] = $this->sortPackagePatches($packagePatches);
         }
 
         return $patches;
+    }
+    
+    private function sortPackagePatches($packagePatches)
+    {
+        $patchDependencies = array_fill_keys(array_keys($packagePatches), array());
+
+        foreach ($packagePatches as $patchPath => $patchInfo) {
+            $patchDependencies[$patchPath] = array_merge(
+                $patchDependencies[$patchPath],
+                $patchInfo[PatchDefinition::AFTER]
+            );
+
+            foreach ($patchInfo[PatchDefinition::BEFORE] as $beforePath) {
+                $patchDependencies[$beforePath][] = $patchPath;
+            }
+        }
+
+        if (!array_filter($patchDependencies)) {
+            return $packagePatches;
+        }
+
+        $sorter = new \MJS\TopSort\Implementations\StringSort();
+
+        foreach ($patchDependencies as $path => $depends) {
+            $sorter->add($path, array_unique($depends));
+        }
+
+        return array_replace(
+            array_flip($sorter->sort()),
+            $packagePatches
+        );
     }
 }

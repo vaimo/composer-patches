@@ -13,11 +13,11 @@ class UrlComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNormal
     {
         $source = $data[PatchDefinition::SOURCE];
 
-        $sourcePathInfo = parse_url($source);
-        $sourceIncludesUrlScheme = isset($sourcePathInfo['scheme']) && $sourcePathInfo['scheme'];
+        $pathInfo = parse_url($source);
+        $includesScheme = isset($pathInfo['scheme']) && $pathInfo['scheme'];
 
         return array(
-            PatchDefinition::URL => $sourceIncludesUrlScheme ? $source : false,
+            PatchDefinition::URL => $includesScheme ? $source : false,
         );
     }
 }
