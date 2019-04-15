@@ -82,27 +82,13 @@ class ConfigFactory
         foreach (array_unique($subConfigKeys) as $key) {
             $configRootKey = PluginConfig::PATCHER_CONFIG_ROOT . ($key ? ('-' . $key) : '');
 
-            $patcherConfig = isset($extra[$configRootKey]) ? $extra[$configRootKey] : array();
-
-            if ($patcherConfig === false) {
-                $patcherConfig = array(
-                    PluginConfig::PATCHER_SOURCES => false
-                );
-            }
-
+            $patcherConfig = $this->resolvePatcherConfigBase($extra, $configRootKey);
+            
             if (isset($patcherConfig['patchers']) && !isset($patcherConfig[PluginConfig::PATCHER_APPLIERS])) {
                 $patcherConfig[PluginConfig::PATCHER_APPLIERS] = $patcherConfig['patchers'];
                 unset($patcherConfig['patchers']);
             }
-
-            if (!isset($patcherConfig[PluginConfig::PATCHER_SOURCES])) {
-                if (isset($extra['enable-patching']) && !$extra['enable-patching']) {
-                    $patcherConfig[PluginConfig::PATCHER_SOURCES] = false;
-                } elseif (isset($extra['enable-patching-from-packages']) && !$extra['enable-patching-from-packages']) {
-                    $patcherConfig[PluginConfig::PATCHER_SOURCES] = array('packages' => false, 'vendors' => false);
-                }
-            }
-
+            
             if ($patcherConfig) {
                 array_unshift($configSources, $patcherConfig);
             }
@@ -117,6 +103,27 @@ class ConfigFactory
         return new PluginConfig(
             $this->resolveValidSubOperations($config, $subConfigKeys)
         );
+    }
+    
+    private function resolvePatcherConfigBase(array $extra, $rootKey)
+    {
+        $patcherConfig = isset($extra[$rootKey]) ? $extra[$rootKey] : array();
+
+        if ($patcherConfig === false) {
+            $patcherConfig = array(
+                PluginConfig::PATCHER_SOURCES => false
+            );
+        }
+        
+        if (!isset($patcherConfig[PluginConfig::PATCHER_SOURCES])) {
+            if (isset($extra['enable-patching']) && !$extra['enable-patching']) {
+                $patcherConfig[PluginConfig::PATCHER_SOURCES] = false;
+            } elseif (isset($extra['enable-patching-from-packages']) && !$extra['enable-patching-from-packages']) {
+                $patcherConfig[PluginConfig::PATCHER_SOURCES] = array('packages' => false, 'vendors' => false);
+            }
+        }
+        
+        return $patcherConfig;
     }
     
     private function resolveValidSubOperations(array $config, array $subConfigKeys)

@@ -49,31 +49,9 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
             foreach ($packagePatches as &$patchData) {
                 $patchConstraints = $patchData[PatchDefinition::DEPENDS];
 
-                $comparisonResults = array();
-
-                foreach ($patchConstraints as $constraintTarget => &$version) {
-                    if (!isset($packages[$constraintTarget])) {
-                        continue;
-                    }
-
-                    $package = $packages[$constraintTarget];
-                    $packageVersions = array($package->getVersion());
-
-                    $matchResult = false;
-                    
-                    foreach (array_filter($packageVersions) as $packageVersion) {
-                        $packageConstraint = $this->versionParser->parseConstraints($packageVersion);
-                        $patchConstraint = $this->versionParser->parseConstraints($version);
-
-                        $matchResult = $patchConstraint->matches($packageConstraint);
-                        
-                        if ($matchResult) {
-                            break;
-                        }
-                    }
-
-                    $comparisonResults[$constraintTarget] = $matchResult;
-                }
+                $this->resolveComparisonResults($patchConstraints, $packages);
+                
+                $comparisonResults = $this->resolveComparisonResults($patchConstraints, $packages);
                 
                 if (!$comparisonResults) {
                     continue;
@@ -95,5 +73,36 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
         }
 
         return array_filter($patches);
+    }
+    
+    private function resolveComparisonResults(array $patchConstraints, array $packages)
+    {
+        $comparisonResults = array();
+
+        foreach ($patchConstraints as $constraintTarget => &$version) {
+            if (!isset($packages[$constraintTarget])) {
+                continue;
+            }
+
+            $package = $packages[$constraintTarget];
+            $packageVersions = array($package->getVersion());
+
+            $matchResult = false;
+
+            foreach (array_filter($packageVersions) as $packageVersion) {
+                $packageConstraint = $this->versionParser->parseConstraints($packageVersion);
+                $patchConstraint = $this->versionParser->parseConstraints($version);
+
+                $matchResult = $patchConstraint->matches($packageConstraint);
+
+                if ($matchResult) {
+                    break;
+                }
+            }
+
+            $comparisonResults[$constraintTarget] = $matchResult;
+        }
+        
+        return $comparisonResults;
     }
 }

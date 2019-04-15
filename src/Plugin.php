@@ -43,14 +43,13 @@ class Plugin implements
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
 
         $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
+        $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
 
         $this->bootstrap = $this->bootstrapFactory->create($configFactory);
 
         $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer);
 
         $pluginBootstrap->preloadPluginClasses();
-
-        $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
     }
 
     public function getCapabilities()

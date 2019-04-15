@@ -5,6 +5,9 @@
  */
 namespace Vaimo\ComposerPatches;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class Logger
 {
     const TYPE_NONE = 'none';
