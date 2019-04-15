@@ -16,8 +16,6 @@ class FilterUtils
         $escapeChar = chr('27');
 
         array_map(function ($filter) use ($delimiter, &$semanticGroups, $escapeChar) {
-            $isNegation = strpos($filter, FilterUtils::NEGATION_PREFIX) === 0;
-
             $escapedFilter = trim(
                 str_replace(
                     $escapeChar,
@@ -33,7 +31,7 @@ class FilterUtils
                 return;
             }
 
-            $semanticGroups[(int)$isNegation][] = $escapedFilter;
+            $semanticGroups[(int)$this->isInvertedFilter($filter)][] = $escapedFilter;
         }, $filters);
 
         $pattern = '%s';
@@ -52,11 +50,14 @@ class FilterUtils
     public function invertRules(array $filters)
     {
         return array_map(function ($filter) {
-            $isNegation = substr($filter, 0, 1) == FilterUtils::NEGATION_PREFIX;
-
-            return (!$isNegation ? FilterUtils::NEGATION_PREFIX : '') .
+            return (!$this->isInvertedFilter($filter) ? FilterUtils::NEGATION_PREFIX : '') .
                 ltrim($filter, FilterUtils::NEGATION_PREFIX);
         }, $filters);
+    }
+    
+    private function isInvertedFilter($filter)
+    {
+        return strpos($filter, FilterUtils::NEGATION_PREFIX) === 0;
     }
 
     public function trimRules(array $filters)

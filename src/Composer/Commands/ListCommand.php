@@ -225,11 +225,6 @@ class ListCommand extends \Composer\Command\BaseCommand
         $this->generateOutput($output, $patches);
     }
     
-    private function resolvePatchesList()
-    {
-        
-    }
-    
     private function createConfigWithEnabledSources(Composer $composer)
     {
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
