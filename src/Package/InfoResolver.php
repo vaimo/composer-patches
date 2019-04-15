@@ -43,7 +43,7 @@ class InfoResolver
 
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
-     * 
+     *
      * @param PackageInterface $package
      * @return bool|string
      */
@@ -110,9 +110,9 @@ class InfoResolver
                     break;
                 case Patch::CWD_INSTALL:
                 default:
-                    $this->installPathCache[$key] = $package instanceof \Composer\Package\RootPackage 
+                    $this->installPathCache[$key] = $package instanceof \Composer\Package\RootPackage
                         ? $this->vendorRoot
-                        : $this->getSourcePath($package); 
+                        : $this->getSourcePath($package);
 
                     break;
             }

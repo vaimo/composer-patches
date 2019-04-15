@@ -96,7 +96,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * 
+     *
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int|void|null

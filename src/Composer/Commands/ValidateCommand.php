@@ -147,13 +147,9 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $installPaths = array();
         foreach ($matches as $packageName => $package) {
-            if ($package instanceof \Composer\Package\RootPackage) {
-                $installPath = $projectRoot;
-            } else {
-                $installPath = $installationManager->getInstallPath($package);
-            }
-
-            $installPaths[$packageName] = $installPath;
+            $installPaths[$packageName] = $package instanceof \Composer\Package\RootPackage
+                ? $projectRoot
+                : $installationManager->getInstallPath($package);
         }
 
         $dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
@@ -203,11 +199,9 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         
         $this->outputOrphans($output, $groups);
 
-        if ($groups) {
-            $output->writeln('<error>Orphans found!</error>');
-        } else {
-            $output->writeln('<info>Validation completed successfully</info>');
-        }
+        $output->writeln(
+            $groups ? '<error>Orphans found!</error>' : '<info>Validation completed successfully</info>'
+        );
         
         return (int)(bool)$groups;
     }

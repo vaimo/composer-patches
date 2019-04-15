@@ -86,8 +86,8 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         $variablePattern = '{{%s}}';
         
         $templateVariables = $this->prepareTemplateValues(
-            $template, 
-            $variablePattern, 
+            $template,
+            $variablePattern,
             array_replace($pathVariables, $extraVariables)
         );
         
@@ -116,7 +116,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
     private function prepareTemplateValues($template, $variablePattern, $variableValues)
     {
         $mutationRules = $this->templateUtils->collectValueMutationRules(
-            $template, 
+            $template,
             array($variablePattern)
         );
 

@@ -46,7 +46,7 @@ class RepositoryManager
 
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
-     * 
+     *
      * @param WritableRepositoryInterface $repository
      * @param PackageInterface $package
      * @throws \Vaimo\ComposerPatches\Exceptions\PackageResetException

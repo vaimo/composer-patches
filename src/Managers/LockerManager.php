@@ -45,7 +45,7 @@ class LockerManager
 
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
-     * 
+     *
      * @return \Composer\Json\JsonFile
      */
     private function getLockFile()

@@ -27,18 +27,7 @@ class SourcesResolverFactory
     {
         $patcherConfig = $pluginConfig->getPatcherConfig();
 
-        $sourceConfig = $patcherConfig[PluginConfig::PATCHER_SOURCES];
-
-        if (isset($sourceConfig['packages'], $sourceConfig['vendors'])) {
-            if (is_array($sourceConfig['packages']) && !is_array($sourceConfig['vendors'])) {
-                $sourceConfig['vendors'] = false;
-            } elseif (is_array($sourceConfig['vendors']) && !is_array($sourceConfig['packages'])) {
-                $sourceConfig['packages'] = false;
-            } elseif ($sourceConfig['packages'] === false || $sourceConfig['vendors'] === false) {
-                $sourceConfig['packages'] = false;
-                $sourceConfig['vendors'] = false;
-            }
-        }
+        $sourceConfig = $this->resolveSourceConfig($patcherConfig);
 
         $listSources = array(
             'project' => new \Vaimo\ComposerPatches\Sources\ProjectSource($this->composer->getPackage()),
@@ -60,5 +49,23 @@ class SourcesResolverFactory
                 array_filter($sourceConfig)
             )
         );
+    }
+    
+    private function resolveSourceConfig($patcherConfig)
+    {
+        $sourceConfig = $patcherConfig[PluginConfig::PATCHER_SOURCES];
+
+        if (isset($sourceConfig['packages'], $sourceConfig['vendors'])) {
+            if (is_array($sourceConfig['packages']) && !is_array($sourceConfig['vendors'])) {
+                $sourceConfig['vendors'] = false;
+            } elseif (is_array($sourceConfig['vendors']) && !is_array($sourceConfig['packages'])) {
+                $sourceConfig['packages'] = false;
+            } elseif ($sourceConfig['packages'] === false || $sourceConfig['vendors'] === false) {
+                $sourceConfig['packages'] = false;
+                $sourceConfig['vendors'] = false;
+            }
+        }
+        
+        return $sourceConfig;
     }
 }

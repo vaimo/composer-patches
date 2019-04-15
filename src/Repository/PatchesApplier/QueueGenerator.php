@@ -84,24 +84,14 @@ class QueueGenerator
         
         foreach ($patchesByTarget as $target => $items) {
             foreach ($items as $path => $item) {
-                $updates = array(
+                $item = array_replace($item, array(
                     Patch::STATUS_NEW => !isset($staticItems[$target][$path]) && !isset($changedItems[$target][$path]),
                     Patch::STATUS_CHANGED => isset($changedItems[$target][$path])
-                );
-
-                $updates[Patch::STATUS] = isset($item[Patch::STATUS])
-                    ? $item[Patch::STATUS]
-                    : '';
-
-                if ($updates[Patch::STATUS_NEW] && !$updates[Patch::STATUS]) {
-                    $updates[Patch::STATUS] = 'new';
-                }
+                ));
                 
-                if ($updates[Patch::STATUS_CHANGED] && !$updates[Patch::STATUS]) {
-                    $updates[Patch::STATUS] = 'changed';
-                }
-                
-                $patchesByTarget[$target][$path] = array_replace($item, $updates);
+                $patchesByTarget[$target][$path] = array_replace($item, array(
+                    Patch::STATUS => $this->resolveStatusCode($item)
+                ));
             }
         }
         
@@ -109,6 +99,23 @@ class QueueGenerator
             $patches,
             $this->patchListUtils->createOriginList($patchesByTarget)
         );
+    }
+    
+    private function resolveStatusCode(array $item)
+    {
+        $status = isset($item[Patch::STATUS])
+            ? $item[Patch::STATUS]
+            : '';
+
+        if ($item[Patch::STATUS_NEW] && !$status) {
+            $status = 'new';
+        }
+
+        if ($item[Patch::STATUS_CHANGED] && !$status) {
+            $status = 'changed';
+        }
+        
+        return $status;
     }
     
     private function resolveAffectedPatches($includes, $removals, $patches)

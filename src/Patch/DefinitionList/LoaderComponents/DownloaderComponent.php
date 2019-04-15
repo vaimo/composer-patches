@@ -26,7 +26,7 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
 
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
-     * 
+     *
      * @param \Composer\Package\RootPackageInterface $rootPackage
      * @param \Composer\Util\RemoteFilesystem $remoteFilesystem
      * @param bool $gracefulMode

@@ -62,7 +62,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
 
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
-     * 
+     *
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param bool $devMode
      */
