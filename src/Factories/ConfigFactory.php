@@ -109,14 +109,14 @@ class ConfigFactory
             array(PluginConfig::OS_DEFAULT)
         );
 
-        $defaultApplierOperations = $config[PluginConfig::PATCHER_APPLIERS][PluginConfig::APPLIER_DEFAULT];
+        $baseOperations = $config[PluginConfig::PATCHER_APPLIERS][PluginConfig::APPLIER_DEFAULT];
 
         foreach ($config[PluginConfig::PATCHER_APPLIERS] as $applierCode => $operations) {
             if ($applierCode === PluginConfig::APPLIER_DEFAULT) {
                 continue;
             }
 
-            $operations = array_replace($defaultApplierOperations, $operations);
+            $operations = array_replace($baseOperations, $operations);
 
             foreach ($operations as $opCode => $operation) {
                 if (!is_array($operation)) {

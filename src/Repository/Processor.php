@@ -53,12 +53,16 @@ class Processor
         }
 
         $this->logger->reset($loggerIndentation);
+
+        $type = '';
+        $message = 'Nothing to patch';
         
-        if (!$packagesUpdated) {
-            $this->logger->writeRaw('Nothing to patch');
-        } else {
-            $this->logger->write('info', 'Writing patch info to install file');
+        if ($packagesUpdated) {
+            $type = 'info';
+            $message = 'Writing patch info to install file';
         }
+
+        $this->logger->write($type, $message);
         
         $this->patchListUtils->sanitizeFileSystem($patches);
         $repository->write();

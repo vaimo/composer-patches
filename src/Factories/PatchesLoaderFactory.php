@@ -107,7 +107,7 @@ class PatchesLoaderFactory
 
         $loaderComponents = $loaderComponentsPool->getList($pluginConfig);
 
-        $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory(
+        $srcResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory(
             $this->composer
         );
 
@@ -116,7 +116,7 @@ class PatchesLoaderFactory
                 array($rootPackage)
             ),
             $patchesCollector,
-            $sourcesResolverFactory->create($pluginConfig),
+            $srcResolverFactory->create($pluginConfig),
             $loaderComponents
         );
     }

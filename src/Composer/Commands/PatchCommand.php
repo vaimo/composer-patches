@@ -97,7 +97,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $composer = $this->getComposer();
-        $io = $this->getIO();
+        $cliIO = $this->getIO();
         
         $isExplicit = $input->getOption('explicit') || $input->getOption('show-reapplies');
         $isDevMode = !$input->getOption('no-dev');
@@ -152,7 +152,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             ));
         }
 
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $io);
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $cliIO);
         
         $outputTriggerFlags = array(
             Patch::STATUS_NEW => !$hasFilers,
@@ -181,9 +181,12 @@ class PatchCommand extends \Composer\Command\BaseCommand
                 Environment::PREFER_OWNER => $input->getOption('from-source'),
                 Environment::FORCE_REAPPLY => $behaviourFlags['redo']
             ));
+
+            $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($cliIO);
             
             $bootstrap->applyPatches($isDevMode);
-            $bootstrap->sanitizeLocker();
+            
+            $lockSanitizer->sanitize();
         }
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);

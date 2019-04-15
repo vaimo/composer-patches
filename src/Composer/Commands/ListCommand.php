@@ -146,11 +146,11 @@ class ListCommand extends \Composer\Command\BaseCommand
         $listResolver = new ListResolvers\FilteredListResolver($filters);
         $changesListResolver = new ListResolvers\ChangesListResolver($listResolver);
 
-        $repositoryStateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
+        $stateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
             $composer
         );
 
-        $repositoryStateAnalyser = $repositoryStateAnalyserFactory->create($configInstance);
+        $stateAnalyser = $stateAnalyserFactory->create($configInstance);
         
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(
@@ -159,19 +159,19 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         $repository = $composer->getRepositoryManager()->getLocalRepository();
         
-        $filteredPatchesLoader = $loaderFactory->create($filteredPool, $configInstance, $isDevMode);
-        $filteredPatches = $filteredPatchesLoader->loadFromPackagesRepository($repository);
+        $filteredLoader = $loaderFactory->create($filteredPool, $configInstance, $isDevMode);
+        $filteredPatches = $filteredLoader->loadFromPackagesRepository($repository);
 
         $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
             $changesListResolver,
-            $repositoryStateAnalyser
+            $stateAnalyser
         );
 
-        $repositoryStateGenerator = new \Vaimo\ComposerPatches\Repository\StateGenerator(
+        $repoStateGenerator = new \Vaimo\ComposerPatches\Repository\StateGenerator(
             $packageCollector
         );
         
-        $repositoryState = $repositoryStateGenerator->generate($repository);
+        $repositoryState = $repoStateGenerator->generate($repository);
         
         $applyQueue = $queueGenerator->generateApplyQueue($filteredPatches, $repositoryState);
         $removeQueue = $queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);
@@ -217,13 +217,13 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         $patches = array_filter($filteredPatches);
         
-        $shouldIncludeExcludedPatches = $withExcluded
+        $shouldAddExcludes = $withExcluded
             && (!$statusFilters || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded'));
         
-        if ($shouldIncludeExcludedPatches) {
-            $patchesLoader = $loaderFactory->create($unfilteredPool, $configInstance, $isDevMode);
+        if ($shouldAddExcludes) {
+            $unfilteredLoader = $loaderFactory->create($unfilteredPool, $configInstance, $isDevMode);
 
-            $allPatches = $patchesLoader->loadFromPackagesRepository($repository);
+            $allPatches = $unfilteredLoader->loadFromPackagesRepository($repository);
             
             $patchesQueue = $listResolver->resolvePatchesQueue($allPatches);
             

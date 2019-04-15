@@ -49,7 +49,7 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
             foreach ($packagePatches as &$patchData) {
                 $patchConstraints = $patchData[PatchDefinition::DEPENDS];
 
-                $patchConstraintsResults = array();
+                $comparisonResults = array();
 
                 foreach ($patchConstraints as $constraintTarget => &$version) {
                     if (!isset($packages[$constraintTarget])) {
@@ -72,19 +72,19 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
                         }
                     }
 
-                    $patchConstraintsResults[$constraintTarget] = $matchResult;
+                    $comparisonResults[$constraintTarget] = $matchResult;
                 }
                 
-                if (!$patchConstraintsResults) {
+                if (!$comparisonResults) {
                     continue;
                 }
 
-                if (count(array_filter($patchConstraintsResults)) !== count($patchConstraintsResults)) {
+                if (count(array_filter($comparisonResults)) !== count($comparisonResults)) {
                     $patchData = false;
                 } else {
                     $patchData[PatchDefinition::DEPENDS] = array_diff_key(
                         $patchData[PatchDefinition::DEPENDS],
-                        array_filter($patchConstraintsResults)
+                        array_filter($comparisonResults)
                     );
                 }
             }

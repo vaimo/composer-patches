@@ -10,15 +10,15 @@ class LockerManager
     /**
      * @var \Composer\IO\IOInterface
      */
-    private $io;
+    private $cliIO;
 
     /**
-     * @param \Composer\IO\IOInterface $io
+     * @param \Composer\IO\IOInterface $cliIO
      */
     public function __construct(
-        \Composer\IO\IOInterface $io
+        \Composer\IO\IOInterface $cliIO
     ) {
-        $this->io = $io;
+        $this->cliIO = $cliIO;
     }
     
     public function readLockData()
@@ -51,6 +51,6 @@ class LockerManager
             ? substr($composerFile, 0, -4) . 'lock'
             : $composerFile . '.lock';
 
-        return new \Composer\Json\JsonFile($lockFile, null, $this->io);
+        return new \Composer\Json\JsonFile($lockFile, null, $this->cliIO);
     }
 }

@@ -62,7 +62,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                 }
 
                 $patchConstraints = $patchData[PatchDefinition::DEPENDS];
-                $patchConstraintsResults = array();
+                $comparisonResults = array();
 
                 foreach ($patchConstraints as $constraintTarget => &$version) {
                     if (!isset($packagesByName[$constraintTarget])) {
@@ -106,10 +106,10 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                         }
                     }
 
-                    $patchConstraintsResults[] = $matchResult;
+                    $comparisonResults[] = $matchResult;
                 }
 
-                if (count($patchConstraints) !== count(array_filter($patchConstraintsResults))) {
+                if (count($patchConstraints) !== count(array_filter($comparisonResults))) {
                     $patchData = false;
                 }
             }

@@ -162,12 +162,10 @@ class PatchesApplier
         foreach ($packages as $packageName => $package) {
             $hasPatches = !empty($applyQueue[$packageName]);
 
-            if ($hasPatches) {
-                $patchTargets = $this->patchListUtils->getAllTargets(array($applyQueue[$packageName]));
-            } else {
-                $patchTargets = array($packageName);
-            }
-
+            $patchTargets = $hasPatches ?
+                $this->patchListUtils->getAllTargets(array($applyQueue[$packageName]))
+                : array($packageName);
+                
             $itemsToReset = array_intersect($resetQueue, $patchTargets);
 
             $resetResult = array();
