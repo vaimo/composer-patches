@@ -106,32 +106,14 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $statusFilters = array_map('strtolower', $input->getOption('status'));
         
-        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
-
-        $defaultValues = $configDefaults->getPatcherConfig();
-
-        $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
-
-        $pluginConfig = array(
-            Config::PATCHER_SOURCES => array_fill_keys($sourceKeys, true)
-        );
-
-        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
-        $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
-
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
-        $configInstance = $configFactory->create(array($pluginConfig));
+        $pluginConfig = $this->createConfigWithEnabledSources($composer);
+        
         
         $filteredPool = $this->createLoaderPool();
-
-        $installationManager = $composer->getInstallationManager();
-        $composerConfig = clone $composer->getConfig();
-
-        $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
-
+        
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
-            $installationManager,
-            $vendorRoot
+            $composer->getInstallationManager(),
+            $composer->getConfig()->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR)
         );
         
         $unfilteredPool = $this->createLoaderPool(array(
@@ -148,26 +130,23 @@ class ListCommand extends \Composer\Command\BaseCommand
         $listResolver = new ListResolvers\FilteredListResolver($filters);
         
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
-        $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(
-            array($composer->getPackage())
-        );
         
         $repository = $composer->getRepositoryManager()->getLocalRepository();
         
-        $filteredLoader = $loaderFactory->create($filteredPool, $configInstance, $isDevMode);
+        $filteredLoader = $loaderFactory->create($filteredPool, $pluginConfig, $isDevMode);
         $filteredPatches = $filteredLoader->loadFromPackagesRepository($repository);
         
-        $queueGenerator = $this->createQueueGenerator($composer, $configInstance, $listResolver);
-        
-        $repoStateGenerator = new \Vaimo\ComposerPatches\Repository\StateGenerator(
-            $packageCollector
-        );
+        $queueGenerator = $this->createQueueGenerator($composer, $pluginConfig, $listResolver);
+
+        $repoStateGenerator = $this->createStateGenerator($composer);
         
         $repositoryState = $repoStateGenerator->generate($repository);
         
         $applyQueue = $queueGenerator->generateApplyQueue($filteredPatches, $repositoryState);
         $removeQueue = $queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);
         $applyQueue = array_map('array_filter', $applyQueue);
+
+        $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
 
         $filteredPatches = $patchListUtils->mergeLists(
             $filteredPatches,
@@ -196,7 +175,9 @@ class ListCommand extends \Composer\Command\BaseCommand
         if ($hasFilers) {
             $filteredPatches = $listResolver->resolvePatchesQueue($filteredPatches);
         }
-        
+
+        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+
         if ($statusFilters) {
             $statusFilter = $filterUtils->composeRegex($statusFilters, '/');
 
@@ -213,7 +194,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             && (!$statusFilters || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded'));
         
         if ($shouldAddExcludes) {
-            $unfilteredLoader = $loaderFactory->create($unfilteredPool, $configInstance, $isDevMode);
+            $unfilteredLoader = $loaderFactory->create($unfilteredPool, $pluginConfig, $isDevMode);
 
             $allPatches = $unfilteredLoader->loadFromPackagesRepository($repository);
             
@@ -242,6 +223,34 @@ class ListCommand extends \Composer\Command\BaseCommand
         }
         
         $this->generateOutput($output, $patches);
+    }
+    
+    private function createConfigWithEnabledSources(Composer $composer)
+    {
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+
+        $defaultValues = $configDefaults->getPatcherConfig();
+
+        $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+
+        $pluginConfig = array(
+            Config::PATCHER_SOURCES => array_fill_keys($sourceKeys, true)
+        );
+
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
+        
+        return $configFactory->create(array($pluginConfig));
+    }
+    
+    private function createStateGenerator(Composer $composer)
+    {
+        $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(
+            array($composer->getPackage())
+        );
+
+        return new \Vaimo\ComposerPatches\Repository\StateGenerator(
+            $packageCollector
+        );
     }
     
     private function createQueueGenerator(Composer $composer, Config $config, ListResolver $listResolver)
