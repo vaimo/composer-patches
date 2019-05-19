@@ -7,6 +7,9 @@ namespace Vaimo\ComposerPatches\Utils;
 
 class FilterUtils
 {
+    const AFFIRMATION = 0;
+    const NEGATION = 1;
+    
     const NEGATION_PREFIX = '!';
 
     public function composeRegex(array $filters, $delimiter)
@@ -37,15 +40,17 @@ class FilterUtils
 
         $pattern = '%s';
 
-        if ($semanticGroups[0]) {
+        if ($semanticGroups[self::NEGATION]) {
             $pattern = sprintf(
                 '^((?!.*(%s)).*%s)',
-                implode('|', $semanticGroups[0]),
-                $semanticGroups[1] ? '(%s)' : ''
+                implode('|', $semanticGroups[self::NEGATION]),
+                $semanticGroups[self::AFFIRMATION] ? '(%s)' : ''
             );
         }
 
-        return $delimiter . sprintf($pattern, implode('|', $semanticGroups[1])) . $delimiter;
+        return $delimiter . 
+            sprintf($pattern, implode('|', $semanticGroups[self::AFFIRMATION])) . 
+            $delimiter;
     }
 
     public function invertRules(array $filters)
