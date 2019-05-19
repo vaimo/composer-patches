@@ -6,6 +6,9 @@ project. Patches can be defined both on project and on package level.
 The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable from 
 the composer.json of the project.
 
+Note that the plugin is kept on very old PHP version as legacy software is usually the most common context
+where patches are needed.
+
 [![GitHub release](https://img.shields.io/github/release/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/releases/latest)
 [![Total Downloads](https://img.shields.io/packagist/dt/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
 [![Daily Downloads](https://img.shields.io/packagist/dd/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)

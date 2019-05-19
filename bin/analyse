@@ -16,6 +16,16 @@ if [ "${type}" == "" ] || [ "${type}" == "phpcs" ] ; then
     fi
 fi
 
+if [ "${type}" == "" ] || [ "${type}" == "phpcpd" ] ; then
+    vendor/bin/phpcpd src
+    
+    result=${?}
+
+    if [ ${result} -gt 0 ] ; then
+        exit 1
+    fi
+fi
+
 if [ "${type}" == "" ] || [ "${type}" == "phpmd" ] ; then
     vendor/bin/phpmd src text phpmd.xml --suffixes php
 
