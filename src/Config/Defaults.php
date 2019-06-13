@@ -52,7 +52,8 @@ class Defaults
             ),
             Config::PATCHER_FAILURES => array(
                 'check' => array(
-                    'garbage' => '/(\n|^)Hmm\.\.\.  Ignoring the trailing garbage/'
+                    'garbage' => '/(\n|^)Hmm\.\.\.  Ignoring the trailing garbage/',
+                    'reversals' => '/(\n|^)Reversed \(or previously applied\) patch detected/'
                 )
             ),
             Config::PATCHER_SEQUENCE => array(

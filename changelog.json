@@ -8,7 +8,8 @@
         "fix": [
             "wrong path used for pre-loading classes while running composer commands when the plugin package used as ROOT",
             "removed all syntax/code that was not compatible with 5.3",
-            "removed/replaced all dependencies that were not compatible with 5.3"
+            "removed/replaced all dependencies that were not compatible with 5.3",
+            "having a patch for a back-ported fix for a package where when the package gets updated, the update could cause reverse-apply of the patch, thus reintroducing issue that was fixed in newer release (only happens with patches that should be declared with upper-capped version constraints but are not for some reason). This will cause patch failure from now on"
         ],
         "maintenance": [
             "improved early autoloader setup within proxy plugin",

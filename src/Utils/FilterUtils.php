@@ -48,8 +48,8 @@ class FilterUtils
             );
         }
 
-        return $delimiter . 
-            sprintf($pattern, implode('|', $semanticGroups[self::AFFIRMATION])) . 
+        return $delimiter .
+            sprintf($pattern, implode('|', $semanticGroups[self::AFFIRMATION])) .
             $delimiter;
     }
 
