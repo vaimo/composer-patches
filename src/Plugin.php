@@ -34,6 +34,11 @@ class Plugin implements
      * @var \Vaimo\ComposerPatches\Repository\Lock\Sanitizer
      */
     private $lockSanitizer;
+
+    /**
+     * @var string[]
+     */
+    private $capabilitiesConfig = array();
     
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
     {
@@ -48,13 +53,19 @@ class Plugin implements
         $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer);
 
         $pluginBootstrap->preloadPluginClasses();
-    }
 
-    public function getCapabilities()
-    {
-        return array(
+        if (class_exists('\Composer\Plugin\Capability\CommandProvider')) {
+            return;
+        }
+        
+        $this->capabilitiesConfig = array(
             'Composer\Plugin\Capability\CommandProvider' => '\Vaimo\ComposerPatches\Composer\CommandsProvider',
         );
+    }
+
+    public function getCapabilities($asd = null)
+    {
+        return $this->capabilitiesConfig;
     }
 
     public static function getSubscribedEvents()
