@@ -25,9 +25,16 @@ class FileSystemUtils
         $files = array();
 
         foreach ($filesIterator as $info) {
-            $files[] = reset($info);
+            $path = reset($info);
+            $files[substr($path, strlen($rootPath) + 1)] = $path;
         }
 
+        array_multisort(
+            array_keys($files), 
+            SORT_NATURAL | SORT_FLAG_CASE, 
+            $files
+        );
+        
         return $files;
     }
 }

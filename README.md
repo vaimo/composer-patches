@@ -949,7 +949,8 @@ to the user when patch is being applied.
 @link <value> (optional) url to additional data about this patch (added to label)
 @depends <value> (optional) other/package (make version constraint target another package instead) 
 @version <value> (optional) >=1.1.0 <1.4.0
-@after <value> (optional) Used in case a patch should be added after another branch
+@after <value> (optional) Used in case a patch should be applied after another branch
+@before <value> (optional) Used in case a patch should be applied before another branch
 @skip (optional) If this tag is present, then the patch will not be applied
 @cwd <value> (optional) Specify in which root path the patch is applied (install, vendor, project, autoload)
 @type <value> (optional) Options: dev, bundle, local (Using multiple: dev+bundle)
