@@ -29,12 +29,13 @@ class FileSystemUtils
             $files[substr($path, strlen($rootPath) + 1)] = $path;
         }
 
-        array_multisort(
-            array_keys($files),
-            SORT_NATURAL | SORT_FLAG_CASE,
+        $sequence = array_keys($files);
+        
+        natsort($sequence);
+
+        return array_replace(
+            array_flip($sequence),
             $files
         );
-        
-        return $files;
     }
 }
