@@ -30,8 +30,8 @@ class FileSystemUtils
         }
 
         array_multisort(
-            array_keys($files), 
-            SORT_NATURAL | SORT_FLAG_CASE, 
+            array_keys($files),
+            SORT_NATURAL | SORT_FLAG_CASE,
             $files
         );
         

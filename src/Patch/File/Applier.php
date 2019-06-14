@@ -78,7 +78,7 @@ class Applier
         
         if (!$patcherName) {
             $message = sprintf(
-                'None of the patch appliers seem to be available: %s', 
+                'None of the patch appliers seem to be available: %s',
                 implode(', ', array_keys($patchers))
             );
             
@@ -93,9 +93,9 @@ class Applier
             );
             
             $patcherName = $this->processOperations(
-                $patchers, 
-                $operations, 
-                $arguments, 
+                $patchers,
+                $operations,
+                $arguments,
                 $failureMessages
             );
             
