@@ -29,7 +29,7 @@ class ConfigUtils
                 $updates[Config::PATCHER_APPLIERS][$code]
             );
         }
-
+        
         $config[Config::PATCHER_SEQUENCE] = array_replace(
             $config[Config::PATCHER_SEQUENCE],
             isset($updates[Config::PATCHER_SEQUENCE]) ? $updates[Config::PATCHER_SEQUENCE] : array()
@@ -54,7 +54,17 @@ class ConfigUtils
             $config[Config::PATCHER_OPERATIONS],
             isset($updates[Config::PATCHER_OPERATIONS]) ? $updates[Config::PATCHER_OPERATIONS] : array()
         );
+        
+        foreach (array_keys($config[Config::PATCHER_SEQUENCE]) as $sequenceName) {
+            $origin = strtok($sequenceName, ':');
 
+            if ($origin === $sequenceName) {
+                continue;
+            }
+
+            $config[$sequenceName] = $config[$origin];
+        }
+        
         $config[Config::PATCHER_LEVELS] = isset($updates[Config::PATCHER_LEVELS])
             ? $updates[Config::PATCHER_LEVELS]
             : $config[Config::PATCHER_LEVELS];

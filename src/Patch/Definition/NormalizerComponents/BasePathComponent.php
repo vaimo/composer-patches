@@ -94,7 +94,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         $source = $this->templateUtils->compose(
             $template . ($sourceTags ? ('#' . $sourceTags) : ''),
             $templateVariables,
-            array_fill_keys(array($variablePattern), false)
+            array_fill_keys(array($variablePattern), array())
         );
 
         $filename = basename($source);
