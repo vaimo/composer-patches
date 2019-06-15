@@ -92,7 +92,7 @@ class Applier
 
         foreach ($levels as $patchLevel) {
             $arguments = array_replace(
-                $arguments, 
+                $arguments,
                 array(PluginConfig::PATCHER_ARG_LEVEL => $patchLevel)
             );
             
