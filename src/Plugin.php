@@ -63,7 +63,7 @@ class Plugin implements
         );
     }
 
-    public function getCapabilities($asd = null)
+    public function getCapabilities()
     {
         return $this->capabilitiesConfig;
     }
@@ -84,11 +84,11 @@ class Plugin implements
 
         $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
 
-        if (!$this->bootstrapStrategy->shouldAllow()) {
-            $repository->write();
-        } else {
+        if ($this->bootstrapStrategy->shouldAllow()) {
             $this->bootstrap->applyPatches($event->isDevMode());
         }
+
+        $repository->write();
 
         $this->lockSanitizer->sanitize();
     }

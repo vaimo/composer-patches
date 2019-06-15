@@ -15,12 +15,19 @@ class RootPatchComponent implements \Vaimo\ComposerPatches\Interfaces\Definition
     private $package;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
+     */
+    private $patchListUtils;
+    
+    /**
      * @param \Composer\Package\PackageInterface $package
      */
     public function __construct(
         \Composer\Package\PackageInterface $package
     ) {
         $this->package = $package;
+        
+        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     /**
@@ -31,23 +38,20 @@ class RootPatchComponent implements \Vaimo\ComposerPatches\Interfaces\Definition
     public function process(array $patches, array $packagesByName)
     {
         $packageName = $this->package->getName();
-        
-        foreach ($patches as &$packagePatches) {
-            foreach ($packagePatches as &$patchData) {
+
+        return $this->patchListUtils->applyDefinitionFilter(
+            $patches,
+            function ($patchData) use ($packageName) {
                 if (!$patchData[PatchDefinition::LOCAL]) {
-                    continue;
+                    return true;
                 }
 
                 if ($packageName === $patchData[PatchDefinition::OWNER]) {
-                    continue;
+                    return true;
                 }
                 
-                $patchData = false;
+                return false;
             }
-
-            $packagePatches = array_filter($packagePatches);
-        }
-
-        return array_filter($patches);
+        );
     }
 }

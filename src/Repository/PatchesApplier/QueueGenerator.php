@@ -18,6 +18,21 @@ class QueueGenerator
      * @var \Vaimo\ComposerPatches\Repository\State\Analyser
      */
     private $repoStateAnalyser;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser 
+     */
+    private $patchListAnalyser;
+    
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Updater
+     */
+    private $patchListUpdater;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
+     */
+    private $patchListTransformer;
     
     /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
@@ -34,7 +49,10 @@ class QueueGenerator
     ) {
         $this->listResolver = $listResolver;
         $this->repoStateAnalyser = $repoStateAnalyser;
-        
+
+        $this->patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
+        $this->patchListUpdater = new \Vaimo\ComposerPatches\Patch\DefinitionList\Updater();
+        $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
@@ -61,8 +79,8 @@ class QueueGenerator
     
     private function updateStatusMarkers($patches, $repositoryState)
     {
-        $patchesByTarget = $this->patchListUtils->createTargetsList(array_map('array_filter', $patches));
-        $patchFootprints = $this->patchListUtils->createSimplifiedList($patchesByTarget);
+        $patchesByTarget = $this->patchListTransformer->createTargetsList(array_map('array_filter', $patches));
+        $patchFootprints = $this->patchListTransformer->createSimplifiedList($patchesByTarget);
 
         $staticItems = array();
         $changedItems = array();
@@ -79,8 +97,8 @@ class QueueGenerator
             );
         }
 
-        $changedItems = $this->patchListUtils->createDetailedList($changedItems);
-        $staticItems = $this->patchListUtils->createDetailedList($staticItems);
+        $changedItems = $this->patchListTransformer->createDetailedList($changedItems);
+        $staticItems = $this->patchListTransformer->createDetailedList($staticItems);
         
         foreach ($patchesByTarget as $target => $items) {
             foreach ($items as $path => $item) {
@@ -97,7 +115,7 @@ class QueueGenerator
         
         return $this->patchListUtils->mergeLists(
             $patches,
-            $this->patchListUtils->createOriginList($patchesByTarget)
+            $this->patchListTransformer->createOriginList($patchesByTarget)
         );
     }
     
@@ -120,15 +138,15 @@ class QueueGenerator
     
     private function resolveAffectedPatches($includes, $removals, $patches)
     {
-        $queueTargets = $this->patchListUtils->getAllTargets(
+        $queueTargets = $this->patchListAnalyser->getAllTargets(
             $this->patchListUtils->mergeLists($includes, $removals)
         );
 
-        $affectedPatches = $this->patchListUtils->getRelatedPatches($patches, $queueTargets);
+        $affectedPatches = $this->patchListAnalyser->getRelatedPatches($patches, $queueTargets);
 
-        $patchesByTarget = $this->patchListUtils->createTargetsList($affectedPatches);
+        $patchesByTarget = $this->patchListTransformer->createTargetsList($affectedPatches);
         
-        return $this->patchListUtils->createOriginList(
+        return $this->patchListTransformer->createOriginList(
             $this->patchListUtils->diffListsByName($patchesByTarget, $removals)
         );
     }
@@ -145,31 +163,31 @@ class QueueGenerator
     
     private function buildChangeQueues($includes, $removals, $patchesQueue)
     {
-        $patchesQueueByTarget = $this->patchListUtils->createTargetsList($patchesQueue);
+        $patchesQueueByTarget = $this->patchListTransformer->createTargetsList($patchesQueue);
         
-        $includesQueue = $this->patchListUtils->createOriginList(
+        $includesQueue = $this->patchListTransformer->createOriginList(
             $this->patchListUtils->intersectListsByName($patchesQueueByTarget, $includes)
         );
 
-        $removalsQueue = $this->patchListUtils->embedInfoToItems($removals, false);
+        $removalsQueue = $this->patchListUpdater->embedInfoToItems($removals, false);
         
         return array($includesQueue, $removalsQueue);
     }
     
     public function generateRemovalQueue(array $patches, array $repositoryState)
     {
-        $state = $this->patchListUtils->createDetailedList($repositoryState);
+        $state = $this->patchListTransformer->createDetailedList($repositoryState);
 
         $stateMatches = $this->patchListUtils->intersectListsByName($state, $patches);
 
-        $state = $this->patchListUtils->createSimplifiedList($stateMatches);
+        $state = $this->patchListTransformer->createSimplifiedList($stateMatches);
         
         $removals = $this->repoStateAnalyser->collectPatchRemovals(
             $state,
             array_map('array_filter', $patches)
         );
         
-        return $this->patchListUtils->embedInfoToItems(
+        return $this->patchListUpdater->embedInfoToItems(
             array_filter($removals),
             array(
                 Patch::STATUS => 'removed',
@@ -182,7 +200,7 @@ class QueueGenerator
     {
         $directTargets = array_keys($patches);
         
-        $declaredTargets = $this->patchListUtils->getAllTargets(
+        $declaredTargets = $this->patchListAnalyser->getAllTargets(
             array_map('array_filter', $patches)
         );
         

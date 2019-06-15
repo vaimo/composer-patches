@@ -12,18 +12,24 @@ class Analyser
      */
     private $patchListUtils;
 
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer 
+     */
+    private $patchListTransformer;
+
     public function __construct()
     {
+        $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
     
     public function collectPatchRemovals(array $repositoryState, array $patches)
     {
-        $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
+        $patchesByTarget = $this->patchListTransformer->groupItemsByTarget($patches);
 
         $result = array();
 
-        $unpackedState = $this->patchListUtils->createDetailedList($repositoryState);
+        $unpackedState = $this->patchListTransformer->createDetailedList($repositoryState);
         
         foreach ($unpackedState as $target => $items) {
             $result[$target] = array_diff_key(
@@ -37,8 +43,8 @@ class Analyser
 
     public function collectPatchIncludes(array $repositoryState, array $patches)
     {
-        $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
-        $patchesFootprints = $this->patchListUtils->createSimplifiedList($patchesByTarget);
+        $patchesByTarget = $this->patchListTransformer->groupItemsByTarget($patches);
+        $patchesFootprints = $this->patchListTransformer->createSimplifiedList($patchesByTarget);
 
         $result = array();
 
@@ -49,6 +55,6 @@ class Analyser
             );
         }
 
-        return $this->patchListUtils->createDetailedList($result);
+        return $this->patchListTransformer->createDetailedList($result);
     }
 }

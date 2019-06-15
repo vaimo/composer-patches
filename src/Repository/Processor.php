@@ -65,6 +65,5 @@ class Processor
         $this->logger->write($type, $message);
         
         $this->patchListUtils->sanitizeFileSystem($patches);
-        $repository->write();
     }
 }

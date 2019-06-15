@@ -15,6 +15,11 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
     private $baseResolver;
 
     /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer 
+     */
+    private $patchListTransformer;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
@@ -27,6 +32,7 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
     ) {
         $this->baseResolver = $baseResolver;
 
+        $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
     
@@ -42,8 +48,8 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
 
     public function resolveInitialState(array $patches, array $state)
     {
-        $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
-        $unpackedState = $this->patchListUtils->createDetailedList($state);
+        $patchesByTarget = $this->patchListTransformer->groupItemsByTarget($patches);
+        $unpackedState = $this->patchListTransformer->createDetailedList($state);
         
         $matches = array();
 
@@ -69,7 +75,7 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
             }
         }
 
-        $state = $this->patchListUtils->createSimplifiedList($unpackedState);
+        $state = $this->patchListTransformer->createSimplifiedList($unpackedState);
         
         return $this->baseResolver->resolveInitialState($matches, $state);
     }
