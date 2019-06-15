@@ -232,8 +232,8 @@ class PatchesApplier
             }
 
             $changedTargets = array_keys(array_filter($changesMap));
-
-            if (!$changedTargets) {
+            
+            if (empty($changedTargets)) {
                 continue;
             }
 

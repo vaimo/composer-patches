@@ -179,7 +179,7 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
 
-        if ($statusFilters) {
+        if (!empty($statusFilters)) {
             $statusFilter = $filterUtils->composeRegex($statusFilters, '/');
 
             $filteredPatches = $patchListUtils->applyDefinitionKeyValueFilter(
