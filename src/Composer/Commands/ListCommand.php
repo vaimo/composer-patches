@@ -191,9 +191,9 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         $patches = array_filter($filteredPatches);
 
-        $shouldAddExcludes = $withExcluded 
+        $shouldAddExcludes = $withExcluded
             && (
-                empty($statusFilters) 
+                empty($statusFilters)
                 || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded')
             );
         
