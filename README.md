@@ -1,5 +1,12 @@
 # Vaimo Composer Patches
-     
+
+[![Latest Stable Version](https://poser.pugx.org/vaimo/composer-patches/v/stable)](https://packagist.org/packages/vaimo/composer-patches)
+[![Total Downloads](https://poser.pugx.org/vaimo/composer-patches/downloads)](https://packagist.org/packages/vaimo/composer-patches)
+[![Daily Downloads](https://poser.pugx.org/vaimo/composer-patches/d/daily)](https://packagist.org/packages/vaimo/composer-patches)
+[![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/vaimo/composer-patches/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/vaimo/composer-patches/?branch=master)
+[![License](https://poser.pugx.org/vaimo/composer-patches/license)](https://packagist.org/packages/vaimo/composer-patches)
+
 Applies a patch from a local or remote file to any package that is part of a given composer 
 project. Patches can be defined both on project and on package level.
 
@@ -9,11 +16,7 @@ the composer.json of the project.
 Note that the plugin is kept on very old PHP version as legacy software is usually the most common context
 where patches are needed.
 
-[![GitHub release](https://img.shields.io/github/release/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/releases/latest)
-[![Total Downloads](https://img.shields.io/packagist/dt/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
-[![Daily Downloads](https://img.shields.io/packagist/dd/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
-[![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
-[![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
+More information on recent changes [HERE](./CHANGELOG.md).
 
 ## Quick Start
 
