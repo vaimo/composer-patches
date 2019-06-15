@@ -28,7 +28,7 @@ class Collector
     private $patcherConfigReader;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Updater 
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Updater
      */
     private $patchListUpdater;
     

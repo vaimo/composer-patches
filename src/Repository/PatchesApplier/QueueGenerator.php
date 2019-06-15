@@ -20,7 +20,7 @@ class QueueGenerator
     private $repoStateAnalyser;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser 
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser
      */
     private $patchListAnalyser;
     

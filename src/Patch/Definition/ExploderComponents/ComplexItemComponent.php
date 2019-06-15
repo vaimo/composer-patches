@@ -9,6 +9,16 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class ComplexItemComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface
 {
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\Definition\Exploder\ItemBuilder
+     */
+    private $itemBuilder;
+    
+    public function __construct()
+    {
+        $this->itemBuilder = new \Vaimo\ComposerPatches\Patch\Definition\Exploder\ItemBuilder();
+    }
+
     public function shouldProcess($label, $data)
     {
         if (!is_array($data)) {
@@ -30,17 +40,6 @@ class ComplexItemComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
 
     public function explode($label, $data)
     {
-        $items = array();
-
-        foreach ($data as $source => $subItem) {
-            $items[] = array(
-                $label,
-                array_replace($subItem, array(
-                    PatchDefinition::SOURCE => $source
-                ))
-            );
-        }
-
-        return $items;
+        return $this->itemBuilder->createMultiple($label, $data, PatchDefinition::SOURCE);
     }
 }

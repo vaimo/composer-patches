@@ -57,12 +57,12 @@ class PatchesApplier
     private $logger;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser 
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser
      */
     private $patchListAnalyser;
     
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer 
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
     

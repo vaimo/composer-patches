@@ -13,7 +13,7 @@ class InclusiveListResolver implements \Vaimo\ComposerPatches\Interfaces\ListRes
     private $baseResolver;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser 
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser
      */
     private $patchListAnalyser;
     

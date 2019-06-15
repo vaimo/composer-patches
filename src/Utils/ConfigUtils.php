@@ -11,14 +11,9 @@ class ConfigUtils
 {
     public function mergeApplierConfig(array $config, array $updates)
     {
-        if (isset($updates[Config::PATCHER_SECURE_HTTP])) {
-            $config[Config::PATCHER_SECURE_HTTP] = $updates[Config::PATCHER_SECURE_HTTP];
-        }
-
-        if (isset($updates[Config::PATCHER_FORCE_RESET])) {
-            $config[Config::PATCHER_FORCE_RESET] = $updates[Config::PATCHER_FORCE_RESET];
-        }
-
+        $this->overrideValue($config, $updates, Config::PATCHER_SECURE_HTTP);
+        $this->overrideValue($config, $updates, Config::PATCHER_FORCE_RESET);
+        
         foreach (array_keys($config[Config::PATCHER_APPLIERS]) as $code) {
             if (!isset($updates[Config::PATCHER_APPLIERS][$code])) {
                 continue;
@@ -29,11 +24,8 @@ class ConfigUtils
                 $updates[Config::PATCHER_APPLIERS][$code]
             );
         }
-        
-        $config[Config::PATCHER_SEQUENCE] = array_replace(
-            $config[Config::PATCHER_SEQUENCE],
-            isset($updates[Config::PATCHER_SEQUENCE]) ? $updates[Config::PATCHER_SEQUENCE] : array()
-        );
+
+        $this->mergeArrayValue($config, $updates, Config::PATCHER_SEQUENCE);
 
         if (isset($updates[Config::PATCHER_SOURCES])) {
             $config[Config::PATCHER_SOURCES] = $updates[Config::PATCHER_SOURCES]
@@ -49,11 +41,8 @@ class ConfigUtils
                 );
             }
         }
-        
-        $config[Config::PATCHER_OPERATIONS] = array_replace(
-            $config[Config::PATCHER_OPERATIONS],
-            isset($updates[Config::PATCHER_OPERATIONS]) ? $updates[Config::PATCHER_OPERATIONS] : array()
-        );
+
+        $this->mergeArrayValue($config, $updates, Config::PATCHER_OPERATIONS);
         
         foreach (array_keys($config[Config::PATCHER_SEQUENCE]) as $sequenceName) {
             $origin = strtok($sequenceName, ':');
@@ -64,12 +53,27 @@ class ConfigUtils
 
             $config[$sequenceName] = $config[$origin];
         }
-        
-        $config[Config::PATCHER_LEVELS] = isset($updates[Config::PATCHER_LEVELS])
-            ? $updates[Config::PATCHER_LEVELS]
-            : $config[Config::PATCHER_LEVELS];
+
+        $this->overrideValue($config, $updates, Config::PATCHER_LEVELS);
 
         return $config;
+    }
+    
+    private function overrideValue(&$config, $update, $key)
+    {
+        if (!isset($update[$key])) {
+            return;
+        }
+    
+        $config[$key] = $update[$key];
+    }
+
+    private function mergeArrayValue(&$config, $update, $key)
+    {
+        $config[$key] = array_replace(
+            $config[$key],
+            isset($update[$key]) ? $update[$key] : array()
+        );
     }
 
     public function sortApplierConfig(array $config)

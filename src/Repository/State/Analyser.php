@@ -13,7 +13,7 @@ class Analyser
     private $patchListUtils;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer 
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
 

@@ -15,7 +15,7 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
     private $baseResolver;
 
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer 
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
     

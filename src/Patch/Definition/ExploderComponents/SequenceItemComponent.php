@@ -9,6 +9,16 @@ use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 class SequenceItemComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface
 {
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\Definition\Exploder\ItemBuilder
+     */
+    private $itemBuilder;
+    
+    public function __construct()
+    {
+        $this->itemBuilder = new \Vaimo\ComposerPatches\Patch\Definition\Exploder\ItemBuilder();
+    }
+
     public function shouldProcess($label, $data)
     {
         if (!is_array($data)) {
@@ -23,17 +33,10 @@ class SequenceItemComponent implements \Vaimo\ComposerPatches\Interfaces\Definit
 
     public function explode($label, $data)
     {
-        $items = array();
-
-        foreach ($data[PatchDefinition::SOURCE] as $source => $subItem) {
-            $items[] = array(
-                $data[PatchDefinition::LABEL],
-                array_replace($subItem, array(
-                    PatchDefinition::SOURCE => $source
-                ))
-            );
-        }
-
-        return $items;
+        return $this->itemBuilder->createMultiple(
+            $data[PatchDefinition::LABEL],
+            $data,
+            PatchDefinition::SOURCE
+        );
     }
 }

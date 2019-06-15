@@ -12,7 +12,7 @@ use Vaimo\ComposerPatches\Composer\Constraint;
 class PatcherStateManager
 {
     /**
-     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer 
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
     
