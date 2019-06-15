@@ -59,7 +59,7 @@ class Analyser
             );
 
             $scanTargets = array_diff($targetsUpdates, $targetsStack, $scanTargets);
-        } while ($scanTargets);
+        } while (!empty($scanTargets));
 
         return $result;
     }

@@ -190,9 +190,12 @@ class ListCommand extends \Composer\Command\BaseCommand
         }
         
         $patches = array_filter($filteredPatches);
-        
-        $shouldAddExcludes = $withExcluded
-            && (!$statusFilters || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded'));
+
+        $shouldAddExcludes = $withExcluded 
+            && (
+                empty($statusFilters) 
+                || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded')
+            );
         
         if ($shouldAddExcludes) {
             $unfilteredLoader = $loaderFactory->create($unfilteredPool, $pluginConfig, $isDevMode);

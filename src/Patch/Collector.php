@@ -75,7 +75,7 @@ class Collector
             
             $loadedPatches = array();
             
-            if (!$sourceLoaders) {
+            if (empty($sourceLoaders)) {
                 continue;
             }
             

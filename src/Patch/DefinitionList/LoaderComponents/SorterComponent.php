@@ -32,7 +32,7 @@ class SorterComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
             foreach ($packagePatches as $patchPath => $patchInfo) {
                 $otherPatches = array_diff(array_keys($packagePatches), array($patchPath));
 
-                if (!$otherPatches) {
+                if (empty($otherPatches)) {
                     continue;
                 }
                 

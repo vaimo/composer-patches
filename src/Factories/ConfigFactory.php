@@ -153,7 +153,7 @@ class ConfigFactory
 
                 $subOperations = $this->dataUtils->extractOrderedItems($operation, $subOperationKeys);
 
-                if (!$subOperations) {
+                if (empty($subOperations)) {
                     continue;
                 }
 
