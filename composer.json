@@ -3,12 +3,6 @@
     "type": "composer-plugin",
     "license": "MIT",
     "description": "Applies a patch from a local or remote file to any package that is part of a given composer project. Patches can be defined both on project and on package level. Optional support for patch versioning, sequencing, custom patch applier configuration and patch command for testing/troubleshooting added patches.",
-    "authors": [
-        {
-            "name": "Allan Paiste",
-            "email": "allan.paiste@vaimo.com"
-        }
-    ],
     "require": {
         "php": ">=5.3.0",
         "ext-json": "*",
@@ -23,6 +17,8 @@
         "phpcompatibility/php-compatibility": "^9.1.1",
         "vaimo/composer-changelogs": "^0.15.1",
         "squizlabs/php_codesniffer": "^2.9.2",
+        "phpunit/phpunit": "^4.8.36",
+        "sebastian/phpcpd": "^1.4.3",
         "phpmd/phpmd": "^2.6.0"
     },
     "config": {
@@ -30,6 +26,12 @@
             "php": "5.3.9"
         }
     },
+    "authors": [
+        {
+            "name": "Allan Paiste",
+            "email": "allan.paiste@vaimo.com"
+        }
+    ],
     "support": {
         "source": "https://github.com/vaimo/composer-patches",
         "docs": "https://github.com/vaimo/composer-patches",

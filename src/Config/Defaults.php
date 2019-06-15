@@ -55,12 +55,14 @@ class Defaults
             ),
             Config::PATCHER_FAILURES => array(
                 'check' => array(
-                    'garbage' => '/(\n|^)Hmm\.\.\.  Ignoring the trailing garbage/'
+                    'garbage' => '/(\n|^)Hmm\.\.\.  Ignoring the trailing garbage/',
+                    'reversals' => '/(\n|^)Reversed \(or previously applied\) patch detected/'
                 )
             ),
             Config::PATCHER_SEQUENCE => array(
                 Config::PATCHER_APPLIERS => array('PATCH', 'GIT'),
-                Config::PATCHER_OPERATIONS => array('resolver', 'bin', 'ping', 'check', 'patch')
+                Config::PATCHER_OPERATIONS => array('resolver', 'bin', 'ping', 'check', 'patch'),
+                Config::PATCHER_SANITY => array('resolver', 'bin')
             ),
             Config::PATCHER_LEVELS => array('0', '1', '2')
         );

@@ -17,10 +17,9 @@ class FilterUtils
         $semanticGroups = array_fill_keys(array(0, 1), array());
 
         $escapeChar = chr('27');
+        $that = $this;
 
-        array_map(function ($filter) use ($delimiter, &$semanticGroups, $escapeChar) {
-            $isNegation = strpos($filter, FilterUtils::NEGATION_PREFIX) === 0;
-
+        array_map(function ($filter) use (&$semanticGroups, $delimiter, $escapeChar, $that) {
             $escapedFilter = trim(
                 str_replace(
                     $escapeChar,
@@ -36,7 +35,7 @@ class FilterUtils
                 return;
             }
 
-            $semanticGroups[(int)$isNegation][] = $escapedFilter;
+            $semanticGroups[(int)$that->isInvertedFilter($filter)][] = $escapedFilter;
         }, $filters);
 
         $pattern = '%s';
@@ -49,19 +48,24 @@ class FilterUtils
             );
         }
 
-        return $delimiter . 
-            sprintf($pattern, implode('|', $semanticGroups[self::AFFIRMATION])) . 
+        return $delimiter .
+            sprintf($pattern, implode('|', $semanticGroups[self::AFFIRMATION])) .
             $delimiter;
     }
 
     public function invertRules(array $filters)
     {
-        return array_map(function ($filter) {
-            $isNegation = substr($filter, 0, 1) == FilterUtils::NEGATION_PREFIX;
-
-            return (!$isNegation ? FilterUtils::NEGATION_PREFIX : '') .
+        $that = $this;
+        
+        return array_map(function ($filter) use ($that) {
+            return (!$that->isInvertedFilter($filter) ? FilterUtils::NEGATION_PREFIX : '') .
                 ltrim($filter, FilterUtils::NEGATION_PREFIX);
         }, $filters);
+    }
+    
+    public function isInvertedFilter($filter)
+    {
+        return strpos($filter, FilterUtils::NEGATION_PREFIX) === 0;
     }
 
     public function trimRules(array $filters)

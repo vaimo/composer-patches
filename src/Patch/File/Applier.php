@@ -33,6 +33,11 @@ class Applier
      * @var \Vaimo\ComposerPatches\Utils\TemplateUtils
      */
     private $templateUtils;
+
+    /**
+     * @var array
+     */
+    private $resultCache;
     
     /**
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -52,10 +57,6 @@ class Applier
 
     public function applyFile($filename, $cwd, array $config = array())
     {
-        $result = false;
-        
-        list($type, $patchLevel, $operationName, $operationCode) = array_fill(0, 4, 'UNKNOWN');
-
         $applierConfig = $this->applierUtils->mergeApplierConfig($this->config, array_filter($config));
         
         $applierConfig = $this->applierUtils->sortApplierConfig($applierConfig);
@@ -64,122 +65,155 @@ class Applier
         $operations = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_OPERATIONS);
         $levels = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_LEVELS);
         $failureMessages = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_FAILURES);
+
+        $sanityOperations = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_SANITY);
         
         try {
             $this->applierUtils->validateConfig($applierConfig);
         } catch (\Vaimo\ComposerPatches\Exceptions\ConfigValidationException $exception) {
             $this->logger->writeVerbose('error', $exception->getMessage());
         }
-        
-        $variableEscapers = array(
-            '{{%s}}' => 'escapeshellarg',
-            '[[%s]]' => false
+
+        $arguments = array(
+            PluginConfig::PATCHER_ARG_FILE => $filename,
+            PluginConfig::PATCHER_ARG_CWD => $cwd
         );
-
-        $resultCache = array();
+            
+        $patcherName = $this->processOperations($patchers, $sanityOperations, $arguments);
         
-        foreach ($levels as $patchLevel) {
-            foreach ($patchers as $type => $patcher) {
-                $result = true;
-                
-                if (!$patcher) {
-                    continue;
-                }
-                
-                $operationResults[$type] = array_fill_keys(array_keys($operations), '');
-                
-                foreach ($operations as $operationCode => $operationName) {
-                    if (!isset($patcher[$operationCode])) {
-                        continue;
-                    }
-                    
-                    $arguments = array_replace($operationResults[$type], array(
-                        PluginConfig::PATCHER_ARG_LEVEL => $patchLevel,
-                        PluginConfig::PATCHER_ARG_FILE => $filename,
-                        PluginConfig::PATCHER_ARG_CWD => $cwd
-                    ));
-
-                    $applierOperations = is_array($patcher[$operationCode])
-                        ? $patcher[$operationCode]
-                        : array($patcher[$operationCode]);
-                    
-                    foreach ($applierOperations as $operation) {
-                        $passOnFailure = strpos($operation, '!') === 0;
-                        $operation = ltrim($operation, '!');
-                        
-                        $command = $this->templateUtils->compose($operation, $arguments, $variableEscapers);
-
-                        $resultKey = $cwd . '|' . $command;
-
-                        if ($passOnFailure) {
-                            $this->logger->writeVerbose(
-                                \Vaimo\ComposerPatches\Logger::TYPE_NONE,
-                                '<comment>***</comment> '
-                                . 'The expected result to execution is a failure'
-                                . '<comment>***</comment>'
-                            );
-                        }
-
-                        if (!isset($resultCache[$resultKey])) {
-                            $resultCache[$resultKey] = $this->shell->execute($command, $cwd);
-                        }
-
-                        list($result, $output) = $resultCache[$resultKey];
-                        
-                        if ($result) {
-                            $result = $this->scanOutputForFailures(
-                                $output,
-                                $this->extractArrayValue($failureMessages, $operationCode)
-                            );
-                        }
-                        
-                        if ($passOnFailure) {
-                            $result = !$result;
-                        }
-                        
-                        if (!$result) {
-                            continue;
-                        }
-
-                        $operationResults[$type][$operationCode] = $output;
-                        
-                        break;
-                    }
-
-                    if (!$result) {
-                        break;
-                    }
-                }
-
-                if ($result) {
-                    break 2;
-                }
-                
-                $this->logger->writeVerbose(
-                    'warning',
-                    '%s (type=%s) failed with p=%s',
-                    array(
-                        is_string($operationName) ? $operationName : $operationCode,
-                        $type,
-                        $patchLevel
-                    )
-                );
-            }
+        if (!$patcherName) {
+            $message = sprintf(
+                'None of the patch appliers seem to be available (tried: %s)',
+                implode(', ', array_keys($patchers))
+            );
+            
+            throw new \Vaimo\ComposerPatches\Exceptions\RuntimeException($message);
         }
 
-        if ($result) {
+        foreach ($levels as $patchLevel) {
+            $arguments = array_replace(
+                $arguments, 
+                array(PluginConfig::PATCHER_ARG_LEVEL => $patchLevel)
+            );
+            
+            $patcherName = $this->processOperations(
+                $patchers,
+                $operations,
+                $arguments,
+                $failureMessages
+            );
+            
+            if (!$patcherName) {
+                continue;
+            }
+
             $this->logger->writeVerbose(
                 'info',
                 'SUCCESS with type=%s (p=%s)',
-                array($type, $patchLevel)
+                array($patcherName, $patchLevel)
             );
+
+            return;
         }
 
-        if (!$result) {
-            throw new \Exception(
-                sprintf('Cannot apply patch %s', $filename)
+        throw new \Exception(
+            sprintf('Cannot apply patch %s', $filename)
+        );
+    }
+    
+    private function processOperations($patchers, array $operations, array $args = array(), array $failures = array())
+    {
+        list($operationName, $operationCode) = array_fill(0, 4, 'UNKNOWN');
+        
+        $variableFormats = array(
+            '{{%s}}' => array('escapeshellarg'),
+            '[[%s]]' => array()
+        );
+
+        foreach ($patchers as $type => $patcher) {
+            $result = true;
+
+            if (!$patcher) {
+                continue;
+            }
+
+            $operationResults[$type] = array_fill_keys(array_keys($operations), '');
+
+            foreach ($operations as $operationCode => $operationName) {
+                if (!isset($patcher[$operationCode])) {
+                    continue;
+                }
+
+                $args = array_replace($args, $operationResults[$type]);
+
+                $applierOperations = is_array($patcher[$operationCode])
+                    ? $patcher[$operationCode]
+                    : array($patcher[$operationCode]);
+
+                foreach ($applierOperations as $operation) {
+                    $passOnFailure = strpos($operation, '!') === 0;
+                    $operation = ltrim($operation, '!');
+
+                    $command = $this->templateUtils->compose($operation, $args, $variableFormats);
+
+                    $cwd = $this->extractStringValue($args, PluginConfig::PATCHER_ARG_CWD);
+                    
+                    $resultKey = $cwd . ' | ' . $command;
+
+                    if ($passOnFailure) {
+                        $this->logger->writeVerbose(
+                            \Vaimo\ComposerPatches\Logger::TYPE_NONE,
+                            '<comment>***</comment> '
+                            . 'The expected result to execution is a failure'
+                            . '<comment>***</comment>'
+                        );
+                    }
+
+                    if (!isset($this->resultCache[$resultKey])) {
+                        $this->resultCache[$resultKey] = $this->shell->execute($command, $cwd);
+                    }
+
+                    list($result, $output) = $this->resultCache[$resultKey];
+
+                    if ($result) {
+                        $result = $this->scanOutputForFailures(
+                            $output,
+                            $this->extractArrayValue($failures, $operationCode)
+                        );
+                    }
+
+                    if ($passOnFailure) {
+                        $result = !$result;
+                    }
+
+                    if (!$result) {
+                        continue;
+                    }
+
+                    $operationResults[$type][$operationCode] = $output;
+
+                    break;
+                }
+
+                if (!$result) {
+                    break;
+                }
+            }
+
+            if ($result) {
+                return $type;
+            }
+            
+            $messageArgs = array(
+                is_string($operationName) ? $operationName : $operationCode,
+                $type,
+                $this->extractStringValue($args, PluginConfig::PATCHER_ARG_LEVEL)
             );
+            
+            $this->logger->writeVerbose('warning', '%s (type=%s) failed with p=%s', $messageArgs);
         }
+        
+        return '';
     }
     
     private function scanOutputForFailures($output, array $failureMessages)
@@ -206,6 +240,16 @@ class Applier
 
     private function extractArrayValue($data, $key)
     {
-        return isset($data[$key]) ? $data[$key] : array();
+        return $this->extractValue($data, $key, array());
+    }
+
+    private function extractStringValue($data, $key)
+    {
+        return $this->extractValue($data, $key, '');
+    }
+
+    private function extractValue($data, $key, $default)
+    {
+        return isset($data[$key]) ? $data[$key] : $default;
     }
 }

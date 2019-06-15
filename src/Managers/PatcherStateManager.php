@@ -12,6 +12,11 @@ use Vaimo\ComposerPatches\Composer\Constraint;
 class PatcherStateManager
 {
     /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
+     */
+    private $patchListTransformer;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
@@ -23,6 +28,7 @@ class PatcherStateManager
 
     public function __construct()
     {
+        $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
@@ -31,7 +37,7 @@ class PatcherStateManager
     {
         $packages = array();
 
-        $patchQueue = $this->patchListUtils->createSimplifiedList(
+        $patchQueue = $this->patchListTransformer->createSimplifiedList(
             array($patches)
         );
 

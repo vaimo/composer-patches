@@ -335,6 +335,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https:
 * wrong path used for pre-loading classes while running composer commands when the plugin package used as ROOT
 * removed all syntax/code that was not compatible with 5.3
 * removed/replaced all dependencies that were not compatible with 5.3
+* having a patch for a back-ported fix for a package where when the package gets updated, the update could cause reverse-apply of the patch, thus reintroducing issue that was fixed in newer release (only happens with patches that should be declared with upper-capped version constraints but are not for some reason). This will cause patch failure from now on
+* don't provide patch commands when plugin on older (<1.1) Composer versions [github/31]
+* always load patches in alphabetical order from file-system when using patches-search (unless @after, @before directives used within the patch file; introduced in FileSystemUtils, using natural sorting) [github/29]
+* fail the whole patching process with fatal exception when none of the patch applier commands (defined in the plugin config) are available [github/30]
+
+### Maintenance
+
+* improved early autoloader setup within proxy plugin
+* code normalised according to coding standards
 
 ### Maintenance
 
@@ -347,7 +356,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.1) [diff](https
 
 ### Feature
 
-* allow platform requirement dependencies on patches a'la php:&gt;=7.2 (previously only package dependencies could be declared); usable with &quot;depends&quot; config or @depends tag
+* allow platform requirement dependencies on patches a'la php:>=7.2 (previously only package dependencies could be declared); usable with "depends" config or @depends tag
 
 ### Fix
 
@@ -359,10 +368,12 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.0) [diff](https
 ## 3.46.0 (2019-04-03)
 
 This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports
+
 ### Feature
 
 * added --with-affected argument option for path:list command to list patches that indirectly are affected by the new/changed patches (would be re-applied on actually patch:apply due to package resets caused by new/changed statuses)
 * patch owner embedded in applied patch registry to provide proper REMOVED information when patch gets removed
+
 
 ### Fix
 
@@ -597,7 +608,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.34.1) [diff](https
 
 ### Feature
 
-* allow patch path strip level to be defined in patch's embedded target-info declaration (@level &lt;int&gt;)
+* allow patch path strip level to be defined in patch's embedded target-info declaration (@level <int>)
 
 ### Fix
 
@@ -1024,7 +1035,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.0) [diff](https
 
 ### Feature
 
-* several config keys renamed (patchers =&gt; appliers, patcher-config =&gt; patcher). Backwards compatible
+* several config keys renamed (patchers => appliers, patcher-config => patcher). Backwards compatible
 * patch enabling moved under patcher/sources (project:bool, packages:bool|array, vendors:bool|array). Backwards compatible
 * allow granular patch sources inclusion (so that only some vendors would be included)
 * allow some providers to have special extra operations (before this change, every applier was expected to have every listed operation declared)

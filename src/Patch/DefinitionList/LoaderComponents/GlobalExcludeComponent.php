@@ -21,6 +21,11 @@ class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
     private $filterUtils;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
+     */
+    private $patchListUtils;
+
+    /**
      * @param array $config
      */
     public function __construct(
@@ -29,6 +34,7 @@ class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
         $this->config = $config;
         
         $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     /**
@@ -56,25 +62,22 @@ class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
             return $patches;
         }
 
-        foreach ($patches as &$packagePatches) {
-            foreach ($packagePatches as &$patchData) {
+        return $this->patchListUtils->applyDefinitionFilter(
+            $patches,
+            function ($patchData) use ($excludedPatches) {
                 $owner = $patchData[PatchDefinition::OWNER];
                 $source = $patchData[PatchDefinition::SOURCE];
 
                 if (!isset($excludedPatches[$owner])) {
-                    continue;
+                    return true;
+                }
+
+                if (!preg_match($excludedPatches[$owner], $source)) {
+                    return true;
                 }
                 
-                if (!preg_match($excludedPatches[$owner], $source)) {
-                    continue;
-                }
-
-                $patchData = false;
+                return false;
             }
-
-            $packagePatches = array_filter($packagePatches);
-        }
-
-        return array_filter($patches);
+        );
     }
 }

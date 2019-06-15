@@ -57,16 +57,24 @@ class TemplateUtils
         return $result;
     }
 
-    public function compose($template, array $arguments, array $patterns)
+    public function compose($template, array $arguments, array $variableFormats)
     {
         $updateGroups = array();
         
-        foreach ($patterns as $format => $escaper) {
+        foreach ($variableFormats as $format => $escapers) {
+            $templateArguments = $arguments;
+            
+            if ($escapers) {
+                foreach ($escapers as $escaper) {
+                    $templateArguments = array_map($escaper, $arguments);
+                }
+            }
+            
             $updateGroups[] = array_combine(
                 array_map(function ($item) use ($format) {
                     return sprintf($format, $item);
                 }, array_keys($arguments)),
-                $escaper ? array_map($escaper, $arguments) : $arguments
+                $templateArguments
             );
         }
 
@@ -80,10 +88,6 @@ class TemplateUtils
             );
         }, $variables);
         
-        return str_replace(
-            $names,
-            $values,
-            $template
-        );
+        return str_replace($names, $values, $template);
     }
 }

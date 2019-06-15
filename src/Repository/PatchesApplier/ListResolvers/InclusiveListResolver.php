@@ -11,6 +11,11 @@ class InclusiveListResolver implements \Vaimo\ComposerPatches\Interfaces\ListRes
      * @var \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
      */
     private $baseResolver;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser
+     */
+    private $patchListAnalyser;
     
     /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
@@ -25,13 +30,14 @@ class InclusiveListResolver implements \Vaimo\ComposerPatches\Interfaces\ListRes
     ) {
         $this->baseResolver = $baseResolver;
 
+        $this->patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     public function resolvePatchesQueue(array $patches)
     {
         $matches = $this->baseResolver->resolvePatchesQueue($patches);
-        $targets = $this->patchListUtils->getAllTargets($matches);
+        $targets = $this->patchListAnalyser->getAllTargets($matches);
 
         return $this->patchListUtils->mergeLists(
             $this->patchListUtils->filterListByTargets($patches, $targets),

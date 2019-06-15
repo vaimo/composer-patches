@@ -26,6 +26,13 @@ class DataUtils
             $data
         );
     }
+
+    public function extractValue(array $data, $key, $default = null)
+    {
+        return isset($data[$key])
+            ? $data[$key]
+            : $default;
+    }
     
     public function removeKeysByPrefix(array $data, $prefix)
     {

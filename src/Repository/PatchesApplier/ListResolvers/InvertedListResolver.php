@@ -8,6 +8,11 @@ namespace Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
 {
     /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
+     */
+    private $patchListTransformer;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
@@ -16,7 +21,7 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
      * @var \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
      */
     private $baseResolver;
-
+    
     /**
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $baseResolver
      */
@@ -25,6 +30,7 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
     ) {
         $this->baseResolver = $baseResolver;
 
+        $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
@@ -45,9 +51,9 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
 
     public function resolveInitialState(array $patches, array $state)
     {
-        $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
+        $patchesByTarget = $this->patchListTransformer->groupItemsByTarget($patches);
         
-        $unpackedState = $this->patchListUtils->createDetailedList($state);
+        $unpackedState = $this->patchListTransformer->createDetailedList($state);
 
         $updates = array();
         
@@ -67,7 +73,7 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
         
         return $this->patchListUtils->mergeLists(
             $state,
-            $this->patchListUtils->createSimplifiedList($updates)
+            $this->patchListTransformer->createSimplifiedList($updates)
         );
     }
 }

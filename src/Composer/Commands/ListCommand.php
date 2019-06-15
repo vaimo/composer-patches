@@ -147,14 +147,15 @@ class ListCommand extends \Composer\Command\BaseCommand
         $applyQueue = array_map('array_filter', $applyQueue);
 
         $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
-
+        $patchListUpdater = new \Vaimo\ComposerPatches\Patch\DefinitionList\Updater();
+        
         $filteredPatches = $patchListUtils->mergeLists(
             $filteredPatches,
             $removeQueue
         );
 
         if ($withAffected) {
-            $applyQueue = $patchListUtils->embedInfoToItems(
+            $applyQueue = $patchListUpdater->embedInfoToItems(
                 $applyQueue,
                 array(PatchDefinition::STATUS => 'affected'),
                 true
@@ -166,7 +167,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             $patchListUtils->intersectListsByName($applyQueue, $filteredPatches)
         );
         
-        $filteredPatches = $patchListUtils->embedInfoToItems(
+        $filteredPatches = $patchListUpdater->embedInfoToItems(
             $filteredPatches,
             array(PatchDefinition::STATUS => 'applied'),
             true
@@ -181,7 +182,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         if ($statusFilters) {
             $statusFilter = $filterUtils->composeRegex($statusFilters, '/');
 
-            $filteredPatches = $patchListUtils->applyDefinitionFilter(
+            $filteredPatches = $patchListUtils->applyDefinitionKeyValueFilter(
                 $filteredPatches,
                 $statusFilter,
                 PatchDefinition::STATUS
@@ -200,14 +201,14 @@ class ListCommand extends \Composer\Command\BaseCommand
             
             $patchesQueue = $listResolver->resolvePatchesQueue($allPatches);
             
-            $excludedPatches = $patchListUtils->updateStatuses(
+            $excludedPatches = $patchListUpdater->updateStatuses(
                 array_filter($patchListUtils->diffListsByPath($patchesQueue, $filteredPatches)),
                 'excluded'
             );
 
             $patches = array_replace_recursive(
                 $patches,
-                $patchListUtils->updateStatuses($excludedPatches, 'excluded')
+                $patchListUpdater->updateStatuses($excludedPatches, 'excluded')
             );
 
             array_walk($patches, function (array &$group) {
@@ -216,18 +217,13 @@ class ListCommand extends \Composer\Command\BaseCommand
         }
         
         if ($beBrief) {
-            $patches = $patchListUtils->embedInfoToItems($patches, array(
+            $patches = $patchListUpdater->embedInfoToItems($patches, array(
                 PatchDefinition::LABEL => false,
                 PatchDefinition::OWNER => false
             ));
         }
         
         $this->generateOutput($output, $patches);
-    }
-    
-    private function resolvePatchesList()
-    {
-        
     }
     
     private function createConfigWithEnabledSources(Composer $composer)

@@ -92,19 +92,19 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
 
-        $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
-
-        $patchPaths = $patchListUtils->extractValue($patches, array(Patch::PATH, Patch::SOURCE));
+        $patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
+        
+        $patchPaths = $patchListAnalyser->extractValue($patches, array(Patch::PATH, Patch::SOURCE));
         
         $patchDefines = array_combine(
             $patchPaths,
-            $patchListUtils->extractValue($patches, array(Patch::OWNER))
+            $patchListAnalyser->extractValue($patches, array(Patch::OWNER))
         );
         
         $patchStatuses = array_filter(
             array_combine(
                 $patchPaths,
-                $patchListUtils->extractValue($patches, array(Patch::STATUS_LABEL))
+                $patchListAnalyser->extractValue($patches, array(Patch::STATUS_LABEL))
             )
         );
         

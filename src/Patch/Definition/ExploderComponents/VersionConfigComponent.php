@@ -14,9 +14,15 @@ class VersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
      */
     private $valueAnalyser;
 
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\Definition\Constraint\Exploder
+     */
+    private $definitionExploder;
+    
     public function __construct()
     {
         $this->valueAnalyser = new \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser();
+        $this->definitionExploder = new \Vaimo\ComposerPatches\Patch\Definition\Constraint\Exploder();
     }
 
     public function shouldProcess($label, $data)
@@ -34,22 +40,6 @@ class VersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
 
     public function explode($label, $data)
     {
-        $items = array();
-
-        foreach ($data as $constraint => $source) {
-            if (!$this->valueAnalyser->isConstraint($constraint)) {
-                continue;
-            }
-
-            $items[] = array(
-                $label,
-                array(
-                    PatchDefinition::VERSION => $constraint,
-                    PatchDefinition::SOURCE => $source
-                )
-            );
-        }
-
-        return $items;
+        return $this->definitionExploder->process($label, $data);
     }
 }

@@ -192,6 +192,10 @@ class PatchCommand extends \Composer\Command\BaseCommand
             $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
 
             $bootstrap->applyPatches($isDevMode);
+
+            $repository = $composer->getRepositoryManager()->getLocalRepository();
+            
+            $repository->write();
             
             $lockSanitizer->sanitize();
         }

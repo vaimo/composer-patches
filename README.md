@@ -14,6 +14,15 @@ separate JSON file. Declaration-free mode (using embedded info within patch file
 The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable (including the 
 actual commands that are executed to apply the patch) from the composer.json of the project.
 
+Note that the plugin is kept on very old PHP version as legacy software is usually the most common context
+where patches are needed.
+
+[![GitHub release](https://img.shields.io/github/release/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/releases/latest)
+[![Total Downloads](https://img.shields.io/packagist/dt/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
+[![Daily Downloads](https://img.shields.io/packagist/dd/vaimo/composer-patches.svg)](https://packagist.org/packages/vaimo/composer-patches)
+[![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
+[![License](https://img.shields.io/github/license/vaimo/composer-patches.svg)](https://github.com/vaimo/composer-patches/blob/master/LICENSE_VAIMO.txt)
+
 More information on recent changes [HERE](./CHANGELOG.md).
 
 ## Quick Start
@@ -1011,7 +1020,8 @@ to the user when patch is being applied.
 @link <value> (optional) url to additional data about this patch (added to label)
 @depends <value> (optional) other/package (make version constraint target another package instead) 
 @version <value> (optional) >=1.1.0 <1.4.0
-@after <value> (optional) Used in case a patch should be added after another branch
+@after <value> (optional) Used in case a patch should be applied after another branch
+@before <value> (optional) Used in case a patch should be applied before another branch
 @skip (optional) If this tag is present, then the patch will not be applied
 @cwd <value> (optional) Specify in which root path the patch is applied (install, vendor, project, autoload)
 @type <value> (optional) Options: dev, bundle, local (Using multiple: dev+bundle)

@@ -7,6 +7,9 @@ namespace Vaimo\ComposerPatches\Patch\File;
 
 class Analyser
 {
+    const REMOVAL_MARKER = '--- ';
+    const ADDITION_MARKER = '+++ ';
+    
     public function getAllPaths($contents)
     {
         $paths = array();
@@ -52,6 +55,6 @@ class Analyser
     {
         $prefix = substr($line, 0, 4);
 
-        return $prefix === '--- ' || $prefix === '+++ ';
+        return $prefix === self::REMOVAL_MARKER || $prefix === self::ADDITION_MARKER;
     }
 }

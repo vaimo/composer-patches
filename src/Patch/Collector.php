@@ -28,6 +28,11 @@ class Collector
     private $patcherConfigReader;
 
     /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Updater
+     */
+    private $patchListUpdater;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
@@ -46,7 +51,8 @@ class Collector
         $this->sourceLoaders = $sourceLoaders;
 
         $this->patcherConfigReader = $patcherConfigReader;
-        
+
+        $this->patchListUpdater = new \Vaimo\ComposerPatches\Patch\DefinitionList\Updater();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
@@ -137,7 +143,7 @@ class Collector
     
     private function updatePackagePatchesConfig(PackageInterface $package, array $patches)
     {
-        return $this->patchListUtils->embedInfoToItems($patches, array(
+        return $this->patchListUpdater->embedInfoToItems($patches, array(
             PatchDefinition::OWNER => $package->getName(),
             PatchDefinition::OWNER_IS_ROOT => $package instanceof RootPackage
         ));

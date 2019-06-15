@@ -10,6 +10,21 @@ use Vaimo\ComposerPatches\Patch\Definition as Patch;
 class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
 {
     /**
+     * @var array
+     */
+    private $filters;
+    
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
+     */
+    private $patchListTransformer;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Updater
+     */
+    private $patchListUpdater;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Utils\FilterUtils
      */
     private $filterUtils;
@@ -20,20 +35,17 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
     private $patchListUtils;
 
     /**
-     * @var array
-     */
-    private $filters;
-
-    /**
      * @param array $filters
      */
     public function __construct(
         array $filters = array()
     ) {
+        $this->filters = $filters;
+
+        $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
+        $this->patchListUpdater = new \Vaimo\ComposerPatches\Patch\DefinitionList\Updater();
         $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
-
-        $this->filters = $filters;
     }
 
     public function resolvePatchesQueue(array $patches)
@@ -41,7 +53,7 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
         $patches = array_filter($patches);
 
         foreach ($this->filters as $key => $filter) {
-            $patches = $this->patchListUtils->applyDefinitionFilter(
+            $patches = $this->patchListUtils->applyDefinitionKeyValueFilter(
                 $patches,
                 $this->filterUtils->composeRegex($filter, '/'),
                 $key
@@ -49,7 +61,7 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
         }
 
         if (array_filter($this->filters)) {
-            $patches = $this->patchListUtils->embedInfoToItems($patches, array(
+            $patches = $this->patchListUpdater->embedInfoToItems($patches, array(
                 Patch::STATUS => 'match',
                 Patch::STATUS_MATCH => true
             ));
@@ -65,9 +77,9 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
     
     public function resolveInitialState(array $patches, array $state)
     {
-        $unpackedState = $this->patchListUtils->createDetailedList($state);
+        $unpackedState = $this->patchListTransformer->createDetailedList($state);
         
-        $patchesByTarget = $this->patchListUtils->groupItemsByTarget($patches);
+        $patchesByTarget = $this->patchListTransformer->groupItemsByTarget($patches);
         
         foreach ($patchesByTarget as $items) {
             foreach ($items as $path => $item) {
@@ -81,6 +93,6 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
             }
         }
         
-        return $this->patchListUtils->createSimplifiedList($unpackedState);
+        return $this->patchListTransformer->createSimplifiedList($unpackedState);
     }
 }

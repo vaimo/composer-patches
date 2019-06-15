@@ -57,6 +57,16 @@ class PatchesApplier
     private $logger;
 
     /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser
+     */
+    private $patchListAnalyser;
+    
+    /**
+     * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
+     */
+    private $patchListTransformer;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig
      */
     private $statusConfig;
@@ -105,6 +115,8 @@ class PatchesApplier
 
         $this->outputStrategy = $outputStrategy;
 
+        $this->patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
+        $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->statusConfig = new \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig();
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
@@ -152,7 +164,7 @@ class PatchesApplier
         
         $applyQueue = array_map('array_filter', $applyQueue);
         
-        $patchQueueFootprints = $this->patchListUtils->createSimplifiedList($applyQueue);
+        $patchQueueFootprints = $this->patchListTransformer->createSimplifiedList($applyQueue);
 
         $labels = array_diff_key($this->statusConfig->getLabels(), array('unknown' => true));
 
@@ -163,7 +175,7 @@ class PatchesApplier
             $hasPatches = !empty($applyQueue[$packageName]);
 
             $patchTargets = $hasPatches ?
-                $this->patchListUtils->getAllTargets(array($applyQueue[$packageName]))
+                $this->patchListAnalyser->getAllTargets(array($applyQueue[$packageName]))
                 : array($packageName);
                 
             $itemsToReset = array_intersect($resetQueue, $patchTargets);

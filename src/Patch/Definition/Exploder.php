@@ -11,7 +11,7 @@ class Exploder
      * @var \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface[]
      */
     private $components;
-
+    
     /**
      * @param \Vaimo\ComposerPatches\Interfaces\DefinitionExploderComponentInterface[] $components
      */
