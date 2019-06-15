@@ -109,7 +109,7 @@ class ConfigUtils
             $this->extractArrayValue($sequenceConfig, Config::PATCHER_APPLIERS)
         );
         
-        if ((!$patcherSequence || array_intersect_key($patchers, array_flip($patcherSequence)))
+        if ((empty($patcherSequence) || array_intersect_key($patchers, array_flip($patcherSequence)))
             && is_array($patchers) && array_filter($patchers)
         ) {
             return;
@@ -117,7 +117,7 @@ class ConfigUtils
 
         $message = 'No valid patchers defined';
 
-        if ($patcherSequence) {
+        if (!empty($patcherSequence)) {
             $message = sprintf('No valid patchers found for sequence: %s', implode(',', $patcherSequence));
         }
         

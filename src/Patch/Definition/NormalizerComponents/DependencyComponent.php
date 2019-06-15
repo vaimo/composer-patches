@@ -33,7 +33,7 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                         }
                     );
                     
-                    if ($matches) {
+                    if (!empty($matches)) {
                         $dependsTarget = $dependsPatterns[reset($matches)];
                     }
                 }

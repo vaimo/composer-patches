@@ -35,7 +35,7 @@ class PackageSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceList
     {
         $packages = $repository->getPackages();
         
-        if (!$this->packages) {
+        if (empty($this->packages)) {
             return $packages;
         }
 

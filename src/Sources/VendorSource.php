@@ -28,7 +28,7 @@ class VendorSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceListI
     {
         $packages = $repository->getPackages();
         
-        if (!$this->vendors) {
+        if (empty($this->vendors)) {
             return $packages;
         }
 
