@@ -74,11 +74,16 @@ class Applier
             $this->logger->writeVerbose('error', $exception->getMessage());
         }
 
-        $patcherName = $this->processOperations($patchers, $sanityOperations);
+        $arguments = array(
+            PluginConfig::PATCHER_ARG_FILE => $filename,
+            PluginConfig::PATCHER_ARG_CWD => $cwd
+        );
+            
+        $patcherName = $this->processOperations($patchers, $sanityOperations, $arguments);
         
         if (!$patcherName) {
             $message = sprintf(
-                'None of the patch appliers seem to be available: %s',
+                'None of the patch appliers seem to be available (tried: %s)',
                 implode(', ', array_keys($patchers))
             );
             
@@ -86,10 +91,9 @@ class Applier
         }
 
         foreach ($levels as $patchLevel) {
-            $arguments = array(
-                PluginConfig::PATCHER_ARG_LEVEL => $patchLevel,
-                PluginConfig::PATCHER_ARG_FILE => $filename,
-                PluginConfig::PATCHER_ARG_CWD => $cwd
+            $arguments = array_replace(
+                $arguments, 
+                array(PluginConfig::PATCHER_ARG_LEVEL => $patchLevel)
             );
             
             $patcherName = $this->processOperations(
