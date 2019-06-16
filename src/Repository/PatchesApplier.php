@@ -190,7 +190,7 @@ class PatchesApplier
 
                 if (!$hasPatches && $resetPatches && !isset($patchQueueFootprints[$targetName])) {
                     $this->logger->writeRaw(
-                        'Resetting patched for <info>%s</info> (%s)',
+                        'Resetting patches for <info>%s</info> (%s)',
                         array($targetName, count($resetResult[$targetName]))
                     );
                 }
@@ -205,33 +205,8 @@ class PatchesApplier
             if (!$hasPatches) {
                 continue;
             }
-
-            $changesMap = array();
             
-            foreach ($patchTargets as $targetName) {
-                $targetQueue = array();
-                
-                if (isset($patchQueueFootprints[$targetName])) {
-                    $targetQueue = $patchQueueFootprints[$targetName];
-                }
-    
-                if (!isset($packages[$targetName])) {
-                    throw new \Vaimo\ComposerPatches\Exceptions\PackageNotFound(
-                        sprintf(
-                            'Unknown target "%s" encountered when checking patch changes for: %s',
-                            $targetName,
-                            implode(',', array_keys($targetQueue))
-                        )
-                    );
-                }
-
-                $changesMap[$targetName] = $this->packageUtils->hasPatchChanges(
-                    $packages[$targetName],
-                    $targetQueue
-                );
-            }
-
-            $changedTargets = array_keys(array_filter($changesMap));
+            $changedTargets = $this->resolveChangedTargets($packages, $patchTargets, $patchQueueFootprints);
             
             if (empty($changedTargets)) {
                 continue;
@@ -253,29 +228,13 @@ class PatchesApplier
             if (!$this->shouldAllowOutput($queuedPatches, $patchRemovals)) {
                 $muteDepth = $this->logger->mute();
             }
+
+            $this->logger->writeRaw(
+                'Applying patches for <info>%s</info> (%s)',
+                array($packageName, count($queuedPatches))
+            );
             
-            try {
-                $this->logger->writeRaw(
-                    'Applying patches for <info>%s</info> (%s)',
-                    array($packageName, count($queuedPatches))
-                );
-                
-                if ($patchRemovals) {
-                    $processIndentation = $this->logger->push('~');
-
-                    foreach ($patchRemovals as $item) {
-                        $this->patchInfoLogger->outputPatchInfo($item);
-                    }
-
-                    $this->logger->reset($processIndentation);
-                }
-                
-                $this->processPatchesForPackage($repository, $package, $queuedPatches);
-            } catch (\Exception $exception) {
-                $this->logger->unMute();
-                
-                throw $exception;
-            }
+            $this->processQueues($repository, $package, $queuedPatches, $patchRemovals);
 
             $packagesUpdated = true;
 
@@ -289,7 +248,58 @@ class PatchesApplier
         return $packagesUpdated;
     }
     
-    private function processPatchesForPackage(Repository $repository, Package $package, $patchesQueue)
+    private function processQueues(Repository $repository, Package $package, $additions, $removals)
+    {
+        try {
+            if ($removals) {
+                $processIndentation = $this->logger->push('~');
+
+                foreach ($removals as $item) {
+                    $this->patchInfoLogger->outputPatchInfo($item);
+                }
+
+                $this->logger->reset($processIndentation);
+            }
+
+            $this->processPatchesForPackage($repository, $package, $additions);
+        } catch (\Exception $exception) {
+            $this->logger->unMute();
+
+            throw $exception;
+        }
+    }
+    
+    private function resolveChangedTargets(array $packages, array $patchTargets, array $patchFootprints)
+    {
+        $changesMap = array();
+
+        foreach ($patchTargets as $targetName) {
+            $targetQueue = array();
+
+            if (isset($patchFootprints[$targetName])) {
+                $targetQueue = $patchFootprints[$targetName];
+            }
+
+            if (!isset($packages[$targetName])) {
+                throw new \Vaimo\ComposerPatches\Exceptions\PackageNotFound(
+                    sprintf(
+                        'Unknown target "%s" found when checking patch changes for: %s',
+                        $targetName,
+                        implode(',', array_keys($targetQueue))
+                    )
+                );
+            }
+
+            $changesMap[$targetName] = $this->packageUtils->hasPatchChanges(
+                $packages[$targetName],
+                $targetQueue
+            );
+        }
+
+        return array_keys(array_filter($changesMap));
+    }
+    
+    private function processPatchesForPackage(Repository $repository, Package $package, array $patchesQueue)
     {
         $processIndentation = $this->logger->push('~');
 
