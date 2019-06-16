@@ -121,23 +121,6 @@ class PatchesApplier
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
-    
-    private function updateStatusLabels(array $queue, array $labels)
-    {
-        foreach ($queue as $target => $group) {
-            foreach ($group as $path => $item) {
-                $status = isset($item[Patch::STATUS]) ? $item[Patch::STATUS] : 'unknown';
-                
-                if (!isset($labels[$status])) {
-                    continue;
-                }
-                
-                $queue[$target][$path][Patch::STATUS_LABEL] = $labels[$status];
-            }
-        }
-        
-        return $queue;
-    }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -246,6 +229,23 @@ class PatchesApplier
         }
 
         return $packagesUpdated;
+    }
+
+    private function updateStatusLabels(array $queue, array $labels)
+    {
+        foreach ($queue as $target => $group) {
+            foreach ($group as $path => $item) {
+                $status = isset($item[Patch::STATUS]) ? $item[Patch::STATUS] : 'unknown';
+
+                if (!isset($labels[$status])) {
+                    continue;
+                }
+
+                $queue[$target][$path][Patch::STATUS_LABEL] = $labels[$status];
+            }
+        }
+
+        return $queue;
     }
     
     private function processQueues(Repository $repository, Package $package, $additions, $removals)
