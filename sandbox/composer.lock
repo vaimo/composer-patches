@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d46fd8b4b09d71600b639bea69335670",
+    "content-hash": "8a428c15e7549a6427d49a91520e0b3a",
     "packages": [],
     "packages-dev": [
         {
@@ -947,7 +947,7 @@
         },
         {
             "name": "vaimo/composer-patches",
-            "version": "dev-master",
+            "version": "dev-release/3",
             "dist": {
                 "type": "path",
                 "url": "modules/composer-patches",
@@ -1067,6 +1067,23 @@
                 "type": "path",
                 "url": "modules/composer-patches-target2",
                 "reference": "f238989dcffa6d131a3e19c8e50cb1c0d74fe312"
+            },
+            "type": "library",
+            "license": [
+                "MIT"
+            ],
+            "description": "Mock module for testing the patch applier",
+            "transport-options": {
+                "symlink": false
+            }
+        },
+        {
+            "name": "vaimo/composer-patches-target3",
+            "version": "dev-release/3",
+            "dist": {
+                "type": "path",
+                "url": "modules/composer-patches-target3",
+                "reference": "7d8af31fcfb37d2f300ffaa5928727454476e8a2"
             },
             "type": "library",
             "license": [
