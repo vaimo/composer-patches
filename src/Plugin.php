@@ -83,10 +83,6 @@ class Plugin implements
         if (!$this->bootstrap) {
             return;
         }
-
-        $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
-
-        $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
         
         if (!$this->bootstrapStrategy->shouldAllow()) {
             return;
@@ -94,15 +90,19 @@ class Plugin implements
 
         $bootstrap = $this->bootstrap;
         $lockSanitizer = $this->lockSanitizer;
-        
+
+        $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
+
         $runtimeUtils->executeWithPostAction(
             function () use ($bootstrap, $event) {
                 $bootstrap->applyPatches($event->isDevMode());
             },
-            function () use ($repository, $lockSanitizer) {
+            function () use ($event, $lockSanitizer) {
+                $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
+
                 $repository->write();
                 $lockSanitizer->sanitize();
-            }
+            },
         );
     }
 

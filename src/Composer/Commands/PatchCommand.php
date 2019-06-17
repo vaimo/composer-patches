@@ -203,7 +203,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             function () use ($repository, $lockSanitizer) {
                 $repository->write();
                 $lockSanitizer->sanitize();
-            }
+            },
         );
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);

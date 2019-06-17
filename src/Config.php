@@ -33,7 +33,6 @@ class Config
     const PATCHER_LEVELS = 'levels';
     const PATCHER_SOURCES = 'sources';
     const PATCHER_SECURE_HTTP = 'secure-http';
-    const PATCHER_GRACEFUL = 'graceful';
     
     const OS_DEFAULT = 'default';
     const APPLIER_DEFAULT = 'DEFAULT';
@@ -61,9 +60,6 @@ class Config
 
     const PATCH_FILE_REGEX_MATCHER = '/^.+\.patch/i';
 
-    const PATCHER_FROM_SOURCE = 'from-source';
-    const PATCHER_FORCE_REAPPLY = 'force-reapply';
-
     /**
      * @var array
      */
@@ -85,24 +81,35 @@ class Config
         $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
     }
 
-    public function shouldExitOnFirstFailure()
-    {
-        return !$this->config[self::PATCHER_GRACEFUL];
-    }
-
     public function shouldPreferOwnerPackageConfig()
     {
-        return (bool)$this->config[self::PATCHER_FROM_SOURCE];
+        return (bool)getenv(Environment::PREFER_OWNER) || (bool)getEnv('COMPOSER_PATCHES_PREFER_OWNER');
+    }
+
+    public function shouldResetEverything()
+    {
+        return (bool)getenv(Environment::FORCE_REAPPLY) || (bool)getenv('COMPOSER_FORCE_PATCH_REAPPLY');
+    }
+
+    public function shouldExitOnFirstFailure()
+    {
+        return (bool)getenv(Environment::EXIT_ON_FAIL) || (bool)getenv('COMPOSER_EXIT_ON_PATCH_FAILURE');
     }
 
     public function shouldForcePackageReset()
     {
         return $this->config[self::PATCHER_FORCE_RESET] || (bool)getenv(Environment::FORCE_RESET);
     }
-
-    public function shouldResetEverything()
+    
+    public function getSkippedPackages()
     {
-        return (bool)$this->config[self::PATCHER_FORCE_REAPPLY];
+        $skipList = getenv(Environment::PACKAGE_SKIP)
+            ? getenv(Environment::PACKAGE_SKIP)
+            : getenv('COMPOSER_SKIP_PATCH_PACKAGES');
+
+        return array_filter(
+            explode(',', $skipList)
+        );
     }
 
     public function getPatcherConfig(array $overrides = array())

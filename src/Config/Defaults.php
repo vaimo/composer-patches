@@ -18,9 +18,6 @@ class Defaults
             Config::PATCHER_SEARCH_DEV => array(),
             Config::PATCHER_TARGETS => array(),
             Config::PATCHER_BASE_PATHS => array(),
-            Config::PATCHER_GRACEFUL => false,
-            Config::PATCHER_FROM_SOURCE => false,
-            Config::PATCHER_FORCE_REAPPLY => false,
             Config::PATCHER_SECURE_HTTP => true,
             Config::PATCHER_FORCE_RESET => false,
             Config::PATCHER_SOURCES => array(

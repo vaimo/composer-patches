@@ -38,7 +38,7 @@ class ComponentPool
         $this->appIO = $appIO;
     }
 
-    public function getList()
+    public function getList($skippedPackages)
     {
         $rootPackage = $this->composer->getPackage();
         $extra = $rootPackage->getExtra();
@@ -74,6 +74,7 @@ class ComponentPool
             'global-exclude' => $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,
             'local-exclude' => new LoaderComponents\LocalExcludeComponent(),
             'root-patch' => new LoaderComponents\RootPatchComponent($rootPackage),
+            'custom-exclude' => new LoaderComponents\CustomExcludeComponent($skippedPackages),
             'path-normalizer' => new LoaderComponents\PathNormalizerComponent($packageInfoResolver),
             'platform' => new LoaderComponents\PlatformComponent($platformPackages),
             'constraints' => new LoaderComponents\ConstraintsComponent($configExtractor),

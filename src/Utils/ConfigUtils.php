@@ -13,7 +13,6 @@ class ConfigUtils
     {
         $this->overrideValue($config, $updates, Config::PATCHER_SECURE_HTTP);
         $this->overrideValue($config, $updates, Config::PATCHER_FORCE_RESET);
-        $this->overrideValue($config, $updates, Config::PATCHER_GRACEFUL);
         
         foreach (array_keys($config[Config::PATCHER_APPLIERS]) as $code) {
             if (!isset($updates[Config::PATCHER_APPLIERS][$code])) {
