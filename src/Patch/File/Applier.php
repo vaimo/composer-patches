@@ -13,7 +13,7 @@ class Applier
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Shell
      */
@@ -38,7 +38,7 @@ class Applier
      * @var array
      */
     private $resultCache;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Logger $logger
      * @param array $config
@@ -58,7 +58,7 @@ class Applier
     public function applyFile($filename, $cwd, array $config = array())
     {
         $applierConfig = $this->applierUtils->mergeApplierConfig($this->config, array_filter($config));
-        
+
         $applierConfig = $this->applierUtils->sortApplierConfig($applierConfig);
 
         $patchers = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_APPLIERS);
@@ -67,7 +67,7 @@ class Applier
         $failureMessages = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_FAILURES);
 
         $sanityOperations = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_SANITY);
-        
+
         try {
             $this->applierUtils->validateConfig($applierConfig);
         } catch (\Vaimo\ComposerPatches\Exceptions\ConfigValidationException $exception) {
@@ -78,15 +78,15 @@ class Applier
             PluginConfig::PATCHER_ARG_FILE => $filename,
             PluginConfig::PATCHER_ARG_CWD => $cwd
         );
-            
+
         $patcherName = $this->executeOperations($patchers, $sanityOperations, $arguments);
-        
+
         if (!$patcherName) {
             $message = sprintf(
                 'None of the patch appliers seem to be available (tried: %s)',
                 implode(', ', array_keys($patchers))
             );
-            
+
             throw new \Vaimo\ComposerPatches\Exceptions\RuntimeException($message);
         }
 
@@ -95,14 +95,14 @@ class Applier
                 $arguments,
                 array(PluginConfig::PATCHER_ARG_LEVEL => $patchLevel)
             );
-            
+
             $patcherName = $this->executeOperations(
                 $patchers,
                 $operations,
                 $arguments,
                 $failureMessages
             );
-            
+
             if (!$patcherName) {
                 continue;
             }
@@ -120,34 +120,34 @@ class Applier
             sprintf('Cannot apply patch %s', $filename)
         );
     }
-    
+
     private function executeOperations($patchers, array $operations, array $args = array(), array $failures = array())
     {
         list($operationName, $operationCode) = array_fill(0, 4, 'UNKNOWN');
-        
+
         foreach ($patchers as $type => $patcher) {
             if (!$patcher) {
                 continue;
             }
-            
+
             $result = $this->processOperationItems($patcher, $operations, $args, $failures);
-            
+
             if ($result) {
                 return $type;
             }
-            
+
             $messageArgs = array(
                 is_string($operationName) ? $operationName : $operationCode,
                 $type,
                 $this->extractStringValue($args, PluginConfig::PATCHER_ARG_LEVEL)
             );
-            
+
             $this->logger->writeVerbose('warning', '%s (type=%s) failed with p=%s', $messageArgs);
         }
-        
+
         return '';
     }
-    
+
     private function processOperationItems($patcher, $operations, $args, $failures)
     {
         $operationResults = array_fill_keys(array_keys($operations), '');
@@ -167,28 +167,28 @@ class Applier
 
 
             $operationFailures = $this->extractArrayValue($failures, $operationCode);
-            
-            $output = $this->getOperationOutput($applierOperations, $args, $operationFailures);
-            
+
+            $output = $this->resolveOperationOutput($applierOperations, $args, $operationFailures);
+
             if ($output !== false) {
                 $operationResults[$operationCode] = $output;
             }
-            
+
             if (!$result) {
                 break;
             }
         }
-        
+
         return $result;
     }
-    
-    private function getOperationOutput($applierOperations, $args, $operationFailures)
+
+    private function resolveOperationOutput($applierOperations, $args, $operationFailures)
     {
         $variableFormats = array(
             '{{%s}}' => array('escapeshellarg'),
             '[[%s]]' => array()
         );
-        
+
         foreach ($applierOperations as $operation) {
             $passOnFailure = strpos($operation, '!') === 0;
             $operation = ltrim($operation, '!');
@@ -228,10 +228,10 @@ class Applier
 
             return $output;
         }
-        
+
         return false;
     }
-    
+
     private function scanOutputForFailures($output, array $failureMessages)
     {
         foreach ($failureMessages as $patternCode => $pattern) {
@@ -250,7 +250,7 @@ class Applier
 
             return false;
         }
-        
+
         return true;
     }
 
