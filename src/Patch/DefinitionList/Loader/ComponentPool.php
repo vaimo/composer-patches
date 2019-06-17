@@ -38,7 +38,7 @@ class ComponentPool
         $this->appIO = $appIO;
     }
 
-    public function getList(PluginConfig $pluginConfig)
+    public function getList()
     {
         $rootPackage = $this->composer->getPackage();
         $extra = $rootPackage->getExtra();

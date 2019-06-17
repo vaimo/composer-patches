@@ -72,7 +72,7 @@ class SorterComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
             return $packagePatches;
         }
 
-        $sorter = new \MJS\TopSort\Implementations\StringSort();
+        $sorter = new \Vaimo\TopSort\Implementations\StringSort();
 
         foreach ($patchDependencies as $path => $depends) {
             $sorter->add($path, array_unique($depends));

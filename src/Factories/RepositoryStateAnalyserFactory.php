@@ -5,9 +5,6 @@
  */
 namespace Vaimo\ComposerPatches\Factories;
 
-use Vaimo\ComposerPatches\Patch\PackageResolvers;
-use Vaimo\ComposerPatches\Config as Config;
-
 class RepositoryStateAnalyserFactory
 {
     /**
@@ -24,12 +21,8 @@ class RepositoryStateAnalyserFactory
         $this->composer = $composer;
     }
 
-    public function create(Config $pluginConfig)
+    public function create()
     {
-        $resetsResolver = $pluginConfig->shouldResetEverything()
-            ? new PackageResolvers\FullResetResolver()
-            : new PackageResolvers\MissingPatchesResolver();
-        
-        return new \Vaimo\ComposerPatches\Repository\State\Analyser($resetsResolver);
+        return new \Vaimo\ComposerPatches\Repository\State\Analyser();
     }
 }
