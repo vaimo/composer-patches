@@ -45,12 +45,10 @@ class Plugin implements
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
         
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
-
         $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
         $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
 
-        $this->bootstrap = $this->bootstrapFactory->create($configFactory);
+        $this->bootstrap = $this->bootstrapFactory->create();
 
         $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer);
 
@@ -102,7 +100,7 @@ class Plugin implements
             function () use ($repository, $lockSanitizer) {
                 $repository->write();
                 $lockSanitizer->sanitize();
-            },
+            }
         );
     }
 
