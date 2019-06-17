@@ -152,7 +152,8 @@ class ListCommand extends \Composer\Command\BaseCommand
             $applyQueue,
             $removeQueue,
             $withAffected,
-            $filters
+            $filters,
+            $statusFilters
         );
         
         $patches = array_filter($filteredPatches);
@@ -197,7 +198,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         $this->generateOutput($output, $patches);
     }
     
-    private function composerFilteredPatchesList($patches, $applyQueue, $removeQueue, $withAffected, $filters)
+    private function composerFilteredPatchesList($patches, $additions, $removals, $withAffected, $filters, $statuses)
     {
         $hasFilers = (bool)array_filter($filters);
 
@@ -208,12 +209,12 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $filteredPatches = $patchListUtils->mergeLists(
             $patches,
-            $removeQueue
+            $removals
         );
 
         if ($withAffected) {
-            $applyQueue = $patchListUpdater->embedInfoToItems(
-                $applyQueue,
+            $additions = $patchListUpdater->embedInfoToItems(
+                $additions,
                 array(PatchDefinition::STATUS => 'affected'),
                 true
             );
@@ -221,7 +222,7 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $filteredPatches = $patchListUtils->mergeLists(
             $filteredPatches,
-            $patchListUtils->intersectListsByName($applyQueue, $filteredPatches)
+            $patchListUtils->intersectListsByName($additions, $filteredPatches)
         );
 
         $filteredPatches = $patchListUpdater->embedInfoToItems(
@@ -233,15 +234,13 @@ class ListCommand extends \Composer\Command\BaseCommand
         if ($hasFilers) {
             $filteredPatches = $listResolver->resolvePatchesQueue($filteredPatches);
         }
-
-        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
-
-        if (!empty($statusFilters)) {
-            $statusFilter = $filterUtils->composeRegex($statusFilters, '/');
+        
+        if (!empty($statuses)) {
+            $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
 
             $filteredPatches = $patchListUtils->applyDefinitionKeyValueFilter(
                 $filteredPatches,
-                $statusFilter,
+                $filterUtils->composeRegex($statuses, '/'),
                 PatchDefinition::STATUS
             );
         }
