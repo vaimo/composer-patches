@@ -102,7 +102,7 @@ class Plugin implements
             function () use ($repository, $lockSanitizer) {
                 $repository->write();
                 $lockSanitizer->sanitize();
-            },
+            }
         );
     }
 
