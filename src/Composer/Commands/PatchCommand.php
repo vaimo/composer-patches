@@ -9,10 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Composer\Script\ScriptEvents;
-
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
 
@@ -82,13 +79,6 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
 
         $this->addOption(
-            '--graceful',
-            null,
-            InputOption::VALUE_NONE,
-            'Continue even when some patch fails to apply'
-        );
-
-        $this->addOption(
             '--force',
             null,
             InputOption::VALUE_NONE,
@@ -110,39 +100,22 @@ class PatchCommand extends \Composer\Command\BaseCommand
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int|void|null
-     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
-        $defaults = $configDefaults->getPatcherConfig();
-
         $composer = $this->getComposer();
-
         $appIO = $this->getIO();
         
         $isExplicit = $input->getOption('explicit') || $input->getOption('show-reapplies');
-        
         $isDevMode = !$input->getOption('no-dev');
 
-        $behaviourFlags = $this->getBehaviourFlags($input);
-        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
-        
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
-        
         $filters = array(
             Patch::SOURCE => $input->getOption('filter'),
             Patch::TARGETS => $input->getArgument('targets')
         );
 
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
-            Config::PATCHER_FORCE_REAPPLY => $behaviourFlags['redo'],
-            Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source'),
-            Config::PATCHER_GRACEFUL => (bool)$input->getOption('graceful')
-                || $behaviourFlags['redo']
-                || $behaviourFlags['undo'],
-            Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)
-        ));
+        $behaviourFlags = $this->getBehaviourFlags($input);
+        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
 
         if ($behaviourFlags['redo'] && !array_filter($filters)) {
             $isExplicit = true;
@@ -167,6 +140,26 @@ class PatchCommand extends \Composer\Command\BaseCommand
         }
         
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
+
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+        
+        $defaultValues = $configDefaults->getPatcherConfig();
+        
+        $config = array(
+            Config::PATCHER_SOURCES => array_fill_keys(
+                array_keys($defaultValues[Config::PATCHER_SOURCES]),
+                true
+            )
+        );
+
+        if ($behaviourFlags['redo'] || $behaviourFlags['undo']) {
+            $runtimeUtils->setEnvironmentValues(array(
+                Environment::EXIT_ON_FAIL => 0,
+                'COMPOSER_EXIT_ON_PATCH_FAILURE' => 0
+            ));
+        }
+
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
         
         $outputTriggerFlags = array(
             Patch::STATUS_NEW => !$hasFilers,
@@ -175,32 +168,37 @@ class PatchCommand extends \Composer\Command\BaseCommand
             Patch::SOURCE => $isExplicit,
             Patch::URL => $isExplicit
         );
-        
+
         $outputTriggers = array_keys(
             array_filter($outputTriggerFlags)
         );
-
+        
         $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
-
-        $bootstrap = $bootstrapFactory->create($configFactory, $listResolver, $outputStrategy);
+        
+        $bootstrap = $bootstrapFactory->create($listResolver, $outputStrategy, $config);
 
         $runtimeUtils->setEnvironmentValues(array(
             Environment::FORCE_RESET => (int)(bool)$input->getOption('force')
         ));
-
-        $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
-        $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
-        $repository = $composer->getRepositoryManager()->getLocalRepository();
         
+        $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
+
         $runtimeUtils->executeWithPostAction(
-            function () use ($shouldUndo, $filters, $bootstrap, $isDevMode) {
+            function () use ($shouldUndo, $filters, $isDevMode, $bootstrap, $runtimeUtils, $input, $behaviourFlags) {
                 if ($shouldUndo && !array_filter($filters)) {
                     $bootstrap->stripPatches($isDevMode);
                 } else {
+                    $runtimeUtils->setEnvironmentValues(array(
+                        Environment::PREFER_OWNER => $input->getOption('from-source'),
+                        Environment::FORCE_REAPPLY => $behaviourFlags['redo']
+                    ));
+
                     $bootstrap->applyPatches($isDevMode);
                 }
             },
-            function () use ($repository, $lockSanitizer) {
+            function () use ($composer, $lockSanitizer) {
+                $repository = $composer->getRepositoryManager()->getLocalRepository();
+
                 $repository->write();
                 $lockSanitizer->sanitize();
             },
