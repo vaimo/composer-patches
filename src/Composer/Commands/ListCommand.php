@@ -136,7 +136,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         $filteredLoader = $loaderFactory->create($filteredPool, $pluginConfig, $isDevMode);
         $filteredPatches = $filteredLoader->loadFromPackagesRepository($repository);
         
-        $queueGenerator = $this->createQueueGenerator($composer, $pluginConfig, $listResolver);
+        $queueGenerator = $this->createQueueGenerator($composer, $listResolver);
 
         $repoStateGenerator = $this->createStateGenerator($composer);
         
@@ -257,7 +257,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
     }
     
-    private function createQueueGenerator(Composer $composer, Config $config, ListResolver $listResolver)
+    private function createQueueGenerator(Composer $composer, ListResolver $listResolver)
     {
         $stateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
             $composer
@@ -265,7 +265,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         $changesListResolver = new ListResolvers\ChangesListResolver($listResolver);
 
-        $stateAnalyser = $stateAnalyserFactory->create($config);
+        $stateAnalyser = $stateAnalyserFactory->create();
         
         return new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
             $changesListResolver,
