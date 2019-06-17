@@ -97,8 +97,8 @@ class ComponentPool
         $platformOverrides = array_filter(
             (array)$composerConfig->get('platform')
         );
-
-        if ($platformOverrides) {
+        
+        if (!empty($platformOverrides)) {
             $platformOverrides = array();
         }
 

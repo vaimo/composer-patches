@@ -316,8 +316,8 @@ class PatchesApplier
             
             $failureIndex = array_search($failedPath, $paths);
             
-            if ($failureIndex !== false) {
-                $appliedPaths = array_slice($paths, 0, array_search($failedPath, $paths));
+            if (is_int($failureIndex)) {
+                $appliedPaths = array_slice($paths, 0, $failureIndex);
                 $appliedPatches = array_intersect_key($patchesQueue, array_flip($appliedPaths));
             } else {
                 $appliedPatches = array();
