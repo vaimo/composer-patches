@@ -148,10 +148,10 @@ class ListCommand extends \Composer\Command\BaseCommand
         $patchListUpdater = new \Vaimo\ComposerPatches\Patch\DefinitionList\Updater();
 
         $filteredPatches = $this->composerFilteredPatchesList(
-            $filteredPatches, 
-            $applyQueue, 
-            $removeQueue, 
-            $withAffected, 
+            $filteredPatches,
+            $applyQueue,
+            $removeQueue,
+            $withAffected,
             $filters
         );
         
