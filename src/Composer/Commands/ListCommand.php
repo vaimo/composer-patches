@@ -152,7 +152,12 @@ class ListCommand extends \Composer\Command\BaseCommand
             $applyQueue,
             $removeQueue,
             $withAffected,
+<<<<<<< HEAD
             $filters
+=======
+            $filters,
+            $statusFilters
+>>>>>>> release/3
         );
         
         $patches = array_filter($filteredPatches);
@@ -197,7 +202,11 @@ class ListCommand extends \Composer\Command\BaseCommand
         $this->generateOutput($output, $patches);
     }
     
+<<<<<<< HEAD
     private function composerFilteredPatchesList($patches, $applyQueue, $removeQueue, $withAffected, $filters)
+=======
+    private function composerFilteredPatchesList($patches, $additions, $removals, $withAffected, $filters, $statuses)
+>>>>>>> release/3
     {
         $hasFilers = (bool)array_filter($filters);
 
@@ -208,12 +217,21 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $filteredPatches = $patchListUtils->mergeLists(
             $patches,
+<<<<<<< HEAD
             $removeQueue
         );
 
         if ($withAffected) {
             $applyQueue = $patchListUpdater->embedInfoToItems(
                 $applyQueue,
+=======
+            $removals
+        );
+
+        if ($withAffected) {
+            $additions = $patchListUpdater->embedInfoToItems(
+                $additions,
+>>>>>>> release/3
                 array(PatchDefinition::STATUS => 'affected'),
                 true
             );
@@ -221,7 +239,11 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $filteredPatches = $patchListUtils->mergeLists(
             $filteredPatches,
+<<<<<<< HEAD
             $patchListUtils->intersectListsByName($applyQueue, $filteredPatches)
+=======
+            $patchListUtils->intersectListsByName($additions, $filteredPatches)
+>>>>>>> release/3
         );
 
         $filteredPatches = $patchListUpdater->embedInfoToItems(
@@ -233,6 +255,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         if ($hasFilers) {
             $filteredPatches = $listResolver->resolvePatchesQueue($filteredPatches);
         }
+<<<<<<< HEAD
 
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
 
@@ -242,6 +265,15 @@ class ListCommand extends \Composer\Command\BaseCommand
             $filteredPatches = $patchListUtils->applyDefinitionKeyValueFilter(
                 $filteredPatches,
                 $statusFilter,
+=======
+        
+        if (!empty($statuses)) {
+            $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+
+            $filteredPatches = $patchListUtils->applyDefinitionKeyValueFilter(
+                $filteredPatches,
+                $filterUtils->composeRegex($statuses, '/'),
+>>>>>>> release/3
                 PatchDefinition::STATUS
             );
         }

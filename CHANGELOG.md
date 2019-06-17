@@ -339,6 +339,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https:
 * don't provide patch commands when plugin on older (<1.1) Composer versions [github/31]
 * always load patches in alphabetical order from file-system when using patches-search (unless @after, @before directives used within the patch file; introduced in FileSystemUtils, using natural sorting) [github/29]
 * fail the whole patching process with fatal exception when none of the patch applier commands (defined in the plugin config) are available [github/30]
+* log output typos corrected
 
 ### Maintenance
 
