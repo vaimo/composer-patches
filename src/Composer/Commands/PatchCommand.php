@@ -174,6 +174,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             Patch::SOURCE => $isExplicit,
             Patch::URL => $isExplicit
         );
+        
         $outputTriggers = array_keys(
             array_filter($outputTriggerFlags)
         );
@@ -186,17 +187,17 @@ class PatchCommand extends \Composer\Command\BaseCommand
             Environment::FORCE_RESET => (int)(bool)$input->getOption('force')
         ));
 
-        if ($shouldUndo && !array_filter($filters)) {
-            $bootstrap->stripPatches($isDevMode);
-        } else {
-            $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
+        $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
+        $repository = $composer->getRepositoryManager()->getLocalRepository();
 
-            $bootstrap->applyPatches($isDevMode);
-
-            $repository = $composer->getRepositoryManager()->getLocalRepository();
-            
+        try {
+            if ($shouldUndo && !array_filter($filters)) {
+                $bootstrap->stripPatches($isDevMode);
+            } else {
+                $bootstrap->applyPatches($isDevMode);
+            }
+        } finally {
             $repository->write();
-            
             $lockSanitizer->sanitize();
         }
 
