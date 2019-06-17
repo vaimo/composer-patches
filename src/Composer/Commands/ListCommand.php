@@ -124,8 +124,6 @@ class ListCommand extends \Composer\Command\BaseCommand
             'global-exclude' => false,
             'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver, true)
         ));
-
-        $hasFilers = (bool)array_filter($filters);
         
         $listResolver = new ListResolvers\FilteredListResolver($filters);
         
@@ -148,48 +146,18 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
         $patchListUpdater = new \Vaimo\ComposerPatches\Patch\DefinitionList\Updater();
-        
-        $filteredPatches = $patchListUtils->mergeLists(
-            $filteredPatches,
-            $removeQueue
+
+        $filteredPatches = $this->composerFilteredPatchesList(
+            $filteredPatches, 
+            $applyQueue, 
+            $removeQueue, 
+            $withAffected, 
+            $filters
         );
-
-        if ($withAffected) {
-            $applyQueue = $patchListUpdater->embedInfoToItems(
-                $applyQueue,
-                array(PatchDefinition::STATUS => 'affected'),
-                true
-            );
-        }
-        
-        $filteredPatches = $patchListUtils->mergeLists(
-            $filteredPatches,
-            $patchListUtils->intersectListsByName($applyQueue, $filteredPatches)
-        );
-        
-        $filteredPatches = $patchListUpdater->embedInfoToItems(
-            $filteredPatches,
-            array(PatchDefinition::STATUS => 'applied'),
-            true
-        );
-        
-        if ($hasFilers) {
-            $filteredPatches = $listResolver->resolvePatchesQueue($filteredPatches);
-        }
-
-        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
-
-        if (!empty($statusFilters)) {
-            $statusFilter = $filterUtils->composeRegex($statusFilters, '/');
-
-            $filteredPatches = $patchListUtils->applyDefinitionKeyValueFilter(
-                $filteredPatches,
-                $statusFilter,
-                PatchDefinition::STATUS
-            );
-        }
         
         $patches = array_filter($filteredPatches);
+
+        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
 
         $shouldAddExcludes = $withExcluded
             && (
@@ -227,6 +195,58 @@ class ListCommand extends \Composer\Command\BaseCommand
         }
         
         $this->generateOutput($output, $patches);
+    }
+    
+    private function composerFilteredPatchesList($patches, $applyQueue, $removeQueue, $withAffected, $filters)
+    {
+        $hasFilers = (bool)array_filter($filters);
+
+        $listResolver = new ListResolvers\FilteredListResolver($filters);
+        
+        $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
+        $patchListUpdater = new \Vaimo\ComposerPatches\Patch\DefinitionList\Updater();
+
+        $filteredPatches = $patchListUtils->mergeLists(
+            $patches,
+            $removeQueue
+        );
+
+        if ($withAffected) {
+            $applyQueue = $patchListUpdater->embedInfoToItems(
+                $applyQueue,
+                array(PatchDefinition::STATUS => 'affected'),
+                true
+            );
+        }
+
+        $filteredPatches = $patchListUtils->mergeLists(
+            $filteredPatches,
+            $patchListUtils->intersectListsByName($applyQueue, $filteredPatches)
+        );
+
+        $filteredPatches = $patchListUpdater->embedInfoToItems(
+            $filteredPatches,
+            array(PatchDefinition::STATUS => 'applied'),
+            true
+        );
+
+        if ($hasFilers) {
+            $filteredPatches = $listResolver->resolvePatchesQueue($filteredPatches);
+        }
+
+        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+
+        if (!empty($statusFilters)) {
+            $statusFilter = $filterUtils->composeRegex($statusFilters, '/');
+
+            $filteredPatches = $patchListUtils->applyDefinitionKeyValueFilter(
+                $filteredPatches,
+                $statusFilter,
+                PatchDefinition::STATUS
+            );
+        }
+        
+        return $filteredPatches;
     }
     
     private function createConfigWithEnabledSources(Composer $composer)
