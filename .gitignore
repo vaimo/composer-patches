@@ -1,2 +1,5 @@
 .idea
 vendor/
+sandbox/modules/composer-patches/src
+sandbox/modules/composer-patches/composer.json
+sandbox/vendor/
