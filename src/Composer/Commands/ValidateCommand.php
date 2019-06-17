@@ -8,10 +8,11 @@ namespace Vaimo\ComposerPatches\Composer\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
+use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
-use Vaimo\ComposerPatches\Config;
 
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
@@ -43,7 +44,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $output->writeln('<info>Scanning packages for orphan patches</info>');
 
         $composer = $this->getComposer();
-
+        
         $localOnly = $input->getOption('local');
 
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
@@ -60,7 +61,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             Config::PATCHER_SOURCES => $patchSources
         );
         
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
+            Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source')
+        ));
+
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
 
         $repository = $composer->getRepositoryManager()->getLocalRepository();
@@ -104,10 +108,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             )
         );
         
-        $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
+        $srcResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
         $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
 
-        $sourcesResolver = $sourcesResolverFactory->create($pluginConfig);
+        $sourcesResolver = $srcResolverFactory->create($pluginConfig);
 
         $sources = $sourcesResolver->resolvePackages($repository);
 

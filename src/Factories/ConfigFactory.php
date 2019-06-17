@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Factories;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
+use Vaimo\ComposerPatches\Environment;
 
 class ConfigFactory
 {
@@ -17,7 +18,7 @@ class ConfigFactory
     /**
      * @var \Vaimo\ComposerPatches\Config\Defaults
      */
-    private $defaults;
+    private $defaultsProvider;
 
     /**
      * @var \Vaimo\ComposerPatches\Utils\ConfigUtils
@@ -30,26 +31,42 @@ class ConfigFactory
     private $context;
 
     /**
+     * @var array
+     */
+    private $defaults;
+    
+    /**
      * @var \Vaimo\ComposerPatches\Utils\DataUtils
      */
     private $dataUtils;
-
+    
+    /**
+     * @param \Composer\Composer $composer
+     * @param array $defaults
+     */
     public function __construct(
-        \Composer\Composer $composer
+        \Composer\Composer $composer,
+        array $defaults = array()
     ) {
         $this->composer = $composer;
+        $this->defaults = $defaults;
 
-        $this->defaults = new \Vaimo\ComposerPatches\Config\Defaults();
+        $this->defaultsProvider = new \Vaimo\ComposerPatches\Config\Defaults();
         $this->configUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
         $this->context = new \Vaimo\ComposerPatches\Config\Context();
         $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
 
-    public function create(array $configSources)
+    public function create(array $configSources = array())
     {
         $composer = $this->composer;
 
-        $defaults = $this->defaults->getPatcherConfig();
+        $defaults = array_replace(
+            $this->defaultsProvider->getPatcherConfig(),
+            $this->defaults,
+            array_filter(array(PluginConfig::PATCHER_GRACEFUL => (bool)getenv(Environment::GRACEFUL_MODE)))
+        );
+
         $extra = $composer->getPackage()->getExtra();
 
         if (isset($extra['patcher-config']) && !isset($extra[PluginConfig::PATCHER_CONFIG_ROOT])) {

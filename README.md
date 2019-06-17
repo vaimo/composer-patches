@@ -4,14 +4,15 @@
 [![Total Downloads](https://poser.pugx.org/vaimo/composer-patches/downloads)](https://packagist.org/packages/vaimo/composer-patches)
 [![Daily Downloads](https://poser.pugx.org/vaimo/composer-patches/d/daily)](https://packagist.org/packages/vaimo/composer-patches)
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/vaimo/composer-patches/badges/quality-score.png?b=release/3)](https://scrutinizer-ci.com/g/vaimo/composer-patches/?branch=release/3)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/vaimo/composer-patches/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/vaimo/composer-patches/?branch=master)
 [![License](https://poser.pugx.org/vaimo/composer-patches/license)](https://packagist.org/packages/vaimo/composer-patches)
 
 Applies a patch from a local or remote file to any package that is part of a given composer 
-project. Patches can be defined both on project and on package level.
+project. Patches can be defined both on project and on package level in package config or 
+separate JSON file. Declaration-free mode (using embedded info within patch files) is available as well.
 
-The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable from 
-the composer.json of the project.
+The way the patches are applied (the commands, pre-checks) by the plugin is fully configurable (including the 
+actual commands that are executed to apply the patch) from the composer.json of the project.
 
 Note that the plugin is kept on very old PHP version as legacy software is usually the most common context
 where patches are needed.
@@ -21,8 +22,10 @@ More information on recent changes [HERE](./CHANGELOG.md).
 ## Quick Start
 
 This example uses the simplest way that the plugin allows you to include a patch in your project and 
-relies on embedded patch target information within the patch file. Other options target information 
-definition options are available (based on defining it in JSON files). 
+relies on embedded patch target information within the patch file. 
+
+Alternatvely, same information can be provided in a [JSON format](#basic-usage-configuring-a-patch-via-composerjson) 
+either directly in package's composer.json or in a separate file that composer.json refers to.
 
 #### 1. composer.json
 
@@ -53,7 +56,7 @@ Edit the `whatever-your-patch-is-called.patch` and define ...
 This patch changes... 
 absolutely everything
 
-@package some/package-name:>=1.2.3
+@package some/package-name
 
 --- Models/Example.php.org
 +++ Models/Example.php
@@ -70,21 +73,42 @@ absolutely everything
 
 The path `Models/Example.php` is relative to the root of `some/package-name`. 
 
-Using version is optional (just `@package some/package-name` woks as well).
+Version constraint can be used by defining `@version >=1.2.3`.
 
 All available/usable tags listed in [patch declaration with embedded target information](#patches-patch-declaration-with-embedded-target-information).
 
 Alternatively the patch can be targeted with configuring it via [providing the declaration in composer.json](#basic-usage-configuring-a-patch-via-composerjson).
 
-#### 4. make sure the patch actually applies
+#### 4. (optional) make sure the patch is configured to target correct package
+
+Check that the new patch is visible to the applier
+
+```shell
+composer patch:list --from-source --status new
+```
+
+The output should be something similar to this:
+
+```shell
+some/package-name
+  ~ vaimo/patch-owner: patches/path/hatever-your-patch-is-called.patch [NEW]
+    This patch changes... 
+    absolutely everything
+```
+
+#### 5. (optional) make sure the patch actually applies properly
 
 Test out the added patch (in project root).
 
 ```shell
-composer patch:redo --from-source some/package-name
+composer patch:apply --from-source some/package-name
+
+# Alternative to 'patch:apply' way of testing it repeatedly
+composer patch:redo --from-source some/package-name 
 ```
 
-The patch will be automatically applied on every composer install, update when required (when it's found that it's not yet installed).
+The patch will be automatically applied on every composer install, update when required (when it's found 
+that it's not yet installed).
 
 ```shell
 Writing lock file
@@ -96,7 +120,26 @@ Processing patches configuration
       absolutely everything
 ```
 
-All patches are applied when after all packages are installed to allow any package to provide patches for any other package.
+All patches are applied when after all packages are installed to allow any package to provide patches for 
+any other package.
+
+#### 6. (demo) simulate normal flow of applying the patch
+
+```shell
+composer patch:undo # remove all patches (in case optional steps were followed)
+composer install # will trigger install AND re-apply the patch
+composer install # second run; just to illustrate that already applied patches remain applied
+```
+
+By default, the patches will be applied in non-graceful mode: first failure will cause a fatal exception
+and the whole process will halt. In case it's required for the composer command run to continue without
+halting, a specific [environment variable](#environment-variables) or patch command `--graceful` flag 
+can be used.
+
+Note that in case patches are provided by a dependency package, the `composer install` will NOT work
+right away as the patches folder root information is not yet available in installed.json, which does 
+require the package (that owns the patches) to be installed on the same (or newer) changeset that introduced
+the `patches-search` config value. 
 
 # Configuration
 
@@ -123,8 +166,10 @@ Where the different groups have the following meaning:
 
 * **patches** - allows patches to be defined in same file.
 * **patches-file** - allows patches to be stored in another file. Can be a single file or list of files.
-* **patches-search** - scans for patch files in defined directory, relies on embedded target info 
-  within the patch (>=3.28.0). Can be a single file or list of files.
+* **patches-search** - (>=3.28.0) scans for patch files in defined directory, relies on embedded info 
+  within the patch. Can be a single path reference or a list of paths. 
+  
+_All paths are relative to package root._
 
 The patches module mimics the way composer separates development packages from normal requirements by 
 introducing two extra keys, where exact same rules apply as for normal patch declarations.
@@ -134,7 +179,7 @@ introducing two extra keys, where exact same rules apply as for normal patch dec
   "extra": {
     "patches-dev": {},
     "patches-file-dev": [],
-    "patches-search": []
+    "patches-search-dev": []
   }
 }
 ```
@@ -181,7 +226,7 @@ in front of all file-path based patch definitions.
 In this case you can define patches without having to repeatedly use the same base-path for every patch 
 definition.
 
-## Basic Usage: configuring a separet patches file
+## Basic Usage: configuring a separate patches file
 
 The way of defining the patches works for:
 
@@ -557,6 +602,10 @@ be used:
 
 The first dependency version will be used for the bundled patches {{version}} value.
 
+Note that using bundled patches may cause massive re-applying of patches for certain modules when they 
+change due to the architecture of this plugin, which relies on re-installing the targeted packages to
+avoid potential errors that might be caused by the package's code being in an unexpected/tampered state. 
+
 ## Patches: defining patches with strict path strip level
 
 By default, the patcher will try to apply the patch with several path stripping options - in some cases 
@@ -632,7 +681,8 @@ of the resolve patch path.
 ## Patches: patch applier cwd options
 
 In cases where there's a need to apply a patch on a file that is mapped to the project root or vendor bin
-root, a custom applier patch target installation path resolver mode can be defined:
+root, a patch applier working directory resolver mode can be defined (which technically would mean that the 
+applier works off of custom root/directory when applying certain patch):
 
 ```json
   {
@@ -650,7 +700,7 @@ root, a custom applier patch target installation path resolver mode can be defin
 ```
 
 This will tell the patch applier to: (a) reset targeted/package; (b) apply 'example.patch' in project root. 
-That means that the targeted file paths within example.patch should also target files relative to project root.
+That means that the targeted file paths within example.patch should also target files relative to project root. 
 
 Available cwd options:
 
@@ -659,6 +709,9 @@ Available cwd options:
 3. **project** - uses project path
 4. **autoload** - uses path that the package has configured as autoloader root (will use first path when multiple
    paths defined). Falls back to using 'install' path when autoloader config not found.
+
+This is particularly useful when `targeted/package` introduces it's own file mapper mechanism that is triggered 
+by composer events (which might mean that files are copied away from the re-install package before patch applier kicks in).
 
 ## Patches: shared config
 
@@ -766,22 +819,29 @@ _Note that by default, user does not really have to declare any of this, but eve
       "paths": {
         "*": "src/Bundled/{{file}}/version-{{version}}.patch"
       },
+      "graceful": false,
+      "force-reset": false,
       "secure-http": true,
-      "force-reset": true,
       "sources": {
         "project": true,
         "packages": true,
         "vendors": true
       },
       "appliers": {
+        "DEFAULT": {
+          "resolver": {
+            "default": "< which",
+            "windows": "< where"
+          }
+        },
         "GIT": {
           "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
-          "bin": "which git",
+          "bin": "[[resolver]] git",
           "check": "[[bin]] apply -p{{level}} --check {{file}}",
           "patch": "[[bin]] apply -p{{level}} {{file}}"
         },
         "PATCH": {
-          "bin": ["which custom-patcher", "which patch"],
+          "bin": ["[[resolver]] custom-patcher", "[[resolver]] patch"],
           "check": "[[bin]] -t --verbose -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
           "patch": "[[bin]] -t -p{{level}} --no-backup-if-mismatch < {{file}}"
         }
@@ -799,7 +859,7 @@ _Note that by default, user does not really have to declare any of this, but eve
       },
       "sequence": {
         "appliers": ["PATCH", "GIT"],
-        "operations": ["bin", "ping", "check", "patch"]
+        "operations": ["resolver", "bin", "ping", "check", "patch"]
       },
       "levels": [0, 1, 2]    
     }
@@ -830,11 +890,13 @@ Some things to point out on patcher configuration:
 9. By default, the patcher will halt when encountering a package that has local changes to avoid developer
    losing their work by accident. the 'force-reset' flag will force the patcher to continue resetting the 
    package code even when there are changes.
-10. The key 'operation-failures' provides developer an opportunity to fail an operation based on custom 
+10. Setting 'graceful' to true will force the module to continue to apply patches even when some of them 
+   fail to apply. By default, the module will halt of first failure.
+11. The key 'operation-failures' provides developer an opportunity to fail an operation based on custom 
    output assessment (even when the original command returns with an exit code that seems to indicate that 
    the execution was successful). Operation failures are defined separately for each operation and can be
    customised in root package configuration;
-11. In case your package includes other patches other than just the ones that are applied with this plugin, consider
+12. In case your package includes other patches other than just the ones that are applied with this plugin, consider
     using patcher/ignore to exclude those the folders that contain such patches. Otherwise false failures will
     be encountered when running `patch:validate`.
 
@@ -1014,6 +1076,9 @@ Installing the plugin will introduce a new composer command group: **patch**
 # Apply new patches (similar to patch apply on 'composer install') 
 composer patch:apply
 
+# Apply new patches and continue even if some of them fail
+composer patch:apply --graceful
+
 # Re-apply all patches
 composer patch:redo 
 
@@ -1039,8 +1104,8 @@ composer patch:redo --filter '!some*description' my/package
 # Reset all patched packages
 composer patch:undo 
 
-# Reset one specific patched package
-composer patch:undo my/package 
+# Reset patches for specified packages (path:apply will restore them)
+composer patch:undo my/package other/package
 
 # Reset one specific patch on package
 composer patch:undo --filter some-fix my/package
@@ -1048,39 +1113,39 @@ composer patch:undo --filter some-fix my/package
 # Reset packages that have patch that contains 'some-fix' in it's path definition
 composer patch:undo --filter some-fix
 
-# Gather patches information from /vendor instead of install.json
+# Gather patches information from /vendor instead of install.json and apply
 composer patch:apply --from-source
 
 # Ideal for testing out a newly added patch against my/package
 composer patch:redo --from-source
 
 # Check that all patches have valid target package info (using info from vendor)
-composer patch:validate --from-source  
+composer patch:validate --from-source
 
 # Check that patches that are owner by ROOT package are all defined correctly
 composer patch:validate --local
 
 # List registered with their current status (with optional filter(s))
-copmposer patch:list --status new --status removed
+composer patch:list --status new --status removed
 
 # List all patches that have either changed, are new or got removed 
 composer patch:list --status '!applied'
-
 ```
+
+Note that `--from-source` is only needed when patch target definitions are provided within a 
+composer.json file. If patches Provided in a separate file, the only reason to use this flag
+is when `patches-file` definitions have changed.
 
 The main purpose of this command is to make the maintenance of already created patches and adding new 
 ones as easy as possible by allowing user to test out a patch directly right after defining it without 
 having to trigger 'composer update' or 'composer install'.
 
+Note that 'validate' command will also validate patches with constraints or with #skip flag in their
+path (or in embedded data).
+
 ## Environment Variables
 
-* **COMPOSER_PATCHES_FATAL_FAIL** - exit after first patch failure is encountered
-* **COMPOSER_PATCHES_SKIP_PACKAGES** - comma-separated package names to exclude from patching, useful 
-  when maintaining patches on package upgrade. Does not affect bundled patches.
-* **COMPOSER_PATCHES_FROM_SOURCE** - always use data directly from owner's composer.json rather than 
-  using the information stored in installed.json
-* **COMPOSER_PATCHES_REAPPLY_ALL** - reapply all patches even when previously applied. Re-applies even 
-  previously applied patches.
+* **COMPOSER_PATCHES_GRACEFUL** - continue applying patches even if some of them fail.
 * **COMPOSER_PATCHES_SKIP_CLEANUP** - Will leave packages patched even when vaimo/composer-patches is 
   removed. By default, patched packages are re-installed to reset the patches (useful when creating 
   immutable build artifacts without any unnecessary modules installed).
@@ -1129,7 +1194,3 @@ composer patch --redo --from-source --filter compatibility-with-pack
 _The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' 
 makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested 
 before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
-
-## Changelog 
-
-_Changelog included in the changelog.json of the package_

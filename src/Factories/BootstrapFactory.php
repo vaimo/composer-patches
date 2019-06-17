@@ -35,16 +35,16 @@ class BootstrapFactory
     }
 
     public function create(
+        ConfigFactory $configFactory,
         ListResolver $listResolver = null,
-        OutputStrategy $outputStrategy = null,
-        array $config = array()
+        OutputStrategy $outputStrategy = null
     ) {
         if ($listResolver === null) {
             $listResolver = new ListResolvers\ChangesListResolver(
                 new ListResolvers\DirectListResolver()
             );
         }
-        
+
         if ($outputStrategy === null) {
             $outputStrategy = new OutputStrategy(
                 array(Patch::STATUS_NEW, Patch::STATUS_CHANGED, Patch::STATUS_MATCH)
@@ -54,9 +54,9 @@ class BootstrapFactory
         return new \Vaimo\ComposerPatches\Bootstrap(
             $this->composer,
             $this->appIO,
+            $configFactory,
             $listResolver,
-            $outputStrategy,
-            $config
+            $outputStrategy
         );
     }
 }
