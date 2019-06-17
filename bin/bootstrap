@@ -9,8 +9,3 @@ vendor/bin/phpcs --config-set installed_paths 'vendor/phpcompatibility/php-compa
 vendor/bin/phpcs --config-set error_severity 1
 vendor/bin/phpcs --config-set default_standard 'LOCAL'
 
-# Setup tarting sandbox
-ln -s $(readlink -f src) sandbox/modules/composer-patches/src 2>/dev/null
-ln -s $(readlink -f composer.json) sandbox/modules/composer-patches 2>/dev/null
-
-exit 0

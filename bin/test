@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+: <<'COPYRIGHT'
+ Copyright (c) Vaimo Group. All rights reserved.
+ See LICENSE_VAIMO.txt for license details.
+COPYRIGHT
+
+if [ ! -d sandbox/vendor ] ; then
+    (
+        cd sandbox
+        composer install --ansi --no-plugins
+    )
+fi
+
+(
+    cd sandbox
+    
+    composer patch:apply
+)

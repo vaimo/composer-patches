@@ -25,6 +25,11 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
     private $constraintUtils;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PackageUtils 
+     */
+    private $packageUtils;
+
+    /**
      * @param \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface $configExtractor
      */
     public function __construct(
@@ -33,6 +38,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
         $this->configExtractor = $configExtractor;
         $this->versionParser = new \Composer\Package\Version\VersionParser();
         $this->constraintUtils = new \Vaimo\ComposerPatches\Utils\ConstraintUtils();
+        $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
 
     /**
@@ -98,7 +104,9 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                 /** @var \Composer\Package\CompletePackageInterface $targetRootPackage */
                 $targetRootPackage = $rootRequires[$constraintTarget];
 
-                preg_match('/.* as (.*)$/', $targetRootPackage->getPrettyVersion(), $matches);
+                $prettyVersion = $this->packageUtils->getPrettyVersion($targetRootPackage);
+                
+                preg_match('/.* as (.*)$/', $prettyVersion, $matches);
 
                 if (isset($matches[1])) {
                     $packageVersions[] = $matches[1];

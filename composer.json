@@ -95,9 +95,10 @@
         "code:normalise": "Apply automatic fixes to the code based on the static code analysis (where applicable)"
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
         "code:analyse": "bin/analyse",
         "code:normalise": "bin/normalise",
+        "code:test": "bin/test",
+        "pre-install-cmd": "bin/bootstrap-sandbox",
         "post-install-cmd": "bin/bootstrap",
         "post-update-cmd" : "bin/bootstrap"
     },
