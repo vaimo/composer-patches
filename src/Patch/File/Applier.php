@@ -154,7 +154,7 @@ class Applier
 
         $result = true;
 
-        foreach ($operations as $operationCode => $operationName) {
+        foreach (array_keys($operations) as $operationCode) {
             if (!isset($patcher[$operationCode])) {
                 continue;
             }
