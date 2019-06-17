@@ -182,23 +182,27 @@ class PatchCommand extends \Composer\Command\BaseCommand
         ));
         
         $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
-        $repository = $composer->getRepositoryManager()->getLocalRepository();
 
-        try {
-            if ($shouldUndo && !array_filter($filters)) {
-                $bootstrap->stripPatches($isDevMode);
-            } else {
-                $runtimeUtils->setEnvironmentValues(array(
-                    Environment::PREFER_OWNER => $input->getOption('from-source'),
-                    Environment::FORCE_REAPPLY => $behaviourFlags['redo']
-                ));
-                
-                $bootstrap->applyPatches($isDevMode);
-            }
-        } finally {
-            $repository->write();
-            $lockSanitizer->sanitize();
-        }
+        $runtimeUtils->executeWithPostAction(
+            function () use ($shouldUndo, $filters, $isDevMode, $bootstrap, $runtimeUtils, $input, $behaviourFlags) {
+                if ($shouldUndo && !array_filter($filters)) {
+                    $bootstrap->stripPatches($isDevMode);
+                } else {
+                    $runtimeUtils->setEnvironmentValues(array(
+                        Environment::PREFER_OWNER => $input->getOption('from-source'),
+                        Environment::FORCE_REAPPLY => $behaviourFlags['redo']
+                    ));
+
+                    $bootstrap->applyPatches($isDevMode);
+                }
+            },
+            function () use ($composer, $lockSanitizer) {
+                $repository = $composer->getRepositoryManager()->getLocalRepository();
+
+                $repository->write();
+                $lockSanitizer->sanitize();
+            },
+        );
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
     }

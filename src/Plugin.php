@@ -44,11 +44,13 @@ class Plugin implements
     {
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
+        
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
 
         $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
         $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
 
-        $this->bootstrap = $this->bootstrapFactory->create();
+        $this->bootstrap = $this->bootstrapFactory->create($configFactory);
 
         $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer);
 
@@ -81,17 +83,27 @@ class Plugin implements
         if (!$this->bootstrap) {
             return;
         }
-
-        $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
-
-        try {
-            if ($this->bootstrapStrategy->shouldAllow()) {
-                $this->bootstrap->applyPatches($event->isDevMode());
-            }
-        } finally {
-            $repository->write();
-            $this->lockSanitizer->sanitize();
+        
+        if (!$this->bootstrapStrategy->shouldAllow()) {
+            return;
         }
+
+        $bootstrap = $this->bootstrap;
+        $lockSanitizer = $this->lockSanitizer;
+
+        $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
+
+        $runtimeUtils->executeWithPostAction(
+            function () use ($bootstrap, $event) {
+                $bootstrap->applyPatches($event->isDevMode());
+            },
+            function () use ($event, $lockSanitizer) {
+                $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
+
+                $repository->write();
+                $lockSanitizer->sanitize();
+            },
+        );
     }
 
     public function resetPackages(\Composer\Installer\PackageEvent $event)
