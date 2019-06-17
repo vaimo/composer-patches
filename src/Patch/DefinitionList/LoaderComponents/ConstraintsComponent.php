@@ -98,7 +98,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                 /** @var \Composer\Package\CompletePackageInterface $targetRootPackage */
                 $targetRootPackage = $rootRequires[$constraintTarget];
 
-                preg_match('/.* as (.*)$/', $targetRootPackage->getPrettyConstraint(), $matches);
+                preg_match('/.* as (.*)$/', $targetRootPackage->getPrettyVersion(), $matches);
 
                 if (isset($matches[1])) {
                     $packageVersions[] = $matches[1];

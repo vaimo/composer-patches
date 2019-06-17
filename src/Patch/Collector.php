@@ -126,7 +126,7 @@ class Collector
                 isset($items['_config']) ? $items['_config'] : array()
             );
 
-            if (!$updates || !isset($patches[$target])) {
+            if (empty($updates) || !isset($patches[$target])) {
                 continue;
             }
             

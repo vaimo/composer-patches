@@ -75,8 +75,6 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                     throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
                         sprintf('Could not resolve targets (patch file not found): %s ', $source)
                     );
-
-                    continue;
                 }
 
                 $paths = $this->patchFileAnalyser->getAllPaths(
