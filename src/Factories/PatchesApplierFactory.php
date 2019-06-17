@@ -84,7 +84,7 @@ class PatchesApplierFactory
             $composer
         );
 
-        $stateAnalyser = $stateAnalyserFactory->create($pluginConfig);
+        $stateAnalyser = $stateAnalyserFactory->create();
 
         $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
             $listResolver,
