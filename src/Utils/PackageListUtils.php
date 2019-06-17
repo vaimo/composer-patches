@@ -16,7 +16,7 @@ class PackageListUtils
                     : $package['name'];
             }, $packages),
             $packages
-        );
+        ) ?: array();
     }
 
     public function extractDataFromExtra(array $packages, $key = null, $default = null)

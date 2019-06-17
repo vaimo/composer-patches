@@ -105,7 +105,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             array_combine(
                 $patchPaths,
                 $patchListAnalyser->extractValue($patches, array(Patch::STATUS_LABEL))
-            )
+            ) ?: array()
         );
         
         $srcResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
