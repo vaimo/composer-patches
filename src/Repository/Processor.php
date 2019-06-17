@@ -47,8 +47,6 @@ class Processor
             
             $this->patchListUtils->sanitizeFileSystem($patches);
             
-            $repository->write();
-            
             throw $exception;
         }
 

@@ -181,22 +181,22 @@ class PatchCommand extends \Composer\Command\BaseCommand
             Environment::FORCE_RESET => (int)(bool)$input->getOption('force')
         ));
         
-        if ($shouldUndo && !array_filter($filters)) {
-            $bootstrap->stripPatches($isDevMode);
-        } else {
-            $runtimeUtils->setEnvironmentValues(array(
-                Environment::PREFER_OWNER => $input->getOption('from-source'),
-                Environment::FORCE_REAPPLY => $behaviourFlags['redo']
-            ));
+        $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
+        $repository = $composer->getRepositoryManager()->getLocalRepository();
 
-            $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
-            
-            $bootstrap->applyPatches($isDevMode);
-
-            $repository = $composer->getRepositoryManager()->getLocalRepository();
-            
+        try {
+            if ($shouldUndo && !array_filter($filters)) {
+                $bootstrap->stripPatches($isDevMode);
+            } else {
+                $runtimeUtils->setEnvironmentValues(array(
+                    Environment::PREFER_OWNER => $input->getOption('from-source'),
+                    Environment::FORCE_REAPPLY => $behaviourFlags['redo']
+                ));
+                
+                $bootstrap->applyPatches($isDevMode);
+            }
+        } finally {
             $repository->write();
-            
             $lockSanitizer->sanitize();
         }
 

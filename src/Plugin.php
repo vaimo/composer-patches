@@ -84,13 +84,14 @@ class Plugin implements
 
         $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
 
-        if ($this->bootstrapStrategy->shouldAllow()) {
-            $this->bootstrap->applyPatches($event->isDevMode());
+        try {
+            if ($this->bootstrapStrategy->shouldAllow()) {
+                $this->bootstrap->applyPatches($event->isDevMode());
+            }
+        } finally {
+            $repository->write();
+            $this->lockSanitizer->sanitize();
         }
-
-        $repository->write();
-
-        $this->lockSanitizer->sanitize();
     }
 
     public function resetPackages(\Composer\Installer\PackageEvent $event)
