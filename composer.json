@@ -110,7 +110,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "modules/proxy-plugin"
+            "url": "modules/*"
         }
     ]
 }

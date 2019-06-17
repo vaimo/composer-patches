@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4521f78329b0beb96b9a8b5c372fcada",
+    "content-hash": "34439ecc36a918c763bc3a304ba18f8c",
     "packages": [
         {
             "name": "seld/jsonlint",
