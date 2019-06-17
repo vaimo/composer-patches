@@ -79,7 +79,8 @@ class ListCommand extends \Composer\Command\BaseCommand
             '--status',
             null,
             InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-            'Match specific statuses (changed, new, applied, removed)'
+            'Match specific statuses (changed, new, applied, removed)',
+            array()
         );
 
         $this->addOption(
@@ -104,7 +105,10 @@ class ListCommand extends \Composer\Command\BaseCommand
             PatchDefinition::TARGETS => $input->getArgument('targets')
         );
 
-        $statusFilters = array_map('strtolower', $input->getOption('status'));
+        $statusFilters = array_map(
+            'strtolower', 
+            array_filter((array)$input->getOption('status'))
+        );
         
         $pluginConfig = $this->createConfigWithEnabledSources($composer);
         

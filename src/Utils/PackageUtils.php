@@ -49,7 +49,9 @@ class PackageUtils
             $extra[PluginConfig::APPLIED_FLAG] = $replacement;
         }
 
-        $package->setExtra($extra);
+        if (method_exists($package, 'setExtra')) {
+            $package->setExtra($extra);
+        } 
 
         return $patchesApplied;
     }

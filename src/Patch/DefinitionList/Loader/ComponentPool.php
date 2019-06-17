@@ -94,7 +94,9 @@ class ComponentPool
 
     private function resolveConstraintPackages(\Composer\Config $composerConfig)
     {
-        $platformOverrides = $composerConfig->get('platform');
+        $platformOverrides = array_filter(
+            (array)$composerConfig->get('platform')
+        );
 
         if ($platformOverrides) {
             $platformOverrides = array();

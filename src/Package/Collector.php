@@ -43,6 +43,6 @@ class Collector
                 return $package->getName();
             }, $packages),
             $packages
-        );
+        ) ?: array();
     }
 }
