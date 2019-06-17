@@ -86,14 +86,24 @@ class Plugin implements
 
         $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
 
-        try {
-            if ($this->bootstrapStrategy->shouldAllow()) {
-                $this->bootstrap->applyPatches($event->isDevMode());
-            }
-        } finally {
-            $repository->write();
-            $this->lockSanitizer->sanitize();
+        $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
+        
+        if (!$this->bootstrapStrategy->shouldAllow()) {
+            return;
         }
+
+        $bootstrap = $this->bootstrap;
+        $lockSanitizer = $this->lockSanitizer;
+        
+        $runtimeUtils->executeWithPostAction(
+            function () use ($bootstrap, $event) {
+                $bootstrap->applyPatches($event->isDevMode());
+            },
+            function () use ($repository, $lockSanitizer) {
+                $repository->write();
+                $lockSanitizer->sanitize();
+            },
+        );
     }
 
     public function resetPackages(\Composer\Installer\PackageEvent $event)

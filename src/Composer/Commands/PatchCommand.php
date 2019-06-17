@@ -110,6 +110,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int|void|null
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -187,19 +188,23 @@ class PatchCommand extends \Composer\Command\BaseCommand
             Environment::FORCE_RESET => (int)(bool)$input->getOption('force')
         ));
 
+        $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
         $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
         $repository = $composer->getRepositoryManager()->getLocalRepository();
-
-        try {
-            if ($shouldUndo && !array_filter($filters)) {
-                $bootstrap->stripPatches($isDevMode);
-            } else {
-                $bootstrap->applyPatches($isDevMode);
-            }
-        } finally {
-            $repository->write();
-            $lockSanitizer->sanitize();
-        }
+        
+        $runtimeUtils->executeWithPostAction(
+            function () use ($shouldUndo, $filters, $bootstrap, $isDevMode) {
+                if ($shouldUndo && !array_filter($filters)) {
+                    $bootstrap->stripPatches($isDevMode);
+                } else {
+                    $bootstrap->applyPatches($isDevMode);
+                }
+            },
+            function () use ($repository, $lockSanitizer) {
+                $repository->write();
+                $lockSanitizer->sanitize();
+            },
+        );
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
     }

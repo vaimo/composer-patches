@@ -13,4 +13,17 @@ class RuntimeUtils
             putenv($name . '=' . $value);
         }
     }
+    
+    public function executeWithPostAction($action, $postAction)
+    {
+        try {
+            $action();
+        } catch (\Exception $exception) {
+            $postAction();
+            
+            throw $exception;
+        }
+
+        $postAction();
+    }
 }
