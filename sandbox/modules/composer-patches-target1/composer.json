@@ -1,0 +1,6 @@
+{
+    "name": "vaimo/composer-patches-target1",
+    "type": "library",
+    "description": "Mock module for testing the patch applier",
+    "license": "MIT"
+}

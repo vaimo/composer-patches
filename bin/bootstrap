@@ -4,6 +4,8 @@
  See LICENSE_VAIMO.txt for license details.
 COPYRIGHT
 
+# Setup static code analysis
 vendor/bin/phpcs --config-set installed_paths 'vendor/phpcompatibility/php-compatibility'
 vendor/bin/phpcs --config-set error_severity 1
 vendor/bin/phpcs --config-set default_standard 'LOCAL'
+

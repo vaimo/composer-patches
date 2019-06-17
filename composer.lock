@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4521f78329b0beb96b9a8b5c372fcada",
+    "content-hash": "adac72037c0db597e1cf5577d0119b6d",
     "packages": [
         {
             "name": "seld/jsonlint",
@@ -2604,31 +2604,6 @@
                 "semantic meaning for change"
             ],
             "time": "2019-04-22T10:31:46+00:00"
-        },
-        {
-            "name": "vaimo/composer-patches-proxy",
-            "version": "dev-release/3",
-            "dist": {
-                "type": "path",
-                "url": "modules/proxy-plugin",
-                "reference": "871eac895cb0bdeb4f70428ab264ae83bad274ec"
-            },
-            "require": {
-                "composer-plugin-api": "^1.0"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "Vaimo\\ComposerPatchesProxy\\Plugin"
-            },
-            "autoload": {
-                "psr-4": {
-                    "Vaimo\\ComposerPatchesProxy\\": "src"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Proxy package to be able to use plugin commands provided by vaimo/composer-changelogs when having vaimo/composer-changelogs as the ROOT package"
         },
         {
             "name": "zetacomponents/base",

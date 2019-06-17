@@ -64,4 +64,21 @@ class PackageUtils
             ? $extra[PluginConfig::APPLIED_FLAG]
             : array();
     }
+
+    public function getPrettyVersion($package)
+    {
+        while ($package instanceof \Composer\Package\AliasPackage) {
+            $package = $package->getAliasOf();
+        }
+        
+        if (method_exists($package, 'getPrettyVersion')) {
+            return $package->getPrettyVersion();
+        }
+        
+        if (method_exists($package, 'getPrettyConstraint')) {
+            return $package->getPrettyConstraint();
+        }
+
+        return '';
+    }
 }

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+: <<'COPYRIGHT'
+ Copyright (c) Vaimo Group. All rights reserved.
+ See LICENSE_VAIMO.txt for license details.
+COPYRIGHT
+
+# Setup tarting sandbox
+ln -s $(readlink -f src) sandbox/modules/composer-patches/src 2>/dev/null
+ln -s $(readlink -f composer.json) sandbox/modules/composer-patches 2>/dev/null
+
+exit 0

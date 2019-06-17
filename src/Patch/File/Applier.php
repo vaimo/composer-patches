@@ -168,7 +168,7 @@ class Applier
 
             $operationFailures = $this->extractArrayValue($failures, $operationCode);
 
-            $output = $this->resolveOperationOutput($applierOperations, $args, $operationFailures);
+            list($result, $output) = $this->resolveOperationOutput($applierOperations, $args, $operationFailures);
 
             if ($output !== false) {
                 $operationResults[$operationCode] = $output;
@@ -226,10 +226,10 @@ class Applier
                 continue;
             }
 
-            return $output;
+            return array($result, $output);
         }
 
-        return false;
+        return array(false, '');
     }
 
     private function scanOutputForFailures($output, array $failureMessages)
