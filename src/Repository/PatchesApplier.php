@@ -313,8 +313,15 @@ class PatchesApplier
             $failedPath = $exception->getFailedPatchPath();
 
             $paths = array_keys($patchesQueue);
-            $appliedPaths = array_slice($paths, 0, array_search($failedPath, $paths));
-            $appliedPatches = array_intersect_key($patchesQueue, array_flip($appliedPaths));
+            
+            $failureIndex = array_search($failedPath, $paths);
+            
+            if ($failureIndex !== false) {
+                $appliedPaths = array_slice($paths, 0, array_search($failedPath, $paths));
+                $appliedPatches = array_intersect_key($patchesQueue, array_flip($appliedPaths));
+            } else {
+                $appliedPatches = array();
+            }
 
             $this->patcherStateManager->registerAppliedPatches($repository, $appliedPatches);
 

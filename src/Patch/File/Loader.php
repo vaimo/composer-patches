@@ -11,7 +11,7 @@ class Loader
     {
         return implode(
             PHP_EOL,
-            array_map('rtrim', file($path))
+            array_map('rtrim', file($path) ?: array())
         );
     }
 }
