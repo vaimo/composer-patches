@@ -110,9 +110,7 @@ class PatchesLoaderFactory
             $loaders
         );
 
-        $loaderComponents = $loaderComponentsPool->getList(
-            $pluginConfig->getSkippedPackages()
-        );
+        $loaderComponents = $loaderComponentsPool->getList();
 
         $srcResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory(
             $this->composer
