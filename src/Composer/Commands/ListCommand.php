@@ -106,7 +106,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
 
         $statusFilters = array_map(
-            'strtolower', 
+            'strtolower',
             array_filter((array)$input->getOption('status'))
         );
         

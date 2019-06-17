@@ -51,7 +51,7 @@ class PackageUtils
 
         if (method_exists($package, 'setExtra')) {
             $package->setExtra($extra);
-        } 
+        }
 
         return $patchesApplied;
     }
