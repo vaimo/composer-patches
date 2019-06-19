@@ -2,11 +2,7 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 3.48.9
-
-### Feature
-
-* allow patches to be searched from custom location provided by a command line argument (can be multiple values) --search=path1 --search=path2
+## 3.47.1 (2019-06-19)
 
 ### Fix
 
@@ -25,7 +21,7 @@ _This file has been auto-generated from the contents of changelog.json_
 * code normalised according to coding standards
 * simple integration tests added that test the patch applying in sandbox Composer project
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.9) [diff](https://github.com/vaimo/composer-patches/compare/3.47.0...3.48.9)
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.1) [diff](https://github.com/vaimo/composer-patches/compare/3.47.0...3.47.1)
 
 ## 3.47.0 (2019-04-09)
 
