@@ -328,7 +328,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.47.1...4.0.0)
 
-## 3.47.1
+## 3.47.1 (2019-06-19)
 
 ### Fix
 
@@ -345,6 +345,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https:
 
 * improved early autoloader setup within proxy plugin
 * code normalised according to coding standards
+* simple integration tests added that test the patch applying in sandbox Composer project
 
 ### Maintenance
 

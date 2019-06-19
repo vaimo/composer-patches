@@ -255,7 +255,8 @@
         ],
         "maintenance": [
             "improved early autoloader setup within proxy plugin",
-            "code normalised according to coding standards"
+            "code normalised according to coding standards",
+            "simple integration tests added that test the patch applying in sandbox Composer project"
         ]
     },
     "3.47.0": {

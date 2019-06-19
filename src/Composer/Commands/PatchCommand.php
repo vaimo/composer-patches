@@ -59,7 +59,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
             'Apply only those patch files/sources that match with provided filter'
         );
-
+        
         $this->addOption(
             '--explicit',
             null,

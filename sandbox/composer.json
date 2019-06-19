@@ -9,9 +9,9 @@
     "require-dev": {
         "composer/composer": "^1.0.0",
         "vaimo/composer-patches": "*",
-        "vaimo/composer-patches-target1": "*",
-        "vaimo/composer-patches-target2": "*",
-        "vaimo/composer-patches-target3": "*"
+        "vaimo/composer-patches-target1": "1.0.0",
+        "vaimo/composer-patches-target2": "1.2.0",
+        "vaimo/composer-patches-target3": "1.2.3"
     },
     "config": {
         "platform": {
@@ -28,7 +28,14 @@
     "repositories": [
         {
             "type": "path",
-            "url": "modules/*",
+            "url": "modules/composer-patches",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "modules/composer-patches-target*",
             "options": {
                 "symlink": false
             }

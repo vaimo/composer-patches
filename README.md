@@ -1194,3 +1194,20 @@ composer patch --redo --from-source --filter compatibility-with-pack
 _The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' 
 makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested 
 before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
+
+## Development
+
+The module ships with several utility scripts that either deal with static code analysis or with running 
+the tests. Note that all these commands expect user to have installed all the dependencies of the package
+beforehand.
+
+```
+# Runs one or several static code analysis tools against the code-base
+composer code:analyse
+
+# Fixes as many issues as possible automatically (phpcs auto-fixer)
+composer code:normalise
+
+# Runs several integration-tests against the application
+composer code:test
+```
