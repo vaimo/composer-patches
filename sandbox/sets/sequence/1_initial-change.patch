@@ -1,8 +1,6 @@
-Change: value8 => valueA
+Change: value8 => valueC
 
 @package vaimo/composer-patches-target1
-
-@assert vaimo/composer-patches-target1,value8,valueC
 
 --- src/example.txt.org
 +++ src/example.txt

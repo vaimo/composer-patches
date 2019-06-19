@@ -35,6 +35,10 @@ bgdylw=$(tput setab 3)      # dark yellow background
 bgcol=$(tput sgr 1 0)       # Switch to background (coloring mode)
 fgcol=$(tput sgr 0 0)       # Switch to foreground (coloring mode)
 
+_info() {
+    echo "${grn}${@}${txtrst}"
+}
+
 _error() {
     echo "${bgdred}${bldwht}${@}${txtrst}"
 }
@@ -85,8 +89,8 @@ assertion_error() {
         after=${tmp}
     fi
 
-    _error "FAIL: ${patch_file}"
-    _error "FILE: ${file}"
+    _error "PATCH: $(readlink -f ${patch_file})"
+    _error "TARGET: ${file}"
     _error "ASSERTION: ${before} => ${after}"        
 }
 
@@ -100,40 +104,53 @@ function apply_patches() {
     eval "composer ${command} --ansi"
 }
 
-function run_tests() {
+function reset_packages() {
     if [ -f vendor/composer/installed.json ] ; then
         sudo sed -i 's|\s"name":\s"vaimo/composer-patches-target\(.*\)",| \
             "name": "__vaimo/composer-patches-target\1",|g' \
             vendor/composer/installed.json
     fi
     
-    composer install --ansi --no-plugins
-    
-    apply_patches 'default' 'patch:apply'
-        
-    for patch_file in $(find patches -type f) ; do
-        local assertion=$(cat ${patch_file}|grep '@assert')
-        
-        assertions=$(echo "${assertion}"|cut -d' ' -f2)
-        
-        local original_ifs=${IFS}
-        IFS=$'\n'
+    composer install --ansi --no-plugins &>/dev/null
+}
 
-        for assertion in ${assertions} ; do
-            if assert ${assertion} ; then
-                continue
-            fi
+function run_tests() {
+    for set_name in $(ls sets -1) ; do
+        reset_packages
+        
+        echo '-----------------------------------'
+        _info "SET NAME: ${set_name}"
+        echo '-----------------------------------'
+        
+        apply_patches "${set_name}" 'patch:apply'
+        
+        for patch_file in $(find -L patches -type f) ; do
+            local assertion=$(cat ${patch_file}|grep '@assert')
+        
+            assertions=$(echo "${assertion}"|cut -d' ' -f2)
+        
+            local original_ifs=${IFS}
+            IFS=$'\n'
+
+            for assertion in ${assertions} ; do
+                if assert ${assertion} ; then
+                    continue
+                fi
             
-            assertion_error "${patch_file}" "${assertion}"
+                assertion_error "${patch_file}" "${assertion}"
                         
-            exit 1
+                exit 1
+            done
+        
+            IFS=${original_ifs}
         done
         
-        IFS=${original_ifs}
+        echo ''
     done
 }
 
 (
     cd sandbox
+    
     run_tests
 )
