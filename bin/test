@@ -39,6 +39,57 @@ _error() {
     echo "${bgdred}${bldwht}${@}${txtrst}"
 }
 
+assert() {
+    assertion=${1}
+    invert=${2}
+
+    local name=$(echo ${assertion}|cut -d',' -f1)
+    local before=$(echo ${assertion}|cut -d',' -f2)
+    local after=$(echo ${assertion}|cut -d',' -f3)
+
+    local contents=$(cat vendor/${name}/src/example.txt)
+
+    if [ "${invert}" != "" ] && [ "${invert}" != "0" ] ; then
+        local tmp=${before}
+        before=${after}
+        after=${tmp}
+    fi
+
+    if echo "${contents}"|grep -qw "^${before}" && [ "${before}" == "${after}" ] ; then
+        return 0
+    fi
+        
+    if ! echo "${contents}"|grep -qw "^${before}" && echo "${contents}"|grep -qw "^${after}" ; then
+        return 0
+    fi
+    
+    return 1
+}
+
+assertion_error() {
+    patch_file=${1}
+    assertion=${2}
+    invert=${3}
+
+    local name=$(echo ${assertion}|cut -d',' -f1)
+    local before=$(echo ${assertion}|cut -d',' -f2)
+    local after=$(echo ${assertion}|cut -d',' -f3)
+
+    local file=vendor/${name}/src/example.txt
+
+    local contents=$(cat ${file})
+
+    if [ "${invert}" != "" ] && [ "${invert}" != "0" ] ; then
+        local tmp=${before}
+        before=${after}
+        after=${tmp}
+    fi
+
+    _error "FAIL: ${patch_file}"
+    _error "FILE: ${file}"
+    _error "ASSERTION: ${before} => ${after}"        
+}
+
 function run_tests()
 {
     if [ -f vendor/composer/installed.json ] ; then
@@ -61,23 +112,12 @@ function run_tests()
         IFS=$'\n'
 
         for assertion in ${assertions} ; do
-            local name=$(echo ${assertion}|cut -d',' -f1)
-            local before=$(echo ${assertion}|cut -d',' -f2)
-            local after=$(echo ${assertion}|cut -d',' -f3)
-        
-            local contents=$(cat vendor/${name}/src/example.txt)
-                
-            if echo "${contents}"|grep -qw "^${before}" && [ "${before}" == "${after}" ] ; then
+            if assert ${assertion} ; then
                 continue
             fi
-        
-            if ! echo "${contents}"|grep -qw "^${before}" && echo "${contents}"|grep -qw "^${after}" ; then
-                continue
-            fi
-
-            _error "FAIL: ${patch_file}"
-            _error "ASSERTION: ${before} => ${after}"
             
+            assertion_error "${patch_file}" "${assertion}"
+                        
             exit 1
         done
         
