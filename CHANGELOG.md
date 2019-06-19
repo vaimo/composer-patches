@@ -2,28 +2,38 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 4.16.1
+## 4.16.1 (2019-06-19)
 
 all features and fixes in this release are forward-ported from 3.47.1
+
 ### Fix
 
 * wrong path used for pre-loading classes while running composer commands when the plugin package used as ROOT
 * removed all syntax/code that was not compatible with 5.3
 * removed/replaced all dependencies that were not compatible with 5.3
+* having a patch for a back-ported fix for a package where when the package gets updated, the update could cause reverse-apply of the patch, thus reintroducing issue that was fixed in newer release (only happens with patches that should be declared with upper-capped version constraints but are not for some reason). This will cause patch failure from now on
+* don't provide patch commands when plugin on older (<1.1) Composer versions [github/31]
+* always load patches in alphabetical order from file-system when using patches-search (unless @after, @before directives used within the patch file; introduced in FileSystemUtils, using natural sorting) [github/29]
+* fail the whole patching process with fatal exception when none of the patch applier commands (defined in the plugin config) are available [github/30]
+* log output typos corrected
+
 
 ### Maintenance
 
 * improved early autoloader setup within proxy plugin
-* code normalised
+* code normalised according to coding standards
+* simple integration tests added that test the patch applying in sandbox Composer project
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.16.1) [diff](https://github.com/vaimo/composer-patches/compare/4.16.0...4.16.1)
 
 ## 4.16.0 (2019-04-09)
 
 all features and fixes in this release are forward-ported from 3.47.0
+
 ### Feature
 
-* allow platform requirement dependencies on patches a'la php:&gt;=7.2 (previously only package dependencies could be declared); usable with &quot;depends&quot; config or @depends tag
+* allow platform requirement dependencies on patches a'la php:>=7.2 (previously only package dependencies could be declared); usable with "depends" config or @depends tag
+
 
 ### Fix
 
@@ -37,10 +47,12 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.16.0) [diff](https
 This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports
 
 All features and fixes in this release are forward-ported from 3.46.0
+
 ### Feature
 
 * added --with-affected argument option for path:list command to list patches that indirectly are affected by the new/changed patches (would be re-applied on actually patch:apply due to package resets caused by new/changed statuses)
 * patch owner embedded in applied patch registry to provide proper REMOVED information when patch gets removed
+
 
 ### Fix
 
@@ -54,9 +66,11 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.15.0) [diff](https
 ## 4.14.0 (2019-04-02)
 
 all features and fixes in this release are forward-ported from 3.45.0
+
 ### Feature
 
 * allow patch:validate to use only patches that the root package owns: --local
+
 
 ### Fix
 
@@ -67,6 +81,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.14.0) [diff](https
 ## 4.13.0 (2019-04-01)
 
 all features and fixes in this release are forward-ported from 3.44.0
+
 ### Feature
 
 * Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)
@@ -76,11 +91,13 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.13.0) [diff](https
 ## 4.12.0 (2019-03-31)
 
 all features and fixes in this release are forward-ported from 3.43.0
+
 ### Feature
 
 * allow patch file paths, etc to be defined under extra/patcher key to make sure that they don't hog up too much main level keys of 'extra' config for given package (old keys are also still supported)
 * allow some patches to be ignored when running patch:validate by providing list of path ignores in package's configuration: extra/patcher/ignore (takes array of ignored paths)
 * allow patcher operations to be split to have separate sub-operation per OS type [github/26]
+
 
 ### Fix
 
@@ -91,13 +108,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.12.0) [diff](https
 
 ## 4.11.0 (2019-03-21)
 
-all features and fixes in this release are forward-ported from 3.42.0, 3.42.1 &amp; 3.42.2
+all features and fixes in this release are forward-ported from 3.42.0, 3.42.1 & 3.42.2
+
 ### Feature
 
 * added more informative patches configuration JSON validation (that gives exact details on what's wrong with the JSON file)
 * added alias for --excluded argument: --with-excludes for more intuitive usage and to move towards more self-documenting arguments
 * added alias for --explicit argument: --show-reapplies for more intuitive usage and to move towards more self-documenting arguments
 * added reason to patch:validation errors (either 'NO FILE' or 'NO CONFIG')
+
 
 ### Fix
 
@@ -107,6 +126,7 @@ all features and fixes in this release are forward-ported from 3.42.0, 3.42.1 &a
 * better error message when wanting to download patches from unsecure URLs by referring to documentation of the plugin rather than to documentation of Composer (the module has it's own 'secure-http' config option that only affects patches)
 * patch validation not properly issues that one can have with remote patches (report UNSECURE and ERROR 404 patches)
 * rollback on newer array declaration usage (broke compatibility with 5.3)
+
 
 ### Maintenance
 
@@ -149,11 +169,13 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.8.1) [diff](https:
 ## 4.8.0 (2019-02-12)
 
 all features and fixes in this release are forward-ported from 3.39.0
+
 ### Feature
 
 * added --brief to list command (skips over description, etc)
 * when using --filter or targeting a specific package with 'redo', 'undo' or 'apply', show only those patches that match with the filter; other patches still applied, just not reported (all actions can still be made visible when using --explicit flag)
 * show information about patches that are removed (when patches are re-applied, show which items were applied, but no longer listed/queued)
+
 
 ### Fix
 
@@ -257,7 +279,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.0) [diff](https:
 
 ### Feature
 
-* forward-port (3.34.0): allow patch path strip level to be defined in patch's embedded target-info declaration (@level &lt;int&gt;)
+* forward-port (3.34.0): allow patch path strip level to be defined in patch's embedded target-info declaration (@level <int>)
 
 ### Fix
 
@@ -346,11 +368,6 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https:
 * improved early autoloader setup within proxy plugin
 * code normalised according to coding standards
 * simple integration tests added that test the patch applying in sandbox Composer project
-
-### Maintenance
-
-* improved early autoloader setup within proxy plugin
-* code normalised
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.1) [diff](https://github.com/vaimo/composer-patches/compare/3.47.0...3.47.1)
 
