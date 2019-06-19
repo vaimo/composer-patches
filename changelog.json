@@ -4,7 +4,10 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
-    "3.47.1": {
+    "3.48.9": {
+        "feature": [
+            "allow patches to be searched from custom location provided by a command line argument (can be multiple values) --search=path1 --search=path2"
+        ],
         "fix": [
             "wrong path used for pre-loading classes while running composer commands when the plugin package used as ROOT",
             "removed all syntax/code that was not compatible with 5.3",

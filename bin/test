@@ -90,19 +90,27 @@ assertion_error() {
     _error "ASSERTION: ${before} => ${after}"        
 }
 
-function run_tests()
-{
+function apply_patches() {
+    local set_name=${1}
+    local command=${2}
+    
+    rm patches 2>/dev/null
+    ln -s sets/${set_name} patches
+    
+    eval "composer ${command} --ansi"
+}
+
+function run_tests() {
     if [ -f vendor/composer/installed.json ] ; then
         sudo sed -i 's|\s"name":\s"vaimo/composer-patches-target\(.*\)",| \
             "name": "__vaimo/composer-patches-target\1",|g' \
             vendor/composer/installed.json
     fi
     
-    
     composer install --ansi --no-plugins
     
-    composer patch:apply --ansi
-    
+    apply_patches 'default' 'patch:apply'
+        
     for patch_file in $(find patches -type f) ; do
         local assertion=$(cat ${patch_file}|grep '@assert')
         

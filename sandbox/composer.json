@@ -28,7 +28,14 @@
     "repositories": [
         {
             "type": "path",
-            "url": "modules/*",
+            "url": "modules/composer-patches",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "modules/composer-patches-target*",
             "options": {
                 "symlink": false
             }

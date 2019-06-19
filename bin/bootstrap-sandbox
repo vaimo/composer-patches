@@ -5,6 +5,7 @@
 COPYRIGHT
 
 # Setup tarting sandbox
+mkdir sandbox/modules/composer-patches 2>/dev/null
 ln -s $(readlink -f src) sandbox/modules/composer-patches/src 2>/dev/null
 ln -s $(readlink -f composer.json) sandbox/modules/composer-patches 2>/dev/null
 
