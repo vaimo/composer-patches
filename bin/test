@@ -157,6 +157,8 @@ function run_tests() {
 
 (
     cd sandbox
-    
+
+    composer install --ansi
+
     run_tests
 )
