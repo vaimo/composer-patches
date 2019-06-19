@@ -25,7 +25,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
     private $constraintUtils;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PackageUtils 
+     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
     private $packageUtils;
 

@@ -150,7 +150,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             Config::PATCHER_SOURCES => array_fill_keys(
                 array_keys($defaultValues[Config::PATCHER_SOURCES]),
                 true
-            )            
+            )
         );
 
         if ($behaviourFlags['redo'] || $behaviourFlags['undo']) {
