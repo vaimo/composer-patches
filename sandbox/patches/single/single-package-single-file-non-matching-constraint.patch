@@ -1,0 +1,18 @@
+Change: value8 => valueA
+
+@package vaimo/composer-patches-target3
+@version >1.2.3
+
+@assert vaimo/composer-patches-target3,value17,value17
+
+--- vaimo/composer-patches-target3/src/example.txt.org
++++ vaimo/composer-patches-target3/src/example.txt
+@@ -14,7 +14,7 @@
+ value14
+ value15
+ value16
+-value17
++valueB
+ value18
+ value19
+ value20

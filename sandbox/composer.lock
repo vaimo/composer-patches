@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0f0d1d84ca9555056ab9eba3b17b7b5c",
+    "content-hash": "30f72bd407eee54952675b34416ed3eb",
     "packages": [],
     "packages-dev": [
         {
@@ -969,8 +969,7 @@
                 "phpunit/phpunit": "^4.8.36",
                 "sebastian/phpcpd": "^1.4.3",
                 "squizlabs/php_codesniffer": "^2.9.2",
-                "vaimo/composer-changelogs": "^0.15.1",
-                "vaimo/composer-patches-proxy": "*"
+                "vaimo/composer-changelogs": "^0.15.1"
             },
             "type": "composer-plugin",
             "extra": {
@@ -1041,15 +1040,15 @@
                 "utils",
                 "version restriction"
             ],
-            "time": "2019-06-17T12:45:52+00:00"
+            "time": "2019-06-17T22:13:06+00:00"
         },
         {
             "name": "vaimo/composer-patches-target1",
-            "version": "dev-release/3",
+            "version": "1.0.0",
             "dist": {
                 "type": "path",
                 "url": "modules/composer-patches-target1",
-                "reference": "ff9a02909d9e7edb82b19ae1e69c70a01e8f3dce"
+                "reference": "d9168f11f64a775069e1d8afec9c6317337e85ab"
             },
             "type": "library",
             "license": [
@@ -1062,11 +1061,11 @@
         },
         {
             "name": "vaimo/composer-patches-target2",
-            "version": "dev-release/3",
+            "version": "1.2.0",
             "dist": {
                 "type": "path",
                 "url": "modules/composer-patches-target2",
-                "reference": "f238989dcffa6d131a3e19c8e50cb1c0d74fe312"
+                "reference": "e5344b038b6d29ef554c95ff9dfe3176bf06e40a"
             },
             "type": "library",
             "license": [
@@ -1079,11 +1078,11 @@
         },
         {
             "name": "vaimo/composer-patches-target3",
-            "version": "dev-release/3",
+            "version": "1.2.3",
             "dist": {
                 "type": "path",
                 "url": "modules/composer-patches-target3",
-                "reference": "7d8af31fcfb37d2f300ffaa5928727454476e8a2"
+                "reference": "3c418ce31877ead2bc84f2beab8ada9ca6c7619b"
             },
             "type": "library",
             "license": [

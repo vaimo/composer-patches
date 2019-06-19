@@ -4,15 +4,88 @@
  See LICENSE_VAIMO.txt for license details.
 COPYRIGHT
 
-if [ ! -d sandbox/vendor ] ; then
-    (
-        cd sandbox
-        composer install --ansi --no-plugins
-    )
-fi
+### Color shortcuts for echoed color output ###
+txtrst=$(tput sgr0)         # Reset color/styling
+txtund=$(tput sgr 0 1)      # Underline
+txtbld=$(tput bold)         # Bold
+red=$(tput setaf 9)         # bright red
+drkred=$(tput setaf 1)      # dark red
+drkmag=$(tput setaf 5)      # dark magenta
+grn=$(tput setaf 2)         # dark green
+brghtgrn=$(tput setaf 10)   # bright green
+dkylw=$(tput setaf 3)       # dark yellow
+yel=$(tput setaf 11)        # yellow
+gry=$(tput setaf 7)         # grey (default terminal grey)
+dgry=$(tput setaf 8)        # dark grey
+blu=$(tput setaf 12)        # blue
+mag=$(tput setaf 13)        # magento
+drkcya=$(tput setaf 6)      # dark cyan
+cya=$(tput setaf 14)        # cyan
+wht=$(tput setaf 15)        # white
+bldred=${txtbld}${red}      # bold-red
+bldgrn=${txtbld}${grn}      # bold-green
+bldyel=${txtbld}${yel}      # bold-yellow
+bldblu=${txtbld}${blu}      # bold-blue
+bldwht=${txtbld}${wht}      # bold-white
+bldcya=${txtbld}${cya}      # bold-cya
+bgdred=$(tput setab 1)      # dark red background
+bgdblu=$(tput setab 4)      # dark blue background
+bgdgrn=$(tput setab 2)      # green background
+bgdylw=$(tput setab 3)      # dark yellow background
+bgcol=$(tput sgr 1 0)       # Switch to background (coloring mode)
+fgcol=$(tput sgr 0 0)       # Switch to foreground (coloring mode)
+
+_error() {
+    echo "${bgdred}${bldwht}${@}${txtrst}"
+}
+
+function run_tests()
+{
+    if [ -f vendor/composer/installed.json ] ; then
+        sudo sed -i 's|\s"name":\s"vaimo/composer-patches-target\(.*\)",| \
+            "name": "__vaimo/composer-patches-target\1",|g' \
+            vendor/composer/installed.json
+    fi
+    
+    
+    composer install --ansi --no-plugins
+    
+    composer patch:apply --ansi
+    
+    for patch_file in $(find patches -type f) ; do
+        local assertion=$(cat ${patch_file}|grep '@assert')
+        
+        assertions=$(echo "${assertion}"|cut -d' ' -f2)
+        
+        local original_ifs=${IFS}
+        IFS=$'\n'
+
+        for assertion in ${assertions} ; do
+            local name=$(echo ${assertion}|cut -d',' -f1)
+            local before=$(echo ${assertion}|cut -d',' -f2)
+            local after=$(echo ${assertion}|cut -d',' -f3)
+        
+            local contents=$(cat vendor/${name}/src/example.txt)
+                
+            if echo "${contents}"|grep -qw "^${before}" && [ "${before}" == "${after}" ] ; then
+                continue
+            fi
+        
+            if ! echo "${contents}"|grep -qw "^${before}" || echo "${contents}"|grep -qw "^${after}" ; then
+                continue
+            fi
+
+            _error "FAIL: ${patch_file}"
+            _error "ASSERTION: ${before} => ${after}"
+            
+            exit 1
+        done
+        
+        IFS=${original_ifs}
+    done
+}
 
 (
     cd sandbox
-    
-    composer patch:apply
+    run_tests
 )
