@@ -947,7 +947,7 @@
         },
         {
             "name": "vaimo/composer-patches",
-            "version": "dev-release/3",
+            "version": "master",
             "dist": {
                 "type": "path",
                 "url": "modules/composer-patches",
