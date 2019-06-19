@@ -27,8 +27,8 @@ bldgrn=${txtbld}${grn}      # bold-green
 bldyel=${txtbld}${yel}      # bold-yellow
 bldblu=${txtbld}${blu}      # bold-blue
 bldwht=${txtbld}${wht}      # bold-white
-bldcya=${txtbld}${cya}      # bold-cya
 bgdred=$(tput setab 1)      # dark red background
+bldcya=${txtbld}${cya}      # bold-cya
 bgdblu=$(tput setab 4)      # dark blue background
 bgdgrn=$(tput setab 2)      # green background
 bgdylw=$(tput setab 3)      # dark yellow background
@@ -114,13 +114,19 @@ function reset_packages() {
     composer install --ansi --no-plugins &>/dev/null
 }
 
+function _line() {
+    local character=${1}
+
+    eval echo $(printf -- '${character}%.0s' {1..80})
+}
+
 function run_tests() {
     for set_name in $(ls sets -1) ; do
         reset_packages
         
-        echo '-----------------------------------'
-        _info "SET NAME: ${set_name}"
-        echo '-----------------------------------'
+        _line '-' 80
+        _info "SET NAME: $(echo ${set_name}|tr '[:lower:]' '[:upper:]')"
+        _line '-' 80
         
         apply_patches "${set_name}" 'patch:apply'
         
