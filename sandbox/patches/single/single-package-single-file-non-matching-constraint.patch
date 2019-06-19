@@ -5,8 +5,8 @@ Change: value8 => valueA
 
 @assert vaimo/composer-patches-target3,value17,value17
 
---- vaimo/composer-patches-target3/src/example.txt.org
-+++ vaimo/composer-patches-target3/src/example.txt
+--- src/example.txt.org
++++ src/example.txt
 @@ -14,7 +14,7 @@
  value14
  value15

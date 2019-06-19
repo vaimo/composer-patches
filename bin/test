@@ -71,7 +71,7 @@ function run_tests()
                 continue
             fi
         
-            if ! echo "${contents}"|grep -qw "^${before}" || echo "${contents}"|grep -qw "^${after}" ; then
+            if ! echo "${contents}"|grep -qw "^${before}" && echo "${contents}"|grep -qw "^${after}" ; then
                 continue
             fi
 
