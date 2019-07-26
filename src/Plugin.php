@@ -56,7 +56,7 @@ class Plugin implements
 
         $pluginBootstrap->preloadPluginClasses();
 
-        if (class_exists('\Composer\Plugin\Capability\CommandProvider')) {
+        if (!interface_exists('\Composer\Plugin\Capability\CommandProvider')) {
             return;
         }
         

@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.16.2
+
+changes in this release forward-ported from 3.47.2
+
+### Fix
+
+* support for older (<1.1) Composer releases faultily implemented where the availability with CommandsProvider was incorrectly checked for
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.16.2) [diff](https://github.com/vaimo/composer-patches/compare/4.16.1...4.16.2)
+
 ## 4.16.1 (2019-06-19)
 
 all features and fixes in this release are forward-ported from 3.47.1
@@ -348,7 +358,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.47.1...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.47.2...4.0.0)
+
+## 3.47.2 (2019-07-26)
+
+### Fix
+
+* support for older (<1.1) Composer releases faultily implemented where the availability with CommandsProvider was incorrectly checked for
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.2) [diff](https://github.com/vaimo/composer-patches/compare/3.47.1...3.47.2)
 
 ## 3.47.1 (2019-06-19)
 
