@@ -79,7 +79,7 @@
         "patch search",
         "patch resolve"
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "extra": {
         "class": "Vaimo\\ComposerPatches\\Plugin",
         "changelog": {

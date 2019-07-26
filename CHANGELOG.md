@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.47.2
+
+### Fix
+
+* support for older (<1.1) Composer releases faultily implemented where the availability with CommandsProvider was incorrectly checked for
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.2) [diff](https://github.com/vaimo/composer-patches/compare/3.47.1...3.47.2)
+
 ## 3.47.1 (2019-06-19)
 
 ### Fix
