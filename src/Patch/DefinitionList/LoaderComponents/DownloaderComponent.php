@@ -25,7 +25,7 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
     private $gracefulMode;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PathUtils 
+     * @var \Vaimo\ComposerPatches\Utils\PathUtils
      */
     private $pathUtils;
 
