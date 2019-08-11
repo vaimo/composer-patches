@@ -91,7 +91,7 @@ class Applier
             throw new \Vaimo\ComposerPatches\Exceptions\RuntimeException($message);
         }
         
-        $errors = [];
+        $errors = array();
 
         foreach ($levels as $patchLevel) {
             $arguments = array_replace(
@@ -117,7 +117,7 @@ class Applier
 
         $errors = array_map(
             'array_unique',
-            array_reduce($errors, 'array_merge_recursive', [])
+            array_reduce($errors, 'array_merge_recursive', array())
         );
         
         foreach ($errors as $type => $messages) {
