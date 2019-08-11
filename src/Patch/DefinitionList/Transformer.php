@@ -28,7 +28,6 @@ class Transformer
             }, array_keys($group), $group);
 
             return array_combine($keys, $fingerprints);
-
         }, $groups);
 
         return $result;

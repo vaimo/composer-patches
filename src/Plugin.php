@@ -110,7 +110,7 @@ class Plugin implements
         }
 
         throw new \Composer\EventDispatcher\ScriptExecutionException(
-            'Execution halted due to composer-patch failure', 
+            'Execution halted due to composer-patch failure',
             1
         );
     }

@@ -7,7 +7,7 @@ namespace Vaimo\ComposerPatches\Sources;
 
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\Package\PackageInterface;
-use Vaimo\ComposerPatches\Composer\Constants as ComposerConstants; 
+use Vaimo\ComposerPatches\Composer\Constants as ComposerConstants;
 
 class VendorSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceListInterface
 {
@@ -35,7 +35,7 @@ class VendorSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceListI
 
         $allowedVendors = array_fill_keys($this->vendors, true);
         return array_filter(
-            $packages, 
+            $packages,
             function (PackageInterface $package) use ($allowedVendors) {
                 $vendorName = strtok($package->getName(), ComposerConstants::PACKAGE_SEPARATOR);
                 

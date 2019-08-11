@@ -116,7 +116,7 @@ class Applier
         }
 
         $errors = array_map(
-            'array_unique', 
+            'array_unique',
             array_reduce($errors, 'array_merge_recursive', [])
         );
         
@@ -125,7 +125,7 @@ class Applier
             
             if ($fileNotFoundMessages !== $messages) {
                 $errors[$type] = array_diff($messages, $fileNotFoundMessages);
-            } 
+            }
         }
 
         $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure(
@@ -138,7 +138,10 @@ class Applier
     }
 
     private function executeOperations(
-        $patchers, array $operations, array $args = array(), array $failures = array()
+        $patchers,
+        array $operations,
+        array $args = array(),
+        array $failures = array()
     ) {
         $outputRecords = array();
         
@@ -150,11 +153,11 @@ class Applier
             try {
                 return $this->processOperationItems($patcher, $operations, $args, $failures);
             } catch (\Vaimo\ComposerPatches\Exceptions\OperationFailure $exception) {
-                $operationReference = is_string($exception->getMessage()) 
-                    ? $exception->getMessage() 
+                $operationReference = is_string($exception->getMessage())
+                    ? $exception->getMessage()
                     : PatcherOperation::TYPE_UNKNOWN;
 
-                $outputRecords[$type] = $exception->getOutput(); 
+                $outputRecords[$type] = $exception->getOutput();
                     
                 $messageArgs = array(
                     strtoupper($operationReference),
@@ -220,8 +223,8 @@ class Applier
             $operationFailures = $this->extractArrayValue($failures, $operationCode);
 
             list($result, $output) = $this->resolveOperationOutput(
-                $applierOperations, 
-                $args, 
+                $applierOperations,
+                $args,
                 $operationFailures
             );
 

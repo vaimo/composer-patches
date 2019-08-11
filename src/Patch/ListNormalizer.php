@@ -34,7 +34,6 @@ class ListNormalizer
         $this->definitionNormalizer = $definitionNormalizer;
 
         $this->patchListSanitizer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Sanitizer();
-        
     }
 
     public function normalize(array $list, array $config)
