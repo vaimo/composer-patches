@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.1
+
+changes in this release forward-ported from 3.48.1
+
+### Fix
+
+* broken compatibility with PHP 5.3 (wrong array syntax used)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.1) [diff](https://github.com/vaimo/composer-patches/compare/4.17.0...4.17.1)
+
 ## 4.17.0 (2019-08-11)
 
 changes in this release forward-ported from 3.48.0

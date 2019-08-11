@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.17.1": {
+        "overview": "changes in this release forward-ported from 3.48.1",
+        "fix": [
+            "broken compatibility with PHP 5.3 (wrong array syntax used)"
+        ]
+    },
     "4.17.0": {
         "overview": "changes in this release forward-ported from 3.48.0",
         "feature": [
