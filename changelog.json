@@ -14,12 +14,14 @@
         ],
         "maintenance": [
             "exception and call stack directly exposed when executing code with 'halt of first failure'; changed to fail with proper error message (full stack still available with -vvv)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.47.2": {
         "fix": [
             "support for older (<1.1) Composer releases faultily implemented where the availability with CommandsProvider was incorrectly checked for"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.47.1": {
         "fix": [
@@ -36,7 +38,8 @@
             "improved early autoloader setup within proxy plugin",
             "code normalised according to coding standards",
             "simple integration tests added that test the patch applying in sandbox Composer project"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.47.0": {
         "feature": [
@@ -45,7 +48,8 @@
         "fix": [
             "malformed package reset queue in some edge cases when using bundled patches which targets packages that have no direct patches applying on them",
             "load all the plugin classes on startup (to avoid crashes on patch apply); the old plugin logic will be used til the end of the particular Composer call that upgraded the plugin [github/28]"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.46.0": {
         "overview": "This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports",
@@ -58,7 +62,8 @@
             "the alias argument for --explicit, --show-reapplies did not trigger explicit output",
             "make sure that repeated patch:undo calls don't reinstall previously undo'd patches",
             "make sure that patch:list uses same functionality that the main patch applier uses, thus guaranteeing that path:list will list the things as they'd be processed in actual patch apply run"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.45.0": {
         "feature": [
@@ -66,7 +71,8 @@
         ],
         "fix": [
             "patch contents not properly analysed when working with Bundled patches or using patches-search or patcher/search when trying to apply patches on Windows; Reason: using OS-specific EOL constant to split file content to lines [github/26]"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.44.0": {
         "feature": [
@@ -114,7 +120,8 @@
         ],
         "maintenance": [
             "made patch commands available within the plugin itself (not currently used for anything, potentially used in integration tests in the near future)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.41.0": {
         "feature": [
@@ -322,7 +329,8 @@
     "3.28.1": {
         "fix": [
             "patch link/issue moved to be presented after the label/description"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.28.0": {
         "feature": [
