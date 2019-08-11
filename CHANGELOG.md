@@ -2,6 +2,7 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+<<<<<<< HEAD
 ## 4.16.2 (2019-07-26)
 
 changes in this release forward-ported from 3.47.2
@@ -359,6 +360,24 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.47.2...4.0.0)
+=======
+## 3.48.0 (2019-08-11)
+
+### Feature
+
+* highlight most probable error that caused patch to fail in the non-verbose error message (full logs available when running with -vvv); this change was introduced to make it easier for people to identify issues within patches as the verbose output is extremely noisy [issues/34]
+
+### Fix
+
+* operation step always gets reported as 'UNKNOWN' when running the apply commands with heightened verbosity [issues/34]
+* hard-coded path separators made patches to fail on certain operation systems (Windows) when applying remote patch [github/33]
+
+### Maintenance
+
+* exception and call stack directly exposed when executing code with 'halt of first failure'; changed to fail with proper error message (full stack still available with -vvv)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.0) [diff](https://github.com/vaimo/composer-patches/compare/3.47.2...3.48.0)
+>>>>>>> release/3
 
 ## 3.47.2 (2019-07-26)
 
