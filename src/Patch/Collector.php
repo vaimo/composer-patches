@@ -33,11 +33,6 @@ class Collector
     private $patchListUpdater;
     
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
-     */
-    private $patchListUtils;
-
-    /**
      * @param \Vaimo\ComposerPatches\Patch\ListNormalizer $listNormalizer
      * @param \Vaimo\ComposerPatches\Patcher\ConfigReader $patcherConfigReader
      * @param PatchSourceLoaderInterface[] $sourceLoaders
@@ -53,7 +48,6 @@ class Collector
         $this->patcherConfigReader = $patcherConfigReader;
 
         $this->patchListUpdater = new \Vaimo\ComposerPatches\Patch\DefinitionList\Updater();
-        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     /**

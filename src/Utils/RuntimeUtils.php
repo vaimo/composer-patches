@@ -17,7 +17,7 @@ class RuntimeUtils
     public function executeWithPostAction($action, $postAction)
     {
         try {
-            $action();
+            $result = $action();
         } catch (\Exception $exception) {
             $postAction();
             
@@ -25,5 +25,7 @@ class RuntimeUtils
         }
 
         $postAction();
+        
+        return $result;
     }
 }

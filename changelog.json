@@ -4,6 +4,19 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.17.0": {
+        "overview": "changes in this release forward-ported from 3.48.0",
+        "feature": [
+            "highlight most probable error that caused patch to fail in the non-verbose error message (full logs available when running with -vvv); this change was introduced to make it easier for people to identify issues within patches as the verbose output is extremely noisy [issues/34]"
+        ],
+        "fix": [
+            "operation step always gets reported as 'UNKNOWN' when running the apply commands with heightened verbosity [issues/34]",
+            "hard-coded path separators made patches to fail on certain operation systems (Windows) when applying remote patch [github/33]"
+        ],
+        "maintenance": [
+            "exception and call stack directly exposed when executing code with 'halt of first failure'; changed to fail with proper error message (full stack still available with -vvv)"
+        ]
+    },
     "4.16.2": {
         "overview": "changes in this release forward-ported from 3.47.2",
         "fix": [
@@ -248,6 +261,18 @@
             "allow patch failures to be passed over gracefully with --graceful flag on 'composer patch:*' commands",
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
+        ]
+    },
+    "3.48.0": {
+        "feature": [
+            "highlight most probable error that caused patch to fail in the non-verbose error message (full logs available when running with -vvv); this change was introduced to make it easier for people to identify issues within patches as the verbose output is extremely noisy [issues/34]"
+        ],
+        "fix": [
+            "operation step always gets reported as 'UNKNOWN' when running the apply commands with heightened verbosity [issues/34]",
+            "hard-coded path separators made patches to fail on certain operation systems (Windows) when applying remote patch [github/33]"
+        ],
+        "maintenance": [
+            "exception and call stack directly exposed when executing code with 'halt of first failure'; changed to fail with proper error message (full stack still available with -vvv)"
         ]
     },
     "3.47.2": {

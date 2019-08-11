@@ -47,7 +47,7 @@ class Processor
             
             $this->patchListUtils->sanitizeFileSystem($patches);
             
-            throw $exception;
+            return false;
         }
 
         $this->logger->reset($loggerIndentation);
@@ -63,5 +63,7 @@ class Processor
         $this->logger->write($type, $message);
         
         $this->patchListUtils->sanitizeFileSystem($patches);
+        
+        return true;
     }
 }

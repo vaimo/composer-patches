@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches\Patch\Definition\NormalizerComponents;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Vaimo\ComposerPatches\Config as PluginConfig;
+use Vaimo\ComposerPatches\Composer\Constants as ComposerConstants;
 
 class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNormalizerComponentInterface
 {
@@ -47,7 +48,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
 
         $template = $this->resolveTemplate($ownerConfig, $target);
 
-        $nameParts = explode('/', $target);
+        $nameParts = explode(ComposerConstants::PACKAGE_SEPARATOR, $target);
 
         $sourceTags = '';
 
@@ -60,7 +61,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         $pathVariables = array(
             'file' => $source,
             'vendor' => array_shift($nameParts),
-            'package' => implode('/', $nameParts),
+            'package' => implode(ComposerConstants::PACKAGE_SEPARATOR, $nameParts),
             'label' => $label
         );
 
@@ -164,7 +165,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
     {
         $templates = $ownerConfig[PluginConfig::PATCHES_BASE];
 
-        $vendorName = strtok($packageName, '/');
+        $vendorName = strtok($packageName, ComposerConstants::PACKAGE_SEPARATOR);
 
         if (is_array($templates)) {
             if (isset($templates[$packageName])) {

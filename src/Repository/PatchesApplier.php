@@ -310,6 +310,20 @@ class PatchesApplier
 
             $this->logger->reset($processIndentation);
         } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
+            $this->logger->push();
+            
+            $this->logger->write('error', $exception->getMessage());
+
+            $previousError = $exception->getPrevious();
+            
+            if ($previousError instanceof \Vaimo\ComposerPatches\Exceptions\ApplierFailure) {
+                $messages = $previousError->getErrors();
+
+                foreach ($messages as $type => $errors) {
+                    $this->logger->write('warning', sprintf('%s: %s', $type, reset($errors)));
+                }
+            }
+
             $failedPath = $exception->getFailedPatchPath();
 
             $paths = array_keys($patchesQueue);

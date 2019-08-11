@@ -90,7 +90,7 @@ class Bootstrap
 
     public function applyPatches($devMode = false)
     {
-        $this->applyPatchesWithConfig(
+        return $this->applyPatchesWithConfig(
             $this->configFactory->create(),
             $devMode
         );
@@ -120,6 +120,6 @@ class Bootstrap
             $this->outputStrategy
         );
 
-        $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
+        return $this->repositoryProcessor->process($repository, $patchesLoader, $patchesApplier);
     }
 }
