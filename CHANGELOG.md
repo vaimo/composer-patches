@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.48.1 (2019-08-11)
+
+### Fix
+
+* broken compatibility with PHP 5.3 (wrong array syntax used)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.1) [diff](https://github.com/vaimo/composer-patches/compare/3.48.0...3.48.1)
+
 ## 3.48.0 (2019-08-11)
 
 ### Feature
