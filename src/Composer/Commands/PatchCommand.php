@@ -184,7 +184,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         
         $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
 
-        $runtimeUtils->executeWithPostAction(
+        $result = $runtimeUtils->executeWithPostAction(
             function () use ($shouldUndo, $filters, $isDevMode, $bootstrap, $runtimeUtils, $input, $behaviourFlags) {
                 if ($shouldUndo && !array_filter($filters)) {
                     $bootstrap->stripPatches($isDevMode);
@@ -194,7 +194,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
                         Environment::FORCE_REAPPLY => $behaviourFlags['redo']
                     ));
 
-                    $bootstrap->applyPatches($isDevMode);
+                    return $bootstrap->applyPatches($isDevMode);
                 }
             },
             function () use ($composer, $lockSanitizer) {
@@ -206,5 +206,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
 
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
+
+        return (int)!$result;
     }
 }

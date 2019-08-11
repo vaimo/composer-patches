@@ -139,7 +139,7 @@ class PatchApplier
         } catch (\Exception $exception) {
             $this->logger->writeException($exception);
 
-            $this->failureHandler->execute($exception->getMessage(), $source);
+            $this->failureHandler->execute($exception, $source);
         }
 
         return false;

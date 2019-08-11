@@ -91,9 +91,9 @@ class Plugin implements
 
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
 
-        $runtimeUtils->executeWithPostAction(
+        $result = $runtimeUtils->executeWithPostAction(
             function () use ($bootstrap, $event) {
-                $bootstrap->applyPatches($event->isDevMode());
+                return $bootstrap->applyPatches($event->isDevMode());
             },
             function () use ($event, $lockSanitizer) {
                 $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
@@ -101,6 +101,15 @@ class Plugin implements
                 $repository->write();
                 $lockSanitizer->sanitize();
             }
+        );
+        
+        if ($result) {
+            return;
+        }
+
+        throw new \Composer\EventDispatcher\ScriptExecutionException(
+            'Execution halted due to composer-patch failure', 
+            1
         );
     }
 

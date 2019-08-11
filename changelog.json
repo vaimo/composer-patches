@@ -4,6 +4,18 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.48.0": {
+        "feature": [
+            "highlight most probable error that caused patch to fail in the non-verbose error message (full logs available when running with -vvv); this change was introduced to make it easier for people to identify issues within patches as the verbose output is extremely noisy [issues/34]"
+        ],
+        "fix": [
+            "operation step always gets reported as 'UNKNOWN' when running the apply commands with heightened verbosity [issues/34]",
+            "hard-coded path separators made patches to fail on certain operation systems (Windows) when applying remote patch [github/33]"
+        ],
+        "maintenance": [
+            "exception and call stack directly exposed when executing code with 'halt of first failure'; changed to fail with proper error message (full stack still available with -vvv)"
+        ]
+    },
     "3.47.2": {
         "fix": [
             "support for older (<1.1) Composer releases faultily implemented where the availability with CommandsProvider was incorrectly checked for"

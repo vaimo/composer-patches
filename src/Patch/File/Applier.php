@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Patch\File;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
+use Vaimo\ComposerPatches\Repository\PatchesApplier\Operation as PatcherOperation;
 
 class Applier
 {
@@ -89,6 +90,8 @@ class Applier
 
             throw new \Vaimo\ComposerPatches\Exceptions\RuntimeException($message);
         }
+        
+        $errors = [];
 
         foreach ($levels as $patchLevel) {
             $arguments = array_replace(
@@ -96,17 +99,13 @@ class Applier
                 array(PluginConfig::PATCHER_ARG_LEVEL => $patchLevel)
             );
 
-            $patcherName = $this->executeOperations(
-                $patchers,
-                $operations,
-                $arguments,
-                $failureMessages
-            );
-
-            if (!$patcherName) {
+            try {
+                $patcherName = $this->executeOperations($patchers, $operations, $arguments, $failureMessages);
+            } catch (\Vaimo\ComposerPatches\Exceptions\ApplierFailure $exception) {
+                $errors[] = $exception->getErrors();
                 continue;
             }
-
+            
             $this->logger->writeVerbose(
                 'info',
                 'SUCCESS with type=%s (p=%s)',
@@ -116,36 +115,88 @@ class Applier
             return;
         }
 
-        throw new \Exception(
+        $errors = array_map(
+            'array_unique', 
+            array_reduce($errors, 'array_merge_recursive', [])
+        );
+        
+        foreach ($errors as $type => $messages) {
+            $fileNotFoundMessages = preg_grep('/(can\'t find file|unable to find file|no such file)/i', $messages);
+            
+            if ($fileNotFoundMessages !== $messages) {
+                $errors[$type] = array_diff($messages, $fileNotFoundMessages);
+            } 
+        }
+
+        $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure(
             sprintf('Cannot apply patch %s', $filename)
         );
+
+        $failure->setErrors($errors);
+        
+        throw $failure;
     }
 
-    private function executeOperations($patchers, array $operations, array $args = array(), array $failures = array())
-    {
-        list($operationName, $operationCode) = array_fill(0, 4, 'UNKNOWN');
-
+    private function executeOperations(
+        $patchers, array $operations, array $args = array(), array $failures = array()
+    ) {
+        $outputRecords = array();
+        
         foreach ($patchers as $type => $patcher) {
             if (!$patcher) {
                 continue;
             }
 
-            $result = $this->processOperationItems($patcher, $operations, $args, $failures);
+            try {
+                return $this->processOperationItems($patcher, $operations, $args, $failures);
+            } catch (\Vaimo\ComposerPatches\Exceptions\OperationFailure $exception) {
+                $operationReference = is_string($exception->getMessage()) 
+                    ? $exception->getMessage() 
+                    : PatcherOperation::TYPE_UNKNOWN;
 
-            if ($result) {
-                return $type;
+                $outputRecords[$type] = $exception->getOutput(); 
+                    
+                $messageArgs = array(
+                    strtoupper($operationReference),
+                    $type,
+                    $this->extractStringValue($args, PluginConfig::PATCHER_ARG_LEVEL)
+                );
+
+                $this->logger->writeVerbose('warning', '%s (type=%s) failed with p=%s', $messageArgs);
             }
-
-            $messageArgs = array(
-                is_string($operationName) ? $operationName : $operationCode,
-                $type,
-                $this->extractStringValue($args, PluginConfig::PATCHER_ARG_LEVEL)
-            );
-
-            $this->logger->writeVerbose('warning', '%s (type=%s) failed with p=%s', $messageArgs);
         }
 
-        return '';
+        $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure();
+
+        $failure->setErrors(
+            $this->collectErrors($outputRecords)
+        );
+
+        throw $failure;
+    }
+    
+    private function collectErrors(array $outputRecords)
+    {
+        $errors = array(
+            'failed',
+            'unexpected',
+            'malformed',
+            'error',
+            'corrupt',
+            'can\'t find file',
+            'patch unexpectedly ends'
+        );
+        
+        $errorMatcher = sprintf('/%s/i', implode('|', $errors));
+        
+        foreach ($outputRecords as $type => $output) {
+            $messages = preg_grep('/^[^\|-]/i', explode(PHP_EOL, $output));
+            $matches = preg_grep($errorMatcher, $messages);
+
+            $outputRecords[$type] = reset($matches);
+        }
+        
+        return $outputRecords;
     }
 
     private function processOperationItems($patcher, $operations, $args, $failures)
@@ -168,15 +219,25 @@ class Applier
 
             $operationFailures = $this->extractArrayValue($failures, $operationCode);
 
-            list($result, $output) = $this->resolveOperationOutput($applierOperations, $args, $operationFailures);
+            list($result, $output) = $this->resolveOperationOutput(
+                $applierOperations, 
+                $args, 
+                $operationFailures
+            );
 
             if ($output !== false) {
                 $operationResults[$operationCode] = $output;
             }
 
-            if (!$result) {
-                break;
+            if ($result) {
+                continue;
             }
+
+            $failure = new \Vaimo\ComposerPatches\Exceptions\OperationFailure($operationCode);
+
+            $failure->setOutput($output);
+            
+            throw $failure;
         }
 
         return $result;
@@ -189,6 +250,8 @@ class Applier
             '[[%s]]' => array()
         );
 
+        $output = '';
+        
         foreach ($applierOperations as $operation) {
             $passOnFailure = strpos($operation, '!') === 0;
             $operation = ltrim($operation, '!');
@@ -229,7 +292,7 @@ class Applier
             return array($result, $output);
         }
 
-        return array(false, '');
+        return array(false, $output);
     }
 
     private function scanOutputForFailures($output, array $failureMessages)

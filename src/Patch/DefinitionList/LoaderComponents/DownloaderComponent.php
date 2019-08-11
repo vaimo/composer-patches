@@ -25,6 +25,11 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
     private $gracefulMode;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\PathUtils 
+     */
+    private $pathUtils;
+
+    /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      *
      * @param \Composer\Package\RootPackageInterface $rootPackage
@@ -39,6 +44,8 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
         $this->rootPackage = $rootPackage;
         $this->remoteFilesystem = $remoteFilesystem;
         $this->gracefulMode = $gracefulMode;
+        
+        $this->pathUtils = new \Vaimo\ComposerPatches\Utils\PathUtils();
     }
 
     /**
@@ -57,7 +64,7 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                 $source = $patchData[PatchDefinition::URL];
                 
                 $filename = sprintf(
-                    '%s/composer-patches-%s.patch',
+                    $this->pathUtils->composePath('%s', 'composer-patches-%s.patch'),
                     sys_get_temp_dir(),
                     md5($this->rootPackage->getName() . '|' . $source)
                 );
