@@ -77,9 +77,9 @@ class PatchesApplier
     private $packageUtils;
 
     /**
-     * \Vaimo\ComposerPatches\Utils\PatchListUtils
+     * @var \Vaimo\ComposerPatches\Console\OutputGenerator 
      */
-    private $patchListUtils;
+    private $outputGenerator;
     
     /**
      * @param \Vaimo\ComposerPatches\Package\Collector $packageCollector
@@ -119,7 +119,7 @@ class PatchesApplier
         $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->statusConfig = new \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig();
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
-        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
+        $this->outputGenerator = new \Vaimo\ComposerPatches\Console\OutputGenerator($logger);
     }
 
     /**
@@ -316,12 +316,8 @@ class PatchesApplier
 
             $previousError = $exception->getPrevious();
             
-            if ($previousError instanceof \Vaimo\ComposerPatches\Exceptions\ApplierFailure) {
-                $messages = $previousError->getErrors();
-
-                foreach ($messages as $type => $errors) {
-                    $this->logger->write('warning', sprintf('%s: %s', $type, reset($errors)));
-                }
+            if ($previousError instanceof \Exception) {
+                $this->outputGenerator->generateForException($previousError);
             }
 
             $failedPath = $exception->getFailedPatchPath();

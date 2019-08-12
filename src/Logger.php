@@ -83,6 +83,23 @@ class Logger
         $this->writeRaw($this->createTag($type, $message), $args);
     }
 
+    public function writeNotice($type, $message, array $args = array())
+    {
+        if (!is_array($message)) {
+            $message = array($message);
+        }
+
+        $length = 0;
+        
+        foreach ($message as $item) {
+            $length = min(80, max(strlen($item), $length));
+        }
+        
+        foreach ($message as $item) {
+            $this->write($type, str_pad($item, $length, ' '), $args);
+        }
+    }
+    
     public function writeVerbose($type, $message, array $args = array())
     {
         if (!$this->appIO->isVerbose()) {

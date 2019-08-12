@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.2
+
+changes in this release forward-ported from 3.48.2
+
+### Maintenance
+
+* added notice to the 'most likely error' output (on patch failure) to indicate that the list presented is not the full list of details
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.2) [diff](https://github.com/vaimo/composer-patches/compare/4.17.1...4.17.2)
+
 ## 4.17.1 (2019-08-11)
 
 changes in this release forward-ported from 3.48.1
@@ -389,7 +399,23 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.0...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.2...4.0.0)
+
+## 3.48.2 (2019-08-12)
+
+### Maintenance
+
+* added notice to the 'most likely error' output (on patch failure) to indicate that the list presented is not the full list of details
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.2) [diff](https://github.com/vaimo/composer-patches/compare/3.48.1...3.48.2)
+
+## 3.48.1 (2019-08-11)
+
+### Fix
+
+* broken compatibility with PHP 5.3 (wrong array syntax used)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.1) [diff](https://github.com/vaimo/composer-patches/compare/3.48.0...3.48.1)
 
 ## 3.48.0 (2019-08-11)
 
