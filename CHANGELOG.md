@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.48.2 (2019-08-12)
+
+### Maintenance
+
+* added notice to the 'most likely error' output (on patch failure) to indicate that the list presented is not the full list of details
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.2) [diff](https://github.com/vaimo/composer-patches/compare/3.48.1...3.48.2)
+
 ## 3.48.1 (2019-08-11)
 
 ### Fix
