@@ -2,7 +2,7 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 4.17.2
+## 4.17.2 (2019-08-12)
 
 changes in this release forward-ported from 3.48.2
 
