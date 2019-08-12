@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.48.2": {
+        "maintenance": [
+            "added notice to the 'most likely error' output (on patch failure) to indicate that the list presented is not the full list of details"
+        ],
+        "branch": "release/3"
+    },
     "3.48.1": {
         "fix": [
             "broken compatibility with PHP 5.3 (wrong array syntax used)"

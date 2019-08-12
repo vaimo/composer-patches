@@ -13,26 +13,29 @@ class GracefulHandler implements \Vaimo\ComposerPatches\Interfaces\PatchFailureH
     private $logger;
 
     /**
+     * @var \Vaimo\ComposerPatches\Console\OutputGenerator 
+     */
+    private $outputGenerator;
+
+    /**
      * @param \Vaimo\ComposerPatches\Logger $logger
      */
     public function __construct(
         \Vaimo\ComposerPatches\Logger $logger
     ) {
         $this->logger = $logger;
+
+        $this->outputGenerator = new \Vaimo\ComposerPatches\Console\OutputGenerator($logger);
     }
     
     public function execute($error, $path)
     {
         $this->logger->write('error', 'Failed to apply the patch. Skipping!');
         
-        if (!$error instanceof \Vaimo\ComposerPatches\Exceptions\ApplierFailure) {
+        if (!$error instanceof \Exception) {
             return;
         }
 
-        $messages = $error->getErrors();
-
-        foreach ($messages as $type => $errors) {
-            $this->logger->write('warning', sprintf('%s: %s', $type, reset($errors)));
-        }
+        $this->outputGenerator->generateForException($error);
     }
 }

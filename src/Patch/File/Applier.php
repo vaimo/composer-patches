@@ -114,27 +114,34 @@ class Applier
 
             return;
         }
-
-        $errors = array_map(
-            'array_unique',
-            array_reduce($errors, 'array_merge_recursive', array())
-        );
         
-        foreach ($errors as $type => $messages) {
-            $fileNotFoundMessages = preg_grep('/(can\'t find file|unable to find file|no such file)/i', $messages);
-            
-            if ($fileNotFoundMessages !== $messages) {
-                $errors[$type] = array_diff($messages, $fileNotFoundMessages);
-            }
-        }
-
         $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure(
             sprintf('Cannot apply patch %s', $filename)
         );
 
-        $failure->setErrors($errors);
+        $failure->setErrors(
+            $this->filterErrors($errors)
+        );
         
         throw $failure;
+    }
+    
+    private function filterErrors(array $errors)
+    {
+        $errors = array_map(
+            'array_unique',
+            array_reduce($errors, 'array_merge_recursive', array())
+        );
+
+        foreach ($errors as $type => $messages) {
+            $fileNotFoundMessages = preg_grep('/(can\'t find file|unable to find file|no such file)/i', $messages);
+
+            if ($fileNotFoundMessages !== $messages) {
+                $errors[$type] = array_diff($messages, $fileNotFoundMessages);
+            }
+        }
+        
+        return array_map('array_filter', $errors);
     }
 
     private function executeOperations(
