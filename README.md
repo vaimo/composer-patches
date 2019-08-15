@@ -1189,7 +1189,7 @@ withing the patch file are relative to the root of package A.
 This can be tested out with...
 
 ```shell
-composer patch --redo --from-source --filter compatibility-with-pack
+composer patch:redo --from-source --filter compatibility-with-pack
 ```
 
 _The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' 
