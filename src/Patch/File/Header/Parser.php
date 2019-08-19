@@ -39,6 +39,6 @@ class Parser
             $data[$key][] = $line;
         }
         
-        return array_diff_key($data, ['']);
+        return array_diff_key($data, array(''));
     }
 }
