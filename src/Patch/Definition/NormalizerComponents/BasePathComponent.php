@@ -33,7 +33,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             return array();
         }
 
-        if (isset($data[PatchDefinition::LABEL]) && is_numeric($label)) {
+        if (is_numeric($label) && isset($data[PatchDefinition::LABEL])) {
             $label = $data[PatchDefinition::LABEL];
         }
 
@@ -47,19 +47,13 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         }
 
         $template = $this->resolveTemplate($ownerConfig, $target);
+        
+        list ($sourcePath, $sourceTags) = $this->deconstructSource($source);
 
         $nameParts = explode(ComposerConstants::PACKAGE_SEPARATOR, $target);
 
-        $sourceTags = '';
-
-        if (strpos($source, '#') !== false) {
-            $sourceSegments = explode('#', $source);
-            $sourceTags = array_pop($sourceSegments);
-            $source = implode('#', $sourceSegments);
-        }
-
         $pathVariables = array(
-            'file' => $source,
+            'file' => $sourcePath,
             'vendor' => array_shift($nameParts),
             'package' => implode(ComposerConstants::PACKAGE_SEPARATOR, $nameParts),
             'label' => $label
@@ -72,33 +66,33 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             'label' => 'label value'
         );
         
-        $pathVariables = $this->expandPathVariables($pathVariables, $mutationNamesMap);
-        
         $extraVariables = array(
             'version' => preg_replace(
                 '/[^A-Za-z0-9.-]/',
                 '',
                 strtok(reset($data[PatchDefinition::DEPENDS]) ?: '0.0.0', ' ')
             ),
-            'file' => $source,
+            'file' => $sourcePath,
             'label' => $label
         );
 
         $variablePattern = '{{%s}}';
-        
+
+        $pathVariables = $this->expandPathVariables($pathVariables, $mutationNamesMap);
+
         $templateVariables = $this->prepareTemplateValues(
             $template,
             $variablePattern,
             array_replace($pathVariables, $extraVariables)
         );
-        
-        $source = $this->templateUtils->compose(
+
+        $sourcePath = $this->templateUtils->compose(
             $template . ($sourceTags ? ('#' . $sourceTags) : ''),
             $templateVariables,
             array_fill_keys(array($variablePattern), array())
         );
 
-        $filename = basename($source);
+        $filename = basename($sourcePath);
 
         if (substr($label, -strlen($filename)) === $filename) {
             $label = str_replace(
@@ -112,6 +106,20 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             PatchDefinition::LABEL => $label,
             PatchDefinition::SOURCE => $source
         );
+    }
+    
+    private function deconstructSource($source)
+    {
+        $sourceTags = '';
+
+        if (strpos($source, '#') !== false) {
+            $sourceSegments = explode('#', $source);
+
+            $sourceTags = array_pop($sourceSegments);
+            $source = implode('#', $sourceSegments);
+        }
+        
+        return array($source, $sourceTags);
     }
     
     private function prepareTemplateValues($template, $variablePattern, $variableValues)

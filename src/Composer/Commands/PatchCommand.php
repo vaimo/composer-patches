@@ -188,14 +188,16 @@ class PatchCommand extends \Composer\Command\BaseCommand
             function () use ($shouldUndo, $filters, $isDevMode, $bootstrap, $runtimeUtils, $input, $behaviourFlags) {
                 if ($shouldUndo && !array_filter($filters)) {
                     $bootstrap->stripPatches($isDevMode);
-                } else {
-                    $runtimeUtils->setEnvironmentValues(array(
-                        Environment::PREFER_OWNER => $input->getOption('from-source'),
-                        Environment::FORCE_REAPPLY => $behaviourFlags['redo']
-                    ));
-
-                    return $bootstrap->applyPatches($isDevMode);
+                    
+                    return true;
                 }
+
+                $runtimeUtils->setEnvironmentValues(array(
+                    Environment::PREFER_OWNER => $input->getOption('from-source'),
+                    Environment::FORCE_REAPPLY => $behaviourFlags['redo']
+                ));
+
+                return $bootstrap->applyPatches($isDevMode);
             },
             function () use ($composer, $lockSanitizer) {
                 $repository = $composer->getRepositoryManager()->getLocalRepository();

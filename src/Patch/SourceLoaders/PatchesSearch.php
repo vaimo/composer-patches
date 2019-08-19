@@ -240,20 +240,6 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $this->extractValueList($data, PatchDefinition::DEPENDS)
         );
         
-        $dependsNormalized = array_map(function ($item) {
-            $valueParts = explode(':', $item);
-
-            return array(
-                trim(array_shift($valueParts)) => trim(array_shift($valueParts)) ?: '>=0.0.0'
-            );
-        }, array_unique($dependsList));
-        
-        $dependsConfig = array_reduce(
-            $dependsNormalized,
-            'array_replace',
-            array()
-        );
-
         $patchTypeFlags = array_fill_keys(
             explode(
                 PatchDefinition::TYPE_SEPARATOR,
@@ -264,10 +250,32 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         
         return array(
             $target,
-            array_filter(
-                array_replace($dependsConfig, array(PatchDefinition::BUNDLE_TARGET => false, '' => false))
-            ),
+            $this->normalizeDependencies($dependsList),
             $patchTypeFlags
+        );
+    }
+    
+    private function normalizeDependencies($dependsList)
+    {
+        $dependsNormalized = array_map(function ($item) {
+            $valueParts = explode(':', $item);
+
+            return array(
+                trim(array_shift($valueParts)) => trim(array_shift($valueParts)) ?: '>=0.0.0'
+            );
+        }, array_unique($dependsList));
+
+        $dependsNormalized = array_reduce(
+            $dependsNormalized,
+            'array_replace',
+            array()
+        );
+
+        return array_filter(
+            array_replace(
+                $dependsNormalized,
+                array(PatchDefinition::BUNDLE_TARGET => false, '' => false)
+            )
         );
     }
 

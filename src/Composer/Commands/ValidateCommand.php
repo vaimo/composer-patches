@@ -104,12 +104,12 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             ) ?: array()
         );
         
-        $sourcesResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
+        $srcResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
         $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
 
-        $sourcesResolver = $sourcesResolverFactory->create($pluginConfig);
+        $srcResolver = $srcResolverFactory->create($pluginConfig);
 
-        $sources = $sourcesResolver->resolvePackages($repository);
+        $sources = $srcResolver->resolvePackages($repository);
 
         $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
             array($composer->getPackage())
