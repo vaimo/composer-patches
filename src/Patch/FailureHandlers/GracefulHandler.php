@@ -13,7 +13,7 @@ class GracefulHandler implements \Vaimo\ComposerPatches\Interfaces\PatchFailureH
     private $logger;
 
     /**
-     * @var \Vaimo\ComposerPatches\Console\OutputGenerator 
+     * @var \Vaimo\ComposerPatches\Console\OutputGenerator
      */
     private $outputGenerator;
 

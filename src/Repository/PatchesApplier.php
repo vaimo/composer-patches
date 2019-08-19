@@ -77,7 +77,7 @@ class PatchesApplier
     private $packageUtils;
 
     /**
-     * @var \Vaimo\ComposerPatches\Console\OutputGenerator 
+     * @var \Vaimo\ComposerPatches\Console\OutputGenerator
      */
     private $outputGenerator;
     
