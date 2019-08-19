@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.4
+
+changes in this release forward-ported from 3.48.4
+
+### Fix
+
+* patch file meta-tags conflict in situations where there are values for all of: depends, package, version; the following setup now results in package+version also being listed as dependency
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.4) [diff](https://github.com/vaimo/composer-patches/compare/4.17.3...4.17.4)
+
 ## 4.17.3 (2019-08-19)
 
 changes in this release forward-ported from 3.48.3
@@ -409,7 +419,23 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.2...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.4...4.0.0)
+
+## 3.48.4 (2019-08-19)
+
+### Fix
+
+* patch file meta-tags conflict in situations where there are values for all of: depends, package, version; the following setup now results in package+version also being listed as dependency
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.4) [diff](https://github.com/vaimo/composer-patches/compare/3.48.3...3.48.4)
+
+## 3.48.3 (2019-08-19)
+
+### Fix
+
+* patch file meta-tags overwriting each-other rather than stacking (when, say @depends is used multiple times)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.3) [diff](https://github.com/vaimo/composer-patches/compare/3.48.2...3.48.3)
 
 ## 3.48.2 (2019-08-12)
 

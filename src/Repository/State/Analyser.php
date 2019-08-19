@@ -8,11 +8,6 @@ namespace Vaimo\ComposerPatches\Repository\State;
 class Analyser
 {
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
-     */
-    private $patchListUtils;
-
-    /**
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
@@ -20,7 +15,6 @@ class Analyser
     public function __construct()
     {
         $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
-        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
     
     public function collectPatchRemovals(array $repositoryState, array $patches)

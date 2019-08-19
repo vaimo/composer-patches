@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.17.4": {
+        "overview": "changes in this release forward-ported from 3.48.4",
+        "fix": [
+            "patch file meta-tags conflict in situations where there are values for all of: depends, package, version; the following setup now results in package+version also being listed as dependency"
+        ]
+    },
     "4.17.3": {
         "overview": "changes in this release forward-ported from 3.48.3",
         "fix": [
@@ -280,6 +286,18 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.48.4": {
+        "fix": [
+            "patch file meta-tags conflict in situations where there are values for all of: depends, package, version; the following setup now results in package+version also being listed as dependency"
+        ],
+        "branch": "release/3"
+    },
+    "3.48.3": {
+        "fix": [
+            "patch file meta-tags overwriting each-other rather than stacking (when, say @depends is used multiple times)"
+        ],
+        "branch": "release/3"
     },
     "3.48.2": {
         "maintenance": [

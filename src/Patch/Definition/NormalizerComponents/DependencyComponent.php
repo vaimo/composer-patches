@@ -17,15 +17,12 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
             : array();
 
         if (isset($data[PatchDefinition::VERSION])) {
-            if (is_array($data[PatchDefinition::VERSION])) {
-                $depends = array_replace(
-                    $depends,
-                    $data[PatchDefinition::VERSION]
-                );
-            } else {
+            if (!is_array($data[PatchDefinition::VERSION])) {
                 $dependsTarget = $target;
+
+                $dependsPatterns = $this->generateDependencyMatchPatterns($ownerConfig);
                 
-                if ($dependsPatterns = $this->generateDependencyMatchPatterns($ownerConfig)) {
+                if ($dependsPatterns) {
                     $matches = array_filter(
                         array_keys($dependsPatterns),
                         function ($pattern) use ($target) {
@@ -37,12 +34,16 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                         $dependsTarget = $dependsPatterns[reset($matches)];
                     }
                 }
-                
-                $depends = array_replace(
-                    $depends,
-                    array($dependsTarget => $data[PatchDefinition::VERSION])
+
+                $data[PatchDefinition::VERSION] = array(
+                    $dependsTarget => $data[PatchDefinition::VERSION]
                 );
             }
+
+            $depends = array_replace(
+                $depends,
+                $data[PatchDefinition::VERSION]
+            );
         }
         
         return array(

@@ -177,8 +177,8 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         if (!$this->devMode && array_intersect_key($flags, array_flip($this->devModeTypes))) {
             $data[PatchDefinition::SKIP] = true;
         }
-
-        $definition = array_replace(array(
+        
+        return array_replace(array(
             PatchDefinition::LABEL => implode(
                 PHP_EOL,
                 isset($data[PatchDefinition::LABEL]) ? $data[PatchDefinition::LABEL] : array('')
@@ -198,10 +198,8 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             PatchDefinition::LEVEL => $this->extractSingleValue($data, PatchDefinition::LEVEL),
             PatchDefinition::CATEGORY => $this->extractSingleValue($data, PatchDefinition::CATEGORY)
         ), $values);
-
-        return $definition;
     }
-
+    
     private function resolveBaseInfo(array $data)
     {
         $target = false;
@@ -216,7 +214,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $depends = trim(array_shift($valueParts));
             $version = trim(implode(':', $valueParts));
         }
-
+        
         if (strpos($package, ':') !== false) {
             $valueParts = explode(':', $package);
 
@@ -236,21 +234,12 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $depends = $target;
         }
 
-        $dependsConfig = array_reduce(
-            array_map(function ($item) {
-                $valueParts = explode(':', $item);
-                
-                return array(
-                    trim(array_shift($valueParts)) => trim(implode(':', $valueParts)) ?: '>=0.0.0'
-                );
-            }, array_merge(
-                array($depends . ':' . $version),
-                $this->extractValueList($data, PatchDefinition::DEPENDS)
-            )),
-            'array_replace',
-            array()
+        $dependsList = array_merge(
+            array($package . ':' . $version),
+            array($depends . ':' . $version),
+            $this->extractValueList($data, PatchDefinition::DEPENDS)
         );
-
+        
         $patchTypeFlags = array_fill_keys(
             explode(
                 PatchDefinition::TYPE_SEPARATOR,
@@ -261,10 +250,32 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         
         return array(
             $target,
-            array_filter(
-                array_replace($dependsConfig, array(PatchDefinition::BUNDLE_TARGET => false, '' => false))
-            ),
+            $this->normalizeDependencies($dependsList),
             $patchTypeFlags
+        );
+    }
+    
+    private function normalizeDependencies($dependsList)
+    {
+        $dependsNormalized = array_map(function ($item) {
+            $valueParts = explode(':', $item);
+
+            return array(
+                trim(array_shift($valueParts)) => trim(array_shift($valueParts)) ?: '>=0.0.0'
+            );
+        }, array_unique($dependsList));
+
+        $dependsNormalized = array_reduce(
+            $dependsNormalized,
+            'array_replace',
+            array()
+        );
+
+        return array_filter(
+            array_replace(
+                $dependsNormalized,
+                array(PatchDefinition::BUNDLE_TARGET => false, '' => false)
+            )
         );
     }
 

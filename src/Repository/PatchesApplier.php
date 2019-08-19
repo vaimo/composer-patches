@@ -325,12 +325,12 @@ class PatchesApplier
             $paths = array_keys($patchesQueue);
             
             $failureIndex = array_search($failedPath, $paths);
-            
+
+            $appliedPatches = array();
+
             if (is_int($failureIndex)) {
                 $appliedPaths = array_slice($paths, 0, $failureIndex);
                 $appliedPatches = array_intersect_key($patchesQueue, array_flip($appliedPaths));
-            } else {
-                $appliedPatches = array();
             }
 
             $this->patcherStateManager->registerAppliedPatches($repository, $appliedPatches);
