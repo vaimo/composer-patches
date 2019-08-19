@@ -104,7 +104,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
 
         return array(
             PatchDefinition::LABEL => $label,
-            PatchDefinition::SOURCE => $source
+            PatchDefinition::SOURCE => $sourcePath
         );
     }
     
