@@ -2,11 +2,19 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.48.4 (2019-08-19)
+
+### Fix
+
+* patch file meta-tags conflict in situations where there are values for all of: depends, package, version; the following setup now results in package+version also being listed as dependency
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.4) [diff](https://github.com/vaimo/composer-patches/compare/3.48.3...3.48.4)
+
 ## 3.48.3 (2019-08-19)
 
 ### Fix
 
-* meta-tags overwriting each-other rather than stacking (when, say @depends is used multiple times)
+* patch file meta-tags overwriting each-other rather than stacking (when, say @depends is used multiple times)
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.3) [diff](https://github.com/vaimo/composer-patches/compare/3.48.2...3.48.3)
 
