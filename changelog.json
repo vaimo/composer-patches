@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.48.5": {
+        "fix": [
+            "basePatch templates not being applied after code changes from last release"
+        ],
+        "branch": "release/3"
+    },
     "3.48.4": {
         "fix": [
             "patch file meta-tags conflict in situations where there are values for all of: depends, package, version; the following setup now results in package+version also being listed as dependency"
