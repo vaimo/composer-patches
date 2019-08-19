@@ -8,7 +8,7 @@ namespace Vaimo\ComposerPatches\Console;
 class OutputGenerator
 {
     /**
-     * @var \Vaimo\ComposerPatches\Logger 
+     * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
     

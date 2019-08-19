@@ -72,22 +72,17 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                 $source = $info[PatchDefinition::SOURCE];
 
                 if (!file_exists($path)) {
-                    throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
-                        sprintf('Could not resolve targets (patch file not found): %s ', $source)
-                    );
+                    throw $this->createError('patch file not found', $source);
                 }
 
                 $paths = $this->patchFileAnalyser->getAllPaths(
                     $this->patchFileLoader->loadWithNormalizedLineEndings($path)
                 );
                 
-
                 $bundleTargets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths);
                 
                 if (!$bundleTargets && !$this->gracefulMode) {
-                    throw new \Vaimo\ComposerPatches\Exceptions\LoaderException(
-                        sprintf('Could not resolve targets (zero matches): %s ', $source)
-                    );
+                    throw $this->createError('zero matches', $source);
                 }
 
                 $patches[$patchTarget][$index][PatchDefinition::TARGETS] = array_unique($bundleTargets);
@@ -95,5 +90,12 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
         }
 
         return $patches;
+    }
+    
+    private function createError($reason, $source)
+    {
+        return new \Vaimo\ComposerPatches\Exceptions\LoaderException(
+            sprintf('Could not resolve targets (%s): %s ', $reason, $source)
+        );
     }
 }

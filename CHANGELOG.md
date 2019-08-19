@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.3
+
+changes in this release forward-ported from 3.48.3
+
+### Fix
+
+* meta-tags overwriting each-other rather than stacking (when, say @depends is used multiple times)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.3) [diff](https://github.com/vaimo/composer-patches/compare/4.17.2...4.17.3)
+
 ## 4.17.2 (2019-08-12)
 
 changes in this release forward-ported from 3.48.2

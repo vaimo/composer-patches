@@ -114,7 +114,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
 
             foreach ($paths as $path) {
                 $contents = $this->patchFileLoader->loadWithNormalizedLineEndings($path);
-                
+
                 $definition = $this->createDefinitionItem($contents, array(
                     PatchDefinition::PATH => $path,
                     PatchDefinition::SOURCE => trim(
