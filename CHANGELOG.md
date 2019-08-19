@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.48.5 (2019-08-20)
+
+### Fix
+
+* basePatch templates not being applied after code changes from last release
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.5) [diff](https://github.com/vaimo/composer-patches/compare/3.48.4...3.48.5)
+
 ## 3.48.4 (2019-08-19)
 
 ### Fix
