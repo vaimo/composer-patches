@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.5
+
+changes in this release forward-ported from 3.48.5
+
+### Fix
+
+* basePatch templates not being applied after code changes from last release
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.5) [diff](https://github.com/vaimo/composer-patches/compare/4.17.4...4.17.5)
+
 ## 4.17.4 (2019-08-19)
 
 changes in this release forward-ported from 3.48.4
@@ -419,7 +429,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.4...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.5...4.0.0)
+
+## 3.48.5 (2019-08-20)
+
+### Fix
+
+* basePatch templates not being applied after code changes from last release
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.5) [diff](https://github.com/vaimo/composer-patches/compare/3.48.4...3.48.5)
 
 ## 3.48.4 (2019-08-19)
 

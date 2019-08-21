@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.17.5": {
+        "overview": "changes in this release forward-ported from 3.48.5",
+        "fix": [
+            "basePatch templates not being applied after code changes from last release"
+        ]
+    },
     "4.17.4": {
         "overview": "changes in this release forward-ported from 3.48.4",
         "fix": [
@@ -286,6 +292,12 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.48.5": {
+        "fix": [
+            "basePatch templates not being applied after code changes from last release"
+        ],
+        "branch": "release/3"    
     },
     "3.48.4": {
         "fix": [
