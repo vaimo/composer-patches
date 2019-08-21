@@ -28,10 +28,6 @@ class Parser
                 $line = ltrim(strstr($line, ' '), ' ');
             }
             
-            if (!trim($line)) {
-                continue;
-            }
-
             if (!isset($data[$key])) {
                 $data[$key] = array();
             }
