@@ -2,6 +2,21 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.6
+
+changes in this release forward-ported from 3.48.6
+
+### Fix
+
+* the meta-data @skip tag not perceived properly (this actually affected all tags that had no value)
+
+
+### Maintenance
+
+* test coverage improved; introduced the possibility to write test scenarios for multiple installations (one using patches-search, other using patches-file, etc)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.6) [diff](https://github.com/vaimo/composer-patches/compare/4.17.5...4.17.6)
+
 ## 4.17.5 (2019-08-21)
 
 changes in this release forward-ported from 3.48.5
@@ -429,7 +444,19 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.5...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.6...4.0.0)
+
+## 3.48.6 (2019-08-21)
+
+### Fix
+
+* the meta-data @skip tag not perceived properly (this actually affected all tags that had no value)
+
+### Maintenance
+
+* test coverage improved; introduced the possibility to write test scenarios for multiple installations (one using patches-search, other using patches-file, etc)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.6) [diff](https://github.com/vaimo/composer-patches/compare/3.48.5...3.48.6)
 
 ## 3.48.5 (2019-08-20)
 

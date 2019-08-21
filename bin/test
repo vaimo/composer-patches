@@ -35,42 +35,39 @@ bgdylw=$(tput setab 3)      # dark yellow background
 bgcol=$(tput sgr 1 0)       # Switch to background (coloring mode)
 fgcol=$(tput sgr 0 0)       # Switch to foreground (coloring mode)
 
-function run_tests() {
-    for scenario in $(ls scenarios -1) ; do
-        reset_packages
+function run_tests() {    
+    scenario_root=${1}
         
-        scenario_root=$(get_scenario_root ${scenario})
-        scenario_label=$(cat ${scenario_root}/.label)
+    scenario_label=$(cat ${scenario_root}/.label)
         
-        _line '-' 80
-        _info "SCENARIO:" "${scenario}" "${scenario_label}"
-        _line '-' 80
+    _line '-' 80
+    _info "SCENARIO:" "${scenario}" "${scenario_label}"
+    _line '-' 80
         
-        apply_patches "${scenario}" 'patch:apply'
+    apply_patches "${scenario_root}" 'patch:apply'
         
-        for patch_file in $(find -L patches -type f) ; do
-            local assertion=$(cat ${patch_file}|grep '@assert')
+    for patch_file in $(find -L patches -type f) ; do
+        local assertion=$(cat ${patch_file}|grep '@assert')
         
-            assertions=$(echo "${assertion}"|cut -d' ' -f2)
+        assertions=$(echo "${assertion}"|cut -d' ' -f2)
         
-            local original_ifs=${IFS}
-            IFS=$'\n'
+        local original_ifs=${IFS}
+        IFS=$'\n'
 
-            for assertion in ${assertions} ; do
-                if assert ${assertion} ; then
-                    continue
-                fi
+        for assertion in ${assertions} ; do
+            if assert ${assertion} ; then
+                continue
+            fi
             
-                assertion_error "${patch_file}" "${assertion}"
+            assertion_error "${patch_file}" "${assertion}"
                         
-                exit 1
-            done
-        
-            IFS=${original_ifs}
+            exit 1
         done
         
-        echo ''
+        IFS=${original_ifs}
     done
+        
+    echo ''
 }
 
 function get_scenario_root() {
@@ -83,13 +80,11 @@ function get_scenario_root() {
 }
 
 function apply_patches() {
-    local scenario=${1}
+    local scenario_root=${1}
     local command=${2}
-    
-    scenario_root=$(get_scenario_root ${scenario})
-    
+            
     rm patches 2>/dev/null
-    ln -s ${scenario_root} patches
+    ln -s ${scenario_root}/files patches
     
     eval "composer ${command} --ansi"
 }
@@ -173,16 +168,65 @@ function reset_packages() {
     composer install --ansi --no-plugins &>/dev/null
 }
 
+function sanitize() {
+    rm -rf patches
+    rm -rf modules
+    rm -rf scenarios
+}
+
 function _line() {
     local character=${1}
 
     eval echo $(printf -- '${character}%.0s' {1..80})
 }
 
+function get_installation_root() {
+    local set_name=${1}
+
+    (
+        cd installations/${set_name} &>/dev/null
+        pwd
+    )
+}
+
+scenario_filter=${1}
+
+if [ "${scenario_filter}" == "" ] ; then
+    scenario_filter=".*"
+fi
+
 (
-    cd sandbox
+    cd sandbox &>/dev/null
+    
+    sandbox_root=$(pwd)
+    
+    installations=$(ls installations -1)
+    scenarios=$(ls scenarios -1)
+    
+    for installation in "${installations}" ; do
+        installation_root=$(get_installation_root ${installation})
+        
+        cd ${installation_root}
+        
+        sanitize
 
-    composer install --ansi
-
-    run_tests
+        ln -s ${sandbox_root}/modules ${installation_root}
+        ln -s ${sandbox_root}/scenarios ${installation_root}
+            
+        composer install --ansi
+    
+        for scenario in ${scenarios} ; do
+            if ! echo ${scenario}|grep -q "${scenario_filter}" ; then
+                continue
+            fi
+            
+            scenario_root=$(get_scenario_root ${scenario})
+            
+            reset_packages
+            
+            run_tests ${scenario_root}
+        done
+    
+        sanitize
+    done
 )
