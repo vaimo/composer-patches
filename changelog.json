@@ -4,6 +4,15 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.48.6": {
+        "fix": [
+            "the meta-data @skip tag not perceived properly (this actually affected all tags that had no value)"
+        ],
+        "maintenance": [
+            "test coverage improved; introduced the possibility to write test scenarios for multiple installations (one using patches-search, other using patches-file, etc)"
+        ],
+        "branch": "release/3"
+    },
     "3.48.5": {
         "fix": [
             "basePatch templates not being applied after code changes from last release"
