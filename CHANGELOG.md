@@ -2,6 +2,18 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.48.6 (2019-08-21)
+
+### Fix
+
+* the meta-data @skip tag not perceived properly (this actually affected all tags that had no value)
+
+### Maintenance
+
+* test coverage improved; introduced the possibility to write test scenarios for multiple installations (one using patches-search, other using patches-file, etc)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.6) [diff](https://github.com/vaimo/composer-patches/compare/3.48.5...3.48.6)
+
 ## 3.48.5 (2019-08-20)
 
 ### Fix
