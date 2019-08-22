@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.48.8": {
+        "fix": [
+            "patches validation not failing when there are patch files present without patch target definition in JSON files (not an issue when using patches-search)"
+        ],
+        "branch": "release/3"
+    },
     "3.48.7": {
         "fix": [
             "using printf variable syntax in patch descriptions crashed the patch applier"

@@ -29,7 +29,8 @@ class UndoCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
     {
         return array(
             'redo' => false,
-            'undo' => true
+            'undo' => true,
+            'force' => false
         );
     }
 }

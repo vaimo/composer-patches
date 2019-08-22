@@ -5,9 +5,12 @@
  */
 namespace Vaimo\ComposerPatches\Composer\Commands;
 
+use Composer\Repository\WritableRepositoryInterface as PackageRepository;
+
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
@@ -47,7 +50,9 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $localOnly = $input->getOption('local');
 
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
-
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
+        $patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
+        
         $defaultValues = $configDefaults->getPatcherConfig();
 
         $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
@@ -59,36 +64,14 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $pluginConfig = array(
             Config::PATCHER_SOURCES => $patchSources
         );
-        
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
-        $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
 
         $repository = $composer->getRepositoryManager()->getLocalRepository();
 
         $pluginConfig = $configFactory->create(array($pluginConfig));
-
-        $composerConfig = clone $composer->getConfig();
-        $downloader = new \Composer\Util\RemoteFilesystem($this->getIO(), $composerConfig);
         
-        $loaderComponentsPool = $this->createLoaderPool(array(
-            'constraints' => false,
-            'platform' => false,
-            'targets-resolver' => false,
-            'local-exclude' => false,
-            'root-patch' => false,
-            'global-exclude' => false,
-            'downloader' => new LoaderComponents\DownloaderComponent(
-                $composer->getPackage(),
-                $downloader,
-                true
-            )
-        ));
-        
-        $patchesLoader = $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
+        $patchesLoader = $this->createPatchesLoader($pluginConfig);
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
-
-        $patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
         
         $patchPaths = $patchListAnalyser->extractValue($patches, array(Patch::PATH, Patch::SOURCE));
         
@@ -104,94 +87,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             ) ?: array()
         );
         
-        $srcResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
-        $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
+        $matches = $this->resolveValidationTargets($repository, $pluginConfig);
 
-        $srcResolver = $srcResolverFactory->create($pluginConfig);
-
-        $sources = $srcResolver->resolvePackages($repository);
-
-        $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
-            array($composer->getPackage())
-        );
+        $installPaths = $this->collectInstallPaths($matches);
         
-        $repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
-
-        $pluginPackage = $packageResolver->resolveForNamespace($repository, __NAMESPACE__);
-        
-        $pluginName = $pluginPackage->getName();
-
-        $pluginUsers = array_merge(
-            $repositoryUtils->filterByDependency($repository, $pluginName),
-            array($composer->getPackage())
-        );
-
-        $matches = array_intersect_key(
-            $packageListUtils->listToNameDictionary($sources),
-            $packageListUtils->listToNameDictionary($pluginUsers)
-        );
-
-        $installationManager = $composer->getInstallationManager();
-
-        $fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
-
-        $projectRoot = getcwd();
-        $vendorRoot = $composerConfig->get(ConfigKeys::VENDOR_DIR);
-        $vendorPath = ltrim(
-            substr($vendorRoot, strlen($projectRoot)),
-            DIRECTORY_SEPARATOR
-        );
-
-        $fileMatches = array();
-        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
-
-        $installPaths = array();
-        foreach ($matches as $packageName => $package) {
-            $installPaths[$packageName] = $package instanceof \Composer\Package\RootPackage
-                ? $projectRoot
-                : $installationManager->getInstallPath($package);
-        }
-
-        $dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
-
-        $defaultIgnores = array($vendorPath, '.hg', '.git', '.idea');
-
-        $configReaderFactory = new \Vaimo\ComposerPatches\Factories\PatcherConfigReaderFactory(
-            $this->getComposer()
-        );
-        
-        $patcherConfigReader = $configReaderFactory->create($pluginConfig);
-        
-        foreach ($matches as $packageName => $package) {
-            $patcherConfig = $patcherConfigReader->readFromPackage($package);
-            
-            $ignores = $dataUtils->getValueByPath(
-                $patcherConfig,
-                array(Config::PATCHER_CONFIG_ROOT, Config::PATCHES_IGNORE),
-                array()
-            );
-            
-            $installPath = $installPaths[$packageName];
-            
-            $skippedPaths = $dataUtils->prefixArrayValues(
-                array_merge($defaultIgnores, $ignores),
-                $installPath . DIRECTORY_SEPARATOR
-            );
-
-            $filter = $filterUtils->composeRegex(
-                $filterUtils->invertRules($skippedPaths),
-                '/'
-            );
-
-            $filter = sprintf('%s.+\.patch/i', rtrim($filter, '/'));
-
-            $result = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
-
-            $fileMatches = array_replace(
-                $fileMatches,
-                array_fill_keys($result, $packageName)
-            );
-        }
+        $fileMatches = $this->collectPatchFilesFromPackages($matches, $pluginConfig);
         
         $groups = array_filter(
             $this->collectOrphans($fileMatches, $patchDefines, $installPaths, $patchStatuses)
@@ -204,6 +104,138 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         );
         
         return (int)(bool)$groups;
+    }
+
+    private function collectInstallPaths(array $matches)
+    {
+        $composer = $this->getComposer();
+        $projectRoot = getcwd();
+
+        $installationManager = $composer->getInstallationManager();
+        
+        $installPaths = array();
+        foreach ($matches as $packageName => $package) {
+            $installPaths[$packageName] = $package instanceof \Composer\Package\RootPackage
+                ? $projectRoot
+                : $installationManager->getInstallPath($package);
+        }
+        
+        return $installPaths;
+    }
+
+    private function collectPatchFilesFromPackages(array $matches, Config $pluginConfig)
+    {
+        $composer = $this->getComposer();
+        $composerConfig = $composer->getConfig();
+
+        $configReaderFactory = new \Vaimo\ComposerPatches\Factories\PatcherConfigReaderFactory($composer);
+        $dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
+        $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
+        $fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
+
+        $projectRoot = getcwd();
+
+        $vendorRoot = $composerConfig->get(ConfigKeys::VENDOR_DIR);
+        $vendorPath = ltrim(
+            substr($vendorRoot, strlen($projectRoot)),
+            DIRECTORY_SEPARATOR
+        );
+        
+        $defaultIgnores = array($vendorPath, '.hg', '.git', '.idea');
+
+        $patcherConfigReader = $configReaderFactory->create($pluginConfig);
+        
+        $installPaths = $this->collectInstallPaths($matches);
+
+        $fileMatchGroups = array();
+
+        foreach ($matches as $packageName => $package) {
+            $patcherConfig = $patcherConfigReader->readFromPackage($package);
+
+            $ignores = $dataUtils->getValueByPath(
+                $patcherConfig,
+                array(Config::PATCHER_CONFIG_ROOT, Config::PATCHES_IGNORE),
+                array()
+            );
+
+            $installPath = $installPaths[$packageName];
+
+            $skippedPaths = $dataUtils->prefixArrayValues(
+                array_merge($defaultIgnores, $ignores),
+                $installPath . DIRECTORY_SEPARATOR
+            );
+
+            $filter = $filterUtils->composeRegex(
+                $filterUtils->invertRules($skippedPaths),
+                '/'
+            );
+
+            $filter = sprintf('%s.+\.patch/i', rtrim($filter, '/'));
+
+            $searchResult = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
+
+            $fileMatchGroups[] = array_fill_keys($searchResult, $packageName);
+        }
+
+        return array_reduce($fileMatchGroups, 'array_replace', array());
+    }
+    
+    private function resolveValidationTargets(PackageRepository $repository, Config $pluginConfig)
+    {
+        $composer = $this->getComposer();
+
+        $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
+            array($composer->getPackage())
+        );
+        
+        $srcResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
+        $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
+
+        $srcResolver = $srcResolverFactory->create($pluginConfig);
+        
+        $sources = $srcResolver->resolvePackages($repository);
+
+        $repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
+
+        $pluginPackage = $packageResolver->resolveForNamespace($repository, __NAMESPACE__);
+
+        $pluginName = $pluginPackage->getName();
+
+        $pluginUsers = array_merge(
+            $repositoryUtils->filterByDependency($repository, $pluginName),
+            array($composer->getPackage())
+        );
+
+        return array_intersect_key(
+            $packageListUtils->listToNameDictionary($sources),
+            $packageListUtils->listToNameDictionary($pluginUsers)
+        );
+    }
+    
+    private function createPatchesLoader(\Vaimo\ComposerPatches\Config $pluginConfig)
+    {
+        $composer = $this->getComposer();
+        
+        $composerConfig = clone $composer->getConfig();
+        $downloader = new \Composer\Util\RemoteFilesystem($this->getIO(), $composerConfig);
+
+        $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
+
+        $loaderComponentsPool = $this->createLoaderPool(array(
+            'constraints' => false,
+            'platform' => false,
+            'targets-resolver' => false,
+            'local-exclude' => false,
+            'root-patch' => false,
+            'global-exclude' => false,
+            'downloader' => new LoaderComponents\DownloaderComponent(
+                $composer->getPackage(),
+                $downloader,
+                true
+            )
+        ));
+
+        return $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
     }
 
     private function createLoaderPool(array $componentUpdates = array())

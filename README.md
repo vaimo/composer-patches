@@ -84,7 +84,8 @@ Test out the added patch (in project root).
 composer patch:redo --from-source some/package-name
 ```
 
-The patch will be automatically applied on every composer install, update when required (when it's found that it's not yet installed).
+The patch will be automatically applied on every composer install, update when required (when it's 
+found that it's not yet installed).
 
 ```shell
 Writing lock file
@@ -96,7 +97,8 @@ Processing patches configuration
       absolutely everything
 ```
 
-All patches are applied when after all packages are installed to allow any package to provide patches for any other package.
+All patches are applied when after all packages are installed to allow any package to provide patches 
+for any other package.
 
 # Configuration
 
@@ -1105,19 +1107,21 @@ auto-loader generation), developers are advised to re-execute 'composer install'
 Let's say that you have a root composer.json which requires two packages: A and B. The package B depends 
 on (requires) package A. In order to be able to use package B properly, package A needs to be patched.
 
-So in this case package B would have the following in it's composer.json
+So in this case package B would have the following in the composer.json:
+
 ```json
 {
     "extra": {
         "patches": {
             "A": {
-                "Compatibility: magic": "patches/compatibility-with-package-a.patch"
+                "Compatibility magic": "patches/compatibility-with-package-a.patch"
             }
         }
     }
 }
 ```
-... where the patch is placed to <package B root>/patches/compatibility-with-dependency-a.patch and paths 
+
+... where the patch is placed to `<package B root>/patches/compatibility-with-dependency-a.patch` and paths 
 withing the patch file are relative to the root of package A.
 
 This can be tested out with...
@@ -1128,7 +1132,8 @@ composer patch --redo --from-source --filter compatibility-with-pack
 
 _The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' 
 makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested 
-before [updating/commiting changes to] a given package). The default behaviour is to scan for them in installed.json_
+before [updating/committing changes to] a given package). The default behaviour is to scan for them 
+in installed.json_
 
 ## Development
 
@@ -1145,6 +1150,24 @@ composer code:normalise
 
 # Runs several integration-tests against the application
 composer code:test
+
+# Runs just one scenario for all test installations
+composer code:test sequence
+
+# Runs just one scenario for just one installation
+composer code:test using-file:skipped-patch
+```
+
+### Adding new scenarios
+
+Not much needs to be done when new scenarios are introduced, one can just create new folder under 
+sandbox/scenarios and define the patches that use certain features or expose certain issue.
+
+Note that assertions are taken from the patch files, where they should be defined using following
+convention/template:
+
+```
+@assert <package-name>,<before>,<after>
 ```
 
 ## Changelog 

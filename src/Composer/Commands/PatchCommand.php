@@ -90,7 +90,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
     {
         return array(
             'redo' => (bool)$input->getOption('redo'),
-            'undo' => (bool)$input->getOption('undo')
+            'undo' => (bool)$input->getOption('undo'),
+            'force' => (bool)$input->getOption('force')
         );
     }
 
@@ -128,20 +129,9 @@ class PatchCommand extends \Composer\Command\BaseCommand
             $filters[Patch::SOURCE] = array('*');
         }
         
-        $listResolver = new ListResolvers\FilteredListResolver($filters);
-        
-        if ($shouldUndo) {
-            $listResolver = new ListResolvers\InvertedListResolver($listResolver);
-        } else {
-            $listResolver = new ListResolvers\InclusiveListResolver($listResolver);
-        }
-        
-        if (!$behaviourFlags['redo'] && !$behaviourFlags['undo']) {
-            $listResolver = new ListResolvers\ChangesListResolver($listResolver);
-        }
+        $listResolver = $this->createListResolver($behaviourFlags, $filters);
         
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
-
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
         
         $defaultValues = $configDefaults->getPatcherConfig();
@@ -153,36 +143,15 @@ class PatchCommand extends \Composer\Command\BaseCommand
             )
         );
 
-        if ($behaviourFlags['redo'] || $behaviourFlags['undo']) {
-            $runtimeUtils->setEnvironmentValues(array(
-                Environment::EXIT_ON_FAIL => 0,
-                'COMPOSER_EXIT_ON_PATCH_FAILURE' => 0
-            ));
-        }
+        $this->configureEnvironmentForBehaviour($behaviourFlags);
+        
+        $outputTriggers = $this->resolveOutputTriggers($filters, $isExplicit);
 
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
-        
-        $outputTriggerFlags = array(
-            Patch::STATUS_NEW => !$hasFilers,
-            Patch::STATUS_CHANGED => !$hasFilers,
-            Patch::STATUS_MATCH => true,
-            Patch::SOURCE => $isExplicit,
-            Patch::URL => $isExplicit
-        );
-
-        $outputTriggers = array_keys(
-            array_filter($outputTriggerFlags)
-        );
-        
-        $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
-        
-        $bootstrap = $bootstrapFactory->create($listResolver, $outputStrategy, $config);
-
-        $runtimeUtils->setEnvironmentValues(array(
-            Environment::FORCE_RESET => (int)(bool)$input->getOption('force')
-        ));
-        
         $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
+        $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
+
+        $bootstrap = $bootstrapFactory->create($listResolver, $outputStrategy, $config);
 
         $result = $runtimeUtils->executeWithPostAction(
             function () use ($shouldUndo, $filters, $isDevMode, $bootstrap, $runtimeUtils, $input, $behaviourFlags) {
@@ -210,5 +179,58 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
 
         return (int)!$result;
+    }
+    
+    private function configureEnvironmentForBehaviour(array $behaviourFlags)
+    {
+        $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
+
+        if ($behaviourFlags['redo'] || $behaviourFlags['undo']) {
+            $runtimeUtils->setEnvironmentValues(array(
+                Environment::EXIT_ON_FAIL => 0,
+                'COMPOSER_EXIT_ON_PATCH_FAILURE' => 0
+            ));
+        }
+
+        $runtimeUtils->setEnvironmentValues(array(
+            Environment::FORCE_RESET => (int)$behaviourFlags['force']
+        ));
+    }
+    
+    private function resolveOutputTriggers(array $filters, $isExplicit)
+    {
+        $hasFilers = (bool)array_filter($filters);
+        
+        $outputTriggerFlags = array(
+            Patch::STATUS_NEW => !$hasFilers,
+            Patch::STATUS_CHANGED => !$hasFilers,
+            Patch::STATUS_MATCH => true,
+            Patch::SOURCE => $isExplicit,
+            Patch::URL => $isExplicit
+        );
+
+        return array_keys(
+            array_filter($outputTriggerFlags)
+        );
+    }
+    
+    private function createListResolver(array $behaviourFlags, array $filters)
+    {
+        $listResolver = new ListResolvers\FilteredListResolver($filters);
+
+        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
+        $isDefaultBehaviour = !$behaviourFlags['redo'] && !$behaviourFlags['undo'];
+        
+        if ($shouldUndo) {
+            $listResolver = new ListResolvers\InvertedListResolver($listResolver);
+        } else {
+            $listResolver = new ListResolvers\InclusiveListResolver($listResolver);
+        }
+
+        if ($isDefaultBehaviour) {
+            $listResolver = new ListResolvers\ChangesListResolver($listResolver);
+        }
+        
+        return $listResolver;
     }
 }

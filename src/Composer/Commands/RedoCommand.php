@@ -29,7 +29,8 @@ class RedoCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
     {
         return array(
             'redo' => true,
-            'undo' => false
+            'undo' => false,
+            'force' => false
         );
     }
 }

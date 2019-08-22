@@ -98,7 +98,7 @@
         "code:analyse": "bin/analyse",
         "code:normalise": "bin/normalise",
         "code:test": "bin/test",
-        "pre-install-cmd": "bin/bootstrap-sandbox",
+        "pre-install-cmd": "bin/bootstrap-test-env",
         "post-install-cmd": "bin/bootstrap",
         "post-update-cmd" : "bin/bootstrap"
     },
@@ -106,14 +106,5 @@
         "psr-4": {
             "Vaimo\\ComposerPatches\\": "src"
         }
-    },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "sandbox/modules/*",
-            "options": {
-                "symlink": false
-            }
-        }
-    ]
+    }
 }
