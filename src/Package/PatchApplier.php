@@ -7,36 +7,19 @@ namespace Vaimo\ComposerPatches\Package;
 
 use Composer\Package\PackageInterface;
 
-use Vaimo\ComposerPatches\Patch\Event;
-use Vaimo\ComposerPatches\Events;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class PatchApplier
 {
     /**
-     * @var \Composer\EventDispatcher\EventDispatcher
+     * @var \Vaimo\ComposerPatches\Package\PatchApplier\ItemProcessor
      */
-    private $eventDispatcher;
+    private $fileProcessor;
     
-    /**
-     * @var \Vaimo\ComposerPatches\Package\InfoResolver
-     */
-    private $packageInfoResolver;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface
-     */
-    private $failureHandler;
-
-    /**
-     * @var \Vaimo\ComposerPatches\Patch\File\Applier
-     */
-    private $patchApplier;
-
     /**
      * @var \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger
      */
-    private $patchInfoLogger;
+    private $detailsLogger;
 
     /**
      * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy
@@ -49,28 +32,19 @@ class PatchApplier
     private $logger;
 
     /**
-     * @param \Composer\EventDispatcher\EventDispatcher $eventDispatcher
-     * @param \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
-     * @param \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler
-     * @param \Vaimo\ComposerPatches\Patch\File\Applier $patchApplier
-     * @param \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $patchInfoLogger
+     * @param \Vaimo\ComposerPatches\Package\PatchApplier\ItemProcessor $fileProcessor
+     * @param \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $detailsLogger
      * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy
      * @param \Vaimo\ComposerPatches\Logger $logger
      */
     public function __construct(
-        \Composer\EventDispatcher\EventDispatcher $eventDispatcher,
-        \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver,
-        \Vaimo\ComposerPatches\Interfaces\PatchFailureHandlerInterface $failureHandler,
-        \Vaimo\ComposerPatches\Patch\File\Applier $patchApplier,
-        \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $patchInfoLogger,
+        \Vaimo\ComposerPatches\Package\PatchApplier\ItemProcessor $fileProcessor,
+        \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $detailsLogger,
         \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy,
         \Vaimo\ComposerPatches\Logger $logger
     ) {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->packageInfoResolver = $packageInfoResolver;
-        $this->failureHandler = $failureHandler;
-        $this->patchApplier = $patchApplier;
-        $this->patchInfoLogger = $patchInfoLogger;
+        $this->fileProcessor = $fileProcessor;
+        $this->detailsLogger = $detailsLogger;
         $this->outputStrategy = $outputStrategy;
         $this->logger = $logger;
     }
@@ -86,14 +60,14 @@ class PatchApplier
 
             $patchInfo = array_replace($info, array(Patch::SOURCE => $source));
             
-            $this->patchInfoLogger->outputPatchSource($patchInfo);
+            $this->detailsLogger->outputPatchSource($patchInfo);
 
             $loggerIndentation = $this->logger->push();
 
-            $this->patchInfoLogger->outputPatchDescription($patchInfo);
+            $this->detailsLogger->outputPatchDescription($patchInfo);
 
             try {
-                $result = $this->processPackagePatch($package, $patchInfo);
+                $result = $this->fileProcessor->processFileInfo($package, $patchInfo);
             } catch (\Exception $exception) {
                 $this->logger->reset($loggerIndentation);
                 
@@ -118,38 +92,5 @@ class PatchApplier
         }
 
         return $appliedPatches;
-    }
-
-    private function processPackagePatch(PackageInterface $package, array $info)
-    {
-        $source = $info[Patch::SOURCE];
-        
-        try {
-            $installPath = $this->packageInfoResolver->getInstallPath($package, $info[Patch::CWD]);
-
-            $this->dispatchEventForPackagePatch(Events::PRE_APPLY, $package, $info);
-            
-            $this->patchApplier->applyFile($info[Patch::PATH], $installPath, $info[Patch::CONFIG]);
-
-            $this->dispatchEventForPackagePatch(Events::POST_APPLY, $package, $info);
-            
-            return true;
-        } catch (\Vaimo\ComposerPatches\Exceptions\RuntimeException $runtimeException) {
-            throw $runtimeException;
-        } catch (\Exception $exception) {
-            $this->logger->writeException($exception);
-
-            $this->failureHandler->execute($exception, $source);
-        }
-
-        return false;
-    }
-    
-    private function dispatchEventForPackagePatch($name, PackageInterface $package, array $patch)
-    {
-        $this->eventDispatcher->dispatch(
-            Events::PRE_APPLY,
-            new Event($name, $package, $patch[Patch::SOURCE], $patch[Patch::LABEL])
-        );
     }
 }

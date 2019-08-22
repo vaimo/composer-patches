@@ -2,6 +2,22 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.9
+
+changes in this release forward-ported from 3.48.9
+
+### Fix
+
+* certain behaviour flags incorrectly forced to false (explicit flag) when using redo/undo with no option to override said falsey value
+
+
+### Maintenance
+
+* improved test coverage where 'redo' and 'undo' also get covered
+* allow multiple commands to be called per test
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.9) [diff](https://github.com/vaimo/composer-patches/compare/4.17.8...4.17.9)
+
 ## 4.17.8 (2019-08-22)
 
 changes in this release forward-ported from 3.48.8
@@ -464,7 +480,20 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.8...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.9...4.0.0)
+
+## 3.48.9 (2019-08-22)
+
+### Fix
+
+* certain behaviour flags incorrectly forced to false (explicit flag) when using redo/undo with no option to override said falsey value
+
+### Maintenance
+
+* improved test coverage where 'redo' and 'undo' also get covered
+* allow multiple commands to be called per test
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.9) [diff](https://github.com/vaimo/composer-patches/compare/3.48.8...3.48.9)
 
 ## 3.48.8 (2019-08-22)
 

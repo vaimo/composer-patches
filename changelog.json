@@ -4,6 +4,17 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.17.9": {
+        "overview": "changes in this release forward-ported from 3.48.9",
+        "fix": [
+            "certain behaviour flags incorrectly forced to false (explicit flag) when using redo/undo with no option to override said falsey value"
+        ],
+        "maintenance": [
+            "improved test coverage where 'redo' and 'undo' also get covered",
+            "allow multiple commands to be called per test"
+        ],
+        "branch": "release/3"
+    },
     "4.17.8": {
         "overview": "changes in this release forward-ported from 3.48.8",
         "fix": [
@@ -313,6 +324,16 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.48.9": {
+        "fix": [
+            "certain behaviour flags incorrectly forced to false (explicit flag) when using redo/undo with no option to override said falsey value"
+        ],
+        "maintenance": [
+            "improved test coverage where 'redo' and 'undo' also get covered",
+            "allow multiple commands to be called per test"
+        ],
+        "branch": "release/3"
     },
     "3.48.8": {
         "fix": [

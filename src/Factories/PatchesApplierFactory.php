@@ -37,14 +37,12 @@ class PatchesApplierFactory
 
     public function create(PluginConfig $pluginConfig, ListResolver $listResolver, OutputStrategy $outputStrategy)
     {
-        $composer = $this->composer;
+        $installer = $this->composer->getInstallationManager();
+        $downloader = $this->composer->getDownloadManager();
 
-        $installer = $composer->getInstallationManager();
-        $downloader = $composer->getDownloadManager();
-
-        $eventDispatcher = $composer->getEventDispatcher();
-        $rootPackage = $composer->getPackage();
-        $composerConfig = $composer->getConfig();
+        $eventDispatcher = $this->composer->getEventDispatcher();
+        $rootPackage = $this->composer->getPackage();
+        $composerConfig = $this->composer->getConfig();
 
         $output = $this->logger->getOutputInstance();
 
@@ -64,14 +62,19 @@ class PatchesApplierFactory
             $pluginConfig->getPatcherConfig()
         );
 
-        $patchInfoLogger = new \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger($this->logger);
-        
-        $packagePatchApplier = new \Vaimo\ComposerPatches\Package\PatchApplier(
+        $patchDetailsLogger = new \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger($this->logger);
+
+        $patchProcessor = new \Vaimo\ComposerPatches\Package\PatchApplier\ItemProcessor(
             $eventDispatcher,
             $packageInfoResolver,
             $failureHandler,
             $patchFileApplier,
-            $patchInfoLogger,
+            $this->logger
+        );
+        
+        $packagePatchApplier = new \Vaimo\ComposerPatches\Package\PatchApplier(
+            $patchProcessor,
+            $patchDetailsLogger,
             $outputStrategy,
             $this->logger
         );
@@ -81,7 +84,7 @@ class PatchesApplierFactory
         );
         
         $stateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
-            $composer
+            $this->composer
         );
 
         $stateAnalyser = $stateAnalyserFactory->create();
@@ -109,7 +112,7 @@ class PatchesApplierFactory
             $packagePatchApplier,
             $queueGenerator,
             $patcherStateManager,
-            $patchInfoLogger,
+            $patchDetailsLogger,
             $outputStrategy,
             $this->logger
         );

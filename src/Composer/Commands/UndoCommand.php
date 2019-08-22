@@ -27,10 +27,11 @@ class UndoCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
 
     protected function getBehaviourFlags(InputInterface $input)
     {
-        return array(
-            'redo' => false,
-            'undo' => true,
-            'force' => false
+        $flags = parent::getBehaviourFlags($input);
+
+        return array_replace(
+            $flags,
+            array('undo' => true)
         );
     }
 }
