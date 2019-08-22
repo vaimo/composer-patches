@@ -39,24 +39,37 @@ function run_tests() {
     scenario_root=${1}
         
     scenario_label=$(cat ${scenario_root}/.label)
+    commands=$(cat ${scenario_root}/.commands)
         
     _line '-' 80
     _info "SCENARIO:" "${scenario}" "${scenario_label}"
     _line '-' 80
+            
+    rm -rf patches 2>/dev/null
+    rm patches.json 2>/dev/null
+    
+    ln -s ${scenario_root}/files patches
+    ln -s ${scenario_root}/patches.json patches.json
         
-    if ! apply_patches "${scenario_root}" 'patch:validate' ; then
+    if ! apply_patches 'patch:validate' ; then
         return 1
     fi
     
-    apply_patches "${scenario_root}" 'patch:apply'
+    local original_ifs=${IFS}
+    IFS=$'\n'
         
+    for command in ${commands} ; do
+        if apply_patches "${command}" ; then
+            continue
+        fi
+
+        return 1
+    done
+    
     for patch_file in $(find -L patches -type f) ; do
         local assertion=$(cat ${patch_file}|grep '@assert')
         
         assertions=$(echo "${assertion}"|cut -d' ' -f2)
-        
-        local original_ifs=${IFS}
-        IFS=$'\n'
 
         for assertion in ${assertions} ; do
             if assert ${assertion} ; then
@@ -67,24 +80,19 @@ function run_tests() {
                         
             return 1
         done
-        
-        IFS=${original_ifs}
     done
+    
+    IFS=${original_ifs}
     
     return 0
 }
 
-function apply_patches() {
-    local scenario_root=${1}
-    local command=${2}
-            
-    rm -rf patches 2>/dev/null
-    rm patches.json 2>/dev/null
-    
-    ln -s ${scenario_root}/files patches
-    ln -s ${scenario_root}/patches.json patches.json
-    
-    eval "composer ${command} --ansi; return \${PIPESTATUS[0]}"
+function apply_patches() {   
+    local args=${1}
+ 
+    local command="composer ${args} --ansi"
+ 
+    eval "${command}; return \${PIPESTATUS[0]}"
     
     local result=${?}
     
