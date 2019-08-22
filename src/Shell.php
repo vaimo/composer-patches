@@ -48,7 +48,10 @@ class Shell
         $outputHandler = function ($type, $data) use ($logger, &$output) {
             $output .= $data;
             
-            $logger->writeVerbose('comment', trim($data));
+            $logger->writeVerbose(
+                'comment', 
+                trim($data)
+            );
         };
         
         if ($this->logger->getOutputInstance()->isVerbose()) {
