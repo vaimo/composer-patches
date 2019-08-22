@@ -24,14 +24,4 @@ class ApplyCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
 
         $definition->setOptions($options);
     }
-
-    protected function getBehaviourFlags(InputInterface $input)
-    {
-        $flags = parent::getBehaviourFlags($input);
-        
-        return array_replace($flags, array(
-            'redo' => false,
-            'undo' => false
-        ));
-    }
 }

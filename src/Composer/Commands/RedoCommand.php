@@ -29,9 +29,9 @@ class RedoCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
     {
         $flags = parent::getBehaviourFlags($input);
 
-        return array_replace($flags, array(
-            'redo' => true,
-            'undo' => false
-        ));
+        return array_replace(
+            $flags, 
+            array('redo' => true)
+        );
     }
 }
