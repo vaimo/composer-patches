@@ -19,9 +19,8 @@ yel=$(tput setaf 11)        # yellow
 gry=$(tput setaf 7)         # grey (default terminal grey)
 dgry=$(tput setaf 8)        # dark grey
 blu=$(tput setaf 12)        # blue
-mag=$(tput setaf 13)        # magento
-drkcya=$(tput setaf 6)      # dark cyan
-cya=$(tput setaf 14)        # cyan
+mag=$(tput setaf 13)        # magenta
+cya=$(tput setaf 6)         # cyan
 wht=$(tput setaf 15)        # white
 bldred=${txtbld}${red}      # bold-red
 bldgrn=${txtbld}${grn}      # bold-green
@@ -227,9 +226,9 @@ fi
 
         installation_label=$(cat ${installation_root}/.label)
     
+        _line '=' 80
         _title "INSTALLATION:" "${installation}" "${installation_label}"
-        _line '-' 80
-        _line '-' 80
+        _line '=' 80
         
         (
             cd ${installation_root}
