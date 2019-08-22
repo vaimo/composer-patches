@@ -2,6 +2,19 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.48.9 (2019-08-22)
+
+### Fix
+
+* certain behaviour flags incorrectly forced to false (explicit flag) when using redo/undo with no option to override said falsey value
+
+### Maintenance
+
+* improved test coverage where 'redo' and 'undo' also get covered
+* allow multiple commands to be called per test
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.9) [diff](https://github.com/vaimo/composer-patches/compare/3.48.8...3.48.9)
+
 ## 3.48.8 (2019-08-22)
 
 ### Fix
