@@ -4,6 +4,16 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.48.9": {
+        "fix": [
+            "certain behaviour flags incorrectly forced to false (explicit flag) when using redo/undo with no option to override said falsey value"
+        ],
+        "maintenance": [
+            "improved test coverage where 'redo' and 'undo' also get covered",
+            "allow multiple commands to be called per test"
+        ],
+        "branch": "release/3"
+    },
     "3.48.8": {
         "fix": [
             "patches validation not failing when there are patch files present without patch target definition in JSON files and using sym-linked patch folder (not an issue when using patches-search)"
