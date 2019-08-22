@@ -232,7 +232,6 @@ fi
         _line '-' 80
         
         (
-            echo ${installation_root}
             cd ${installation_root}
         
             sanitize
@@ -260,7 +259,11 @@ fi
             echo ''
         
             sanitize
-        )    
+        )
+        
+        if [ ${?} != 0 ] ; then
+            exit 1
+        fi
     done
     
     exit 0
