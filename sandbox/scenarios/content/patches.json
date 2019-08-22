@@ -1,0 +1,5 @@
+{
+    "vaimo/composer-patches-target1": {
+        "Change: value8 => valueC with some corrupting %s description %1 %s": "patches/single-package-single-file.patch"
+    }
+}
