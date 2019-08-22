@@ -1,0 +1,10 @@
+{
+    "vaimo/composer-patches-target1": {
+        "Change: value8 => valueC (inline skip)": "patches/0_initial-change.patch#skip",
+        "Change: value8 => valueC (explicit skip)": {
+            "source": "patches/0_initial-change.patch",
+            "skip": true
+        },
+        "Change: valueC => valueX": "patches/1_second-change.patch"
+    }
+}

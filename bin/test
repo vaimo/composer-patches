@@ -13,14 +13,14 @@ drkred=$(tput setaf 1)      # dark red
 drkmag=$(tput setaf 5)      # dark magenta
 grn=$(tput setaf 2)         # dark green
 brghtgrn=$(tput setaf 10)   # bright green
+brghtcya=$(tput setaf 14)   # bright cyan
 dkylw=$(tput setaf 3)       # dark yellow
 yel=$(tput setaf 11)        # yellow
 gry=$(tput setaf 7)         # grey (default terminal grey)
 dgry=$(tput setaf 8)        # dark grey
 blu=$(tput setaf 12)        # blue
-mag=$(tput setaf 13)        # magento
-drkcya=$(tput setaf 6)      # dark cyan
-cya=$(tput setaf 14)        # cyan
+mag=$(tput setaf 13)        # magenta
+cya=$(tput setaf 6)         # cyan
 wht=$(tput setaf 15)        # white
 bldred=${txtbld}${red}      # bold-red
 bldgrn=${txtbld}${grn}      # bold-green
@@ -61,13 +61,13 @@ function run_tests() {
             
             assertion_error "${patch_file}" "${assertion}"
                         
-            exit 1
+            return 1
         done
         
         IFS=${original_ifs}
     done
-        
-    echo ''
+    
+    return 0
 }
 
 function get_scenario_root() {
@@ -83,8 +83,11 @@ function apply_patches() {
     local scenario_root=${1}
     local command=${2}
             
-    rm patches 2>/dev/null
+    rm -rf patches 2>/dev/null
+    rm patches.json 2>/dev/null
+    
     ln -s ${scenario_root}/files patches
+    ln -s ${scenario_root}/patches.json patches.json
     
     eval "composer ${command} --ansi"
 }
@@ -101,6 +104,20 @@ _info() {
     fi
 
     echo "${grn}${1}${txtrst} ${brghtgrn}$(echo ${group}|tr '[:lower:]' '[:upper:]')${txtrst}${separator}${3}"
+}
+
+_title() {
+    topic=${1}
+    group=${2}
+    label=${3}
+    
+    local separator=
+    
+    if [ "${group}" != '' ] ; then
+        local separator=' - '
+    fi
+
+    echo "${cya}${1}${txtrst} ${brghtcya}$(echo ${group}|tr '[:lower:]' '[:upper:]')${txtrst}${separator}${3}"
 }
 
 _error() {
@@ -169,9 +186,10 @@ function reset_packages() {
 }
 
 function sanitize() {
-    rm -rf patches
-    rm -rf modules
-    rm -rf scenarios
+    rm -rf patches 2>/dev/null
+    rm -rf modules 2>/dev/null
+    rm -rf scenarios 2>/dev/null
+    rm patches.json 2>/dev/null
 }
 
 function _line() {
@@ -181,10 +199,10 @@ function _line() {
 }
 
 function get_installation_root() {
-    local set_name=${1}
+    local installation_name=${1}
 
     (
-        cd installations/${set_name} &>/dev/null
+        cd installations/${installation_name} &>/dev/null
         pwd
     )
 }
@@ -203,30 +221,49 @@ fi
     installations=$(ls installations -1)
     scenarios=$(ls scenarios -1)
     
-    for installation in "${installations}" ; do
+    for installation in ${installations} ; do
         installation_root=$(get_installation_root ${installation})
-        
-        cd ${installation_root}
-        
-        sanitize
 
-        ln -s ${sandbox_root}/modules ${installation_root}
-        ln -s ${sandbox_root}/scenarios ${installation_root}
-            
-        composer install --ansi
+        installation_label=$(cat ${installation_root}/.label)
     
-        for scenario in ${scenarios} ; do
-            if ! echo ${scenario}|grep -q "${scenario_filter}" ; then
-                continue
-            fi
+        _line '=' 80
+        _title "INSTALLATION:" "${installation}" "${installation_label}"
+        _line '=' 80
+        
+        (
+            cd ${installation_root}
+        
+            sanitize
+
+            ln -s ${sandbox_root}/modules ${installation_root}
+            ln -s ${sandbox_root}/scenarios ${installation_root}
             
-            scenario_root=$(get_scenario_root ${scenario})
-            
-            reset_packages
-            
-            run_tests ${scenario_root}
-        done
+            composer install --ansi --no-plugins
     
-        sanitize
+            for scenario in ${scenarios} ; do
+                if ! echo ${scenario}|grep -q "${scenario_filter}" ; then
+                    continue
+                fi
+            
+                scenario_root=$(get_scenario_root ${scenario})
+            
+                reset_packages
+            
+                if ! run_tests ${scenario_root} ; then
+                    sanitize
+                    exit 1
+                fi
+            done
+            
+            echo ''
+        
+            sanitize
+        )
+        
+        if [ ${?} != 0 ] ; then
+            exit 1
+        fi
     done
+    
+    exit 0
 )

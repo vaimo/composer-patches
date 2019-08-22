@@ -1,0 +1,19 @@
+{
+    "vaimo/composer-patches-target1": {
+        "Change: valueY => valueZ": {
+            "source": "patches/0_fourth-change.patch",
+            "after": "third-change"
+        },
+        "Change: valueC => valueX": {
+            "source": "patches/1_second-change.patch",
+            "after": "initial-change"
+        },
+        "Change: value8 => valueC": {
+            "source": "patches/2_initial-change.patch"
+        },
+        "Change: valueX => valueY": {
+            "source": "patches/3_third-change.patch",
+            "after": "second-change"
+        }
+    }
+}

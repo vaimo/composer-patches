@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.7
+
+changes in this release forward-ported from 3.48.7
+
+### Fix
+
+* using printf variable syntax in patch descriptions crashed the patch applier
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.7) [diff](https://github.com/vaimo/composer-patches/compare/4.17.6...4.17.7)
+
 ## 4.17.6 (2019-08-21)
 
 changes in this release forward-ported from 3.48.6
@@ -444,7 +454,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.6...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.7...4.0.0)
+
+## 3.48.7 (2019-08-22)
+
+### Fix
+
+* using printf variable syntax in patch descriptions crashed the patch applier
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.7) [diff](https://github.com/vaimo/composer-patches/compare/3.48.6...3.48.7)
 
 ## 3.48.6 (2019-08-21)
 

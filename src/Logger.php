@@ -35,31 +35,6 @@ class Logger
     ) {
         $this->appIO = $appIO;
     }
-
-    /**
-     * @return \Composer\IO\IOInterface|\Composer\IO\ConsoleIO
-     */
-    public function getOutputInstance()
-    {
-        return $this->appIO;
-    }
-
-    public function isMuted()
-    {
-        return (bool)$this->muteDepth;
-    }
-    
-    public function mute()
-    {
-        return $this->muteDepth++;
-    }
-
-    public function unMute($muteDepth = null)
-    {
-        $this->muteDepth = $muteDepth
-            ? $muteDepth
-            : max(--$this->muteDepth, 0);
-    }
     
     public function writeRaw($message, array $args = array())
     {
@@ -72,9 +47,11 @@ class Logger
         $lines = array_map(function ($line) use ($prefix) {
             return $prefix . $line;
         }, explode(PHP_EOL, $message));
+
+        $prefixedMessage = implode(PHP_EOL, $lines);
         
         $this->appIO->write(
-            vsprintf(implode(PHP_EOL, $lines), $args)
+            !$args ? $prefixedMessage : vsprintf($prefixedMessage, $args)
         );
     }
     
@@ -130,7 +107,7 @@ class Logger
     
     private function createTag($type, $contents)
     {
-        if (!$type || $type == \Vaimo\ComposerPatches\Logger::TYPE_NONE) {
+        if (!$type || $type === \Vaimo\ComposerPatches\Logger::TYPE_NONE) {
             return $contents;
         }
         
@@ -171,5 +148,33 @@ class Logger
     public function pop()
     {
         array_pop($this->indentationStack);
+    }
+
+    /**
+     * @return \Composer\IO\IOInterface|\Composer\IO\ConsoleIO
+     */
+    public function getOutputInstance()
+    {
+        return $this->appIO;
+    }
+
+    public function isMuted()
+    {
+        return (bool)$this->muteDepth;
+    }
+
+    public function mute()
+    {
+        return $this->muteDepth++;
+    }
+
+    public function unMute($muteDepth = null)
+    {
+        $this->muteDepth = $muteDepth ?: max(--$this->muteDepth, 0);
+    }
+
+    public function escape($message)
+    {
+        return str_replace(array('%'), array('%%'), $message);
     }
 }

@@ -48,9 +48,9 @@ class FilterUtils
             );
         }
 
-        return $delimiter .
-            sprintf($pattern, implode('|', $semanticGroups[self::AFFIRMATION])) .
-            $delimiter;
+        $query = sprintf($pattern, implode('|', $semanticGroups[self::AFFIRMATION]));
+        
+        return $delimiter . $query . $delimiter;
     }
 
     public function invertRules(array $filters)

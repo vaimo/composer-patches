@@ -12,7 +12,7 @@ class TemplateUtils
         $result = array();
 
         foreach ($patterns as $pattern) {
-            preg_match_all('/' . sprintf($pattern, '([^\}]+)'). '/', $template, $usedVariables);
+            preg_match_all('/' . sprintf($pattern, '([^\}]+)') . '/', $template, $usedVariables);
 
             foreach ($usedVariables[1] as $variableName) {
                 if (!preg_match_all('/\(([^\)]+)\)/', $variableName, $valueRules)) {

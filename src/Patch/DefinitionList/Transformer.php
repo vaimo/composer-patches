@@ -13,7 +13,7 @@ class Transformer
     {
         $groups = $this->createTargetsList($patches);
 
-        $result = array_map(function ($group) {
+        return array_map(function ($group) {
             $fingerprints = array_map(function ($item) {
                 return sprintf(
                     '%s, %s:%s',
@@ -23,14 +23,21 @@ class Transformer
                 );
             }, $group);
 
-            $keys = array_map(function ($key, $item) {
-                return sprintf('%s%s%s', $item[Patch::OWNER], Patch::SOURCE_INFO_SEPARATOR, $key);
-            }, array_keys($group), $group);
+            $keys = array_map(
+                function ($key, $item) {
+                    return sprintf(
+                        '%s%s%s', 
+                        $item[Patch::OWNER], 
+                        Patch::SOURCE_INFO_SEPARATOR, 
+                        $key
+                    );
+                }, 
+                array_keys($group), 
+                $group
+            );
 
             return array_combine($keys, $fingerprints);
         }, $groups);
-
-        return $result;
     }
 
     public function createDetailedList(array $patches)
