@@ -13,14 +13,14 @@ class MissingPatchesResolver implements \Vaimo\ComposerPatches\Interfaces\PatchP
     private $packagePatchDataUtils;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PackageUtils
+     * @var \Vaimo\ComposerPatches\Utils\DataUtils
      */
-    private $packageUtils;
+    private $dataUtils;
 
     public function __construct()
     {
         $this->packagePatchDataUtils = new \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils();
-        $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
+        $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
 
     public function resolve(array $patches, array $repositoryState)
@@ -28,7 +28,7 @@ class MissingPatchesResolver implements \Vaimo\ComposerPatches\Interfaces\PatchP
         $matches = array();
 
         foreach ($repositoryState as $name => $packageState) {
-            $packagePatches = isset($patches[$name]) ? $patches[$name] : array();
+            $packagePatches = $this->dataUtils->extractValue($patches, $name, array());
             
             if (!$this->packagePatchDataUtils->shouldReinstall($packageState, $packagePatches)) {
                 continue;

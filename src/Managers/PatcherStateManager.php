@@ -21,16 +21,10 @@ class PatcherStateManager
      */
     private $packageUtils;
 
-    /**
-     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
-     */
-    private $patchListUtils;
-
     public function __construct()
     {
         $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
-        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     public function registerAppliedPatches(WritableRepositoryInterface $repository, array $patches)

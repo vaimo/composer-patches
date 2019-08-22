@@ -103,9 +103,7 @@ class Config
     
     public function getSkippedPackages()
     {
-        $skipList = getenv(Environment::PACKAGE_SKIP)
-            ? getenv(Environment::PACKAGE_SKIP)
-            : getenv('COMPOSER_SKIP_PATCH_PACKAGES');
+        $skipList = getenv(Environment::PACKAGE_SKIP) ?: getenv('COMPOSER_SKIP_PATCH_PACKAGES');
 
         return array_filter(
             explode(',', $skipList)

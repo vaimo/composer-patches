@@ -12,6 +12,9 @@ use Vaimo\ComposerPatches\Patch\Definition\NormalizerComponents;
 use Vaimo\ComposerPatches\Patch\SourceLoaders;
 use Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool as LoaderComponents;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class PatchesLoaderFactory
 {
     /**
@@ -38,13 +41,11 @@ class PatchesLoaderFactory
      */
     public function create(LoaderComponents $loaderComponentsPool, PluginConfig $pluginConfig, $devMode = false)
     {
-        $composer = $this->composer;
+        $installationManager = $this->composer->getInstallationManager();
 
-        $installationManager = $composer->getInstallationManager();
+        $rootPackage = $this->composer->getPackage();
 
-        $rootPackage = $composer->getPackage();
-
-        $composerConfig = clone $composer->getConfig();
+        $composerConfig = clone $this->composer->getConfig();
         $patcherConfig = $pluginConfig->getPatcherConfig();
         
         $composerConfig->merge(array(

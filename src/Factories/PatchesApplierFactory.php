@@ -11,6 +11,9 @@ use Vaimo\ComposerPatches\Strategies;
 use Vaimo\ComposerPatches\Interfaces\ListResolverInterface as ListResolver;
 use Vaimo\ComposerPatches\Strategies\OutputStrategy;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class PatchesApplierFactory
 {
     /**
@@ -82,12 +85,8 @@ class PatchesApplierFactory
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(
             array($rootPackage)
         );
-        
-        $stateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
-            $this->composer
-        );
 
-        $stateAnalyser = $stateAnalyserFactory->create();
+        $stateAnalyser = new \Vaimo\ComposerPatches\Repository\State\Analyser();
 
         $queueGenerator = new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
             $listResolver,

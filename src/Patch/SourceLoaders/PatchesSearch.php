@@ -43,7 +43,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     /**
      * @var array
      */
-    private $tagAliases = array();
+    private $tagAliases;
 
     /**
      * @var array
@@ -235,8 +235,8 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         }
 
         $dependsList = array_merge(
-            array($package . ':' . $version),
-            array($depends . ':' . $version),
+            array(sprintf('%s:%s', $package, $version)),
+            array(sprintf('%s:%s', $depends, $version)),
             $this->extractValueList($data, PatchDefinition::DEPENDS)
         );
         

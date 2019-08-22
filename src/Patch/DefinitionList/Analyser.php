@@ -11,16 +11,15 @@ class Analyser
 {
     public function getAllTargets(array $patches)
     {
-        $targetList = array();
+        $patchTargets = array();
 
         foreach ($patches as $patchGroup) {
             foreach ($patchGroup as $patchInfo) {
-                $targetList = array_merge(
-                    $targetList,
-                    $patchInfo[Patch::TARGETS]
-                );
+                $patchTargets[] = $patchInfo[Patch::TARGETS];
             }
         }
+
+        $targetList = array_reduce($patchTargets, 'array_merge', array());
 
         return array_values(
             array_unique($targetList)
@@ -36,7 +35,7 @@ class Analyser
         $result = array();
 
         do {
-            $targetsUpdates = array();
+            $patchTargets = array();
 
             foreach ($patchesList as $owner => $patches) {
                 foreach ($patches as $patchPath => $patchInfo) {
@@ -50,9 +49,11 @@ class Analyser
 
                     $result[$owner][$patchPath] = $patchInfo;
 
-                    $targetsUpdates = array_merge($targetsUpdates, $patchInfo[Patch::TARGETS]);
+                    $patchTargets[] = $patchInfo[Patch::TARGETS];
                 }
             }
+
+            $targetsUpdates = array_reduce($patchTargets, 'array_merge', array());
 
             $targetsStack = array_unique(
                 array_merge($targetsStack, $scanTargets)

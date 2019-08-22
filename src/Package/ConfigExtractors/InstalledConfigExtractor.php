@@ -20,8 +20,6 @@ class InstalledConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Pack
             )
         );
         
-        return call_user_func(
-            array($package, $methodName)
-        );
+        return $package->$methodName();
     }
 }

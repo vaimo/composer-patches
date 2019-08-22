@@ -15,11 +15,6 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
     private $versionParser;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\ConstraintUtils
-     */
-    private $constraintUtils;
-
-    /**
      * @var \Composer\Package\PackageInterface[]
      */
     private $constraintPackages;
@@ -31,7 +26,6 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
         array $constraintPackages = array()
     ) {
         $this->versionParser = new \Composer\Package\Version\VersionParser();
-        $this->constraintUtils = new \Vaimo\ComposerPatches\Utils\ConstraintUtils();
         $this->constraintPackages = $constraintPackages;
     }
 

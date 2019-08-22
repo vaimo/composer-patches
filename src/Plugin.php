@@ -5,6 +5,9 @@
  */
 namespace Vaimo\ComposerPatches;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Plugin implements
     \Composer\Plugin\PluginInterface,
     \Composer\EventDispatcher\EventSubscriberInterface,
