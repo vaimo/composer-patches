@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.48.7 (2019-08-22)
+
+### Fix
+
+* using printf variable syntax in patch descriptions crashed the patch applier
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.7) [diff](https://github.com/vaimo/composer-patches/compare/3.48.6...3.48.7)
+
 ## 3.48.6 (2019-08-21)
 
 ### Fix
