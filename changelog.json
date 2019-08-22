@@ -12,8 +12,7 @@
         "maintenance": [
             "improved test coverage where 'redo' and 'undo' also get covered",
             "allow multiple commands to be called per test"
-        ],
-        "branch": "release/3"
+        ]
     },
     "4.17.8": {
         "overview": "changes in this release forward-ported from 3.48.8",
