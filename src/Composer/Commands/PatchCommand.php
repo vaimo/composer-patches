@@ -101,7 +101,8 @@ class PatchCommand extends \Composer\Command\BaseCommand
         return array(
             'redo' => (bool)$input->getOption('redo'),
             'undo' => (bool)$input->getOption('undo'),
-            'force' => (bool)$input->getOption('force')
+            'force' => (bool)$input->getOption('force'),
+            'explicit' => $input->getOption('explicit') || $input->getOption('show-reapplies')
         );
     }
 
@@ -122,19 +123,12 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $appIO = $this->getIO();
         
-        $isExplicit = $input->getOption('explicit') || $input->getOption('show-reapplies');
-        
         $isDevMode = !$input->getOption('no-dev');
 
         $behaviourFlags = $this->getBehaviourFlags($input);
         $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
         
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
-        
-        $filters = array(
-            Patch::SOURCE => $input->getOption('filter'),
-            Patch::TARGETS => $input->getArgument('targets')
-        );
 
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
             Config::PATCHER_FORCE_REAPPLY => $behaviourFlags['redo'],
@@ -144,22 +138,14 @@ class PatchCommand extends \Composer\Command\BaseCommand
                 || $behaviourFlags['undo'],
             Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)
         ));
-
-        if ($behaviourFlags['redo'] && !array_filter($filters)) {
-            $isExplicit = true;
-        }
-
-        $hasFilers = (bool)array_filter($filters);
-
-        if (!$hasFilers && $behaviourFlags['redo']) {
-            $filters[Patch::SOURCE] = array('*');
-        }
+        
+        $filters = $this->resolveActiveFilters($input, $behaviourFlags);
         
         $listResolver = $this->createListResolver($behaviourFlags, $filters);
         
         $this->configureEnvironmentForBehaviour($behaviourFlags);
 
-        $outputTriggers = $this->resolveOutputTriggers($filters, $isExplicit);
+        $outputTriggers = $this->resolveOutputTriggers($filters, $behaviourFlags);
         $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
         $bootstrap = $bootstrapFactory->create($configFactory, $listResolver, $outputStrategy);
 
@@ -188,6 +174,24 @@ class PatchCommand extends \Composer\Command\BaseCommand
         return (int)!$result;
     }
     
+    private function resolveActiveFilters(InputInterface $input, $behaviourFlags)
+    {
+        $filters = array(
+            Patch::SOURCE => $input->getOption('filter'),
+            Patch::TARGETS => $input->getArgument('targets')
+        );
+
+        $hasFilers = (bool)array_filter($filters);
+
+
+        
+        if (!$hasFilers && $behaviourFlags['redo']) {
+            $filters[Patch::SOURCE] = array('*');
+        }
+
+        return $filters;
+    }
+    
     private function configureEnvironmentForBehaviour(array $behaviourFlags)
     {
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
@@ -197,9 +201,15 @@ class PatchCommand extends \Composer\Command\BaseCommand
         ));
     }
     
-    private function resolveOutputTriggers(array $filters, $isExplicit)
+    private function resolveOutputTriggers(array $filters, array $behaviourFlags)
     {
         $hasFilers = (bool)array_filter($filters);
+
+        $isExplicit = $behaviourFlags['explicit'];
+        
+        if (!$hasFilers && $behaviourFlags['redo']) {
+            $isExplicit = true;
+        }
         
         $outputTriggerFlags = array(
             Patch::STATUS_NEW => !$hasFilers,
