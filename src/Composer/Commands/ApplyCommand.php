@@ -29,7 +29,8 @@ class ApplyCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
     {
         return array(
             'redo' => false,
-            'undo' => false
+            'undo' => false,
+            'force' => false
         );
     }
 }

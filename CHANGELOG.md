@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.8
+
+changes in this release forward-ported from 3.48.8
+
+### Fix
+
+* patches validation not failing when there are patch files present without patch target definition in JSON files and using sym-linked patch folder (not an issue when using patches-search)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.8) [diff](https://github.com/vaimo/composer-patches/compare/4.17.7...4.17.8)
+
 ## 4.17.7 (2019-08-22)
 
 changes in this release forward-ported from 3.48.7
@@ -454,7 +464,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.7...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.8...4.0.0)
+
+## 3.48.8 (2019-08-22)
+
+### Fix
+
+* patches validation not failing when there are patch files present without patch target definition in JSON files and using sym-linked patch folder (not an issue when using patches-search)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.8) [diff](https://github.com/vaimo/composer-patches/compare/3.48.7...3.48.8)
 
 ## 3.48.7 (2019-08-22)
 

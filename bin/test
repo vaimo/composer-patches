@@ -44,6 +44,10 @@ function run_tests() {
     _info "SCENARIO:" "${scenario}" "${scenario_label}"
     _line '-' 80
         
+    if ! apply_patches "${scenario_root}" 'patch:validate' ; then
+        return 1
+    fi
+    
     apply_patches "${scenario_root}" 'patch:apply'
         
     for patch_file in $(find -L patches -type f) ; do
@@ -70,15 +74,6 @@ function run_tests() {
     return 0
 }
 
-function get_scenario_root() {
-    local set_name=${1}
-
-    (
-        cd scenarios/${set_name} &>/dev/null
-        pwd
-    )
-}
-
 function apply_patches() {
     local scenario_root=${1}
     local command=${2}
@@ -89,7 +84,11 @@ function apply_patches() {
     ln -s ${scenario_root}/files patches
     ln -s ${scenario_root}/patches.json patches.json
     
-    eval "composer ${command} --ansi"
+    eval "composer ${command} --ansi; return \${PIPESTATUS[0]}"
+    
+    local result=${?}
+    
+    return ${result};
 }
 
 _info() {
@@ -209,12 +208,19 @@ function get_installation_root() {
 
 scenario_filter=${1}
 
+if echo "${scenario_filter}"|grep -q ':' ; then
+    installation_filter=$(echo "${scenario_filter}"|cut -d':' -f1)
+    scenario_filter=$(echo "${scenario_filter}"|cut -d':' -f2)
+else 
+    installation_filter=".*"
+fi
+
 if [ "${scenario_filter}" == "" ] ; then
     scenario_filter=".*"
 fi
 
 (
-    cd sandbox &>/dev/null
+    cd test &>/dev/null
     
     sandbox_root=$(pwd)
     
@@ -222,6 +228,10 @@ fi
     scenarios=$(ls scenarios -1)
     
     for installation in ${installations} ; do
+        if ! echo ${installation}|grep -q "${installation_filter}" ; then
+            continue
+        fi
+                
         installation_root=$(get_installation_root ${installation})
 
         installation_label=$(cat ${installation_root}/.label)
@@ -236,7 +246,6 @@ fi
             sanitize
 
             ln -s ${sandbox_root}/modules ${installation_root}
-            ln -s ${sandbox_root}/scenarios ${installation_root}
             
             composer install --ansi --no-plugins
     
@@ -245,7 +254,7 @@ fi
                     continue
                 fi
             
-                scenario_root=$(get_scenario_root ${scenario})
+                scenario_root=${sandbox_root}/scenarios/${scenario}
             
                 reset_packages
             

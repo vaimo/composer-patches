@@ -26,13 +26,13 @@ class Transformer
             $keys = array_map(
                 function ($key, $item) {
                     return sprintf(
-                        '%s%s%s', 
-                        $item[Patch::OWNER], 
-                        Patch::SOURCE_INFO_SEPARATOR, 
+                        '%s%s%s',
+                        $item[Patch::OWNER],
+                        Patch::SOURCE_INFO_SEPARATOR,
                         $key
                     );
-                }, 
-                array_keys($group), 
+                },
+                array_keys($group),
                 $group
             );
 

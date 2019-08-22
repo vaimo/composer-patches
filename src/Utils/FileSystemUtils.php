@@ -13,7 +13,11 @@ class FileSystemUtils
             return array();
         }
         
-        $directoryIterator = new \RecursiveDirectoryIterator($rootPath);
+        $directoryIterator = new \RecursiveDirectoryIterator(
+            $rootPath,
+            \RecursiveDirectoryIterator::FOLLOW_SYMLINKS
+        );
+        
         $recursiveIterator = new \RecursiveIteratorIterator($directoryIterator);
 
         $filesIterator = new \RegexIterator(

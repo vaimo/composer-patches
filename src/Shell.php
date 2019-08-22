@@ -49,7 +49,7 @@ class Shell
             $output .= $data;
             
             $logger->writeVerbose(
-                'comment', 
+                'comment',
                 trim($data)
             );
         };
