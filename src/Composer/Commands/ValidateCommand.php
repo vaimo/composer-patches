@@ -49,20 +49,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $localOnly = $input->getOption('local');
 
-        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
         $patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
         
-        $defaultValues = $configDefaults->getPatcherConfig();
-
-        $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
-        
-        $patchSources = $localOnly
-            ? array_replace(array_fill_keys($sourceKeys, false), array('project' => true))
-            : array_fill_keys($sourceKeys, true);
-
         $pluginConfig = array(
-            Config::PATCHER_SOURCES => $patchSources
+            Config::PATCHER_SOURCES => $this->createSourcesEnablerConfig($localOnly)
         );
 
         $repository = $composer->getRepositoryManager()->getLocalRepository();
@@ -106,6 +97,23 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         return (int)(bool)$groups;
     }
 
+    private function createSourcesEnablerConfig($localOnly)
+    {
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+
+        $defaultValues = $configDefaults->getPatcherConfig();
+        
+        if (isset($defaultValues[Config::PATCHER_SOURCES]) && is_array($defaultValues[Config::PATCHER_SOURCES])) {
+            $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+
+            return $localOnly
+                ? array_replace(array_fill_keys($sourceKeys, false), array('project' => true))
+                : array_fill_keys($sourceKeys, true);
+        }
+
+        return array();
+    }
+    
     private function collectInstallPaths(array $matches)
     {
         $composer = $this->getComposer();

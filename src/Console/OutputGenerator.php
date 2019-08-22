@@ -23,7 +23,7 @@ class OutputGenerator
         if ($exception instanceof \Vaimo\ComposerPatches\Exceptions\ApplierFailure) {
             $messages = array_filter($exception->getErrors());
 
-            if (!$messages) {
+            if (empty($messages)) {
                 return;
             }
 

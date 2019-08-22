@@ -110,15 +110,9 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $listResolver = $this->createListResolver($behaviourFlags, $filters);
         
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
-        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
-        
-        $defaultValues = $configDefaults->getPatcherConfig();
         
         $config = array(
-            Config::PATCHER_SOURCES => array_fill_keys(
-                array_keys($defaultValues[Config::PATCHER_SOURCES]),
-                true
-            )
+            Config::PATCHER_SOURCES => $this->createSourcesEnablerConfig()
         );
 
         $this->configureEnvironmentForBehaviour($behaviourFlags);
@@ -157,6 +151,21 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
 
         return (int)!$result;
+    }
+    
+    private function createSourcesEnablerConfig()
+    {
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+
+        $defaultValues = $configDefaults->getPatcherConfig();
+        
+        if (isset($defaultValues[Config::PATCHER_SOURCES]) && is_array($defaultValues[Config::PATCHER_SOURCES])) {
+            $sourceTypes = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+
+            return array_fill_keys($sourceTypes, true);
+        }
+
+        return array();
     }
 
     protected function getBehaviourFlags(InputInterface $input)
