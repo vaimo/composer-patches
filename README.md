@@ -108,13 +108,8 @@ composer patch:apply --from-source some/package-name
 composer patch:redo --from-source some/package-name 
 ```
 
-<<<<<<< HEAD
-The patch will be automatically applied on every composer install, update when required (when it's found 
-that it's not yet installed).
-=======
 The patch will be automatically applied on every composer install, update when required (when it's 
 found that it's not yet installed).
->>>>>>> release/3
 
 ```shell
 Writing lock file
@@ -126,9 +121,8 @@ Processing patches configuration
       absolutely everything
 ```
 
-<<<<<<< HEAD
-All patches are applied when after all packages are installed to allow any package to provide patches for 
-any other package.
+All patches are applied when after all packages are installed to allow any package to provide patches 
+for any other package.
 
 #### 6. (demo) simulate normal flow of applying the patch
 
@@ -147,10 +141,6 @@ Note that in case patches are provided by a dependency package, the `composer in
 right away as the patches folder root information is not yet available in installed.json, which does 
 require the package (that owns the patches) to be installed on the same (or newer) changeset that introduced
 the `patches-search` config value. 
-=======
-All patches are applied when after all packages are installed to allow any package to provide patches 
-for any other package.
->>>>>>> release/3
 
 # Configuration
 
