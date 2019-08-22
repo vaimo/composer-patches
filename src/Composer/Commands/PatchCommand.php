@@ -108,9 +108,6 @@ class PatchCommand extends \Composer\Command\BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
-        $defaults = $configDefaults->getPatcherConfig();
-
         $composer = $this->getComposer();
 
         $appIO = $this->getIO();
@@ -128,7 +125,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             Config::PATCHER_GRACEFUL => (bool)$input->getOption('graceful')
                 || $behaviourFlags['redo']
                 || $behaviourFlags['undo'],
-            Config::PATCHER_SOURCES => array_fill_keys(array_keys($defaults[Config::PATCHER_SOURCES]), true)
+            Config::PATCHER_SOURCES => $this->createSourcesEnablerConfig()
         ));
         
         $filters = $this->resolveActiveFilters($input, $behaviourFlags);
@@ -164,6 +161,21 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
 
         return (int)!$result;
+    }
+    
+    private function createSourcesEnablerConfig()
+    {
+        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+
+        $defaultValues = $configDefaults->getPatcherConfig();
+        
+        if (isset($defaultValues[Config::PATCHER_SOURCES]) && is_array($defaultValues[Config::PATCHER_SOURCES])) {
+            $sourceTypes = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+
+            return array_fill_keys($sourceTypes, true);
+        }
+
+        return array();
     }
 
     protected function getBehaviourFlags(InputInterface $input)
