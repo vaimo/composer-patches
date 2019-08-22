@@ -12,6 +12,7 @@ use Composer\Script\ScriptEvents;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
+use Vaimo\ComposerPatches\Interfaces\ListResolverInterface;
 
 use Vaimo\ComposerPatches\Environment;
 
@@ -164,7 +165,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             'redo' => $this->getOptionGraceful($input, 'redo'),
             'undo' => $this->getOptionGraceful($input, 'undo'),
             'force' => $this->getOptionGraceful($input, 'force'),
-            'explicit' => $this->getOptionGraceful($input, 'explicit') 
+            'explicit' => $this->getOptionGraceful($input, 'explicit')
                 || $this->getOptionGraceful($input, 'show-reapplies')
         );
     }
@@ -233,19 +234,25 @@ class PatchCommand extends \Composer\Command\BaseCommand
     {
         $listResolver = new ListResolvers\FilteredListResolver($filters);
 
-        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
         $isDefaultBehaviour = !$behaviourFlags['redo'] && !$behaviourFlags['undo'];
-        
-        if ($shouldUndo) {
-            $listResolver = new ListResolvers\InvertedListResolver($listResolver);
-        } else {
-            $listResolver = new ListResolvers\InclusiveListResolver($listResolver);
-        }
 
+        $listResolver = $this->attachBehaviourToListResolver($listResolver, $behaviourFlags);
+        
         if ($isDefaultBehaviour) {
             $listResolver = new ListResolvers\ChangesListResolver($listResolver);
         }
         
         return $listResolver;
+    }
+    
+    private function attachBehaviourToListResolver(ListResolverInterface $listResolver, array $behaviourFlags)
+    {
+        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
+
+        if ($shouldUndo) {
+            return new ListResolvers\InvertedListResolver($listResolver);
+        }
+
+        return new ListResolvers\InclusiveListResolver($listResolver);
     }
 }

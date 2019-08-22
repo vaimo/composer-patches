@@ -20,11 +20,6 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
     private $patchListTransformer;
     
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
-     */
-    private $patchListUtils;
-
-    /**
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $baseResolver
      */
     public function __construct(
@@ -33,7 +28,6 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
         $this->baseResolver = $baseResolver;
 
         $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
-        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
     
     public function resolvePatchesQueue(array $patches)

@@ -91,21 +91,26 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             $templateVariables,
             array_fill_keys(array($variablePattern), array())
         );
-
+        
+        return array(
+            PatchDefinition::LABEL => $this->normalizeLabelForSourcePath($label, $sourcePath),
+            PatchDefinition::SOURCE => $sourcePath
+        );
+    }
+    
+    private function normalizeLabelForSourcePath($label, $sourcePath)
+    {
         $filename = basename($sourcePath);
 
         if (substr($label, -strlen($filename)) === $filename) {
-            $label = str_replace(
+            return str_replace(
                 $filename,
                 preg_replace('/\s{2,}/', ' ', preg_replace('/[^A-Za-z0-9]/', ' ', strtok($filename, '.'))),
                 $label
             );
         }
-
-        return array(
-            PatchDefinition::LABEL => $label,
-            PatchDefinition::SOURCE => $sourcePath
-        );
+        
+        return $label;
     }
     
     private function deconstructSource($source)
