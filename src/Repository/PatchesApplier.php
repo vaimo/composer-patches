@@ -190,7 +190,7 @@ class PatchesApplier
                 $this->repositoryManager->resetPackage($repository, $resetTarget);
             }
             
-            $packagesUpdated = (bool)array_filter($resetResult);
+            $packagesUpdated = $packagesUpdated || (bool)array_filter($resetResult);
 
             if (!$hasPatches) {
                 continue;
