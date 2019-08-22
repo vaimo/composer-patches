@@ -27,10 +27,11 @@ class ApplyCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
 
     protected function getBehaviourFlags(InputInterface $input)
     {
-        return array(
+        $flags = parent::getBehaviourFlags($input);
+        
+        return array_replace($flags, array(
             'redo' => false,
-            'undo' => false,
-            'force' => false
-        );
+            'undo' => false
+        ));
     }
 }

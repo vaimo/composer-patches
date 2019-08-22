@@ -86,15 +86,6 @@ class PatchCommand extends \Composer\Command\BaseCommand
         );
     }
 
-    protected function getBehaviourFlags(InputInterface $input)
-    {
-        return array(
-            'redo' => (bool)$input->getOption('redo'),
-            'undo' => (bool)$input->getOption('undo'),
-            'force' => (bool)$input->getOption('force')
-        );
-    }
-
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      *
@@ -108,26 +99,12 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $composer = $this->getComposer();
         $appIO = $this->getIO();
         
-        $isExplicit = $input->getOption('explicit') || $input->getOption('show-reapplies');
         $isDevMode = !$input->getOption('no-dev');
-
-        $filters = array(
-            Patch::SOURCE => $input->getOption('filter'),
-            Patch::TARGETS => $input->getArgument('targets')
-        );
 
         $behaviourFlags = $this->getBehaviourFlags($input);
         $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
 
-        if ($behaviourFlags['redo'] && !array_filter($filters)) {
-            $isExplicit = true;
-        }
-
-        $hasFilers = (bool)array_filter($filters);
-
-        if (!$hasFilers && $behaviourFlags['redo']) {
-            $filters[Patch::SOURCE] = array('*');
-        }
+        $filters = $this->resolveActiveFilters($input, $behaviourFlags);
         
         $listResolver = $this->createListResolver($behaviourFlags, $filters);
         
@@ -145,7 +122,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $this->configureEnvironmentForBehaviour($behaviourFlags);
         
-        $outputTriggers = $this->resolveOutputTriggers($filters, $isExplicit);
+        $outputTriggers = $this->resolveOutputTriggers($filters, $behaviourFlags);
 
         $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
@@ -180,6 +157,38 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         return (int)!$result;
     }
+
+    protected function getBehaviourFlags(InputInterface $input)
+    {
+        return array(
+            'redo' => $this->getOptionGraceful($input, 'redo'),
+            'undo' => $this->getOptionGraceful($input, 'undo'),
+            'force' => $this->getOptionGraceful($input, 'force'),
+            'explicit' => $this->getOptionGraceful($input, 'explicit') 
+                || $this->getOptionGraceful($input, 'show-reapplies')
+        );
+    }
+    
+    private function getOptionGraceful(InputInterface $input, $name)
+    {
+        return $input->hasOption($name) && $input->getOption($name);
+    }
+    
+    private function resolveActiveFilters(InputInterface $input, array $behaviourFlags)
+    {
+        $filters = array(
+            Patch::SOURCE => $input->getOption('filter'),
+            Patch::TARGETS => $input->getArgument('targets')
+        );
+
+        $hasFilers = (bool)array_filter($filters);
+
+        if (!$hasFilers && $behaviourFlags['redo']) {
+            $filters[Patch::SOURCE] = array('*');
+        }
+
+        return $filters;
+    }
     
     private function configureEnvironmentForBehaviour(array $behaviourFlags)
     {
@@ -197,9 +206,15 @@ class PatchCommand extends \Composer\Command\BaseCommand
         ));
     }
     
-    private function resolveOutputTriggers(array $filters, $isExplicit)
+    private function resolveOutputTriggers(array $filters, array $behaviourFlags)
     {
         $hasFilers = (bool)array_filter($filters);
+
+        $isExplicit = $behaviourFlags['explicit'];
+        
+        if (!$hasFilers && $behaviourFlags['redo']) {
+            $isExplicit = true;
+        }
         
         $outputTriggerFlags = array(
             Patch::STATUS_NEW => !$hasFilers,
