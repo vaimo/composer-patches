@@ -59,15 +59,13 @@ class ConfigFactory
 
     public function create(array $configSources = array())
     {
-        $composer = $this->composer;
-
         $defaults = array_replace(
             $this->defaultsProvider->getPatcherConfig(),
             $this->defaults,
             array_filter(array(PluginConfig::PATCHER_GRACEFUL => (bool)getenv(Environment::GRACEFUL_MODE)))
         );
 
-        $extra = $composer->getPackage()->getExtra();
+        $extra = $this->composer->getPackage()->getExtra();
 
         if (isset($extra['patcher-config']) && !isset($extra[PluginConfig::PATCHER_CONFIG_ROOT])) {
             $extra[PluginConfig::PATCHER_CONFIG_ROOT] = $extra['patcher-config'];

@@ -34,6 +34,8 @@ class PatchListUtils
 
                 $patchData = false;
             }
+            
+            unset($patchData);
 
             $packagePatches = array_filter($packagePatches);
         }

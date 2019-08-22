@@ -9,6 +9,9 @@ use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ComponentPool
 {
     /**

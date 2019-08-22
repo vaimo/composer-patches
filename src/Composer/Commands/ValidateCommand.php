@@ -16,6 +16,9 @@ use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
     protected function configure()

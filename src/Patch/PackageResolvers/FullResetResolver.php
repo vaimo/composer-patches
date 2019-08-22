@@ -22,7 +22,7 @@ class FullResetResolver implements \Vaimo\ComposerPatches\Interfaces\PatchPackag
         $matches = array();
 
         foreach ($repositoryState as $name => $packageState) {
-            if (!$this->packagePatchDataUtils->shouldReinstall($packageState, array()) && !isset($patches[$name])) {
+            if (!isset($patches[$name]) && !$this->packagePatchDataUtils->shouldReinstall($packageState, array())) {
                 continue;
             }
 

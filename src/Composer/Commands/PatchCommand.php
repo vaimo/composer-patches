@@ -20,6 +20,9 @@ use Vaimo\ComposerPatches\Interfaces\ListResolverInterface;
 
 use Vaimo\ComposerPatches\Environment;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class PatchCommand extends \Composer\Command\BaseCommand
 {
     protected function configure()

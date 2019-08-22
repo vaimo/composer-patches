@@ -24,6 +24,8 @@ class LocalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Definit
 
                 $patchData = false;
             }
+            
+            unset($patchData);
 
             $packagePatches = array_filter($packagePatches);
         }

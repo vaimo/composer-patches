@@ -17,6 +17,9 @@ use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ListCommand extends \Composer\Command\BaseCommand
 {
     protected function configure()
@@ -121,7 +124,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         $repository = $composer->getRepositoryManager()->getLocalRepository();
         
         $repoStateGenerator = $this->createStateGenerator($composer);
-        $queueGenerator = $this->createQueueGenerator($composer, $listResolver);
+        $queueGenerator = $this->createQueueGenerator($listResolver);
         $filteredLoader = $loaderFactory->create($filteredPool, $pluginConfig, $isDevMode);
         
         $filteredPatches = $filteredLoader->loadFromPackagesRepository($repository);
@@ -283,15 +286,11 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
     }
     
-    private function createQueueGenerator(Composer $composer, ListResolver $listResolver)
+    private function createQueueGenerator(ListResolver $listResolver)
     {
-        $stateAnalyserFactory = new \Vaimo\ComposerPatches\Factories\RepositoryStateAnalyserFactory(
-            $composer
-        );
-        
         $changesListResolver = new ListResolvers\ChangesListResolver($listResolver);
-
-        $stateAnalyser = $stateAnalyserFactory->create();
+        
+        $stateAnalyser = new \Vaimo\ComposerPatches\Repository\State\Analyser();
         
         return new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
             $changesListResolver,

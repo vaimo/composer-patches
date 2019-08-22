@@ -26,6 +26,14 @@ class DataUtils
             $data
         );
     }
+    
+    public function extractItems(array &$data, array $keys)
+    {
+        $subset = array_intersect($data, $keys);
+        $data = array_diff($data, $keys);
+
+        return $subset;
+    }
 
     public function extractValue(array $data, $key, $default = null)
     {

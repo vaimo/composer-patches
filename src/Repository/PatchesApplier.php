@@ -9,6 +9,9 @@ use Composer\Repository\WritableRepositoryInterface as Repository;
 use Composer\Package\PackageInterface as Package;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class PatchesApplier
 {
     /**
@@ -77,6 +80,11 @@ class PatchesApplier
     private $packageUtils;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\DataUtils
+     */
+    private $dataUtils;
+
+    /**
      * @var \Vaimo\ComposerPatches\Console\OutputGenerator
      */
     private $outputGenerator;
@@ -107,19 +115,20 @@ class PatchesApplier
         $this->queueGenerator = $queueGenerator;
         $this->patcherStateManager = $patcherStateManager;
         $this->patchInfoLogger = $patchInfoLogger;
+        $this->outputStrategy = $outputStrategy;
         $this->logger = $logger;
 
         $this->repositoryStateGenerator = new \Vaimo\ComposerPatches\Repository\StateGenerator(
             $this->packageCollector
         );
 
-        $this->outputStrategy = $outputStrategy;
-
+        $this->outputGenerator = new \Vaimo\ComposerPatches\Console\OutputGenerator($logger);
+        
         $this->patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
         $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->statusConfig = new \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig();
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
-        $this->outputGenerator = new \Vaimo\ComposerPatches\Console\OutputGenerator($logger);
+        $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
 
     /**
@@ -160,9 +169,9 @@ class PatchesApplier
             $patchTargets = $hasPatches ?
                 $this->patchListAnalyser->getAllTargets(array($applyQueue[$packageName]))
                 : array($packageName);
-                
-            $itemsToReset = array_intersect($resetQueue, $patchTargets);
 
+            $itemsToReset = $this->dataUtils->extractItems($resetQueue, $patchTargets);
+            
             $resetResult = array();
 
             foreach ($itemsToReset as $targetName) {
@@ -179,11 +188,9 @@ class PatchesApplier
                 }
 
                 $this->repositoryManager->resetPackage($repository, $resetTarget);
-
-                $packagesUpdated = $packagesUpdated || (bool)$resetResult[$targetName];
             }
             
-            $resetQueue = array_diff($resetQueue, $patchTargets);
+            $packagesUpdated = $packagesUpdated || (bool)array_filter($resetResult);
 
             if (!$hasPatches) {
                 continue;
@@ -201,34 +208,42 @@ class PatchesApplier
                     return array_intersect($data[Patch::TARGETS], $changedTargets);
                 }
             );
-            
-            $muteDepth = null;
-            
-            $patchRemovals = isset($removeQueue[$packageName])
-                ? $removeQueue[$packageName]
-                : array();
-            
-            if (!$this->shouldAllowOutput($queuedPatches, $patchRemovals)) {
-                $muteDepth = $this->logger->mute();
-            }
-
-            $this->logger->writeRaw(
-                'Applying patches for <info>%s</info> (%s)',
-                array($packageName, count($queuedPatches))
+    
+            $this->updatePackage(
+                $package,
+                $repository,
+                $queuedPatches,
+                $this->dataUtils->extractValue($removeQueue, $packageName, array())
             );
             
-            $this->processQueues($repository, $package, $queuedPatches, $patchRemovals);
-
             $packagesUpdated = true;
-
-            $this->logger->writeNewLine();
-
-            if ($muteDepth !== null) {
-                $this->logger->unMute($muteDepth);
-            }
         }
 
         return $packagesUpdated;
+    }
+    
+    private function updatePackage(Package $package, Repository $repository, array $additions, array $removals)
+    {
+        $muteDepth = null;
+
+        $packageName = $package->getName();
+        
+        if (!$this->shouldAllowOutput($additions, $removals)) {
+            $muteDepth = $this->logger->mute();
+        }
+
+        $this->logger->writeRaw(
+            'Applying patches for <info>%s</info> (%s)',
+            array($packageName, count($additions))
+        );
+
+        $this->processQueues($package, $repository, $additions, $removals);
+        
+        $this->logger->writeNewLine();
+
+        if ($muteDepth !== null) {
+            $this->logger->unMute($muteDepth);
+        }
     }
 
     private function updateStatusLabels(array $queue, array $labels)
@@ -248,7 +263,7 @@ class PatchesApplier
         return $queue;
     }
     
-    private function processQueues(Repository $repository, Package $package, $additions, $removals)
+    private function processQueues(Package $package, Repository $repository, $additions, $removals)
     {
         try {
             if ($removals) {

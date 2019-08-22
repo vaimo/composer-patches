@@ -8,13 +8,13 @@ namespace Vaimo\ComposerPatches\Package;
 class ConfigReader
 {
     /**
-     * @var \Vaimo\ComposerPatches\Json\Decoder
+     * @var \Seld\JsonLint\JsonParser
      */
     private $jsonDecoder;
 
     public function __construct()
     {
-        $this->jsonDecoder = new \Vaimo\ComposerPatches\Json\Decoder();
+        $this->jsonDecoder = new \Seld\JsonLint\JsonParser();
     }
 
     public function readToArray($source)
@@ -28,13 +28,13 @@ class ConfigReader
         $sourceData = file_get_contents($source);
 
         try {
-            $fileContents = $this->jsonDecoder->decode($sourceData);
+            $result = $this->jsonDecoder->parse($sourceData, \Seld\JsonLint\JsonParser::PARSE_TO_ASSOC);
         } catch (\Vaimo\ComposerPatches\Exceptions\DecoderException $exception) {
             $message = sprintf('Failed to retrieve contents of %s', $source);
 
             throw new \Vaimo\ComposerPatches\Exceptions\ReadException($message, 0, $exception);
         }
 
-        return $fileContents;
+        return $result;
     }
 }

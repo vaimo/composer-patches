@@ -20,11 +20,7 @@ class ItemBuilder
         $items = array();
 
         foreach ($data as $source => $subItem) {
-            $items[] = $this->createItem(
-                $label,
-                $subItem,
-                array($keyName => $source)
-            );
+            $items[] = $this->createItem($label, $subItem, array($keyName => $source));
         }
 
         return $items;
