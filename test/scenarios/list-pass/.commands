@@ -1,0 +1,4 @@
+patch:validate
+patch:list
+patch:apply
+patch:list

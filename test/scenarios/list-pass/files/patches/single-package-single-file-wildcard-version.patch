@@ -3,6 +3,8 @@ Change: value17 => valueX
 @package vaimo/composer-patches-target1
 @version *
 
+@assert vaimo/composer-patches-target1,value17,valueX
+
 --- src/example.txt.org
 +++ src/example.txt
 @@ -14,7 +14,7 @@

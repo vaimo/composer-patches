@@ -315,10 +315,15 @@ fi
             exit 0
         )
         
-        if [ ${?} != 0 ] ; then 
+        if [ ${?} != 0 ] ; then
+            _line '"' 80
+            _error "FAIL" 
             exit 1
         fi
     done
 
+    _line '▚' 80
+    _info "SUCCESS"
+    
     exit 0    
 )

@@ -1,4 +1,4 @@
-Change: value8 => valueC
+Change: valueX => valueY
 
 @package vaimo/composer-patches-target1
 
@@ -8,8 +8,8 @@ Change: value8 => valueC
  value5
  value6
  value7
--value8
-+valueC
+-valueX
++valueY
  value9
  value10
  value11

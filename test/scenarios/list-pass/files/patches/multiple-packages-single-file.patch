@@ -2,6 +2,9 @@ Change: value17 => valueB; value5 => valueA
 
 @type bundle
 
+@assert vaimo/composer-patches-target2,value17,valueB
+@assert vaimo/composer-patches-target3,value5,valueA
+
 --- vaimo/composer-patches-target2/src/example.txt.org
 +++ vaimo/composer-patches-target2/src/example.txt
 @@ -14,7 +14,7 @@
