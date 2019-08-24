@@ -36,8 +36,7 @@ bgcol=$(tput sgr 1 0)       # Switch to background (coloring mode)
 fgcol=$(tput sgr 0 0)       # Switch to foreground (coloring mode)
 
 function run_tests() {
-    installation_root=${1}    
-    scenario_root=${2}
+    scenario_root=${1}
         
     scenario_label=$(cat ${scenario_root}/.label)
     commands=$(cat ${scenario_root}/.commands)
@@ -52,33 +51,51 @@ function run_tests() {
     local original_ifs=${IFS}
     IFS=$'\n'
     
-    for dependency in $(cat ${installation_root}/.depend) ; do
-        ln -s ${scenario_root}/${dependency} ${dependency}
+    for dependency in $(ls -1 ${scenario_root}/files) ; do
+        ln -s ${scenario_root}/files/${dependency} ${dependency}
     done 
         
+    local should_fail
+    
     for command in ${commands} ; do
-        if apply_patches "${command}" ; then
+        should_fail=0
+        
+        if [ "${command:0:1}" == "!" ] ; then
+            _warning "EXPECTING FAILURE"
+            should_fail=1
+        fi
+        
+        command=$(echo ${command}|tr -d '!')
+    
+        apply_patches "${command}"
+        local result=${?}
+    
+        if ( [ ${result} -eq 0 ] && [ ${should_fail} -eq 0 ]) \
+            || ([ ${result} -gt 0 ] && [ ${should_fail} -eq 1 ] \
+        ) ; then
             continue
         fi
-
+    
         return 1
     done
     
-    for patch_file in $(find -L patches -type f) ; do
-        local assertion=$(cat ${patch_file}|grep '@assert')
+    if [ -d patches ] ; then
+            for patch_file in $(find -L patches -type f) ; do
+            local assertion=$(cat ${patch_file}|grep '@assert')
         
-        assertions=$(echo "${assertion}"|cut -d' ' -f2)
+            assertions=$(echo "${assertion}"|cut -d' ' -f2)
 
-        for assertion in ${assertions} ; do
-            if assert ${assertion} ; then
-                continue
-            fi
+            for assertion in ${assertions} ; do
+                if assert ${assertion} ; then
+                    continue
+                fi
             
-            assertion_error "${patch_file}" "${assertion}"
+                assertion_error "${patch_file}" "${assertion}"
                         
-            return 1
+                return 1
+            done
         done
-    done
+    fi
     
     IFS=${original_ifs}
     
@@ -123,6 +140,11 @@ _title() {
     fi
 
     echo "${cya}${1}${txtrst} ${brghtcya}$(echo ${group}|tr '[:lower:]' '[:upper:]')${txtrst}${separator}${3}"
+}
+
+_warning()
+{
+    echo "${bgdylw}${bldwht}${@}${txtrst}"
 }
 
 _error() {
@@ -194,7 +216,15 @@ function sanitize() {
     rm -rf patches 2>/dev/null
     rm -rf modules 2>/dev/null
     rm -rf scenarios 2>/dev/null
-    rm patches.json 2>/dev/null
+    rm patches.json 2>/dev/null    
+}
+
+function sanitize_scenario() {    
+    local scenario_root=${1}
+    
+    for dependency in $(ls -1 ${scenario_root}/files) ; do
+        rm -rf ${dependency} 2>/dev/null   
+    done 
 }
 
 function _line() {
@@ -241,6 +271,7 @@ fi
         installation_root=$(get_installation_root ${installation})
 
         installation_label=$(cat ${installation_root}/.label)
+        scenarios_skip=$(cat ${installation_root}/.skip 2>/dev/null)
     
         _line '=' 80
         _title "INSTALLATION:" "${installation}" "${installation_label}"
@@ -256,6 +287,10 @@ fi
             composer install --ansi --no-plugins
     
             for scenario in ${scenarios} ; do
+                if [ "${scenarios_skip}" != "" ] && echo "${scenarios_skip}"|grep -q "^${scenario}$" ; then
+                    continue
+                fi
+            
                 if ! echo ${scenario}|grep -q "${scenario_filter}" ; then
                     continue
                 fi
@@ -264,21 +299,26 @@ fi
             
                 reset_packages
             
-                if ! run_tests "${installation_root}" "${scenario_root}" ; then
+                if ! run_tests "${scenario_root}" ; then
                     sanitize
+                    sanitize_scenario ${scenario_root}
                     exit 1
+                else 
+                    sanitize_scenario ${scenario_root}
                 fi
             done
             
             echo ''
         
             sanitize
+            
+            exit 0
         )
         
-        if [ ${?} != 0 ] ; then
+        if [ ${?} != 0 ] ; then 
             exit 1
         fi
     done
-    
-    exit 0
+
+    exit 0    
 )
