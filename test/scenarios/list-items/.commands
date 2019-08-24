@@ -1,3 +1,4 @@
 patch:validate
+patch:list
 patch:apply
-patch:undo --filter second
+patch:list
