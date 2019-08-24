@@ -35,8 +35,9 @@ bgdylw=$(tput setab 3)      # dark yellow background
 bgcol=$(tput sgr 1 0)       # Switch to background (coloring mode)
 fgcol=$(tput sgr 0 0)       # Switch to foreground (coloring mode)
 
-function run_tests() {    
-    scenario_root=${1}
+function run_tests() {
+    installation_root=${1}    
+    scenario_root=${2}
         
     scenario_label=$(cat ${scenario_root}/.label)
     commands=$(cat ${scenario_root}/.commands)
@@ -48,15 +49,12 @@ function run_tests() {
     rm -rf patches 2>/dev/null
     rm patches.json 2>/dev/null
     
-    ln -s ${scenario_root}/files patches
-    ln -s ${scenario_root}/patches.json patches.json
-        
-    if ! apply_patches 'patch:validate' ; then
-        return 1
-    fi
-    
     local original_ifs=${IFS}
     IFS=$'\n'
+    
+    for dependency in $(cat ${installation_root}/.depend) ; do
+        ln -s ${scenario_root}/${dependency} ${dependency}
+    done 
         
     for command in ${commands} ; do
         if apply_patches "${command}" ; then
@@ -266,7 +264,7 @@ fi
             
                 reset_packages
             
-                if ! run_tests ${scenario_root} ; then
+                if ! run_tests "${installation_root}" "${scenario_root}" ; then
                     sanitize
                     exit 1
                 fi

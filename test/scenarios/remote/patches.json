@@ -1,5 +1,5 @@
 {
     "vaimo/composer-patches-target1": {
-        "Change: value8 => valueC": "patches/single-package-single-file-no-version.patch"
+        "Change: value8 => valueC": "https://raw.githubusercontent.com/vaimo/composer-patches/release/3/test/scenarios/remote/files/single-package-single-file-no-version.patch"
     }
 }
