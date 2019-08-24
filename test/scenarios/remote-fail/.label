@@ -1,1 +1,1 @@
-simple set of single and multi-line patches
+remote patch should fail to download due to bad path
