@@ -1158,10 +1158,23 @@ composer code:test sequence
 composer code:test using-file:skipped-patch
 ```
 
+### Components
+
+The tests have the following components:
+
+* **installations** - full composer project that the scenarios will be executed against. Installations differ in
+  their patcher configurations, but should end up in same state when a scenario is executed (except in some
+  cases where certain configuration can not be used. Example: using patches-search to apply remote patch).  
+* **modules** - the modules that are included in the installations. All assertions are based on checking the
+  state of the module files after patches have been applied.
+* **scenarios** - includes all the possible scenarios (with different patches) that will be executed against 
+  each installation.
+
 ### Adding new scenarios
 
-Not much needs to be done when new scenarios are introduced, one can just create new folder under 
-sandbox/scenarios and define the patches that use certain features or expose certain issue.
+When new scenarios are introduced, one can just create new folder under test/scenarios and define the 
+patches that use certain features or expose certain issue. Note that the scenario will be executed with
+commands provided in `.commands` and will use the description provided under `.label`.
 
 Note that assertions are taken from the patch files, where they should be defined using following
 convention/template:
