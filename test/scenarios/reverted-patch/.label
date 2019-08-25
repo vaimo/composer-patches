@@ -1,0 +1,1 @@
+reverted changes should not be applied when patcher detects already applied patch

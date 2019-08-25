@@ -9,6 +9,23 @@ use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 class PatchListUtils
 {
+    public function compareLists(array $listA, array $listB, \Closure $logicProvider)
+    {
+        $matches = array();
+        
+        foreach ($listB as $name => $itemsB) {
+            $itemsA = isset($listA[$name]) ? $listA[$name] : array();
+
+            if (!$logicProvider($itemsA, $itemsB)) {
+                continue;
+            }
+
+            $matches[] = $name;
+        }
+
+        return $matches;
+    }
+    
     public function sanitizeFileSystem(array $patches)
     {
         foreach ($patches as $patchGroup) {
@@ -22,7 +39,7 @@ class PatchListUtils
         }
     }
     
-    public function applyDefinitionFilter(array $patches, $logicProvider)
+    public function applyDefinitionFilter(array $patches, \Closure $logicProvider)
     {
         foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {

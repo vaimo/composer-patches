@@ -12,23 +12,28 @@ class FullResetResolver implements \Vaimo\ComposerPatches\Interfaces\PatchPackag
      */
     private $packagePatchDataUtils;
 
+    /**
+     * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
+     */
+    private $patchListUtils;
+    
     public function __construct()
     {
         $this->packagePatchDataUtils = new \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils();
+        $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     public function resolve(array $patches, array $repositoryState)
     {
-        $matches = array();
-
-        foreach ($repositoryState as $name => $packageState) {
-            if (!isset($patches[$name]) && !$this->packagePatchDataUtils->shouldReinstall($packageState, array())) {
-                continue;
+        $patchDataUtils = $this->packagePatchDataUtils;
+        
+        return $this->patchListUtils->compareLists(
+            $patches,
+            $repositoryState,
+            function ($packagePatches, $packageState) use ($patchDataUtils) {
+                return $packagePatches
+                    || $patchDataUtils->shouldReinstall($packageState, $packagePatches);
             }
-
-            $matches[] = $name;
-        }
-
-        return $matches;
+        );
     }
 }

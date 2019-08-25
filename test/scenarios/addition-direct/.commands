@@ -1,0 +1,5 @@
+patch:validate
+>mv patches/1_second-change.patch patches/1_second-change.bak
+patch:apply
+>mv patches/1_second-change.bak patches/1_second-change.patch
+patch:apply

@@ -194,7 +194,8 @@ class Applier
             'error',
             'corrupt',
             'can\'t find file',
-            'patch unexpectedly ends'
+            'patch unexpectedly ends',
+            'due to output analysis'
         );
         
         $errorMatcher = sprintf('/%s/i', implode('|', $errors));
@@ -281,6 +282,13 @@ class Applier
                 );
             }
 
+            if (isset($this->resultCache[$resultKey])) {
+                $this->logger->writeVerbose(
+                    \Vaimo\ComposerPatches\Logger::TYPE_NONE,
+                    sprintf('(using cached result for: %s = %s)', $command, reset($this->resultCache[$resultKey]))
+                );
+            }
+            
             if (!isset($this->resultCache[$resultKey])) {
                 $this->resultCache[$resultKey] = $this->shell->execute($command, $cwd);
             }
@@ -311,17 +319,19 @@ class Applier
             if (!$pattern || !preg_match($pattern, $output)) {
                 continue;
             }
+            
+            $message = sprintf('Success changed to FAILURE due to output analysis (%s)', $patternCode);
 
             $this->logger->writeVerbose(
                 'warning',
-                sprintf(
-                    'Success changed to FAILURE due to output analysis (%s): %s',
-                    $patternCode,
-                    $pattern
-                )
+                sprintf('%s: %s', $message, $pattern)
             );
-
-            return false;
+            
+            $failure = new \Vaimo\ComposerPatches\Exceptions\OperationFailure('Output analysis failed');
+            
+            $failure->setOutput($message);
+            
+            throw $failure;
         }
 
         return true;

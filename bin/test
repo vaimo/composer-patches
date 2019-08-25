@@ -52,22 +52,43 @@ function run_tests() {
     IFS=$'\n'
     
     for dependency in $(ls -1 ${scenario_root}/files) ; do
-        ln -s ${scenario_root}/files/${dependency} ${dependency}
+        cp -R ${scenario_root}/files/${dependency} ${dependency}
     done 
         
     local should_fail
-    
+    local assertions=
+
     for command in ${commands} ; do
         should_fail=0
-        
+        system_call=0
+
         if [ "${command:0:1}" == "!" ] ; then
             _warning "EXPECTING FAILURE"
             should_fail=1
         fi
         
-        command=$(echo ${command}|tr -d '!')
+        command=$(echo ${command}|sed 's/^\!*//g')
     
-        apply_patches "${command}"
+        if [ "${command:0:1}" == "@" ] ; then
+            if process_assertions "${command}" ; then
+                continue
+            fi
+            
+            return 1
+        fi
+        
+        if [ "${command:0:1}" == ">" ] ; then
+            system_call=1
+        fi
+    
+        command=$(echo ${command}|sed 's/^>*//g')
+    
+        if [ ${system_call} -eq 0 ] ; then
+            apply_patches "${command}"
+        else 
+            _warning "SYSTEM: ${command}"
+            eval "${command}"
+        fi
         
         local result=${?}
     
@@ -81,22 +102,40 @@ function run_tests() {
     done
     
     if [ -d patches ] ; then
-            for patch_file in $(find -L patches -type f) ; do
-            local assertion=$(cat ${patch_file}|grep '@assert')
-        
-            assertions=$(echo "${assertion}"|cut -d' ' -f2)
-
-            for assertion in ${assertions} ; do
-                if assert ${assertion} ; then
-                    continue
-                fi
-            
-                assertion_error "${patch_file}" "${assertion}"
-                        
-                return 1
-            done
+        for patch_file in $(find -L patches -type f) ; do
+            assertions="${assertions}\n"$(cat ${patch_file}|grep '@assert')
         done
     fi
+    
+    if [ "${assertions}" != "" ] && ! process_assertions ${assertions}; then
+        return 1
+    fi
+    
+    IFS=${original_ifs}
+    
+    return 0
+}
+
+function process_assertions() {
+    local assertions=${1}
+        
+    local assertions=$(echo -e "${assertions}"|cut -d' ' -f2)
+
+    local original_ifs=${IFS}
+    IFS=$'\n'
+    
+    for assertion in ${assertions} ; do
+        if [ "${assertion}" == "" ] ; then
+            continue
+        fi
+        if assert ${assertion} ; then
+            continue
+        fi
+            
+        assertion_error "${patch_file}" "${assertion}"
+                        
+        return 1
+    done
     
     IFS=${original_ifs}
     
@@ -107,6 +146,10 @@ function apply_patches() {
     local args=${1}
  
     local command="COMPOSER_PATCHES_FATAL_FAIL=1 composer ${args} --ansi"
+ 
+    if [ "${VERBOSE}" == "1" ] ; then
+        command="${command} -vvv"
+    fi
  
     eval "${command}; return \${PIPESTATUS[0]}"
     
@@ -317,7 +360,7 @@ fi
         )
         
         if [ ${?} != 0 ] ; then
-            _line '"' 80
+            _line '▚' 80
             _error "FAIL" 
             exit 1
         fi

@@ -1,0 +1,13 @@
+patch:validate
+
+patch:apply
+
+>rm patches/*
+>echo '{}' > patches.json
+
+patch:apply
+
+@assert vaimo/composer-patches-target2,value17,value17
+@assert vaimo/composer-patches-target3,value5,value5
+@assert vaimo/composer-patches-target1,value8,value8
+@assert vaimo/composer-patches-target1,value17,value17
