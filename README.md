@@ -1221,6 +1221,10 @@ composer code:test sequence
 
 # Runs just one scenario for just one installation
 composer code:test using-file:skipped-patch
+
+# Validate that all production-level dependencies are compatible 
+# with the system requirements of this package 
+composer code:validate-deps
 ```
 
 ### Components
