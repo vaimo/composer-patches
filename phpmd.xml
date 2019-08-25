@@ -4,6 +4,8 @@
  See LICENSE_VAIMO.txt for license details.
 -->
 <ruleset name="LOCAL">
+    <description>PHP CodeSniffer rules for PhpMd</description>
+    
     <rule ref="rulesets/cleancode.xml" />
     <rule ref="rulesets/codesize.xml" />
     <rule ref="rulesets/design.xml" />

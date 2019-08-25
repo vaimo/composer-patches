@@ -1,3 +1,4 @@
 .idea
 vendor/
 test/modules/composer-patches/
+phpcs.xml

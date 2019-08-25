@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+ Copyright (c) Vaimo Group. All rights reserved.
+ See LICENSE_VAIMO.txt for license details.
+-->
+<ruleset name="LOCAL">
+    <description>PHP CodeSniffer rules for Composer Patches</description>
+    
+    <rule ref="PHPCompatibility" />
+
+    <config name="testVersion" value="5.3-"/>
+</ruleset>
