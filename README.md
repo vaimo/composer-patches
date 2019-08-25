@@ -1,6 +1,7 @@
 # Vaimo Composer Patches
 
 [![Latest Stable Version](https://poser.pugx.org/vaimo/composer-patches/v/stable)](https://packagist.org/packages/vaimo/composer-patches)
+[![Build Status](https://travis-ci.org/vaimo/composer-patches.svg?branch=release/3)](https://travis-ci.org/vaimo/composer-patches)
 [![Total Downloads](https://poser.pugx.org/vaimo/composer-patches/downloads)](https://packagist.org/packages/vaimo/composer-patches)
 [![Daily Downloads](https://poser.pugx.org/vaimo/composer-patches/d/daily)](https://packagist.org/packages/vaimo/composer-patches)
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
