@@ -1,7 +1,7 @@
 # Vaimo Composer Patches
 
 [![Latest Stable Version](https://poser.pugx.org/vaimo/composer-patches/v/stable)](https://packagist.org/packages/vaimo/composer-patches)
-[![Build Status](https://travis-ci.org/vaimo/composer-patches.svg?branch=release/3)](https://travis-ci.org/vaimo/composer-patches)
+[![Build Status](https://travis-ci.org/vaimo/composer-patches.svg?branch=master)](https://travis-ci.org/vaimo/composer-patches)
 [![Total Downloads](https://poser.pugx.org/vaimo/composer-patches/downloads)](https://packagist.org/packages/vaimo/composer-patches)
 [![Daily Downloads](https://poser.pugx.org/vaimo/composer-patches/d/daily)](https://packagist.org/packages/vaimo/composer-patches)
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/vaimo/composer-patches.svg)](https://php.net/)
@@ -26,7 +26,7 @@ More information on recent changes [HERE](./CHANGELOG.md).
 This example uses the simplest way that the plugin allows you to include a patch in your project and 
 relies on embedded patch target information within the patch file. 
 
-Alternatvely, same information can be provided in a [JSON format](#basic-usage-configuring-a-patch-via-composerjson) 
+Alternatively, same information can be provided in a [JSON format](#basic-usage-configuring-a-patch-via-composerjson) 
 either directly in package's composer.json or in a separate file that composer.json refers to.
 
 #### 1. composer.json
