@@ -7,7 +7,7 @@ COPYRIGHT
 type=${1}
 
 rm phpcs.xml 2>/dev/null
-ln -s $(pwd)/.config/package.xml $(pwd)/phpcs.xml
+ln -s $(pwd)/.config/phpcs/package.xml $(pwd)/phpcs.xml
 
 if [ "${type}" == "" ] || [ "${type}" == "phpcs" ] ; then
     vendor/bin/phpcs -p src

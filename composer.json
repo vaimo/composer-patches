@@ -90,13 +90,14 @@
         }
     },
     "scripts-descriptions": {
-        "test": "Run tests",
+        "code:test": "Run tests",
         "code:analyse": "Run static code analysis for the source code",
-        "code:normalise": "Apply automatic fixes to the code based on the static code analysis (where applicable)"
+        "code:normalise": "Apply automatic fixes to the code based on the static code analysis (where applicable)",
+        "code:validate-deps": "Make sure that dependencies have code that will actually work with platform requirements defined"
     },
     "scripts": {
         "code:analyse": "bin/analyse",
-        "code:deps": "bin/analyse-vendor",
+        "code:validate-deps": "bin/analyse-vendor",
         "code:normalise": "bin/normalise",
         "code:test": "bin/test",
         "pre-install-cmd": "bin/bootstrap-test-env",

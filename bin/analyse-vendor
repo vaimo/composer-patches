@@ -5,7 +5,7 @@
 COPYRIGHT
 
 rm phpcs.xml 2>/dev/null
-ln -s $(pwd)/.config/vendor.xml $(pwd)/phpcs.xml
+ln -s $(pwd)/.config/phpcs/vendor.xml $(pwd)/phpcs.xml
 
 function main()
 {
