@@ -1076,7 +1076,8 @@ having to trigger 'composer update' or 'composer install'.
 
 ## Environment Variables
 
-* **COMPOSER_PATCHES_FATAL_FAIL** - exit after first patch failure is encountered
+* **COMPOSER_PATCHES_FATAL_FAIL** - exit after first patch failure is encountered (the default behaviour 
+  for the patch applier is to continue gracefully).
 * **COMPOSER_PATCHES_SKIP_PACKAGES** - comma-separated package names to exclude from patching, useful 
   when maintaining patches on package upgrade. Does not affect bundled patches.
 * **COMPOSER_PATCHES_FROM_SOURCE** - always use data directly from owner's composer.json rather than 

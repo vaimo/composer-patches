@@ -68,6 +68,7 @@ function run_tests() {
         command=$(echo ${command}|tr -d '!')
     
         apply_patches "${command}"
+        
         local result=${?}
     
         if ( [ ${result} -eq 0 ] && [ ${should_fail} -eq 0 ]) \
@@ -75,7 +76,7 @@ function run_tests() {
         ) ; then
             continue
         fi
-    
+
         return 1
     done
     
@@ -105,7 +106,7 @@ function run_tests() {
 function apply_patches() {   
     local args=${1}
  
-    local command="composer ${args} --ansi"
+    local command="COMPOSER_PATCHES_FATAL_FAIL=1 composer ${args} --ansi"
  
     eval "${command}; return \${PIPESTATUS[0]}"
     
