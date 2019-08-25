@@ -1,0 +1,22 @@
+# Copyright (c) Vaimo Group. All rights reserved.
+# See LICENSE_VAIMO.txt for license details.
+language: php
+
+git:
+  depth: 1
+
+cache:
+  directories:
+    - "$HOME/.cache/composer"
+    - "$HOME/.composer/cache"
+
+php:
+  - 5.3.0
+
+install:
+  - composer install
+
+script:
+  - "composer test"
+  - "composer code:analyse"
+  - "composer code:validate-deps"
