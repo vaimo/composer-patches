@@ -22,6 +22,7 @@ blu=$(tput setaf 12)        # blue
 mag=$(tput setaf 13)        # magenta
 cya=$(tput setaf 6)         # cyan
 wht=$(tput setaf 15)        # white
+blck=$(tput setaf 0)         # black 
 bldred=${txtbld}${red}      # bold-red
 bldgrn=${txtbld}${grn}      # bold-green
 bldyel=${txtbld}${yel}      # bold-yellow
@@ -188,7 +189,7 @@ _title() {
 
 _warning()
 {
-    echo "${bgdylw}${bldwht}${@}${txtrst}"
+    echo "${bgdylw}${txtbld}${blck}${@}${txtrst}"
 }
 
 _error() {
