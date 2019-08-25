@@ -2,6 +2,21 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.17.10
+
+changes in this release forward-ported from 3.48.10
+
+### Fix
+
+* more clear error reporting when encountering patch reversals (failures from log output analysis)
+
+
+### Maintenance
+
+* increased test coverage
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.10) [diff](https://github.com/vaimo/composer-patches/compare/4.17.9...4.17.10)
+
 ## 4.17.9 (2019-08-22)
 
 changes in this release forward-ported from 3.48.9
@@ -480,7 +495,19 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.9...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.10...4.0.0)
+
+## 3.48.10 (2019-08-25)
+
+### Fix
+
+* more clear error reporting when encountering patch reversals (failures from log output analysis)
+
+### Maintenance
+
+* increased test coverage
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.10) [diff](https://github.com/vaimo/composer-patches/compare/3.48.9...3.48.10)
 
 ## 3.48.9 (2019-08-22)
 

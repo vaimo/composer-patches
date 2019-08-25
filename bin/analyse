@@ -10,6 +10,7 @@ rm phpcs.xml 2>/dev/null
 ln -s $(pwd)/.config/phpcs/package.xml $(pwd)/phpcs.xml
 
 if [ "${type}" == "" ] || [ "${type}" == "phpcs" ] ; then
+    echo ">>> phpcs"
     vendor/bin/phpcs -p src
     
     result=${?}
@@ -20,6 +21,7 @@ if [ "${type}" == "" ] || [ "${type}" == "phpcs" ] ; then
 fi
 
 if [ "${type}" == "" ] || [ "${type}" == "phpmd" ] ; then
+    echo ">>> phpmd"
     vendor/bin/phpmd src text phpmd.xml --suffixes php
 
     result=${?}
@@ -30,6 +32,7 @@ if [ "${type}" == "" ] || [ "${type}" == "phpmd" ] ; then
 fi
 
 if [ "${type}" == "" ] || [ "${type}" == "phpcpd" ] ; then
+    echo ">>> phpcpd"
     vendor/bin/phpcpd src
     
     result=${?}

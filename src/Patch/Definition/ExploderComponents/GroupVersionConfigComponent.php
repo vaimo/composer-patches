@@ -14,9 +14,15 @@ class GroupVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
      */
     private $valueAnalyser;
 
+    /**
+     * @var PatchDefinition\Constraint\Exploder
+     */
+    private $constraintExploder;
+
     public function __construct()
     {
         $this->valueAnalyser = new \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser();
+        $this->constraintExploder = new \Vaimo\ComposerPatches\Patch\Definition\Constraint\Exploder();
     }
 
     public function shouldProcess($label, $data)
@@ -48,29 +54,10 @@ class GroupVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
 
     public function explode($label, $data)
     {
-        $items = array();
-
-        $sources = $data[PatchDefinition::SOURCE];
-
-        unset($data[PatchDefinition::SOURCE]);
-
-        foreach ($sources as $constraint => $source) {
-            if (!$this->valueAnalyser->isConstraint($constraint)) {
-                continue;
-            }
-
-            $items[] = array(
-                $label,
-                array_replace(
-                    $data,
-                    array(
-                        PatchDefinition::VERSION => $constraint,
-                        PatchDefinition::SOURCE => $source
-                    )
-                )
-            );
-        }
-
-        return $items;
+        return $this->constraintExploder->process(
+            $label,
+            $data[PatchDefinition::SOURCE],
+            array_diff_key($data, array(PatchDefinition::SOURCE => true))
+        );
     }
 }

@@ -7,7 +7,7 @@ namespace Vaimo\ComposerPatches\Patch\Definition\Exploder;
 
 class ItemBuilder
 {
-    public function createItem($label, $item, $updates)
+    public function createItem($label, array $item, array $updates = array())
     {
         return array(
             $label,
@@ -15,7 +15,7 @@ class ItemBuilder
         );
     }
     
-    public function createMultiple($label, $data, $keyName)
+    public function createMultiple($label, array $data, $keyName)
     {
         $items = array();
 

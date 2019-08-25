@@ -1,0 +1,4 @@
+patch:validate
+patch:apply
+>rm patches/1_second-change.patch
+patch:apply
