@@ -1,6 +1,7 @@
 # Copyright (c) Vaimo Group. All rights reserved.
 # See LICENSE_VAIMO.txt for license details.
 language: php
+dist: precise
 
 git:
   depth: 1
