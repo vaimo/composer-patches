@@ -1,0 +1,5 @@
+patch:validate
+patch:apply
+>mv patches/1_second-change.patch patches/1_renamed-patch.patch
+>sed -i 's/valueX/valueZ/' patches/1_renamed-patch.patch
+patch:apply
