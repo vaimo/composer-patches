@@ -2,6 +2,18 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.48.10 (2019-08-25)
+
+### Fix
+
+* more clear error reporting when encountering patch reversals (failures from log output analysis)
+
+### Maintenance
+
+* increased test coverage
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.10) [diff](https://github.com/vaimo/composer-patches/compare/3.48.9...3.48.10)
+
 ## 3.48.9 (2019-08-22)
 
 ### Fix
