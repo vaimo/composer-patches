@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+: <<'COPYRIGHT'
+ Copyright (c) Vaimo Group. All rights reserved.
+ See LICENSE_VAIMO.txt for license details.
+COPYRIGHT
+
+rm phpcs.xml 2>/dev/null
+ln -s $(pwd)/.config/vendor.xml $(pwd)/phpcs.xml
+
+function main()
+{
+    root_package="vaimo/composer-patches"
+
+    for dependency in $(find vendor/ -mindepth 2 -maxdepth 2 -type d|sed 's|[^/]*\/||') ; do
+        if ! is_production_dependency "${root_package}" "${dependency}" ; then
+            continue
+        fi
+
+        echo ">>> ${dependency}" 
+    
+        if vendor/bin/phpcs -p vendor//${dependency} ; then
+            continue
+        fi
+
+        exit 1
+    done
+}
+
+function is_production_dependency()
+{
+    root_name=${1}
+    dependency=${2}
+    
+    items="${dependency}"
+
+    original_ifs=${IFS}
+    IFS=$'\n'
+
+    for item in ${items} ; do
+        if [ "${item}" == "" ] ; then
+            continue
+        fi
+        
+        results=$(composer why ${item}|grep -v 'for development'|cut -d' ' -f1)
+        
+        if [ "${results}" == "" ] ; then
+            continue
+        fi
+        
+        for result in ${results} ; do
+            if [ "${result}" != "${root_name}" ] ; then
+                items="\n${results}"
+                
+                continue
+            fi
+
+             return 0
+        done       
+    done
+    
+    IFS=${original_ifs}
+
+    return 1
+}
+
+main

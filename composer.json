@@ -96,6 +96,7 @@
     },
     "scripts": {
         "code:analyse": "bin/analyse",
+        "code:deps": "bin/analyse-vendor",
         "code:normalise": "bin/normalise",
         "code:test": "bin/test",
         "pre-install-cmd": "bin/bootstrap-test-env",

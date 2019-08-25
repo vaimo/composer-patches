@@ -4,7 +4,7 @@
  See LICENSE_VAIMO.txt for license details.
 -->
 <ruleset name="LOCAL">
-    <description>My rules for PHP CodeSniffer</description>
+    <description>PHP CodeSniffer rules for Composer Patches</description>
     
     <rule ref="PHPCompatibility" />
 
