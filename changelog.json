@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.49.2": {
+        "maintenance": [
+            "package configuration and build flow updates"
+        ],
+        "branch": "release/3"
+    },
     "3.49.1": {
         "maintenance": [
             "code quality improvements"
