@@ -5,5 +5,4 @@ Processing patches configuration
   The "https://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-version.patch" file could not be downloaded (HTTP/1.1 404 Not Found)  
                                                                                                                                                                                   
 
-patch:apply [--no-dev] [--filter [FILTER]] [--explicit] [--show-reapplies] [--from-source] [--force] [--] [<targets>]...
 
