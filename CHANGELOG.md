@@ -2,6 +2,22 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.49.0 (2019-08-26)
+
+### Feature
+
+* allow very precise configuration for specific OS based on OS names in drupol\phposinfo\Enum\OsName
+
+### Fix
+
+* switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used
+
+### Maintenance
+
+* improved dependency compatibility scanner to allow whitelisted issue reports (in case the dependency had mechanics to deal with the reported issue)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.10...3.49.0)
+
 ## 3.48.10 (2019-08-25)
 
 ### Fix
