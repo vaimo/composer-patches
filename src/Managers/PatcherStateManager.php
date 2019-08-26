@@ -35,8 +35,10 @@ class PatcherStateManager
             array($patches)
         );
 
-        foreach ($patchQueue as $target => $patches) {
-            if (!$package = $repository->findPackage($target, Constraint::ANY)) {
+        foreach ($patchQueue as $target => $items) {
+            $package = $repository->findPackage($target, Constraint::ANY);
+            
+            if (!$package) {
                 continue;
             }
 
@@ -45,7 +47,7 @@ class PatcherStateManager
 
             $info = array_replace_recursive(
                 $package->getExtra(),
-                array(PluginConfig::APPLIED_FLAG => $patches)
+                array(PluginConfig::APPLIED_FLAG => $items)
             );
 
             $package->setExtra($info);

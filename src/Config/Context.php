@@ -14,8 +14,8 @@ class Context
     public function getOperationSystemTypeCode()
     {
         return preg_replace(
-            '/-+/', 
-            '-', 
+            '/-+/',
+            '-',
             trim(preg_replace(
                 '/[^A-Za-z0-9\-]/',
                 '-',
@@ -77,7 +77,9 @@ class Context
 
     public function getOperationSystemFamily()
     {
-        $familyId = OsInfo::family();
+        // @codingStandardsIgnoreStart
+        $familyId = OsInfo::family(); // phpcs:ignore PHPCompatibility.Extensions.RemovedExtensions
+        // @codingStandardsIgnoreEnd
         
         $labels = array(
             FamilyName::BSD => 'unix',

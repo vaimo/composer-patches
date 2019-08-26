@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.18.1": {
+        "overview": "changes in this release forward-ported from 3.49.1",
+        "maintenance": [
+            "code quality improvements"
+        ]
+    },
     "4.18.0": {
         "overview": "changes in this release forward-ported from 3.49.0",
         "feature": [
@@ -344,6 +350,12 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.49.1": {
+        "maintenance": [
+            "code quality improvements"
+        ],
+        "branch": "release/3"
     },
     "3.49.0": {
         "feature": [

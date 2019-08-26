@@ -10,7 +10,7 @@ class MissingPatchesResolver implements \Vaimo\ComposerPatches\Interfaces\PatchP
     /**
      * @var \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils
      */
-    private $packagePatchDataUtils;
+    private $patchDataUtils;
 
     /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
@@ -19,13 +19,13 @@ class MissingPatchesResolver implements \Vaimo\ComposerPatches\Interfaces\PatchP
 
     public function __construct()
     {
-        $this->packagePatchDataUtils = new \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils();
+        $this->patchDataUtils = new \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
     public function resolve(array $patches, array $repositoryState)
     {
-        $patchDataUtils = $this->packagePatchDataUtils;
+        $patchDataUtils = $this->patchDataUtils;
 
         return $this->patchListUtils->compareLists(
             $patches,

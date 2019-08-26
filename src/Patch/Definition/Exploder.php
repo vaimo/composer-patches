@@ -28,9 +28,13 @@ class Exploder
                 continue;
             }
 
-            if ($items = $processor->explode($label, $data)) {
-                return $items;
+            $items = $processor->explode($label, $data);
+            
+            if (!$items) {
+                continue;
             }
+
+            return $items;
         }
 
         return array(

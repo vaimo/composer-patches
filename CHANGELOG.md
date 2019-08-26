@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.18.1
+
+changes in this release forward-ported from 3.49.1
+
+### Maintenance
+
+* code quality improvements
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.18.1) [diff](https://github.com/vaimo/composer-patches/compare/4.18.0...4.18.1)
+
 ## 4.18.0 (2019-08-26)
 
 changes in this release forward-ported from 3.49.0
@@ -515,7 +525,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.49.0...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.49.1...4.0.0)
+
+## 3.49.1 (2019-08-26)
+
+### Maintenance
+
+* code quality improvements
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.1) [diff](https://github.com/vaimo/composer-patches/compare/3.49.0...3.49.1)
 
 ## 3.49.0 (2019-08-26)
 
