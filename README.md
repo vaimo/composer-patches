@@ -21,7 +21,120 @@ where patches are needed.
 
 More information on recent changes [HERE](./CHANGELOG.md).
 
-## Quick Start
+## Overview
+
+Composer packages can be targeted with patches in two ways: via embedded metadata (recommended approach) and 
+through JSON declaration.
+
+### Embedded Metadata
+
+```json
+{
+  "require": {
+    "some/package-name": "1.2.3"
+  },
+  "extra": {
+    "patches-search": "patches"
+  }
+}
+```
+
+Contents of patches/changes.patch:
+
+```diff
+This patch changes... 
+absolutely everything
+
+@package some/package-name
+
+--- Models/Example.php.org
++++ Models/Example.php
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+```
+
+### JSON Declaration
+
+```json
+{
+  "require": {
+    "some/package-name": "1.2.3"
+  },
+  "extra": {
+    "patches": {
+      "some/package-name": {
+        "This patch changes ... absolutely everything": "patches/changes.patch"
+      }
+    }
+  }
+}
+```
+
+Contents of patches/changes.patch:
+
+```diff
+--- Models/Example.php.org
++++ Models/Example.php
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+``` 
+
+## Configuration: overview
+
+Patches are declared under the following keys in composer.json of the patch owner (may it be project or
+a package).
+
+```json
+{
+  "extra": {
+    "patches": {},
+    "patches-file": [],
+    "patches-search": [],
+    "patcher": {},
+    "patcher-<os_type>": {}
+  }
+}
+```
+
+Where the different groups have the following meaning:
+
+* **patches** - allows patches to be defined in same file.
+* **patches-file** - allows patches to be stored in another file. Can be a single file or list of files.
+* **patches-search** - (>=3.28.0) scans for patch files in defined directory, relies on embedded info 
+  within the patch. Can be a single path reference or a list of paths. 
+  
+_All paths are relative to package root._
+
+The patches module mimics the way composer separates development packages from normal requirements by 
+introducing two extra keys, where exact same rules apply as for normal patch declarations.
+
+```json
+{
+  "extra": {
+    "patches-dev": {},
+    "patches-file-dev": [],
+    "patches-search-dev": []
+  }
+}
+```
+
+The patches declared under those keys will NOT be applied when installing the project with `--no-dev` option.
+
+## Basic Usage: configuring a patch with embedded metadata
 
 This example uses the simplest way that the plugin allows you to include a patch in your project and 
 relies on embedded patch target information within the patch file. 
@@ -143,51 +256,6 @@ right away as the patches folder root information is not yet available in instal
 require the package (that owns the patches) to be installed on the same (or newer) changeset that introduced
 the `patches-search` config value. 
 
-# Configuration
-
-More detailed information on what the module is capable of and how to configure it.
-
-## Configuration: overview
-
-Patches are declared under the following keys in composer.json of the patch owner (may it be project or
-a package).
-
-```json
-{
-  "extra": {
-    "patches": {},
-    "patches-file": [],
-    "patches-search": [],
-    "patcher": {},
-    "patcher-<os_type>": {}
-  }
-}
-```
-
-Where the different groups have the following meaning:
-
-* **patches** - allows patches to be defined in same file.
-* **patches-file** - allows patches to be stored in another file. Can be a single file or list of files.
-* **patches-search** - (>=3.28.0) scans for patch files in defined directory, relies on embedded info 
-  within the patch. Can be a single path reference or a list of paths. 
-  
-_All paths are relative to package root._
-
-The patches module mimics the way composer separates development packages from normal requirements by 
-introducing two extra keys, where exact same rules apply as for normal patch declarations.
-
-```json
-{
-  "extra": {
-    "patches-dev": {},
-    "patches-file-dev": [],
-    "patches-search-dev": []
-  }
-}
-```
-
-The patches declared under those keys will NOT be applied when installing the project with `--no-dev` option.
-
 ## Basic Usage: configuring a patch via composer.json
 
 The way of defining the patches works for:
@@ -228,7 +296,7 @@ in front of all file-path based patch definitions.
 In this case you can define patches without having to repeatedly use the same base-path for every patch 
 definition.
 
-## Basic Usage: configuring a separate patches file
+## Basic Usage: configuring a separate patches.json file
 
 The way of defining the patches works for:
 
