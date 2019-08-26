@@ -1,0 +1,12 @@
+Scanning packages for orphan patches
+Validation completed successfully
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-target1 (1)
+    ~ vaimo/composer-patches-sandbox: patches/some-changes.patch [NEW]
+      Change: value8 => valueC
+      Failed to apply the patch. Halting execution!
+      Most likely causes for the failure:                                   
+                                                                            
+      * PATCH: Success changed to FAILURE due to output analysis (reversals)
+                                                                            
+      (For full, unfiltered details please use: composer patch:apply -vvv)  

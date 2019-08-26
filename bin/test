@@ -10,10 +10,10 @@ script_root=$(dirname $(test -L ${script_path} && readlink -f ${script_path} || 
 source ${script_root}/lib/output.sh
 
 run_tests() {
-    scenario_root=${1}
+    local scenario_root=${1}
         
-    scenario_label=$(cat ${scenario_root}/.label)
-    commands=$(cat ${scenario_root}/.commands)
+    local scenario_label=$(cat ${scenario_root}/.label)
+    local commands=$(cat ${scenario_root}/.commands)
         
     _line '-' 80
     _info "SCENARIO:" "${scenario}" "${scenario_label}"
@@ -21,7 +21,9 @@ run_tests() {
             
     rm -rf patches 2>/dev/null
     rm patches.json 2>/dev/null
-    
+    rm output.out 2>/dev/null
+    rm output.txt 2>/dev/null
+
     local original_ifs=${IFS}
     IFS=$'\n'
     
@@ -58,7 +60,7 @@ run_tests() {
         command=$(echo ${command}|sed 's/^>*//g')
     
         if [ ${system_call} -eq 0 ] ; then
-            apply_patches "${command}"
+            apply_patches "${command}" "output.out"            
         else 
             _warning "SYSTEM: ${command}"
             eval "${command}"
@@ -87,7 +89,50 @@ run_tests() {
     
     IFS=${original_ifs}
     
+    if ! assert_scenario_output "${scenario_root}" "output.out" ; then
+        return 1
+    fi 
+    
     return 0
+}
+
+assert_scenario_output() {
+    local scenario_root=${1}
+    local output_file=${2}
+    
+    local expected_output_file="${scenario_root}/.output"
+ 
+    if [ ! -f ${output_file} ] ; then
+        return 0
+    fi
+ 
+    cat ${output_file} \
+        |sed -r "s/[[:cntrl:]]\[[0-9]{1,3}m//g" \
+        |sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" \
+        > output.txt
+        
+    rm ${output_file} 2>/dev/null
+
+    if [ ! -f ${expected_output_file} ] ; then
+        return 0
+    fi
+
+    local diff_out=$(diff -u ${expected_output_file} output.txt|grep -v '^\(+++\|---\|@@\)')
+                
+    if [ "${diff_out}" == "" ] ; then
+        return 0
+    fi
+    
+    echo ''
+    _error "ERROR: output differs from what is expected:"            
+    
+    _line '↓' 80
+    echo "${diff_out}"
+    _line '↑' 80
+    
+    echo ''
+            
+    return 1 
 }
 
 process_assertions() {
@@ -118,6 +163,7 @@ process_assertions() {
 
 function apply_patches() {   
     local args=${1}
+    local out_file=${2}
  
     local command="composer ${args} --ansi"
  
@@ -125,8 +171,12 @@ function apply_patches() {
         command="${command} -vvv"
     fi
  
+    if [ "${out_file}" != "" ] ; then
+        command="${command} &> >(tee -a ${out_file})"
+    fi
+ 
     eval "${command}; return \${PIPESTATUS[0]}"
-    
+        
     local result=${?}
     
     return ${result};

@@ -4,6 +4,15 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.18.3": {
+        "overview": "changes in this release forward-ported from 3.49.3",
+        "fix": [
+            "needless whitespace in output when using patches-search (extra line for patch label added for no reason)"
+        ],
+        "maintenance": [
+            "introduces output expectation for each test scenario"
+        ]
+    },
     "4.18.2": {
         "overview": "changes in this release forward-ported from 3.49.2",
         "maintenance": [
@@ -356,6 +365,15 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.49.3": {
+        "fix": [
+            "needless whitespace in output when using patches-search (extra line for patch label added for no reason)"
+        ],
+        "maintenance": [
+            "introduces output expectation for each test scenario"
+        ],
+        "branch": "release/3"
     },
     "3.49.2": {
         "maintenance": [

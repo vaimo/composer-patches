@@ -1,0 +1,6 @@
+Scanning packages for orphan patches
+  - vaimo/composer-patches-sandbox
+    ~ patches/single-package-single-file-non-matching-constraint.patch [NO CONFIG]
+    ~ patches2/multiple-packages-single-file.patch [NO CONFIG]
+    ~ patches/multiple-packages-single-file.patch [NO FILE]
+Orphans found!

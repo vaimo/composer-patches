@@ -70,7 +70,7 @@ class InfoLogger
     
     private function resolveLabelLines(array $patch)
     {
-        $lines = explode(PHP_EOL, $patch[Patch::LABEL]);
+        $lines = explode(PHP_EOL, trim($patch[Patch::LABEL], PHP_EOL));
 
         $reference = $this->resolveReferenceInfo($patch);
 
