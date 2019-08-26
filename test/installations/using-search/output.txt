@@ -1,4 +1,0 @@
-Scanning packages for orphan patches
-  - vaimo/composer-patches-sandbox
-    ~ patches2/multiple-packages-single-file.patch [NO CONFIG]
-Orphans found!

@@ -1,0 +1,6 @@
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-sandbox (1)
+    ~ vaimo/composer-patches-sandbox: https://raw.githubusercontent.com/vaimo/composer-patches/release/3/test/scenarios/remote-bundle-success/files/patches/multiple-packages-single-file.patch [NEW]
+      Change: multiple
+
+Writing patch info to install file
