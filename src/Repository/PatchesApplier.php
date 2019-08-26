@@ -339,7 +339,7 @@ class PatchesApplier
 
             $previousError = $exception->getPrevious();
             
-            if ($previousError instanceof \Exception) {
+            if ($previousError) {
                 $this->outputGenerator->generateForException($previousError);
             }
 

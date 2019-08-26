@@ -262,7 +262,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         $sourceKeys = array();
 
         if (isset($defaultValues[Config::PATCHER_SOURCES]) && is_array($defaultValues[Config::PATCHER_SOURCES])) {
-            $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+            $sourceKeys = array_keys((array)$defaultValues[Config::PATCHER_SOURCES]);
         }
 
         $pluginConfig = array(

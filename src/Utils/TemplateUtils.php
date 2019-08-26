@@ -41,7 +41,7 @@ class TemplateUtils
         foreach ($mutations as $mutationName => $mutation) {
             $matches = array_intersect_key($mutation, $arguments);
             
-            if (!$matches) {
+            if (empty($matches)) {
                 continue;
             }
 

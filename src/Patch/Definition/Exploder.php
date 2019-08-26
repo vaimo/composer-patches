@@ -30,7 +30,7 @@ class Exploder
 
             $items = $processor->explode($label, $data);
             
-            if (!$items) {
+            if (empty($items)) {
                 continue;
             }
 

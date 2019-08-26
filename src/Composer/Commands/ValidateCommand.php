@@ -107,7 +107,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $defaultValues = $configDefaults->getPatcherConfig();
         
         if (isset($defaultValues[Config::PATCHER_SOURCES]) && is_array($defaultValues[Config::PATCHER_SOURCES])) {
-            $sourceKeys = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+            $sourceKeys = array_keys((array)$defaultValues[Config::PATCHER_SOURCES]);
 
             return $localOnly
                 ? array_replace(array_fill_keys($sourceKeys, false), array('project' => true))
