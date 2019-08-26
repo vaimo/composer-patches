@@ -36,7 +36,9 @@ class Normalizer
         $config = array();
 
         foreach ($this->components as $component) {
-            if (!$updates = $component->normalize($target, $label, $data, $ownerConfig)) {
+            $updates = $component->normalize($target, $label, $data, $ownerConfig);
+            
+            if (!$updates) {
                 continue;
             }
 

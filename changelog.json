@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.49.1": {
+        "maintenance": [
+            "code quality improvements"
+        ],
+        "branch": "release/3"
+    },
     "3.49.0": {
         "feature": [
             "allow very precise configuration for specific OS based on OS names in drupol\\phposinfo\\Enum\\OsName"
@@ -892,4 +898,4 @@
         ],
         "branch": "release/3"
     }
-}
+},

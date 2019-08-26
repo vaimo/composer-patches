@@ -42,7 +42,7 @@ class PatchesApplier
     /**
      * @var \Vaimo\ComposerPatches\Repository\StateGenerator
      */
-    private $repositoryStateGenerator;
+    private $repoStateGenerator;
 
     /**
      * @var \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger
@@ -118,7 +118,7 @@ class PatchesApplier
         $this->outputStrategy = $outputStrategy;
         $this->logger = $logger;
 
-        $this->repositoryStateGenerator = new \Vaimo\ComposerPatches\Repository\StateGenerator(
+        $this->repoStateGenerator = new \Vaimo\ComposerPatches\Repository\StateGenerator(
             $this->packageCollector
         );
 
@@ -148,7 +148,7 @@ class PatchesApplier
 
         $packagesUpdated = false;
 
-        $repositoryState = $this->repositoryStateGenerator->generate($repository);
+        $repositoryState = $this->repoStateGenerator->generate($repository);
         
         $applyQueue = $this->queueGenerator->generateApplyQueue($patches, $repositoryState);
         $removeQueue = $this->queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);

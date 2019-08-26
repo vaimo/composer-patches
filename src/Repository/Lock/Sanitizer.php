@@ -34,7 +34,9 @@ class Sanitizer
     
     public function sanitize()
     {
-        if (!$lockData = $this->lockerManager->readLockData()) {
+        $lockData = $this->lockerManager->readLockData();
+        
+        if (!$lockData) {
             return;
         }
 
