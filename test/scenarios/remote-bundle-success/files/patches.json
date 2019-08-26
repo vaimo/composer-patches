@@ -1,0 +1,5 @@
+{
+    "*": {
+        "Change: multiple": "https://raw.githubusercontent.com/vaimo/composer-patches/release/3/test/scenarios/remote-bundle-success/files/patches/multiple-packages-single-file.patch"
+    }
+}
