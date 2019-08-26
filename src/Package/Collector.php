@@ -39,9 +39,12 @@ class Collector
         }
 
         return array_combine(
-            array_map(function (\Composer\Package\PackageInterface $package) {
-                return $package->getName();
-            }, $packages),
+            array_map(
+                function (\Composer\Package\PackageInterface $package) {
+                    return $package->getName();
+                },
+                $packages
+            ),
             $packages
         ) ?: array();
     }

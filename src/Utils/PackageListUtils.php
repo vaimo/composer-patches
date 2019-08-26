@@ -10,11 +10,14 @@ class PackageListUtils
     public function listToNameDictionary(array $packages)
     {
         return array_combine(
-            array_map(function ($package) {
-                return $package instanceof \Composer\Package\PackageInterface
-                    ? $package->getName()
-                    : $package['name'];
-            }, $packages),
+            array_map(
+                function ($package) {
+                    return $package instanceof \Composer\Package\PackageInterface
+                        ? $package->getName()
+                        : $package['name'];
+                },
+                $packages
+            ),
             $packages
         ) ?: array();
     }

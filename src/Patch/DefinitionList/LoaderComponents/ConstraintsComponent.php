@@ -48,9 +48,12 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
      */
     public function process(array $patches, array $packagesByName)
     {
-        $rootPackages = array_filter($packagesByName, function ($package) {
-            return $package instanceof \Composer\Package\RootPackage;
-        });
+        $rootPackages = array_filter(
+            $packagesByName,
+            function ($package) {
+                return $package instanceof \Composer\Package\RootPackage;
+            }
+        );
 
         /** @var \Composer\Package\CompletePackageInterface $rootPackage */
         $rootPackage = reset($rootPackages);
