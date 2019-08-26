@@ -10,13 +10,10 @@ cache:
     - "$HOME/.cache/composer"
     - "$HOME/.composer/cache"
 
-php:
-  - 7.2.0
-
 install:
   - composer install
 
 script:
   - "composer test"
   - "composer code:analyse"
-  - "composer code:validate-deps"
+  - "composer code:deps"
