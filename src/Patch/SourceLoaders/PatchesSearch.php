@@ -222,7 +222,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $version = trim(implode(':', $valueParts));
         }
 
-        if (!$target && $package) {
+        if ($package) {
             $target = $package;
         }
 

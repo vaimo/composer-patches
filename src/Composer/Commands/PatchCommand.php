@@ -173,7 +173,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $defaultValues = $configDefaults->getPatcherConfig();
         
         if (isset($defaultValues[Config::PATCHER_SOURCES]) && is_array($defaultValues[Config::PATCHER_SOURCES])) {
-            $sourceTypes = array_keys($defaultValues[Config::PATCHER_SOURCES]);
+            $sourceTypes = array_keys((array)$defaultValues[Config::PATCHER_SOURCES]);
 
             return array_fill_keys($sourceTypes, true);
         }

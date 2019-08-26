@@ -2,6 +2,21 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.18.3
+
+changes in this release forward-ported from 3.49.3
+
+### Fix
+
+* needless whitespace in output when using patches-search (extra line for patch label added for no reason)
+
+
+### Maintenance
+
+* introduces output expectation for each test scenario
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.18.3) [diff](https://github.com/vaimo/composer-patches/compare/4.18.2...4.18.3)
+
 ## 4.18.2 (2019-08-26)
 
 changes in this release forward-ported from 3.49.2
@@ -535,7 +550,19 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.49.2...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.49.3...4.0.0)
+
+## 3.49.3 (2019-08-26)
+
+### Fix
+
+* needless whitespace in output when using patches-search (extra line for patch label added for no reason)
+
+### Maintenance
+
+* introduces output expectation for each test scenario
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.3) [diff](https://github.com/vaimo/composer-patches/compare/3.49.2...3.49.3)
 
 ## 3.49.2 (2019-08-26)
 

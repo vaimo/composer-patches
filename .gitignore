@@ -3,3 +3,5 @@ vendor/
 test/modules/composer-patches/
 phpcs.xml
 report-*
+output.txt
+output.out
