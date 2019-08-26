@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.49.2 (2019-08-26)
+
+### Maintenance
+
+* package configuration and build flow updates
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.2) [diff](https://github.com/vaimo/composer-patches/compare/3.49.1...3.49.2)
+
 ## 3.49.1 (2019-08-26)
 
 ### Maintenance
