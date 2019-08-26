@@ -158,7 +158,10 @@ class PatchesApplier
         
         $patchQueueFootprints = $this->patchListTransformer->createSimplifiedList($applyQueue);
 
-        $labels = array_diff_key($this->statusConfig->getLabels(), array('unknown' => true));
+        $labels = array_diff_key(
+            $this->statusConfig->getLabels(),
+            array('unknown' => true)
+        );
 
         $applyQueue = $this->updateStatusLabels($applyQueue, $labels);
         $removeQueue = $this->updateStatusLabels($removeQueue, $labels);
@@ -178,7 +181,10 @@ class PatchesApplier
                 $resetTarget = $packages[$targetName];
 
                 $resetPatches = $this->packageUtils->resetAppliedPatches($resetTarget);
-                $resetResult[$targetName] = is_array($resetPatches) ? $resetPatches : array();
+                
+                $resetResult[$targetName] = is_array($resetPatches)
+                    ? $resetPatches
+                    : array();
 
                 if (!$hasPatches && $resetPatches && !isset($patchQueueFootprints[$targetName])) {
                     $this->logger->writeRaw(
@@ -250,7 +256,9 @@ class PatchesApplier
     {
         foreach ($queue as $target => $group) {
             foreach ($group as $path => $item) {
-                $status = isset($item[Patch::STATUS]) ? $item[Patch::STATUS] : 'unknown';
+                $status = isset($item[Patch::STATUS])
+                    ? $item[Patch::STATUS]
+                    : 'unknown';
 
                 if (!isset($labels[$status])) {
                     continue;
@@ -339,13 +347,17 @@ class PatchesApplier
 
             $paths = array_keys($patchesQueue);
             
-            $failureIndex = array_search($failedPath, $paths);
+            $failureIndex = array_search($failedPath, $paths, true);
 
             $appliedPatches = array();
 
             if (is_int($failureIndex)) {
                 $appliedPaths = array_slice($paths, 0, $failureIndex);
-                $appliedPatches = array_intersect_key($patchesQueue, array_flip($appliedPaths));
+
+                $appliedPatches = array_intersect_key(
+                    $patchesQueue,
+                    array_flip($appliedPaths)
+                );
             }
 
             $this->patcherStateManager->registerAppliedPatches($repository, $appliedPatches);
