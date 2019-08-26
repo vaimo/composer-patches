@@ -4,6 +4,18 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.49.0": {
+        "feature": [
+            "allow very precise configuration for specific OS based on OS names in drupol\\phposinfo\\Enum\\OsName"
+        ],
+        "fix": [
+            "switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used"
+        ],
+        "maintenance": [
+            "improved dependency compatibility scanner to allow whitelisted issue reports (in case the dependency had mechanics to deal with the reported issue)"
+        ],
+        "branch": "release/3"
+    },
     "3.48.10": {
         "fix": [
             "more clear error reporting when encountering patch reversals (failures from log output analysis)"

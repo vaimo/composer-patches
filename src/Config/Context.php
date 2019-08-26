@@ -5,33 +5,67 @@
  */
 namespace Vaimo\ComposerPatches\Config;
 
-use Tivie\OS;
+use drupol\phposinfo\OsInfo;
+use drupol\phposinfo\Enum\OsName;
+use drupol\phposinfo\Enum\FamilyName;
 
 class Context
 {
-    /**
-     * @var OS\Detector
-     */
-    protected $osDetector;
-
-    public function __construct()
+    public function getOperationSystemTypeCode()
     {
-        $this->osDetector = new OS\Detector();
+        return preg_replace(
+            '/-+/', 
+            '-', 
+            trim(preg_replace(
+                '/[^A-Za-z0-9\-]/',
+                '-',
+                strtolower(OsInfo::os())
+            ), '-')
+        );
     }
     
     public function getOperationSystemName()
     {
-        $typeId = $this->osDetector->getType();
+        $typeId = OsInfo::os();
 
         $labels = array(
-            OS\MACOSX => 'mac',
-            OS\GEN_UNIX => 'unix',
-            OS\BSD => 'bsd',
-            OS\LINUX => 'linux',
-            OS\WINDOWS => 'windows',
-            OS\SUN_OS => 'sun',
-            OS\CYGWIN => 'cygwin',
-            OS\CYGWIN => 'mingw'
+            OsName::DARWIN => 'mac',
+            OsName::AIX => 'unix',
+            OsName::GNU => 'unix',
+            OsName::HPUX => 'unix',
+            OsName::MINIX => 'unix',
+            OsName::OSF1 => 'unix',
+            OsName::QNX => 'unix',
+            OsName::RELIANTUNIXY => 'unix',
+            OsName::SCOSV => 'unix',
+            OsName::SINIXY => 'unix',
+            OsName::ULTRIX => 'unix',
+            OsName::UNIXWARE => 'unix',
+            OsName::UWIN => 'unix',
+            OsName::UWINW7 => 'unix',
+            OsName::ZOS => 'zos',
+            OsName::DEBIANFREEBSD => 'bsd',
+            OsName::FREEBSD => 'bsd',
+            OsName::GNUFREEBSD => 'bsd',
+            OsName::GNUKFREEBSD => 'bsd',
+            OsName::NETBSD => 'bsd',
+            OsName::OPENBSD => 'bsd',
+            OsName::DRAGONFLY => 'bsd',
+            OsName::GNULINUX => 'linux',
+            OsName::LINUX => 'linux',
+            OsName::WIN32 => 'windows',
+            OsName::WINDOWS => 'windows',
+            OsName::WINDOWSNT => 'windows',
+            OsName::WINNT => 'windows',
+            OsName::SOLARIS => 'solaris',
+            OsName::SUNOS => 'sun',
+            OsName::CYGWIN => 'cygwin',
+            OsName::CYGWINNT51 => 'cygwin',
+            OsName::CYGWINNT61 => 'cygwin',
+            OsName::CYGWINNT61WOW64 => 'cygwin',
+            OsName::MINGW => 'mingw',
+            OsName::MINGW32NT61 => 'mingw',
+            OsName::MSYSNT61 => 'mingw'
         );
 
         if (isset($labels[$typeId])) {
@@ -43,12 +77,14 @@ class Context
 
     public function getOperationSystemFamily()
     {
-        $familyId = $this->osDetector->getFamily();
-
+        $familyId = OsInfo::family();
+        
         $labels = array(
-            OS\UNIX_FAMILY => 'unix',
-            OS\WINDOWS_FAMILY => 'windows',
-            OS\UNIX_ON_WINDOWS_FAMILY => 'windows-unix'
+            FamilyName::BSD => 'unix',
+            FamilyName::DARWIN => 'unix',
+            FamilyName::LINUX => 'unix',
+            FamilyName::WINDOWS => 'windows',
+            FamilyName::UNIX_ON_WINDOWS => 'windows-unix'
         );
 
         if (isset($labels[$familyId])) {

@@ -55,6 +55,7 @@ class ConfigFactory
         }
 
         $subConfigKeys = array(
+            $this->context->getOperationSystemTypeCode(),
             $this->context->getOperationSystemName(),
             $this->context->getOperationSystemFamily(),
             '',
