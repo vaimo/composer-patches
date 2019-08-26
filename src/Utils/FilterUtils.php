@@ -57,10 +57,13 @@ class FilterUtils
     {
         $that = $this;
         
-        return array_map(function ($filter) use ($that) {
-            return (!$that->isInvertedFilter($filter) ? FilterUtils::NEGATION_PREFIX : '') .
-                ltrim($filter, FilterUtils::NEGATION_PREFIX);
-        }, $filters);
+        return array_map(
+            function ($filter) use ($that) {
+                return (!$that->isInvertedFilter($filter) ? FilterUtils::NEGATION_PREFIX : '') .
+                    ltrim($filter, FilterUtils::NEGATION_PREFIX);
+            },
+            $filters
+        );
     }
     
     public function isInvertedFilter($filter)
@@ -70,8 +73,11 @@ class FilterUtils
 
     public function trimRules(array $filters)
     {
-        return array_map(function ($filter) {
-            return ltrim($filter, FilterUtils::NEGATION_PREFIX);
-        }, $filters);
+        return array_map(
+            function ($filter) {
+                return ltrim($filter, FilterUtils::NEGATION_PREFIX);
+            },
+            $filters
+        );
     }
 }

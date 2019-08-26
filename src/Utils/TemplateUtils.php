@@ -73,9 +73,12 @@ class TemplateUtils
             }
             
             $updateGroups[] = array_combine(
-                array_map(function ($item) use ($format) {
-                    return sprintf($format, $item);
-                }, array_keys($arguments)),
+                array_map(
+                    function ($item) use ($format) {
+                        return sprintf($format, $item);
+                    },
+                    array_keys($arguments)
+                ),
                 $templateArguments
             );
         }
@@ -84,11 +87,14 @@ class TemplateUtils
         
         $names = array_keys($variables);
         
-        $values = array_map(function ($value) {
-            return trim(
-                strtok($value, PHP_EOL)
-            );
-        }, $variables);
+        $values = array_map(
+            function ($value) {
+                return trim(
+                    strtok($value, PHP_EOL)
+                );
+            },
+            $variables
+        );
         
         return str_replace($names, $values, $template);
     }

@@ -41,8 +41,11 @@ class PackageSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceList
 
         $filter = $this->filterUtils->composeRegex($this->packages, '/');
         
-        return array_filter($packages, function (PackageInterface $package) use ($filter) {
-            return preg_match($filter, $package->getName());
-        });
+        return array_filter(
+            $packages,
+            function (PackageInterface $package) use ($filter) {
+                return preg_match($filter, $package->getName());
+            }
+        );
     }
 }

@@ -9,9 +9,12 @@ class PathUtils
 {
     public function composePath()
     {
-        $pathSegments = array_map(function ($item) {
-            return rtrim($item, DIRECTORY_SEPARATOR);
-        }, func_get_args());
+        $pathSegments = array_map(
+            function ($item) {
+                return rtrim($item, DIRECTORY_SEPARATOR);
+            },
+            func_get_args()
+        );
 
         return implode(
             DIRECTORY_SEPARATOR,

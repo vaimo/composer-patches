@@ -257,13 +257,16 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     
     private function normalizeDependencies($dependsList)
     {
-        $dependsNormalized = array_map(function ($item) {
-            $valueParts = explode(':', $item);
+        $dependsNormalized = array_map(
+            function ($item) {
+                $valueParts = explode(':', $item);
 
-            return array(
-                trim(array_shift($valueParts)) => trim(array_shift($valueParts)) ?: '>=0.0.0'
-            );
-        }, array_unique($dependsList));
+                return array(
+                    trim(array_shift($valueParts)) => trim(array_shift($valueParts)) ?: '>=0.0.0'
+                );
+            },
+            array_unique($dependsList)
+        );
 
         $dependsNormalized = array_reduce(
             $dependsNormalized,
