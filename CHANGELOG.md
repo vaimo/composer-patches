@@ -2,6 +2,18 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.49.3 (2019-08-26)
+
+### Fix
+
+* needless whitespace in output when using patches-search (extra line for patch label added for no reason)
+
+### Maintenance
+
+* introduces output expectation for each test scenario
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.3) [diff](https://github.com/vaimo/composer-patches/compare/3.49.2...3.49.3)
+
 ## 3.49.2 (2019-08-26)
 
 ### Maintenance
