@@ -54,7 +54,7 @@ validate_dependency()
     original_ifs=${IFS}
     IFS=$'\n'
     
-    local full_path=$(cd vendor/${dependency})
+    local full_path=$(cd vendor/${dependency} &>/dev/null && pwd)
     
     local whitelist_path=".config/phpcs/whitelist/${code}"
     
@@ -89,7 +89,7 @@ get_autoload_paths()
 {
     package_path=${1}
     
-    local package_root=$(cd "vendor/${dependency}")
+    local package_root=$(cd "vendor/${dependency}" &>/dev/null && pwd)
 
     local autoload_config_extractor=$(cat <<SCRIPT
         \$config = json_decode(

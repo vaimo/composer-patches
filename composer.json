@@ -100,7 +100,7 @@
         "test": "bin/test",
         "code:test": "bin/test",
         "code:analyse": "bin/analyse",
-        "code:validate-deps": "bin/analyse-vendor",
+        "code:deps": "bin/analyse-vendor",
         "code:normalise": "bin/normalise",
         "pre-install-cmd": "bin/bootstrap-test-env",
         "post-install-cmd": "bin/bootstrap",
