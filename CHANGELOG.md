@@ -2,6 +2,20 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.50.0 (2019-08-28)
+
+### Feature
+
+* allow defining sha1 checksum for remote patches through 'sha1' key within JSON definition
+* allow validation to include/skip certain packages or patterns (added --filter argument)
+
+### Fix
+
+* the configuration value of 'secure-http' not having any effect (value usage ignored); Now properly handled by remote filesystem implementation
+* allow retries on failed downloads (switch from using remote filesystem to file downloader which allows the usage of caching and retry logic in place for Composer package downloads)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.0) [diff](https://github.com/vaimo/composer-patches/compare/3.49.3...3.50.0)
+
 ## 3.49.3 (2019-08-26)
 
 ### Fix
