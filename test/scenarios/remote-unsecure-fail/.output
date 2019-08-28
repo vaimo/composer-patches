@@ -1,0 +1,8 @@
+Processing patches configuration
+
+                                                                                                                                                                                                                                                                            
+  [Composer\Downloader\TransportException]                                                                                                                                                                                                                                  
+  Your configuration does not allow connections to http://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-version.patch. Override the 'secure-http' to allow: https://github.com/vaimo/composer-patches#patcher-configuration  
+                                                                                                                                                                                                                                                                            
+
+

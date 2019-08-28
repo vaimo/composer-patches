@@ -1,0 +1,5 @@
+Scanning packages for orphan patches
+  - vaimo/composer-patches-sandbox
+    ~ vendor/vaimo/composer-patches/downloads/9b7d97168f0e525ff0c102f42b843766/single-package-single-file-no-version.patch [ERROR 404]
+    ~ vendor/vaimo/composer-patches/downloads/3e6b1cb5ea6a89cb3a0c911febf0a9b6/single-package-single-file-no-version.patch [UNSECURE]
+Orphans found!

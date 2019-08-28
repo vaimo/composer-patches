@@ -2,6 +2,21 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.19.1
+
+changes in this release forward-ported from 3.50.1
+
+### Fix
+
+* the command patch:list not usable when some patch configuration included remote patches that would have resulted in 404 errors on apply (now listing said patches with proper errors)
+
+
+### Maintenance
+
+* test coverage increased around dealing with remote patches
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.1) [diff](https://github.com/vaimo/composer-patches/compare/4.19.0...4.19.1)
+
 ## 4.19.0 (2019-08-28)
 
 changes in this release forward-ported from 3.50.0
@@ -566,7 +581,19 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.0...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.1...4.0.0)
+
+## 3.50.1 (2019-08-28)
+
+### Fix
+
+* the command patch:list not usable when some patch configuration included remote patches that would have resulted in 404 errors on apply (now listing said patches with proper errors)
+
+### Maintenance
+
+* test coverage increased around dealing with remote patches
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.1) [diff](https://github.com/vaimo/composer-patches/compare/3.50.0...3.50.1)
 
 ## 3.50.0 (2019-08-28)
 

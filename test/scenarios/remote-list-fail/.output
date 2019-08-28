@@ -1,0 +1,6 @@
+vaimo/composer-patches-target1
+  ~ vaimo/composer-patches-sandbox: https://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-version.patch [ERROR 404]
+    Change: value8 => valueC
+  ~ vaimo/composer-patches-sandbox: http://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-version.patch [UNSECURE]
+    Change: value9 => valueD
+
