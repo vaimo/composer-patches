@@ -98,7 +98,7 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                     );
                 } catch (\Composer\Downloader\TransportException $exception) {
                     $patchData[PatchDefinition::STATUS_LABEL] = $this->handleTransportError($source, $exception);
-                    $patchData[PatchDefinition::STATUS] = PatchDefinition::STATUS_ERRORS; 
+                    $patchData[PatchDefinition::STATUS] = PatchDefinition::STATUS_ERRORS;
                 }
 
                 $patchData[PatchDefinition::PATH] = $destinationFile;

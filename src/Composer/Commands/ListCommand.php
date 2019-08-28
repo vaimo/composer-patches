@@ -351,8 +351,8 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         if ($status === PatchDefinition::STATUS_ERRORS) {
             $stateDecorator = sprintf(
-                $stateDecorator, 
-                $info[PatchDefinition::STATE_LABEL] ? $info[PatchDefinition::STATE_LABEL] : 'ERROR'  
+                $stateDecorator,
+                $info[PatchDefinition::STATE_LABEL] ? $info[PatchDefinition::STATE_LABEL] : 'ERROR'
             );
         }
         
