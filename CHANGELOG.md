@@ -2,6 +2,23 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.19.0
+
+changes in this release forward-ported from 3.50.0
+
+### Feature
+
+* allow defining sha1 checksum for remote patches through 'sha1' key within JSON definition
+* allow validation to include/skip certain packages or patterns (added --filter argument)
+
+
+### Fix
+
+* the configuration value of 'secure-http' not having any effect (value usage ignored); Now properly handled by remote filesystem implementation
+* allow retries on failed downloads (switch from using remote filesystem to file downloader which allows the usage of caching and retry logic in place for Composer package downloads)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.0) [diff](https://github.com/vaimo/composer-patches/compare/4.18.3...4.19.0)
+
 ## 4.18.3 (2019-08-26)
 
 changes in this release forward-ported from 3.49.3
@@ -550,7 +567,21 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.49.3...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.0...4.0.0)
+
+## 3.50.0 (2019-08-28)
+
+### Feature
+
+* allow defining sha1 checksum for remote patches through 'sha1' key within JSON definition
+* allow validation to include/skip certain packages or patterns (added --filter argument)
+
+### Fix
+
+* the configuration value of 'secure-http' not having any effect (value usage ignored); Now properly handled by remote filesystem implementation
+* allow retries on failed downloads (switch from using remote filesystem to file downloader which allows the usage of caching and retry logic in place for Composer package downloads)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.0) [diff](https://github.com/vaimo/composer-patches/compare/3.49.3...3.50.0)
 
 ## 3.49.3 (2019-08-26)
 

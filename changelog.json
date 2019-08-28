@@ -4,6 +4,17 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.19.0": {
+        "overview": "changes in this release forward-ported from 3.50.0",
+        "feature": [
+            "allow defining sha1 checksum for remote patches through 'sha1' key within JSON definition",
+            "allow validation to include/skip certain packages or patterns (added --filter argument)"
+        ],
+        "fix": [
+            "the configuration value of 'secure-http' not having any effect (value usage ignored); Now properly handled by remote filesystem implementation",
+            "allow retries on failed downloads (switch from using remote filesystem to file downloader which allows the usage of caching and retry logic in place for Composer package downloads)"
+        ]
+    },
     "4.18.3": {
         "overview": "changes in this release forward-ported from 3.49.3",
         "fix": [
@@ -365,6 +376,17 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.50.0": {
+        "feature": [
+            "allow defining sha1 checksum for remote patches through 'sha1' key within JSON definition",
+            "allow validation to include/skip certain packages or patterns (added --filter argument)"
+        ],
+        "fix": [
+            "the configuration value of 'secure-http' not having any effect (value usage ignored); Now properly handled by remote filesystem implementation",
+            "allow retries on failed downloads (switch from using remote filesystem to file downloader which allows the usage of caching and retry logic in place for Composer package downloads)"
+        ],
+        "branch": "release/3"
     },
     "3.49.3": {
         "fix": [

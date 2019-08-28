@@ -1,0 +1,8 @@
+{
+    "vaimo/composer-patches-target1": {
+        "Change: value8 => valueC": {
+            "source": "https://raw.githubusercontent.com/vaimo/composer-patches/release/3/test/scenarios/remote-success/files/patches/single-package-single-file-no-version.patch",
+            "sha1": "wrong-hash"
+        }
+    }
+}

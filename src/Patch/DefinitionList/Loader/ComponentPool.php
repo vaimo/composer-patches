@@ -23,26 +23,44 @@ class ComponentPool
      * @var \Composer\IO\IOInterface
      */
     private $appIO;
-
+    
     /**
      * @var bool[]|\Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface[]
      */
     private $components = array();
 
     /**
+     * @var bool
+     */
+    private $gracefulMode;
+
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     *
      * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $appIO
+     * @param bool $gracefulMode
      */
     public function __construct(
         \Composer\Composer $composer,
-        \Composer\IO\IOInterface $appIO
+        \Composer\IO\IOInterface $appIO,
+        $gracefulMode = false
     ) {
         $this->composer = $composer;
         $this->appIO = $appIO;
+        $this->gracefulMode = $gracefulMode;
     }
 
-    public function getList()
+    public function getList(PluginConfig $pluginConfig)
     {
+        $patcherConfig = $pluginConfig->getPatcherConfig();
+
+        $composerConfig = clone $this->composer->getConfig();
+
+        $composerConfig->merge(array(
+            'config' => array('secure-http' => $patcherConfig[PluginConfig::PATCHER_SECURE_HTTP])
+        ));
+        
         $rootPackage = $this->composer->getPackage();
         $extra = $rootPackage->getExtra();
         
@@ -56,9 +74,21 @@ class ComponentPool
 
         $installationManager = $this->composer->getInstallationManager();
         $composerConfig = clone $this->composer->getConfig();
+
+        $cache = null;
+        
+        if ($composerConfig->get('cache-files-ttl') > 0) {
+            $cache = new \Composer\Cache(
+                $this->appIO,
+                $composerConfig->get('cache-files-dir'),
+                'a-z0-9_./'
+            );
+        }
+        
+        $fileDownloader = new \Composer\Downloader\FileDownloader($this->appIO, $composerConfig, null, $cache);
         
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
-
+        
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
             $installationManager,
             $vendorRoot
@@ -67,10 +97,21 @@ class ComponentPool
         $configExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\VendorConfigExtractor(
             $packageInfoResolver
         );
-
-        $downloader = new \Composer\Util\RemoteFilesystem($this->appIO, $composerConfig);
-
+        
         $platformPackages = $this->resolveConstraintPackages($composerConfig);
+
+        $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
+            array($this->composer->getPackage())
+        );
+
+        $repositoryManager = $this->composer->getRepositoryManager();
+
+        $pluginPackage = $packageResolver->resolveForNamespace(
+            $repositoryManager->getLocalRepository(),
+            __NAMESPACE__
+        );
+
+        $consoleSilencer = new \Vaimo\ComposerPatches\Console\Silencer($this->appIO);
         
         $defaults = array(
             'bundle' => new LoaderComponents\BundleComponent($rootPackage),
@@ -80,7 +121,13 @@ class ComponentPool
             'path-normalizer' => new LoaderComponents\PathNormalizerComponent($packageInfoResolver),
             'platform' => new LoaderComponents\PlatformComponent($platformPackages),
             'constraints' => new LoaderComponents\ConstraintsComponent($configExtractor),
-            'downloader' => new LoaderComponents\DownloaderComponent($rootPackage, $downloader),
+            'downloader' => new LoaderComponents\DownloaderComponent(
+                $pluginPackage,
+                $fileDownloader,
+                $consoleSilencer,
+                $vendorRoot,
+                $this->gracefulMode
+            ),
             'validator' => new LoaderComponents\ValidatorComponent(),
             'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver),
             'merger' => new LoaderComponents\MergerComponent(),

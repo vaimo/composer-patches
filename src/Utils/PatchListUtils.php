@@ -35,6 +35,13 @@ class PatchListUtils
                 }
 
                 unlink($patchInfo[Patch::PATH]);
+
+                $dirName = dirname($patchInfo[Patch::PATH]);
+                $iterator = new \FilesystemIterator($dirName);
+                
+                if (!$iterator->valid()) {
+                    rmdir($dirName);
+                }
             }
         }
     }

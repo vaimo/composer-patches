@@ -70,7 +70,12 @@ absolutely everything
   "extra": {
     "patches": {
       "some/package-name": {
-        "This patch changes ... absolutely everything": "patches/changes.patch"
+        "This patch changes ... absolutely everything": "patches/changes.patch",
+        "remote patch": "http://www.example.com/remote-patch.patch",
+        "remote patch with checksum check": {
+          "source": "http://www.example.com/other-patch.patch",
+          "sha1": "5a52eeee822c068ea19f0f56c7518d8a05aef16e"
+        }
       }
     }
   }
@@ -272,7 +277,11 @@ The way of defining the patches works for:
     "patches": {
       "some/package": {
         "example local patch": "path/to/patches/relative/to/patch/owner/some-fix.patch",
-        "example remote patch": "http://www.example.com/remote-patch.patch"
+        "example remote patch": "http://www.example.com/remote-patch.patch",
+        "example remote patch with checksum check": {
+          "source": "http://www.example.com/remote-patch.patch",
+          "sha1": "5a52eeee822c068ea19f0f56c7518d8a05aef16e"
+        }
       }
     }
   }

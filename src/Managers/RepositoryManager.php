@@ -15,14 +15,9 @@ use Vaimo\ComposerPatches\Composer\OutputUtils;
 class RepositoryManager
 {
     /**
-     * @var \Composer\IO\ConsoleIO
-     */
-    private $appIO;
-
-    /**
      * @var \Composer\Installer\InstallationManager
      */
-    private $installer;
+    private $installationManager;
 
     /**
      * @var \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface
@@ -30,18 +25,23 @@ class RepositoryManager
     private $packageResetStrategy;
 
     /**
-     * @param \Composer\IO\ConsoleIO $appIO
-     * @param \Composer\Installer\InstallationManager $installer
+     * @var \Vaimo\ComposerPatches\Console\Silencer
+     */
+    private $consoleSilencer;
+
+    /**
+     * @param \Composer\Installer\InstallationManager $installationManager
      * @param \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface $packageResetStrategy
+     * @param \Vaimo\ComposerPatches\Console\Silencer $consoleSilencer
      */
     public function __construct(
-        \Composer\IO\ConsoleIO $appIO,
-        \Composer\Installer\InstallationManager $installer,
-        \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface $packageResetStrategy
+        \Composer\Installer\InstallationManager $installationManager,
+        \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface $packageResetStrategy,
+        \Vaimo\ComposerPatches\Console\Silencer $consoleSilencer
     ) {
-        $this->appIO = $appIO;
-        $this->installer = $installer;
+        $this->installationManager = $installationManager;
         $this->packageResetStrategy = $packageResetStrategy;
+        $this->consoleSilencer = $consoleSilencer;
     }
 
     /**
@@ -53,26 +53,20 @@ class RepositoryManager
      */
     public function resetPackage(WritableRepositoryInterface $repository, PackageInterface $package)
     {
-        $verbosityLevel = OutputUtils::resetVerbosity($this->appIO, OutputInterface::VERBOSITY_QUIET);
-
         $operation = new ResetOperation($package, 'Package reset due to changes in patches configuration');
 
         if (!$this->packageResetStrategy->shouldAllowReset($package)) {
-            OutputUtils::resetVerbosity($this->appIO, $verbosityLevel);
-
             throw new \Vaimo\ComposerPatches\Exceptions\PackageResetException(
                 sprintf('Package reset halted due to encountering local changes: %s', $package->getName())
             );
         }
 
-        try {
-            $this->installer->install($repository, $operation);
-        } catch (\Exception $exception) {
-            OutputUtils::resetVerbosity($this->appIO, $verbosityLevel);
-
-            throw $exception;
-        }
-
-        OutputUtils::resetVerbosity($this->appIO, $verbosityLevel);
+        $installer = $this->installationManager;
+        
+        $this->consoleSilencer->applyToCallback(
+            function () use ($installer, $repository, $operation) {
+                $installer->install($repository, $operation);
+            }
+        );
     }
 }
