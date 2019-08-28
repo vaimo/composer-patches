@@ -7,8 +7,7 @@
     "4.19.0": {
         "overview": "changes in this release forward-ported from 3.50.0",
         "feature": [
-            "allow defining sha1 checksum for remote patches through 'sha1' key within JSON definition",
-            "allow validation to include/skip certain packages or patterns (added --filter argument)"
+            "allow defining sha1 checksum for remote patches through 'sha1' key within JSON definition"
         ],
         "fix": [
             "the configuration value of 'secure-http' not having any effect (value usage ignored); Now properly handled by remote filesystem implementation",
