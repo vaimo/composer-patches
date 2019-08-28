@@ -160,7 +160,11 @@ The way of defining the patches works for:
     "patches": {
       "some/package": {
         "example local patch": "path/to/patches/relative/to/patch/owner/some-fix.patch",
-        "example remote patch": "http://www.example.com/remote-patch.patch"
+        "example remote patch": "http://www.example.com/remote-patch.patch",
+        "example remote patch with checksum check": {
+          "source": "http://www.example.com/remote-patch.patch",
+          "sha1": "5a52eeee822c068ea19f0f56c7518d8a05aef16e"
+        }
       }
     }
   }
@@ -184,7 +188,7 @@ in front of all file-path based patch definitions.
 In this case you can define patches without having to repeatedly use the same base-path for every patch 
 definition.
 
-## Basic Usage: configuring a separet patches file
+## Basic Usage: configuring a separate patches file
 
 The way of defining the patches works for:
 
