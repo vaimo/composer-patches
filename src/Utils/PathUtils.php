@@ -7,7 +7,7 @@ namespace Vaimo\ComposerPatches\Utils;
 
 class PathUtils
 {
-    public function composePath()
+    public static function composePath()
     {
         $pathSegments = array_map(
             function ($item) {

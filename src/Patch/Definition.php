@@ -23,6 +23,7 @@ class Definition
     const LINK = 'link';
     const OWNER_IS_ROOT = 'owner_is_root';
     const HASH = 'md5';
+    const CHECKSUM = 'checksum';
     const TARGETS = 'targets';
     const ORIGIN = 'origin';
     const SKIP = 'skip';

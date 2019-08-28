@@ -227,9 +227,6 @@ class ValidateCommand extends \Composer\Command\BaseCommand
     {
         $composer = $this->getComposer();
         
-        $composerConfig = clone $composer->getConfig();
-        $downloader = new \Composer\Util\RemoteFilesystem($this->getIO(), $composerConfig);
-
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
 
         $loaderComponentsPool = $this->createLoaderPool(array(
@@ -238,12 +235,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             'targets-resolver' => false,
             'local-exclude' => false,
             'root-patch' => false,
-            'global-exclude' => false,
-            'downloader' => new LoaderComponents\DownloaderComponent(
-                $composer->getPackage(),
-                $downloader,
-                true
-            )
+            'global-exclude' => false
         ));
 
         return $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
@@ -256,7 +248,8 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
             $composer,
-            $appIO
+            $appIO,
+            true
         );
 
         foreach ($componentUpdates as $componentName => $replacement) {

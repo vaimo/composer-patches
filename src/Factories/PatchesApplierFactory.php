@@ -98,11 +98,11 @@ class PatchesApplierFactory
         $packageResetStrategy = $pluginConfig->shouldForcePackageReset()
             ? new Strategies\Package\ForcedResetStrategy()
             : new Strategies\Package\DefaultResetStrategy($installer, $downloader);
-
+        
         $repositoryManager = new \Vaimo\ComposerPatches\Managers\RepositoryManager(
-            $output,
             $installer,
-            $packageResetStrategy
+            $packageResetStrategy,
+            new \Vaimo\ComposerPatches\Console\Silencer($output)
         );
 
         return new \Vaimo\ComposerPatches\Repository\PatchesApplier(

@@ -110,6 +110,7 @@ assert_scenario_output() {
         |sed -r "s/[[:cntrl:]]\[[0-9]{1,3}m//g" \
         |sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" \
         |grep -v "^patch:apply" \
+        |grep -v "^You are running composer with xdebug enabled" \
         > output.txt
         
     rm ${output_file} 2>/dev/null

@@ -6,55 +6,71 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Vaimo\ComposerPatches\Utils\PathUtils;
 
 class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
-    /**
-     * @var \Composer\Package\RootPackageInterface
-     */
-    private $rootPackage;
-    
-    /**
-     * @var \Composer\Util\RemoteFilesystem
-     */
-    private $remoteFilesystem;
-    
     /**
      * @var bool
      */
     private $gracefulMode;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\PathUtils
+     * @var \Composer\Downloader\FileDownloader
      */
-    private $pathUtils;
+    private $fileDownloader;
+
+    /**
+     * @var \Vaimo\ComposerPatches\Console\Silencer
+     */
+    private $consoleSilencer;
+
+    /**
+     * @var \Composer\Package\PackageInterface
+     */
+    private $ownerPackage;
+
+    /**
+     * @var string
+     */
+    private $vendorDir;
 
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      *
-     * @param \Composer\Package\RootPackageInterface $rootPackage
-     * @param \Composer\Util\RemoteFilesystem $remoteFilesystem
+     * @param \Composer\Package\PackageInterface $ownerPackage
+     * @param \Composer\Downloader\FileDownloader $downloadManager
+     * @param \Vaimo\ComposerPatches\Console\Silencer $consoleSilencer
+     * @param string $vendorDir
      * @param bool $gracefulMode
      */
     public function __construct(
-        \Composer\Package\RootPackageInterface $rootPackage,
-        \Composer\Util\RemoteFilesystem $remoteFilesystem,
+        \Composer\Package\PackageInterface $ownerPackage,
+        \Composer\Downloader\FileDownloader $downloadManager,
+        \Vaimo\ComposerPatches\Console\Silencer $consoleSilencer,
+        $vendorDir,
         $gracefulMode = false
     ) {
-        $this->rootPackage = $rootPackage;
-        $this->remoteFilesystem = $remoteFilesystem;
+        $this->ownerPackage = $ownerPackage;
+        $this->fileDownloader = $downloadManager;
+        $this->consoleSilencer = $consoleSilencer;
+        $this->vendorDir = $vendorDir;
         $this->gracefulMode = $gracefulMode;
-        
-        $this->pathUtils = new \Vaimo\ComposerPatches\Utils\PathUtils();
     }
 
     /**
      * @param array $patches
      * @param \Composer\Package\PackageInterface[] $packagesByName
      * @return array
+     * @throws \Exception
      */
     public function process(array $patches, array $packagesByName)
     {
+        $ownerName = $this->ownerPackage->getName();
+
+        $relativePath = PathUtils::composePath($ownerName, 'downloads');
+        $absolutePath = PathUtils::composePath($this->vendorDir, $relativePath);
+        
         foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
                 if (!$patchData[PatchDefinition::URL]) {
@@ -62,50 +78,78 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                 }
 
                 $source = $patchData[PatchDefinition::URL];
-                
-                $filename = sprintf(
-                    $this->pathUtils->composePath('%s', 'composer-patches-%s.patch'),
-                    sys_get_temp_dir(),
-                    md5($this->rootPackage->getName() . '|' . $source)
-                );
-                
-                if (!file_exists($filename)) {
-                    $hostname = parse_url($source, PHP_URL_HOST);
-                    
-                    try {
-                        $this->remoteFilesystem->copy($hostname, $source, $filename, false);
-                    } catch (\Composer\Downloader\TransportException $exception) {
-                        if (strpos($exception->getMessage(), 'configuration does not allow connections') !== false) {
-                            $exception = new \Composer\Downloader\TransportException(
-                                sprintf(
-                                    'Your configuration does not allow connections to %s. ' .
-                                    'Override the \'secure-http\' to allow: ' .
-                                    'https://github.com/vaimo/composer-patches#patcher-configuration',
-                                    $source
-                                ),
-                                $exception->getCode()
-                            );
+                $checksum = $patchData[PatchDefinition::CHECKSUM];
 
-                            $patchData[PatchDefinition::STATUS_LABEL] = 'UNSECURE';
-                        }
-                        
-                        if ($exception->getCode() === 404) {
-                            $patchData[PatchDefinition::STATUS_LABEL] = 'ERROR 404';
-                        }
-                        
-                        if ($this->gracefulMode) {
-                            continue;
-                        }
+                $hashComponents = array($source, $checksum);
+                $sourceHash = md5(implode('|', $hashComponents));
 
-                        throw $exception;
-                    }
+                $package = $this->createPackage($source, $sourceHash, $relativePath, $checksum);
+                
+                $destinationFolder = PathUtils::composePath($absolutePath, $sourceHash);
+                $destinationFile = PathUtils::composePath($destinationFolder, basename($source));
+                
+                try {
+                    $downloader = $this->fileDownloader;
+
+                    $this->consoleSilencer->applyToCallback(
+                        function () use ($downloader, $package, $destinationFolder) {
+                            $downloader->download($package, $destinationFolder, false);
+                        }
+                    );
+                } catch (\Composer\Downloader\TransportException $exception) {
+                    $this->handleTransportError($source, $exception);
                 }
 
-                $patchData[PatchDefinition::PATH] = $filename;
+                $patchData[PatchDefinition::PATH] = $destinationFile;
                 $patchData[PatchDefinition::TMP] = true;
             }
         }
 
         return $patches;
+    }
+    
+    private function createPackage($remoteFile, $name, $targetDir, $checksum = null)
+    {
+        $version = '0.0.0';
+        
+        $package = new \Composer\Package\Package($name, $version, $version);
+
+        $package->setInstallationSource('dist');
+        $package->setDistType('file');
+        $package->setTargetDir($targetDir);
+        $package->setDistUrl($remoteFile);
+        
+        if ($checksum) {
+            $package->setDistSha1Checksum($checksum);
+        }
+        
+        return $package;
+    }
+    
+    private function handleTransportError($source, \Composer\Downloader\TransportException $exception)
+    {
+        if (strpos($exception->getMessage(), 'configuration does not allow connections') !== false) {
+            $exception = new \Composer\Downloader\TransportException(
+                sprintf(
+                    'Your configuration does not allow connections to %s. ' .
+                    'Override the \'secure-http\' to allow: ' .
+                    'https://github.com/vaimo/composer-patches#patcher-configuration',
+                    $source
+                ),
+                $exception->getCode()
+            );
+
+            $patchData[PatchDefinition::STATUS_LABEL] = 'UNSECURE';
+        }
+
+        if ($exception->getCode() === 404) {
+            $patchData[PatchDefinition::STATUS_LABEL] = 'ERROR 404';
+        }
+
+        if ($this->gracefulMode) {
+            return;
+        }
+
+        throw $exception;
     }
 }

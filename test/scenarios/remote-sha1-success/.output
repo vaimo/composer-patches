@@ -1,0 +1,6 @@
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-target1 (1)
+    ~ vaimo/composer-patches-sandbox: https://raw.githubusercontent.com/vaimo/composer-patches/release/3/test/scenarios/remote-success/files/patches/single-package-single-file-no-version.patch [NEW]
+      Change: value8 => valueC
+
+Writing patch info to install file
