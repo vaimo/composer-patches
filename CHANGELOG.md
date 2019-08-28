@@ -7,7 +7,6 @@ _This file has been auto-generated from the contents of changelog.json_
 ### Feature
 
 * allow defining sha1 checksum for remote patches through 'sha1' key within JSON definition
-* allow validation to include/skip certain packages or patterns (added --filter argument)
 
 ### Fix
 
