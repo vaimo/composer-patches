@@ -4,6 +4,15 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.50.1": {
+        "fix": [
+            "the command patch:list not usable when some patch configuration included remote patches that would have resulted in 404 errors on apply (now listing said patches with proper errors)"
+        ],
+        "maintenance": [
+            "test coverage increased around dealing with remote patches"
+        ],
+        "branch": "release/3"
+    },
     "3.50.0": {
         "feature": [
             "allow defining sha1 checksum for remote patches through 'sha1' key within JSON definition"

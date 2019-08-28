@@ -11,6 +11,7 @@ class StatusConfig
     {
         return array(
             'new' => '<info>NEW</info>',
+            'errors' => '<fg=red>%s</>',
             'match' => '<info>MATCH</info>',
             'affected' => '<fg=cyan>AFFECTED</>',
             'changed' => '<fg=yellow>CHANGED</>',

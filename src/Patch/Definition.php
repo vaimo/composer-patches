@@ -54,6 +54,7 @@ class Definition
     const STATUS_NEW = 'new';
     const STATUS_MATCH = 'match';
     const STATUS_LABEL = 'state_label';
+    const STATUS_ERRORS = 'errors';
     
     const OWNER_UNKNOWN = 'unknown';
     

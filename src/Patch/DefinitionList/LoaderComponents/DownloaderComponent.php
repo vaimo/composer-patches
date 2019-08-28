@@ -97,7 +97,8 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                         }
                     );
                 } catch (\Composer\Downloader\TransportException $exception) {
-                    $this->handleTransportError($source, $exception);
+                    $patchData[PatchDefinition::STATUS_LABEL] = $this->handleTransportError($source, $exception);
+                    $patchData[PatchDefinition::STATUS] = PatchDefinition::STATUS_ERRORS; 
                 }
 
                 $patchData[PatchDefinition::PATH] = $destinationFile;
@@ -128,6 +129,8 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
     
     private function handleTransportError($source, \Composer\Downloader\TransportException $exception)
     {
+        $statusLabel = sprintf('ERROR %s', $exception->getCode());
+        
         if (strpos($exception->getMessage(), 'configuration does not allow connections') !== false) {
             $exception = new \Composer\Downloader\TransportException(
                 sprintf(
@@ -139,15 +142,11 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                 $exception->getCode()
             );
 
-            $patchData[PatchDefinition::STATUS_LABEL] = 'UNSECURE';
-        }
-
-        if ($exception->getCode() === 404) {
-            $patchData[PatchDefinition::STATUS_LABEL] = 'ERROR 404';
+            $statusLabel = 'UNSECURE';
         }
 
         if ($this->gracefulMode) {
-            return;
+            return $statusLabel;
         }
 
         throw $exception;

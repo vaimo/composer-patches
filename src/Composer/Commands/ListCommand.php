@@ -301,7 +301,8 @@ class ListCommand extends \Composer\Command\BaseCommand
     {
         $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
             $this->getComposer(),
-            $this->getIO()
+            $this->getIO(),
+            true
         );
 
         foreach ($componentUpdates as $componentName => $replacement) {
@@ -345,8 +346,17 @@ class ListCommand extends \Composer\Command\BaseCommand
             : 'unknown';
 
         $owner = $info[PatchDefinition::OWNER];
+
+        $stateDecorator = $statusDecorators[$status];
         
-        $statusLabel = sprintf(' [%s]', $statusDecorators[$status]);
+        if ($status === PatchDefinition::STATUS_ERRORS) {
+            $stateDecorator = sprintf(
+                $stateDecorator, 
+                $info[PatchDefinition::STATE_LABEL] ? $info[PatchDefinition::STATE_LABEL] : 'ERROR'  
+            );
+        }
+        
+        $statusLabel = sprintf(' [%s]', $stateDecorator);
 
         if ($owner === PatchDefinition::OWNER_UNKNOWN) {
             return sprintf('  ~ %s%s', $path, $statusLabel);
