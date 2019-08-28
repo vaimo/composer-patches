@@ -2,6 +2,18 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.50.1 (2019-08-28)
+
+### Fix
+
+* the command patch:list not usable when some patch configuration included remote patches that would have resulted in 404 errors on apply (now listing said patches with proper errors)
+
+### Maintenance
+
+* test coverage increased around dealing with remote patches
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.1) [diff](https://github.com/vaimo/composer-patches/compare/3.50.0...3.50.1)
+
 ## 3.50.0 (2019-08-28)
 
 ### Feature
