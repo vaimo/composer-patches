@@ -34,7 +34,9 @@ through JSON declaration.
     "some/package-name": "1.2.3"
   },
   "extra": {
-    "patches-search": "patches"
+    "patcher": {
+      "search": "patches"
+    }
   }
 }
 ```
@@ -96,7 +98,7 @@ Contents of patches/changes.patch:
          /**
           * rest of the logic of the function
           */
-``` 
+```
 
 ## Configuration: overview
 
