@@ -6,7 +6,7 @@
     ],
     "3.50.2": {
         "fix": [
-            "loosened dependency on drupol/phposinfo to make sure that the module is installable on all PHP version (latest release of the module is only covering PHP <7.0 (the constraint used to explicitly state 1.6.1.2, changed to 1.6 which covers all needed PHP versions)",
+            "loosened dependency on drupol/phposinfo to make sure that the module is installable on all PHP version (latest release of the module is only covering PHP <7.0 (the constraint used to explicitly state 1.6.1.2, changed to 1.6 which covers all needed PHP versions) [issues/37]",
             "validation error for remote patches displayed TMP path in output instead of the URL"
         ],
         "maintenance": [
@@ -60,7 +60,7 @@
             "allow very precise configuration for specific OS based on OS names in drupol\\phposinfo\\Enum\\OsName"
         ],
         "fix": [
-            "switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used"
+            "switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used [issues/36]"
         ],
         "maintenance": [
             "improved dependency compatibility scanner to allow whitelisted issue reports (in case the dependency had mechanics to deal with the reported issue)"
