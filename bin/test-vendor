@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+: <<'COPYRIGHT'
+ Copyright (c) Vaimo Group. All rights reserved.
+ See LICENSE_VAIMO.txt for license details.
+COPYRIGHT
+
+script_path=${BASH_SOURCE[0]}
+script_root=$(dirname $(test -L ${script_path} && readlink -f ${script_path} || echo ${script_path}))
+
+source ${script_root}/lib/output.sh
+
+bin/bootstrap-test-env
+
+main()
+{
+    local versions="5.3.9 5.4.45 5.5.38 5.6.40 7.0.33 7.1.32 7.2.22 7.3.9"
+    
+    (
+        cd test &>/dev/null
+        
+        sandbox_root=$(pwd)
+        
+        cd dependencies &>/dev/null
+        
+        if [ ! -d modules ] ; then
+            ln -s ${sandbox_root}/modules $(pwd)
+        fi
+        
+        for version in ${versions} ; do
+            _line '=' 80
+            _title "TEST INSTALL WITH:" "${version}"
+            _line '=' 80
+            
+            composer config platform.php ${version}
+            
+            composer update
+        done
+    )
+}
+
+main

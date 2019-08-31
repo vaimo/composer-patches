@@ -35,6 +35,13 @@ main()
     if [ "${has_errors}" == "1" ] ; then
         exit 1
     fi
+    
+    local versions="5.3.9 5.4.45 5.5.38 5.6.40 7.0.33 7.1.32 7.2.22 7.3.9"
+    
+    for version in ${versions} ; do
+        echo ${version}
+    done
+    
 }
 
 validate_dependency()

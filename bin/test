@@ -298,7 +298,7 @@ fi
         if ! echo ${installation}|grep -q "${installation_filter}" ; then
             continue
         fi
-                
+
         installation_root=$(get_installation_root ${installation})
 
         installation_label=$(cat ${installation_root}/.label)

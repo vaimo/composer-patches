@@ -57,11 +57,11 @@ _title() {
     
     local separator=
     
-    if [ "${group}" != '' ] ; then
+    if [ "${label}" != '' ] ; then
         local separator=' - '
     fi
 
-    echo "${cya}${1}${txtrst} ${brghtcya}$(echo ${group}|tr '[:lower:]' '[:upper:]')${txtrst}${separator}${3}"
+    echo "${cya}${1}${txtrst} ${brghtcya}$(echo ${group}|tr '[:lower:]' '[:upper:]')${txtrst}${separator}${label}"
 }
 
 _warning()

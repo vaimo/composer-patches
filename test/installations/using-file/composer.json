@@ -9,12 +9,6 @@
         "vaimo/composer-patches-target2": "1.2.0",
         "vaimo/composer-patches-target3": "1.2.3"
     },
-    "authors": [
-        {
-            "name": "Allan Paiste",
-            "email": "allan.paiste@vaimo.com"
-        }
-    ],
     "minimum-stability": "dev",
     "repositories": [
         {
