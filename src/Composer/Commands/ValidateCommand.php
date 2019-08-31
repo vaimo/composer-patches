@@ -184,10 +184,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
             $searchResult = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
 
-            $fileMatchGroups[] = array_fill_keys($searchResult, [
+            $fileMatchGroups[] = array_fill_keys($searchResult, array(
                 Patch::OWNER => $packageName,
                 Patch::URL => ''
-            ]);
+            ));
         }
 
         return array_reduce($fileMatchGroups, 'array_replace', array());
@@ -308,8 +308,8 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
             foreach ($items as $item) {
                 $lines[] = sprintf(
-                    '    ~ %s [<fg=red>%s</>]', 
-                    $item['path'], 
+                    '    ~ %s [<fg=red>%s</>]',
+                    $item['path'],
                     $item['issue']
                 );
             }

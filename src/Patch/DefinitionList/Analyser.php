@@ -104,7 +104,7 @@ class Analyser
                 $values = array_values(
                     array_map(function ($item) use ($keyFlags) {
                         return array_replace(
-                            $keyFlags, 
+                            $keyFlags,
                             array_intersect_key($item, $keyFlags)
                         );
                     }, $items)
