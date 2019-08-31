@@ -7,18 +7,18 @@
         "php": ">=5.3.0",
         "ext-json": "*",
         "composer-plugin-api": "^1.0",
-        "drupol/phposinfo": "^1.6.1.2",
-        "vaimo/topological-sort": "^1.0",
-        "seld/jsonlint": "^1.7.1"
+        "drupol/phposinfo": "^1.6",
+        "seld/jsonlint": "^1.7.1",
+        "vaimo/topological-sort": "^1.0"
     },
     "require-dev": {
         "composer/composer": "^1.0.0",
         "phpcompatibility/php-compatibility": "^9.1.1",
-        "vaimo/composer-changelogs": "^0.15.1",
         "squizlabs/php_codesniffer": "^2.9.2",
         "phpunit/phpunit": "^4.8.36",
         "sebastian/phpcpd": "^1.4.3",
-        "phpmd/phpmd": "^2.6.0"
+        "phpmd/phpmd": "^2.6.0",
+        "vaimo/composer-changelogs": "^0.15.1"
     },
     "config": {
         "platform": {
