@@ -93,4 +93,26 @@ class Analyser
             array()
         );
     }
+
+    public function extractDictionary(array $patches, array $keys)
+    {
+        $keyFlags = array_fill_keys($keys, null);
+        
+        return array_reduce(
+            $patches,
+            function (array $result, array $items) use ($keyFlags) {
+                $values = array_values(
+                    array_map(function ($item) use ($keyFlags) {
+                        return array_replace(
+                            $keyFlags,
+                            array_intersect_key($item, $keyFlags)
+                        );
+                    }, $items)
+                );
+
+                return array_merge($result, $values);
+            },
+            array()
+        );
+    }
 }

@@ -7,6 +7,44 @@ namespace Vaimo\ComposerPatches\Utils;
 
 class DataUtils
 {
+    public function listToGroups(array $items, $keyMatcher)
+    {
+        $result = array();
+
+        $key = null;
+        
+        foreach ($items as $item) {
+            if (preg_match($keyMatcher, $item, $matches)) {
+                $key = $matches[1];
+
+                continue;
+            }
+
+            if (!$key) {
+                continue;
+            }
+
+            if (!isset($result[$key])) {
+                $result[$key] = array();
+            }
+            
+            $result[$key][] = $item;
+        }
+
+        return $result;
+    }
+    
+    public function embedGroupKeyToItems(array $groups, $template = '%s:%s')
+    {
+        $result = array();
+        
+        foreach ($groups as $key => $items) {
+            $result[$key] = $this->prefixArrayValues($items, $key, $template);
+        }
+
+        return $result;
+    }
+    
     public function extractOrderedItems(array $items, array $targets)
     {
         $targets = array_flip($targets);
@@ -17,11 +55,11 @@ class DataUtils
         );
     }
     
-    public function prefixArrayValues(array $data, $prefix)
+    public function prefixArrayValues(array $data, $prefix, $template = '%s%s')
     {
         return array_map(
-            function ($value) use ($prefix) {
-                return $prefix . $value;
+            function ($value) use ($prefix, $template) {
+                return sprintf($template, $prefix, $value);
             },
             $data
         );

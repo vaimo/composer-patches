@@ -7,14 +7,19 @@ COPYRIGHT
 script_path=${BASH_SOURCE[0]}
 script_root=$(dirname $(test -L ${script_path} && readlink -f ${script_path} || echo ${script_path}))
 
+package="vaimo/composer-patches-local"
+versions="5.3.9 5.4.45 5.5.38 5.6.40 7.0.33 7.1.32 7.2.22 7.3.9"
+
 source ${script_root}/lib/output.sh
 
-rm phpcs.xml 2>/dev/null
-ln -s $(pwd)/.config/phpcs/vendor.xml $(pwd)/phpcs.xml
+bin/bootstrap-test-env
 
-main()
+analyse_deps()
 {
-    local root_package="vaimo/composer-patches"
+    local root_package=${1}
+    local config_root=${2}
+
+    local whitelist_root="${config_root}/phpcs/whitelist"
 
     local has_errors=
     
@@ -25,7 +30,7 @@ main()
 
         _info "${dependency}" 
     
-        if validate_dependency ${dependency} ; then
+        if validate_dependency "${dependency}" "${whitelist_root}" ; then
             continue
         fi
         
@@ -40,6 +45,7 @@ main()
 validate_dependency()
 {
     dependency=${1}
+    whitelist_root=${2}
     
     local src_paths=$(get_autoload_paths "${dependency}")
 
@@ -56,7 +62,7 @@ validate_dependency()
     
     local full_path=$(cd vendor/${dependency} &>/dev/null && pwd)
     
-    local whitelist_path=".config/phpcs/whitelist/${code}"
+    local whitelist_path="${whitelist_root}/${code}"
     
     if [ -f ${whitelist_path} ] ; then
         local whitelist=$(cat ${whitelist_path})
@@ -145,5 +151,45 @@ is_production_dependency()
 
     return 1
 }
+    
+(
+    package_root=$(pwd)
+    
+    cd test &>/dev/null
+        
+    sandbox_root=$(pwd)
+        
+    cd dependencies &>/dev/null
+        
+    if [ ! -d modules ] ; then
+        ln -s ${sandbox_root}/modules $(pwd)
+    fi
 
-main
+    for version in ${versions} ; do
+        rm phpcs.xml 2>/dev/null
+        
+        cp ${package_root}/.config/phpcs/vendor.xml $(pwd)/phpcs.xml
+
+        version_mm=$(echo ${version}|cut -d'.' -f1-2)
+
+        sed -i 's|_VERSION_|'${version_mm}'|g' $(pwd)/phpcs.xml
+        
+        _line '=' 80
+        _title "VALIDATE VIABILITY WITH" "PHP ${version_mm}" "code compatibility of required dependencies"
+        _line '=' 80
+
+        composer config platform.php ${version}
+
+        if ! composer update --ansi ; then
+            exit 1
+        fi
+        
+        vendor/bin/phpcs --config-set installed_paths 'vendor/phpcompatibility/php-compatibility'
+        vendor/bin/phpcs --config-set error_severity 1
+        vendor/bin/phpcs --config-set default_standard 'LOCAL'
+        
+        analyse_deps "${package}" "${package_root}/.config"
+    done
+)
+
+

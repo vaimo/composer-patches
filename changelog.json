@@ -4,6 +4,20 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.19.2": {
+        "overview": "changes in this release forward-ported from 3.50.2",
+        "fix": [
+            "loosened dependency on drupol/phposinfo to make sure that the module is installable on all PHP version (latest release of the module is only covering PHP <7.0 (the constraint used to explicitly state 1.6.1.2, changed to 1.6 which covers all needed PHP versions) [issues/37]",
+            "validation error for remote patches displayed TMP path in output instead of the URL",
+            "the 'probable causes' report did not include file path reference"
+        ],
+        "maintenance": [
+            "removed lock files from tests to make sure that initial setup always ends up installing the latest package dependencies",
+            "make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)",
+            "run tests (including the test that the module can be installed) on multiple PHP versions: 5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3",
+            "run Comaptibility ruleset on all installations"
+        ]
+    },
     "4.19.1": {
         "overview": "changes in this release forward-ported from 3.50.1",
         "fix": [
@@ -385,6 +399,20 @@
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
     },
+    "3.50.2": {
+        "fix": [
+            "loosened dependency on drupol/phposinfo to make sure that the module is installable on all PHP version (latest release of the module is only covering PHP <7.0 (the constraint used to explicitly state 1.6.1.2, changed to 1.6 which covers all needed PHP versions) [issues/37]",
+            "validation error for remote patches displayed TMP path in output instead of the URL",
+            "the 'probable causes' report did not include file path reference"
+        ],
+        "maintenance": [
+            "removed lock files from tests to make sure that initial setup always ends up installing the latest package dependencies",
+            "make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)",
+            "run tests (including the test that the module can be installed) on multiple PHP versions: 5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3",
+            "run Comaptibility ruleset on all installations"
+        ],
+        "branch": "release/3"
+    },
     "3.50.1": {
         "fix": [
             "the command patch:list not usable when some patch configuration included remote patches that would have resulted in 404 errors on apply (now listing said patches with proper errors)"
@@ -430,7 +458,7 @@
             "allow very precise configuration for specific OS based on OS names in drupol\\phposinfo\\Enum\\OsName"
         ],
         "fix": [
-            "switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used"
+            "switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used [issues/36]"
         ],
         "maintenance": [
             "improved dependency compatibility scanner to allow whitelisted issue reports (in case the dependency had mechanics to deal with the reported issue)"

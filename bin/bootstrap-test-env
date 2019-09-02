@@ -6,7 +6,13 @@ COPYRIGHT
 
 # Setup tarting sandbox
 mkdir test/modules/composer-patches 2>/dev/null
-ln -s $(readlink -f src) test/modules/composer-patches/src 2>/dev/null
-ln -s $(readlink -f composer.json) test/modules/composer-patches 2>/dev/null
+
+if [ ! -L test/modules/composer-patches/src ] ; then
+    ln -s $(readlink -f src) test/modules/composer-patches/src 2>/dev/null
+fi
+
+cp composer.json test/modules/composer-patches 2>/dev/null
+
+sed -i 's|composer-patches"|composer-patches-local"|g' test/modules/composer-patches/composer.json
 
 exit 0

@@ -2,6 +2,26 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.19.2
+
+changes in this release forward-ported from 3.50.2
+
+### Fix
+
+* loosened dependency on drupol/phposinfo to make sure that the module is installable on all PHP version (latest release of the module is only covering PHP <7.0 (the constraint used to explicitly state 1.6.1.2, changed to 1.6 which covers all needed PHP versions) [issues/37]
+* validation error for remote patches displayed TMP path in output instead of the URL
+* the 'probable causes' report did not include file path reference
+
+
+### Maintenance
+
+* removed lock files from tests to make sure that initial setup always ends up installing the latest package dependencies
+* make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)
+* run tests (including the test that the module can be installed) on multiple PHP versions: 5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3
+* run Comaptibility ruleset on all installations
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.2) [diff](https://github.com/vaimo/composer-patches/compare/4.19.1...4.19.2)
+
 ## 4.19.1 (2019-08-28)
 
 changes in this release forward-ported from 3.50.1
@@ -581,7 +601,24 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.1...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.2...4.0.0)
+
+## 3.50.2 (2019-09-02)
+
+### Fix
+
+* loosened dependency on drupol/phposinfo to make sure that the module is installable on all PHP version (latest release of the module is only covering PHP <7.0 (the constraint used to explicitly state 1.6.1.2, changed to 1.6 which covers all needed PHP versions) [issues/37]
+* validation error for remote patches displayed TMP path in output instead of the URL
+* the 'probable causes' report did not include file path reference
+
+### Maintenance
+
+* removed lock files from tests to make sure that initial setup always ends up installing the latest package dependencies
+* make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)
+* run tests (including the test that the module can be installed) on multiple PHP versions: 5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3
+* run Comaptibility ruleset on all installations
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.2) [diff](https://github.com/vaimo/composer-patches/compare/3.50.1...3.50.2)
 
 ## 3.50.1 (2019-08-28)
 
@@ -644,7 +681,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.1) [diff](https
 
 ### Fix
 
-* switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used
+* switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used [issues/36]
 
 ### Maintenance
 

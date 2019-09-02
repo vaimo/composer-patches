@@ -1288,6 +1288,9 @@ beforehand.
 # Runs one or several static code analysis tools against the code-base
 composer code:analyse
 
+# Runs just one type of code analyser
+composer code:analyse phpmd
+
 # Fixes as many issues as possible automatically (phpcs auto-fixer)
 composer code:normalise
 
@@ -1316,6 +1319,8 @@ The tests have the following components:
   state of the module files after patches have been applied.
 * **scenarios** - includes all the possible scenarios (with different patches) that will be executed against 
   each installation.
+* **dependencies** - sandbox for testing the possibility to install the defined dependencies on all supported
+  versions of PHP; Said dependencies will also be analysed for syntax compatibility.
 
 ### Adding new scenarios
 

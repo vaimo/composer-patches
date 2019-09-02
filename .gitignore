@@ -5,3 +5,6 @@ phpcs.xml
 report-*
 output.txt
 output.out
+test/**/composer.lock
+test/**/modules
+test/**/patches

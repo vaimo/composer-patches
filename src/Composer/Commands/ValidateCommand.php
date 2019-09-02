@@ -13,8 +13,9 @@ use Symfony\Component\Console\Input\InputOption;
 
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Config;
-use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
+use Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool;
+use Vaimo\ComposerPatches\Utils\PathUtils;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -74,7 +75,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         
         $patchDefines = array_combine(
             $patchPaths,
-            $patchListAnalyser->extractValue($patches, array(Patch::OWNER))
+            $patchListAnalyser->extractDictionary($patches, array(Patch::OWNER, Patch::URL))
         );
         
         $patchStatuses = array_filter(
@@ -90,9 +91,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         
         $fileMatches = $this->collectPatchFilesFromPackages($matches, $pluginConfig);
         
-        $groups = array_filter(
-            $this->collectOrphans($fileMatches, $patchDefines, $installPaths, $patchStatuses)
-        );
+        $groups = $this->collectOrphans($fileMatches, $patchDefines, $installPaths, $patchStatuses);
         
         $this->outputOrphans($output, $groups);
 
@@ -188,7 +187,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
             $searchResult = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
 
-            $fileMatchGroups[] = array_fill_keys($searchResult, $packageName);
+            $fileMatchGroups[] = array_fill_keys($searchResult, array(
+                Patch::OWNER => $packageName,
+                Patch::URL => ''
+            ));
         }
 
         return array_reduce($fileMatchGroups, 'array_replace', array());
@@ -249,11 +251,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $composer = $this->getComposer();
         $appIO = $this->getIO();
 
-        $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
-            $composer,
-            $appIO,
-            true
-        );
+        $componentPool = new ComponentPool($composer, $appIO, true);
 
         foreach ($componentUpdates as $componentName => $replacement) {
             $componentPool->registerComponent($componentName, $replacement);
@@ -262,11 +260,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         return $componentPool;
     }
     
-    private function collectOrphans($fileMatches, $patchesWithTargets, $installPaths, $patchStatuses)
+    private function collectOrphans(array $files, array $patches, array $paths, array $statuses)
     {
-        $orphanFiles = array_diff_key($fileMatches, $patchesWithTargets);
-        
-        $orphanConfig = array_diff_key($patchesWithTargets, $fileMatches);
+        $orphanFiles = array_diff_key($files, $patches);
+        $orphanConfig = array_diff_key($patches, $files);
 
         /**
          * Make sure that downloaded patches are not perceived as missing files
@@ -278,37 +275,31 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             )
         );
 
-        $groups = array_fill_keys(array_keys($installPaths), array());
-
-        foreach ($orphanFiles as $path => $ownerName) {
-            $installPath = $installPaths[$ownerName];
+        $groups = array_fill_keys(array_keys($paths), array());
+        
+        foreach ($orphanFiles as $path => $config) {
+            $ownerName = $config[Patch::OWNER];
+            $installPath = $paths[$ownerName];
             
             $groups[$ownerName][] = array(
                 'issue' => 'NO CONFIG',
-                'path' => ltrim(
-                    substr($path, strlen($installPath)),
-                    DIRECTORY_SEPARATOR
-                )
+                'path' => $config[Patch::URL] ?: PathUtils::reducePathLeft($path, $installPath)
             );
         }
         
-        foreach ($orphanConfig as $path => $ownerName) {
-            $installPath = $installPaths[$ownerName];
-
-            $pathInfo = parse_url($path);
-            $pathIncludesScheme = isset($pathInfo['scheme']) && $pathInfo['scheme'];
-
+        foreach ($orphanConfig as $path => $config) {
+            $ownerName = $config[Patch::OWNER];
+            $installPath = $paths[$ownerName];
+            
             $groups[$ownerName][] = array(
-                'issue' => isset($patchStatuses[$path]) && $patchStatuses[$path]
-                    ? $patchStatuses[$path]
+                'issue' => isset($statuses[$path]) && $statuses[$path]
+                    ? $statuses[$path]
                     : 'NO FILE',
-                'path' => !$pathIncludesScheme
-                    ? ltrim(substr($path, strlen($installPath)), DIRECTORY_SEPARATOR)
-                    : $path
+                'path' => $config[Patch::URL] ?: PathUtils::reducePathLeft($path, $installPath)
             );
         }
 
-        return $groups;
+        return array_filter($groups);
     }
 
     private function outputOrphans(OutputInterface $output, array $groups)
@@ -319,7 +310,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $lines[] = sprintf('  - <info>%s</info>', $packageName);
 
             foreach ($items as $item) {
-                $lines[] = sprintf('    ~ %s [<fg=red>%s</>]', $item['path'], $item['issue']);
+                $lines[] = sprintf(
+                    '    ~ %s [<fg=red>%s</>]',
+                    $item['path'],
+                    $item['issue']
+                );
             }
         }
         

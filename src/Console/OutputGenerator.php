@@ -21,20 +21,28 @@ class OutputGenerator
     public function generateForException(\Exception $exception)
     {
         if ($exception instanceof \Vaimo\ComposerPatches\Exceptions\ApplierFailure) {
-            $messages = array_filter($exception->getErrors());
-
-            if (empty($messages)) {
+            $errors = array_filter($exception->getErrors());
+            
+            if (empty($errors)) {
                 return;
             }
+            
+            $lines = array();
 
-            $lines = array(
-                'Most likely causes for the failure:',
-                ''
-            );
+            foreach ($this->prioritizeErrors($errors) as $type => $groups) {
+                if (!empty($lines)) {
+                    $lines[] = '';
+                }
 
-            foreach ($messages as $type => $errors) {
-                $lines[] = sprintf('* %s: %s', $type, reset($errors));
+                $lines[] = sprintf('> %s', $type);
+                
+                foreach ($groups as $path => $messages) {
+                    $lines[] = sprintf('  @ %s', $path);
+                    $lines[] = sprintf('  ! %s', reset($messages));
+                }
             }
+
+            $lines = array_merge(array('Probable causes for the failure:', ''), $lines);
 
             $lines = array_merge($lines, array(
                 '',
@@ -43,5 +51,40 @@ class OutputGenerator
 
             $this->logger->writeNotice('warning', $lines);
         }
+    }
+    
+    private function prioritizeErrors(array $errors)
+    {
+        $filters = array(
+            'can\'t find file',
+            'unable to find file',
+            'no such file',
+            'no file to patch'
+        );
+
+        $filterPattern = sprintf('/(%s)/i', implode('|', $filters));
+
+        $result = array();
+
+        foreach ($errors as $code => $groups) {
+            $result[$code] = array();
+
+            foreach ($groups as $path => $messages) {
+                $messages = array_unique($messages);
+
+                $fileNotFoundMessages = preg_grep($filterPattern, $messages);
+
+                if ($fileNotFoundMessages !== $messages) {
+                    $messages = array_merge(
+                        array_diff($messages, $fileNotFoundMessages),
+                        $fileNotFoundMessages
+                    );
+                }
+
+                $result[$code][$path] = $messages;
+            }
+        }
+
+        return array_map('array_filter', $result);
     }
 }
