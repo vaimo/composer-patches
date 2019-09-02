@@ -290,17 +290,22 @@ if [ "${scenario_filter}" == "" ] ; then
 fi
 
 (
-    cd test &>/dev/null
+    package_root=$(pwd)
+     
+    cd ${package_root}/test &>/dev/null
     
     sandbox_root=$(pwd)
     
     installations=$(ls installations -1)
     scenarios=$(ls scenarios -1)
     
-    for installation in ${installations} ; do
-        installation_root=$(get_installation_root ${installation})
-        rm "${installation_root}/composer.lock" 2>/dev/null
-    done
+    if [ "${PURGE}" == "1" ] ; then
+        for installation in ${installations} ; do
+            installation_root=$(get_installation_root ${installation})
+        
+            rm "${installation_root}/composer.lock" 2>/dev/null
+        done
+    fi
     
     for installation in ${installations} ; do
         if ! echo ${installation}|grep -q "${installation_filter}" ; then
