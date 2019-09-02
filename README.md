@@ -65,7 +65,7 @@ absolutely everything
 ```
 
 Full list of tag options (that cover all features of the plugin can be 
-found [HERE](`Patches: patch declaration with embedded target information`))
+found [HERE](#patches-patch-declaration-with-embedded-target-information))
 
 ### JSON Declaration
 
@@ -129,7 +129,7 @@ Where the different groups have the following meaning:
 * **patches-search** - (>=3.28.0) scans for patch files in defined directory, relies on embedded info 
   within the patch. Can be a single path reference or a list of paths. 
   
-_All paths are relative to package root._
+_All defined JSON file paths are relative to package root._
 
 The patches module mimics the way composer separates development packages from normal requirements by 
 introducing two extra keys, where exact same rules apply as for normal patch declarations.
@@ -297,20 +297,6 @@ The way of defining the patches works for:
 
 * Paths to patches are relative to the owner of the composer.json that introduces a certain file path.
 * Paths within patch files are relative to targeted package's root (might differ based on path-strip level).
-
-If your patches are declared in some sub-folder, it's possible to define a base-folder that would be added
-in front of all file-path based patch definitions.
-
-```json
-{
-  "extra": {
-    "patches-base": "path/to/patches"
-  }
-}
-```
-
-In this case you can define patches without having to repeatedly use the same base-path for every patch 
-definition.
 
 ## Basic Usage: configuring a separate patches.json file
 
