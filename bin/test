@@ -304,6 +304,7 @@ fi
             installation_root=$(get_installation_root ${installation})
         
             rm "${installation_root}/composer.lock" 2>/dev/null
+            rm -rf "${installation_root}/vendor" 2>/dev/null
         done
     fi
     
