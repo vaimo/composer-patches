@@ -15,7 +15,6 @@
         "composer/composer": "^1.0.0",
         "phpcompatibility/php-compatibility": "^9.1.1",
         "squizlabs/php_codesniffer": "^2.9.2",
-        "phpunit/phpunit": "^4.8.36",
         "sebastian/phpcpd": "^1.4.3",
         "phpmd/phpmd": "^2.6.0",
         "vaimo/composer-changelogs": "^0.15.1"
@@ -100,7 +99,7 @@
         "test": "bin/test",
         "code:test": "bin/test",
         "code:analyse": "bin/analyse",
-        "code:deps": "bin/analyse-vendor",
+        "code:deps": "bin/analyse-dependencies",
         "code:normalise": "bin/normalise",
         "pre-install-cmd": "bin/bootstrap-test-env",
         "post-install-cmd": "bin/bootstrap",

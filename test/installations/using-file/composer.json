@@ -4,12 +4,11 @@
     "license": "MIT",
     "description": "Sandbox module for testing out patch applier functionality",
     "require": {
-        "vaimo/composer-patches-local": "*",
+        "vaimo/composer-patches-local": "@dev",
         "vaimo/composer-patches-target1": "1.0.0",
         "vaimo/composer-patches-target2": "1.2.0",
         "vaimo/composer-patches-target3": "1.2.3"
     },
-    "minimum-stability": "dev",
     "repositories": [
         {
             "type": "path",

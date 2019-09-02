@@ -8,5 +8,5 @@
     
     <rule ref="PHPCompatibility" />
 
-    <config name="testVersion" value="5.3-"/>
+    <config name="testVersion" value="_VERSION_-_VERSION_" />
 </ruleset>

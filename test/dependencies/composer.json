@@ -4,9 +4,12 @@
     "license": "MIT",
     "description": "Sandbox module for testing out patch applier functionality",
     "require": {
-        "vaimo/composer-patches-local": "*"
+        "vaimo/composer-patches-local": "@dev"
     },
-    "minimum-stability": "dev",
+    "require-dev": {
+        "phpcompatibility/php-compatibility": "^9.1.1",
+        "squizlabs/php_codesniffer": "^2.9.2"
+    },
     "repositories": [
         {
             "type": "path",
@@ -18,7 +21,7 @@
     ],
     "config": {
         "platform": {
-            "php": "5.4.45"
+            "php": "5.3.9"
         }
     }
 }
