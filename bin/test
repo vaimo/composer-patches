@@ -240,10 +240,13 @@ assertion_error() {
 }
 
 function reset_packages() {
-    if [ -f vendor/composer/installed.json ] ; then
+    local installation_root=${1}
+    local install_info_path="${installation_root}/vendor/composer/installed.json"
+    
+    if [ -f ${install_info_path} ] ; then
         sudo sed -i 's|\s"name":\s"vaimo/composer-patches-target\(.*\)",| \
             "name": "__vaimo/composer-patches-target\1",|g' \
-            vendor/composer/installed.json
+            ${install_info_path}
     fi
     
     composer install --ansi --no-plugins &>/dev/null
@@ -295,6 +298,11 @@ fi
     scenarios=$(ls scenarios -1)
     
     for installation in ${installations} ; do
+        installation_root=$(get_installation_root ${installation})
+        rm "${installation_root}/composer.lock" 2>/dev/null
+    done
+    
+    for installation in ${installations} ; do
         if ! echo ${installation}|grep -q "${installation_filter}" ; then
             continue
         fi
@@ -326,10 +334,10 @@ fi
                     continue
                 fi
             
+                reset_packages "${installation_root}"
+
                 scenario_root=${sandbox_root}/scenarios/${scenario}
-            
-                reset_packages
-            
+                        
                 if ! run_tests "${scenario_root}" ; then
                     sanitize
                     sanitize_scenario ${scenario_root}
