@@ -13,10 +13,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "modules/composer-patches",
-            "options": {
-                "symlink": true
-            }
+            "url": "modules/composer-patches"
         }
     ],
     "config": {

@@ -7,15 +7,15 @@ namespace Vaimo\ComposerPatches\Exceptions;
 
 class ApplierFailure extends \Exception
 {
-    private $output = array();
+    private $errors = array();
 
     public function setErrors(array $output)
     {
-        $this->output = $output;
+        $this->errors = $output;
     }
 
     public function getErrors()
     {
-        return $this->output;
+        return $this->errors;
     }
 }

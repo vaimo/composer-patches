@@ -69,7 +69,7 @@ class Logger
         $length = 0;
         
         foreach ($message as $item) {
-            $length = min(80, max(strlen($item), $length));
+            $length = max(min(80, strlen($item)), $length);
         }
         
         foreach ($message as $item) {

@@ -39,7 +39,7 @@ run_tests() {
         system_call=0
 
         if [ "${command:0:1}" == "!" ] ; then
-            _warning "EXPECTING FAILURE"
+            _warning "(EXPECTING FAILURE)"
             should_fail=1
         fi
         
@@ -345,7 +345,9 @@ fi
                         
                 if ! run_tests "${scenario_root}" ; then
                     sanitize
+                    
                     sanitize_scenario ${scenario_root}
+                    
                     exit 1
                 else 
                     sanitize_scenario ${scenario_root}

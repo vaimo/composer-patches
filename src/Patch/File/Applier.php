@@ -36,6 +36,11 @@ class Applier
     private $templateUtils;
 
     /**
+     * @var \Vaimo\ComposerPatches\Utils\DataUtils
+     */
+    private $dataUtils;
+
+    /**
      * @var array
      */
     private $resultCache;
@@ -54,6 +59,7 @@ class Applier
         $this->shell = new \Vaimo\ComposerPatches\Shell($logger);
         $this->applierUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
         $this->templateUtils = new \Vaimo\ComposerPatches\Utils\TemplateUtils();
+        $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
 
     public function applyFile($filename, $cwd, array $config = array())
@@ -91,7 +97,7 @@ class Applier
             throw new \Vaimo\ComposerPatches\Exceptions\RuntimeException($message);
         }
         
-        $errors = array();
+        $errorGroups = array();
 
         foreach ($levels as $patchLevel) {
             $arguments = array_replace(
@@ -102,7 +108,7 @@ class Applier
             try {
                 $patcherName = $this->executeOperations($patchers, $operations, $arguments, $failureMessages);
             } catch (\Vaimo\ComposerPatches\Exceptions\ApplierFailure $exception) {
-                $errors[] = $exception->getErrors();
+                $errorGroups[] = $exception->getErrors();
                 continue;
             }
             
@@ -118,30 +124,12 @@ class Applier
         $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure(
             sprintf('Cannot apply patch %s', $filename)
         );
-
+        
         $failure->setErrors(
-            $this->filterErrors($errors)
+            array_reduce($errorGroups, 'array_merge_recursive', array())
         );
         
         throw $failure;
-    }
-    
-    private function filterErrors(array $errors)
-    {
-        $errors = array_map(
-            'array_unique',
-            array_reduce($errors, 'array_merge_recursive', array())
-        );
-
-        foreach ($errors as $type => $messages) {
-            $fileNotFoundMessages = preg_grep('/(can\'t find file|unable to find file|no such file)/i', $messages);
-
-            if ($fileNotFoundMessages !== $messages) {
-                $errors[$type] = array_diff($messages, $fileNotFoundMessages);
-            }
-        }
-        
-        return array_map('array_filter', $errors);
     }
 
     private function executeOperations(
@@ -176,18 +164,7 @@ class Applier
             }
         }
 
-        $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure();
-
-        $failure->setErrors(
-            $this->collectErrors($outputRecords)
-        );
-
-        throw $failure;
-    }
-    
-    private function collectErrors(array $outputRecords)
-    {
-        $errors = array(
+        $messages = $this->collectErrors($outputRecords, array(
             'failed',
             'unexpected',
             'malformed',
@@ -195,19 +172,38 @@ class Applier
             'corrupt',
             'can\'t find file',
             'patch unexpectedly ends',
-            'due to output analysis'
-        );
+            'due to output analysis',
+            'no file to patch'
+        ));
         
-        $errorMatcher = sprintf('/%s/i', implode('|', $errors));
+        $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure();
         
-        foreach ($outputRecords as $type => $output) {
-            $messages = preg_grep('/^[^\|-]/i', explode(PHP_EOL, $output));
-            $matches = preg_grep($errorMatcher, $messages);
+        $failure->setErrors($messages);
 
-            $outputRecords[$type] = reset($matches);
+        throw $failure;
+    }
+    
+    private function collectErrors(array $outputRecords, array $filters)
+    {
+        $pathMarker = '\|\+\+\+\s(.*)';
+        
+        $errorMatcher = sprintf(
+            '/(%s)/i',
+            implode('|', array_merge($filters, array($pathMarker)))
+        );
+
+        $pathMatcher = sprintf('/^%s/i', $pathMarker);
+
+        $result = array();
+        
+        foreach ($outputRecords as $code => $output) {
+            $result[$code] = $this->dataUtils->listToGroups(
+                preg_grep($errorMatcher, explode(PHP_EOL, $output)),
+                $pathMatcher
+            );
         }
         
-        return $outputRecords;
+        return $result;
     }
 
     private function processOperationItems($patcher, $operations, $args, $failures)
@@ -315,26 +311,54 @@ class Applier
 
     private function scanOutputForFailures($output, array $failureMessages)
     {
-        foreach ($failureMessages as $patternCode => $pattern) {
-            if (!$pattern || !preg_match($pattern, $output)) {
+        $pathMarker = '\|\+\+\+\s(.*)';
+        $pathMatcher = sprintf('/^%s/', $pathMarker);
+
+        $patternsWithResults = array_filter($failureMessages, function ($pattern) use ($output) {
+            return $pattern && preg_match($pattern, $output);
+        });
+        
+        if (!$patternsWithResults) {
+            return true;
+        }
+        
+        $lines = explode(PHP_EOL, $output);
+        
+        $matches = array();
+        
+        foreach ($lines as $line) {
+            if (preg_match($pathMatcher, $line)) {
+                $matches[] = $line;
+
                 continue;
             }
             
-            $message = sprintf('Success changed to FAILURE due to output analysis (%s)', $patternCode);
+            foreach ($patternsWithResults as $patternCode => $pattern) {
+                if (!preg_match($pattern, $line)) {
+                    continue;
+                }
 
-            $this->logger->writeVerbose(
-                'warning',
-                sprintf('%s: %s', $message, $pattern)
-            );
-            
-            $failure = new \Vaimo\ComposerPatches\Exceptions\OperationFailure('Output analysis failed');
-            
-            $failure->setOutput($message);
-            
-            throw $failure;
+                $message = sprintf(
+                    'Success changed to FAILURE due to output analysis (%s)',
+                    $patternCode
+                );
+                
+                $matches[] = $message;
+
+                $this->logger->writeVerbose(
+                    'warning',
+                    sprintf('%s: %s', $message, $pattern)
+                );
+            }
         }
+        
+        $failure = new \Vaimo\ComposerPatches\Exceptions\OperationFailure('Output analysis failed');
 
-        return true;
+        $failure->setOutput(
+            implode(PHP_EOL, $matches)
+        );
+
+        throw $failure;
     }
 
     private function extractArrayValue($data, $key)
