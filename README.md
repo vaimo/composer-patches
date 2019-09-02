@@ -23,8 +23,49 @@ More information on recent changes [HERE](./CHANGELOG.md).
 
 ## Quick Start
 
-Composer packages can be targeted with patches in two ways: via JSON declaration and embedded 
-metadata (latter being the recommended approach). 
+Composer packages can be targeted with patches in two ways: 
+
+* Embedded metadata
+* JSON declaration and embedded (recommended for remote patches)
+
+### Embedded Metadata
+
+```json
+{
+  "require": {
+    "some/package-name": "1.2.3"
+  },
+  "extra": {
+    "patcher": {
+      "search": "patches"
+    }
+  }
+}
+```
+
+Contents of patches/changes.patch:
+
+```diff
+This patch changes... 
+absolutely everything
+
+@package some/package-name
+
+--- Models/Example.php.org
++++ Models/Example.php
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+```
+
+Full list of tag options (that cover all features of the plugin can be 
+found [HERE](`Patches: patch declaration with embedded target information`))
 
 ### JSON Declaration
 
@@ -63,45 +104,6 @@ Contents of patches/changes.patch:
           * rest of the logic of the function
           */
 ```
-
-### Embedded Metadata
-
-```json
-{
-  "require": {
-    "some/package-name": "1.2.3"
-  },
-  "extra": {
-    "patcher": {
-      "search": "patches"
-    }
-  }
-}
-```
-
-Contents of patches/changes.patch:
-
-```diff
-This patch changes... 
-absolutely everything
-
-@package some/package-name
-
---- Models/Example.php.org
-+++ Models/Example.php
-@@ -31,7 +31,7 @@
-      */
-     protected function someFunction($someArg)
-     {
--        $var1 = 123;
-+        $var1 = 456;
-         /**
-          * rest of the logic of the function
-          */
-```
-
-Most things that one can do with JSON declaration, can be done with meta-data tags/values 
-as well (except defining a remote patch).   
 
 # Configuration
 
