@@ -419,7 +419,7 @@ you can use partial names (instead of using full path) and wildcards to target p
 
 Multiple dependencies can be defined when after/before value given as an array.
 
-## Patches: version restriction
+## Patches: package version restriction
 
 There are several ways a version restriction for a patch can be defined, the choice on which one to use 
 usually depends on a situation and how much extra information needs to be configured for the patch to 
@@ -483,6 +483,27 @@ It's also possible to branch this configuration when value is provided as an arr
 
 Note that 'default' and '*' are reserved for internal use where 'default' will be default fallback and
 '*' refers to bundled patches.
+
+## Patches: platform version restriction
+
+Patches can be defined to be only applied when certain platform constraint requirements are met.
+
+```json
+{
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "applies only when running on system that has runs PHP with high enough version": {
+          "source": "example/other-fix.patch",
+          "depends": {
+            "php": ">=7.1.0"
+          }
+        }
+      }
+    }
+  }
+}
+```
 
 ## Patches: version branching
 
@@ -1087,7 +1108,7 @@ to the user when patch is being applied.
 @after <value> (optional) Used in case a patch should be applied after another branch
 @before <value> (optional) Used in case a patch should be applied before another branch
 @skip (optional) If this tag is present, then the patch will not be applied
-@cwd <value> (optional) Specify in which root path the patch is applied (install, vendor, project, autoload)
+@cwd <value> (optional) Specify the cwd path for patch applier (install, vendor, project, autoload)
 @type <value> (optional) Options: dev, bundle, local (Using multiple: dev+bundle)
 @level <value> (optional) 0 (forces/locks the patch applier to use certain patch path strip level)
 @category <value> (optional) free-form value to explain what the patch is (fix/feature/enhancement)
