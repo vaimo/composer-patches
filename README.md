@@ -21,46 +21,10 @@ where patches are needed.
 
 More information on recent changes [HERE](./CHANGELOG.md).
 
-## Overview
+## Quick Start
 
-Composer packages can be targeted with patches in two ways: via embedded metadata (recommended approach) and 
-through JSON declaration.
-
-### Embedded Metadata
-
-```json
-{
-  "require": {
-    "some/package-name": "1.2.3"
-  },
-  "extra": {
-    "patcher": {
-      "search": "patches"
-    }
-  }
-}
-```
-
-Contents of patches/changes.patch:
-
-```diff
-This patch changes... 
-absolutely everything
-
-@package some/package-name
-
---- Models/Example.php.org
-+++ Models/Example.php
-@@ -31,7 +31,7 @@
-      */
-     protected function someFunction($someArg)
-     {
--        $var1 = 123;
-+        $var1 = 456;
-         /**
-          * rest of the logic of the function
-          */
-```
+Composer packages can be targeted with patches in two ways: via JSON declaration and embedded 
+metadata (latter being the recommended approach). 
 
 ### JSON Declaration
 
@@ -100,7 +64,46 @@ Contents of patches/changes.patch:
           */
 ```
 
-## Configuration: overview
+### Embedded Metadata
+
+```json
+{
+  "require": {
+    "some/package-name": "1.2.3"
+  },
+  "extra": {
+    "patcher": {
+      "search": "patches"
+    }
+  }
+}
+```
+
+Contents of patches/changes.patch:
+
+```diff
+This patch changes... 
+absolutely everything
+
+@package some/package-name
+
+--- Models/Example.php.org
++++ Models/Example.php
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+```
+
+Most things that one can do with JSON declaration, can be done with meta-data tags/values 
+as well (except defining a remote patch).   
+
+# Configuration
 
 Patches are declared under the following keys in composer.json of the patch owner (may it be project or
 a package).
@@ -629,9 +632,7 @@ alternative patch definition format is recommended:
             "other/module"
           ]
         },
-        "same as above, but targets are auto-resolved from file contents": {
-          "source": "example/bundled-fixes.patch"
-        }
+        "same as above, but targets are auto-resolved from file contents": "example/bundled-fixes.patch"
       }
     }
   }
@@ -1149,7 +1150,7 @@ Multiple values can be also used in the declaration by providing them as array o
 The key "patches-base", etc are not mandatory to be declared when using patches-search as the exact path
 of the patches will already be known.
 
-## Patch Commands
+# Commands
 
 Installing the plugin will introduce a new composer command group: **patch**
 
@@ -1280,7 +1281,7 @@ makes the patches scan for patches directly in 'vendor' folder (which allows pat
 before [updating/committing changes to] a given package). The default behaviour is to scan for them 
 in installed.json_
 
-## Development
+# Development
 
 The module ships with several utility scripts that either deal with static code analysis or with running 
 the tests. Note that all these commands expect user to have installed all the dependencies of the package
