@@ -440,8 +440,7 @@ apply correctly.
         "applies when other/package's version is >=2.1.7": {
           "source": "example/other-fix.patch",
           "depends": {
-            "other/package": ">=2.1.7",
-            "php": ">=7.1.0"
+            "other/package": ">=2.1.7"
           }
         }
       }
