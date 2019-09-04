@@ -1,0 +1,40 @@
+patch:validate
+
+> before=$(md5sum composer.lock)
+
+patch:apply
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+patch:redo
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+patch:apply
+patch:apply
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+patch:undo
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+patch:apply
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+patch:redo
+patch:redo
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+patch:undo
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"

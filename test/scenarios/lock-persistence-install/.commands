@@ -1,0 +1,8 @@
+patch:validate
+
+> before=$(md5sum composer.lock)
+
+install
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
