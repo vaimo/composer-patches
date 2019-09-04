@@ -5,6 +5,8 @@
  */
 namespace Vaimo\ComposerPatches;
 
+use Composer\EventDispatcher\ScriptExecutionException;
+
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
@@ -110,10 +112,7 @@ class Plugin implements
             return;
         }
 
-        throw new \Composer\EventDispatcher\ScriptExecutionException(
-            'Execution halted due to composer-patch failure',
-            1
-        );
+        throw new ScriptExecutionException('Execution halted due to composer-patch failure', 1);
     }
 
     public function resetPackages(\Composer\Installer\PackageEvent $event)
