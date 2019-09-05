@@ -33,6 +33,7 @@ run_tests() {
     done 
     
     local should_fail
+    local system_call
 
     for line in ${commands} ; do
         should_fail=0
