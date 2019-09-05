@@ -2,6 +2,19 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.50.3
+
+### Fix
+
+* running 'composer update --lock' not cleaning up composer.lock afterwards when patches already applied. No such issue when no patches applied at all (running 'update' with --lock does not apply the patches); This situation resulted in patches being perceived as already applied when a package with such a lock was installed
+
+### Maintenance
+
+* the state of the test installation not properly reset when composer.lock got corrupted (a'la: 'patches_applied' key ended up there)
+* test run output improvements; less output from composer calls that are not directly relevant to scenarios
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.3) [diff](https://github.com/vaimo/composer-patches/compare/3.50.2...3.50.3)
+
 ## 3.50.2 (2019-09-02)
 
 ### Fix
@@ -15,7 +28,7 @@ _This file has been auto-generated from the contents of changelog.json_
 * removed lock files from tests to make sure that initial setup always ends up installing the latest package dependencies
 * make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)
 * run tests (including the test that the module can be installed) on multiple PHP versions: 5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3
-* run Comaptibility ruleset on all installations
+* run Compatibility ruleset on all installations
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.2) [diff](https://github.com/vaimo/composer-patches/compare/3.50.1...3.50.2)
 
