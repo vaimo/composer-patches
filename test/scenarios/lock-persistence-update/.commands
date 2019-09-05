@@ -2,24 +2,24 @@ patch:validate
 
 update
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 @queue_update vaimo/composer-patches-target2
 update
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 @queue_update vaimo/composer-patches-target1
 update
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 @queue_install vaimo/composer-patches-target2
 update
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 @queue_install vaimo/composer-patches-target1
 update
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #

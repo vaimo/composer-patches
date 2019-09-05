@@ -2,30 +2,30 @@ patch:validate
 
 patch:apply
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 patch:redo
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 patch:apply
 patch:apply
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 patch:undo
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 patch:apply
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 patch:redo
 patch:redo
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #
 
 patch:undo
 
-> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == "" # Scanning lock contents #

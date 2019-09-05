@@ -129,9 +129,19 @@ EOF
     
         if [ ${system_call} -eq 0 ] ; then
             apply_patches "${line}" "output.out"            
-        else 
-            _warning "SYSTEM: $(_trim_string ${line})"
-
+        else
+            local line_label=${line}
+            
+            if [ "${line_label:${#line_label} - 1}" == "#" ] ; then
+                line_label=$(echo ${line_label}|rev|cut -d'#' -f1-2|rev)
+            fi
+            
+            if [ "${line_label}" != "${line}" ] ; then
+                _warning "$(_trim_string $(echo ${line_label}|tr -d '#'))"
+            else
+                _warning "SYSTEM: $(_trim_string ${line_label})"
+            fi 
+            
             eval "${line}"
         fi
         
@@ -195,6 +205,12 @@ assert_scenario_output() {
         |grep -v "^\s\s\s\s[0-9]\+/[0-9]\+:" \
         |grep -v "^\s\s\s\sFinished:\ssuccess:\s" \
         |grep -v "^You are running composer with xdebug enabled" \
+        |grep -v "^Writing lock file" \
+        |grep -v "^Generating autoload files" \
+        |grep -v "^Nothing to install or update" \
+        |grep -v "^Loading composer repositories with package information" \
+        |grep -v "^Updating dependencies (including require-dev)" \
+        |grep -v "^Installing dependencies (including require-dev) from lock file" \
         |grep -v "^patch:apply" \
         |grep -v "^patch:list" \
         |grep -v "^patch:validate" \
@@ -302,6 +318,8 @@ assert() {
 assertion_error() {
     assertion=${1}
     invert=${2}
+
+    echo ${assertion}
 
     local name=$(echo ${assertion}|cut -d',' -f1)
     local before=$(echo ${assertion}|cut -d',' -f2)
@@ -425,6 +443,8 @@ fi
         _line '=' 80
         _title "INSTALLATION:" "${installation}" "${installation_label}"
         _line '=' 80
+        
+        failed_scenario=
         
         (
             cd ${installation_root}
