@@ -1,32 +1,25 @@
 patch:validate
 
-> before=$(md5sum composer.lock)
-
 update
 
-> after=$(md5sum composer.lock)
-> test "${before}" == "${after}"
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
 
 @queue_update vaimo/composer-patches-target2
 update
 
-> after=$(md5sum composer.lock)
-> test "${before}" == "${after}"
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
 
 @queue_update vaimo/composer-patches-target1
 update
 
-> after=$(md5sum composer.lock)
-> test "${before}" == "${after}"
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
 
 @queue_install vaimo/composer-patches-target2
 update
 
-> after=$(md5sum composer.lock)
-> test "${before}" == "${after}"
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""
 
 @queue_install vaimo/composer-patches-target1
 update
 
-> after=$(md5sum composer.lock)
-> test "${before}" == "${after}"
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""

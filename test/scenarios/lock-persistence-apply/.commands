@@ -1,8 +1,5 @@
 patch:validate
 
-> before=$(md5sum composer.lock)
-
 patch:apply
 
-> after=$(md5sum composer.lock)
-> test "${before}" == "${after}"
+> test "$(cat composer.lock|grep '\"patches_applied\"')" == ""

@@ -68,7 +68,7 @@ run_tests() {
                     if (\$index !== false) {
                         \$config[\$index]['version'] = '0.0.0';
                         \$config[\$index]['version_normalized'] = '0.0.0';
-                        file_put_contents('${installed_config}', json_encode(\$config));                
+                        file_put_contents('${installed_config}', json_encode(\$config, JSON_PRETTY_PRINT));                
                     }
                 }                
 EOF
@@ -86,7 +86,7 @@ EOF
                 
                     if (\$index !== false) {
                         unset(\$config[\$index]);
-                        file_put_contents('${installed_config}', json_encode(\$config));                
+                        file_put_contents('${installed_config}', json_encode(\$config, JSON_PRETTY_PRINT));                
                     }                
                 }
 EOF
@@ -255,7 +255,7 @@ function apply_patches() {
     local args=${1}
     local out_file=${2}
  
-    local command="COMPOSER_PATCHES_FATAL_FAIL=1 composer ${args} --ansi"
+    local command="composer ${args} --ansi"
  
     if [ "${VERBOSE}" == "1" ] ; then
         command="${command} -vvv"
@@ -325,10 +325,32 @@ function reset_packages() {
     local installation_root=${1}
     local install_info_path="${installation_root}/vendor/composer/installed.json"
     
+    local lock_path="${installation_root}/composer.lock"
+    
     if [ -f ${install_info_path} ] ; then
-        sudo sed -i 's|\s"name":\s"vaimo/composer-patches-target\(.*\)",| \
-            "name": "__vaimo/composer-patches-target\1",|g' \
+        sudo sed -i 's|\(\s"name":\s"\)\(vaimo/composer-patches-target\)\(.*\)",|\1__\2\3",|g' \
             ${install_info_path}
+            
+            local php_script=$(cat <<EOF
+                if (file_exists('${lock_path}')) {
+                
+                    \$config = json_decode(file_get_contents('${lock_path}'), true);
+                    
+                    foreach (['packages', 'packages-dev'] as \$group) {
+                        \$names = array_column(\$config[\$group], 'name');                    
+                        \$matches = preg_grep('|vaimo/composer-patches-target|', \$names);
+                        
+                        foreach (array_keys(\$matches) as \$index) {
+                            \$config[\$group][\$index]['extra']['patches_applied'] = [];
+                        }  
+                    }
+                
+                    file_put_contents('${lock_path}', json_encode(\$config, JSON_PRETTY_PRINT));                
+                }
+EOF
+)            
+        
+        php -r "${php_script}"        
     fi
     
     composer install --ansi --no-plugins &>/dev/null
@@ -411,7 +433,11 @@ fi
 
             ln -s ${sandbox_root}/modules ${installation_root}
             
-            composer install --ansi --no-plugins
+            if [ ! -f composer.lock ] ; then
+                composer install --ansi --no-plugins
+            else
+                composer install --ansi --no-plugins &>/dev/null
+            fi
     
             for scenario in ${scenarios} ; do
                 if [ "${scenarios_skip}" != "" ] && echo "${scenarios_skip}"|grep -q "^${scenario}$" ; then
