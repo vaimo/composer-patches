@@ -128,7 +128,7 @@ EOF
         line=$(echo ${line}|sed 's/^>*//g')
     
         if [ ${system_call} -eq 0 ] ; then
-            apply_patches "${line}" "output.out"            
+            apply_patches "${line}" "output.out"
         else
             local line_label=${line}
             
@@ -271,7 +271,7 @@ function apply_patches() {
     local args=${1}
     local out_file=${2}
  
-    local command="composer ${args} --ansi"
+    local command="COMPOSER_PATCHES_FATAL_FAIL=1 composer ${args} --ansi"
  
     if [ "${VERBOSE}" == "1" ] ; then
         command="${command} -vvv"
