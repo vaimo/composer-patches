@@ -1,0 +1,32 @@
+patch:validate
+
+> before=$(md5sum composer.lock)
+
+install
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+@queue_update vaimo/composer-patches-target2
+install
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+@queue_update vaimo/composer-patches-target1
+install
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+@queue_install vaimo/composer-patches-target2
+install
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
+
+@queue_install vaimo/composer-patches-target1
+install
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"

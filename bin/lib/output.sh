@@ -78,3 +78,7 @@ _line() {
 
     eval echo $(printf -- '${character}%.0s' {1..80})
 }
+
+_trim_string() {
+    echo "${@}"|sed 's/^ *//g' | sed 's/ *$//g'
+}

@@ -1,0 +1,8 @@
+patch:validate
+
+> before=$(md5sum composer.lock)
+
+patch:apply
+
+> after=$(md5sum composer.lock)
+> test "${before}" == "${after}"
