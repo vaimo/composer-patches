@@ -8,3 +8,4 @@ output.out
 test/**/composer.lock
 test/**/modules
 test/**/patches
+test/**/patches.json

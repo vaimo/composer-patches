@@ -30,11 +30,6 @@ run_tests() {
     
     for dependency in $(ls -1 ${scenario_root}/files) ; do
         cp -R ${scenario_root}/files/${dependency} ${dependency}
-        
-        retries=3
-        while [ ! -f ${dependency} ] && [ ! -d ${dependency} ] && [ ${retries} -gt 0 ]; do
-            retries=$(expr ${retries} - 1)
-        done 
     done 
     
     local should_fail
