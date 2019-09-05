@@ -1,7 +1,5 @@
 patch:validate
 
-> before=$(md5sum composer.lock)
-
 update --lock
 
 @assert_changes

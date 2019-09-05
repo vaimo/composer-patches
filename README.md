@@ -1311,6 +1311,9 @@ composer code:test
 # Runs just one scenario for all test installations
 composer code:test sequence
 
+# Runs all scenarios on one specific installation
+composer code:test using-file:.*
+
 # Runs just one scenario for just one installation
 composer code:test using-file:skipped-patch
 

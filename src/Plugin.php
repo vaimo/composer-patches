@@ -86,18 +86,22 @@ class Plugin implements
     public function postInstall(\Composer\Script\Event $event)
     {
         if (!$this->bootstrap) {
+            $this->lockSanitizer->sanitize();
+
             return;
         }
         
         if (!$this->bootstrapStrategy->shouldAllow()) {
+            $this->lockSanitizer->sanitize();
+            
             return;
         }
 
-        $bootstrap = $this->bootstrap;
-        $lockSanitizer = $this->lockSanitizer;
-
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
 
+        $lockSanitizer = $this->lockSanitizer;
+        $bootstrap = $this->bootstrap;
+        
         $result = $runtimeUtils->executeWithPostAction(
             function () use ($bootstrap, $event) {
                 return $bootstrap->applyPatches($event->isDevMode());

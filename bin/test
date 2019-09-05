@@ -68,7 +68,7 @@ run_tests() {
                     if (\$index !== false) {
                         \$config[\$index]['version'] = '0.0.0';
                         \$config[\$index]['version_normalized'] = '0.0.0';
-                        file_put_contents('${installed_config}', json_encode(\$config));                
+                        file_put_contents('${installed_config}', json_encode(\$config, JSON_PRETTY_PRINT));                
                     }
                 }                
 EOF
@@ -86,7 +86,7 @@ EOF
                 
                     if (\$index !== false) {
                         unset(\$config[\$index]);
-                        file_put_contents('${installed_config}', json_encode(\$config));                
+                        file_put_contents('${installed_config}', json_encode(\$config, JSON_PRETTY_PRINT));                
                     }                
                 }
 EOF
@@ -128,10 +128,20 @@ EOF
         line=$(echo ${line}|sed 's/^>*//g')
     
         if [ ${system_call} -eq 0 ] ; then
-            apply_patches "${line}" "output.out"            
-        else 
-            _warning "SYSTEM: $(_trim_string ${line})"
-
+            apply_patches "${line}" "output.out"
+        else
+            local line_label=${line}
+            
+            if [ "${line_label:${#line_label} - 1}" == "#" ] ; then
+                line_label=$(echo ${line_label}|rev|cut -d'#' -f1-2|rev)
+            fi
+            
+            if [ "${line_label}" != "${line}" ] ; then
+                _warning "$(_trim_string $(echo ${line_label}|tr -d '#'))"
+            else
+                _warning "SYSTEM: $(_trim_string ${line_label})"
+            fi 
+            
             eval "${line}"
         fi
         
@@ -195,6 +205,12 @@ assert_scenario_output() {
         |grep -v "^\s\s\s\s[0-9]\+/[0-9]\+:" \
         |grep -v "^\s\s\s\sFinished:\ssuccess:\s" \
         |grep -v "^You are running composer with xdebug enabled" \
+        |grep -v "^Writing lock file" \
+        |grep -v "^Generating autoload files" \
+        |grep -v "^Nothing to install or update" \
+        |grep -v "^Loading composer repositories with package information" \
+        |grep -v "^Updating dependencies (including require-dev)" \
+        |grep -v "^Installing dependencies (including require-dev) from lock file" \
         |grep -v "^patch:apply" \
         |grep -v "^patch:list" \
         |grep -v "^patch:validate" \
@@ -303,6 +319,8 @@ assertion_error() {
     assertion=${1}
     invert=${2}
 
+    echo ${assertion}
+
     local name=$(echo ${assertion}|cut -d',' -f1)
     local before=$(echo ${assertion}|cut -d',' -f2)
     local after=$(echo ${assertion}|cut -d',' -f3)
@@ -325,10 +343,32 @@ function reset_packages() {
     local installation_root=${1}
     local install_info_path="${installation_root}/vendor/composer/installed.json"
     
+    local lock_path="${installation_root}/composer.lock"
+    
     if [ -f ${install_info_path} ] ; then
-        sudo sed -i 's|\s"name":\s"vaimo/composer-patches-target\(.*\)",| \
-            "name": "__vaimo/composer-patches-target\1",|g' \
+        sudo sed -i 's|\(\s"name":\s"\)\(vaimo/composer-patches-target\)\(.*\)",|\1__\2\3",|g' \
             ${install_info_path}
+            
+            local php_script=$(cat <<EOF
+                if (file_exists('${lock_path}')) {
+                
+                    \$config = json_decode(file_get_contents('${lock_path}'), true);
+                    
+                    foreach (['packages', 'packages-dev'] as \$group) {
+                        \$names = array_column(\$config[\$group], 'name');                    
+                        \$matches = preg_grep('|vaimo/composer-patches-target|', \$names);
+                        
+                        foreach (array_keys(\$matches) as \$index) {
+                            \$config[\$group][\$index]['extra']['patches_applied'] = [];
+                        }  
+                    }
+                
+                    file_put_contents('${lock_path}', json_encode(\$config, JSON_PRETTY_PRINT));                
+                }
+EOF
+)            
+        
+        php -r "${php_script}"        
     fi
     
     composer install --ansi --no-plugins &>/dev/null
@@ -404,6 +444,8 @@ fi
         _title "INSTALLATION:" "${installation}" "${installation_label}"
         _line '=' 80
         
+        failed_scenario=
+        
         (
             cd ${installation_root}
         
@@ -411,7 +453,11 @@ fi
 
             ln -s ${sandbox_root}/modules ${installation_root}
             
-            composer install --ansi --no-plugins
+            if [ ! -f composer.lock ] ; then
+                composer install --ansi --no-plugins
+            else
+                composer install --ansi --no-plugins &>/dev/null
+            fi
     
             for scenario in ${scenarios} ; do
                 if [ "${scenarios_skip}" != "" ] && echo "${scenarios_skip}"|grep -q "^${scenario}$" ; then

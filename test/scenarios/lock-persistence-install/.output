@@ -1,9 +1,5 @@
 Scanning packages for orphan patches
 Validation completed successfully
-Loading composer repositories with package information
-Installing dependencies (including require-dev) from lock file
-Nothing to install or update
-Generating autoload files
 Processing patches configuration
   - Applying patches for vaimo/composer-patches-sandbox (1)
     ~ vaimo/composer-patches-sandbox: patches/multiple-packages-single-file.patch [NEW]
@@ -16,24 +12,18 @@ Processing patches configuration
       Change: value17 => valueX
 
 Writing patch info to install file
-Loading composer repositories with package information
-Installing dependencies (including require-dev) from lock file
 Package operations: 0 installs, 1 update, 0 removals
   - Updating vaimo/composer-patches-target2 (0.0.0 => 1.2.0): Mirroring from modules/composer-patches-target2
 
-Generating autoload files
 Processing patches configuration
   - Applying patches for vaimo/composer-patches-sandbox (1)
     ~ vaimo/composer-patches-sandbox: patches/multiple-packages-single-file.patch [NEW]
       Change: value17 => valueB; value5 => valueA
 
 Writing patch info to install file
-Loading composer repositories with package information
-Installing dependencies (including require-dev) from lock file
 Package operations: 0 installs, 1 update, 0 removals
   - Updating vaimo/composer-patches-target1 (0.0.0 => 1.0.0): Mirroring from modules/composer-patches-target1
 
-Generating autoload files
 Processing patches configuration
   - Applying patches for vaimo/composer-patches-target1 (2)
     ~ vaimo/composer-patches-sandbox: patches/single-package-single-file-no-version.patch [NEW]
@@ -42,22 +32,16 @@ Processing patches configuration
       Change: value17 => valueX
 
 Writing patch info to install file
-Loading composer repositories with package information
-Installing dependencies (including require-dev) from lock file
 Package operations: 1 install, 0 updates, 0 removals
   - Installing vaimo/composer-patches-target2 (1.2.0): Mirroring from modules/composer-patches-target2
-Generating autoload files
 Processing patches configuration
   - Applying patches for vaimo/composer-patches-sandbox (1)
     ~ vaimo/composer-patches-sandbox: patches/multiple-packages-single-file.patch [NEW]
       Change: value17 => valueB; value5 => valueA
 
 Writing patch info to install file
-Loading composer repositories with package information
-Installing dependencies (including require-dev) from lock file
 Package operations: 1 install, 0 updates, 0 removals
   - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
-Generating autoload files
 Processing patches configuration
   - Applying patches for vaimo/composer-patches-target1 (2)
     ~ vaimo/composer-patches-sandbox: patches/single-package-single-file-no-version.patch [NEW]
