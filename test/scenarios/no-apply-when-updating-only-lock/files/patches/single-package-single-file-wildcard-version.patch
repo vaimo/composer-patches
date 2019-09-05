@@ -1,0 +1,18 @@
+Change: value17 => valueX
+
+@package vaimo/composer-patches-target1
+@version *
+
+@assert vaimo/composer-patches-target1,value17,value17
+
+--- src/example.txt.org
++++ src/example.txt
+@@ -14,7 +14,7 @@
+ value14
+ value15
+ value16
+-value17
++valueX
+ value18
+ value19
+ value20

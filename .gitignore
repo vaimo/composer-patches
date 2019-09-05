@@ -6,6 +6,7 @@ report-*
 output.txt
 output.out
 test/**/composer.lock
-test/**/modules
-test/**/patches
-test/**/patches.json
+test/installations/**/modules
+test/installations/**/patches
+test/installations/**/patches.json
+test/dependencies/modules
