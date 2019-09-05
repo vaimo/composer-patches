@@ -32,39 +32,105 @@ run_tests() {
     done 
         
     local should_fail
-    local assertions=
 
-    for command in ${commands} ; do
+    for line in ${commands} ; do
         should_fail=0
         system_call=0
 
-        if [ "${command:0:1}" == "!" ] ; then
+        if [ "${line:0:1}" == "!" ] ; then
             _warning "(EXPECTING FAILURE)"
             should_fail=1
         fi
         
-        command=$(echo ${command}|sed 's/^\!*//g')
+        line=$(echo ${line}|sed 's/^\!*//g')
     
-        if [ "${command:0:1}" == "@" ] ; then            
-            if process_assertions "${command}" ; then
-                continue
+        if [ "${line:0:1}" == "#" ] ; then
+            continue
+        fi
+    
+        if [ "${line:0:1}" == "@" ] ; then
+            local command=$(_trim_string ${line:1}|cut -d' ' -f1)
+            local args=$(_trim_string ${line:1}|cut -d' ' -f2-)
+            
+            local php_script=
+            
+            if [ "${command}" == "queue_update" ] ; then
+                local target=$(echo ${args}|cut -d' ' -f2)
+                local installed_config="vendor/composer/installed.json"
+                
+                local php_script=$(cat <<EOF
+                if (file_exists('${installed_config}')) {
+                    \$config = json_decode(file_get_contents('${installed_config}'), true);                
+                    \$index = array_search('${target}', array_column(\$config, 'name'), true);
+                                
+                    if (\$index !== false) {
+                        \$config[\$index]['version'] = '0.0.0';
+                        \$config[\$index]['version_normalized'] = '0.0.0';
+                        file_put_contents('${installed_config}', json_encode(\$config));                
+                    }
+                }                
+EOF
+)
             fi
             
-            return 1
+            if [ "${command}" == "queue_install" ] ; then
+                local target=$(echo ${args}|cut -d' ' -f2)
+                local installed_config="vendor/composer/installed.json"
+                
+                local php_script=$(cat <<EOF
+                if (file_exists('${installed_config}')) {
+                    \$config = json_decode(file_get_contents('${installed_config}'), true);
+                    \$index = array_search('${target}', array_column(\$config, 'name'), true);
+                
+                    if (\$index !== false) {
+                        unset(\$config[\$index]);
+                        file_put_contents('${installed_config}', json_encode(\$config));                
+                    }                
+                }
+EOF
+)
+            fi
+            
+            if [ "${php_script}" != "" ] ; then
+                php -r "${php_script}"
+                continue                
+            fi
+            
+            if [ "${command}" == "assert_changes" ] ; then
+                if assert_patches ; then
+                    continue
+                fi
+                
+                return 1
+            fi
+
+            if [ "${command}" == "abort" ] ; then
+                return 0
+            fi
+            
+            if [ "${command}" == "assert" ]  ; then
+                if process_assertions "${args}" ; then
+                    continue
+                fi
+                
+                return 1
+            fi
+            
+            continue
         fi
         
-        if [ "${command:0:1}" == ">" ] ; then
+        if [ "${line:0:1}" == ">" ] ; then
             system_call=1
         fi
     
-        command=$(echo ${command}|sed 's/^>*//g')
+        line=$(echo ${line}|sed 's/^>*//g')
     
         if [ ${system_call} -eq 0 ] ; then
-            apply_patches "${command}" "output.out"            
+            apply_patches "${line}" "output.out"            
         else 
-            _warning "SYSTEM: $(_trim_string ${command})"
+            _warning "SYSTEM: $(_trim_string ${line})"
 
-            eval "${command}"
+            eval "${line}"
         fi
         
         local result=${?}
@@ -77,24 +143,38 @@ run_tests() {
 
         return 1
     done
+
+    IFS=${original_ifs}
     
-    if [ -d patches ] ; then
-        for patch_file in $(find -L patches -type f) ; do
-            assertions="${assertions}\n"$(cat ${patch_file}|grep '@assert')
-        done
-    fi
-    
-    if [ "${assertions}" != "" ] && ! process_assertions ${assertions}; then
+    if ! assert_patches ; then
         return 1
     fi
-    
-    IFS=${original_ifs}
     
     if ! assert_scenario_output "${scenario_root}" "output.out" ; then
         return 1
     fi 
     
     return 0
+}
+
+assert_patches() {
+    local assertions=
+
+    if [ -d patches ] ; then
+        for patch_file in $(find -L patches -type f) ; do
+            assertions=${assertions}$'\n'$(cat ${patch_file}|grep '@assert'|sed 's/^@assert //g')
+        done
+    fi
+    
+    if [ "${assertions}" == "" ] ; then
+        return 0
+    fi
+        
+    if process_assertions "${assertions}" ; then
+        return 0
+    fi
+    
+    return 1
 }
 
 assert_scenario_output() {
@@ -146,22 +226,20 @@ assert_scenario_output() {
 
 process_assertions() {
     local assertions=${1}
-        
-    local assertions=$(echo -e "${assertions}"|cut -d' ' -f2)
 
     local original_ifs=${IFS}
     IFS=$'\n'
-    
-    for assertion in ${assertions} ; do
+        
+    for assertion in ${assertions} ; do        
         if [ "${assertion}" == "" ] ; then
             continue
         fi
-        
+
         if assert ${assertion} ; then
             continue
         fi
             
-        assertion_error "${patch_file}" "${assertion}"
+        assertion_error "${assertion}"
                         
         return 1
     done
@@ -220,9 +298,8 @@ assert() {
 }
 
 assertion_error() {
-    patch_file=${1}
-    assertion=${2}
-    invert=${3}
+    assertion=${1}
+    invert=${2}
 
     local name=$(echo ${assertion}|cut -d',' -f1)
     local before=$(echo ${assertion}|cut -d',' -f2)
@@ -238,7 +315,6 @@ assertion_error() {
         after=${tmp}
     fi
 
-    _error "PATCH: $(readlink -f ${patch_file})"
     _error "TARGET: ${file}"
     _error "ASSERTION: ${before} => ${after}"        
 }

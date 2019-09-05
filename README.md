@@ -1147,7 +1147,7 @@ The module ships with several utility scripts that either deal with static code 
 the tests. Note that all these commands expect user to have installed all the dependencies of the package
 beforehand.
 
-```
+```shell
 # Runs one or several static code analysis tools against the code-base
 composer code:analyse
 
@@ -1191,11 +1191,46 @@ When new scenarios are introduced, one can just create new folder under test/sce
 patches that use certain features or expose certain issue. Note that the scenario will be executed with
 commands provided in `.commands` and will use the description provided under `.label`.
 
-Note that assertions are taken from the patch files, where they should be defined using following
-convention/template:
+If the scenario has `.output` file, the whole Composer console output of the scenario will be compared 
+against the contents of that file. 
+
+#### Assertions
+
+Note that assertions are taken from the patch files (or defined in `.commands`), where they should be defined 
+using following convention/template:
 
 ```
 @assert <package-name>,<before>,<after>
+```
+
+#### Commands
+
+The different commands that one can use within `.commands` file:
+
+```shell
+# Calls Composer with mentioned command
+patch:apply
+
+# Does a raw system call
+>echo test
+
+# Modifies the state of the project to consider there to
+# be a need to install the some/package
+@queue_install some/package
+
+# Modifies the state of the project to consider there to
+# be a need to update the some/package
+@queue_update some/package
+
+# Exit the test scenario with a positive return code
+@abort
+
+# Assert state for the files: <package-name>,<before>,<after>
+# where <before> should not be found in a file and <after> should be
+@assert some/package,thisValue,thatValue
+
+# Go through all the assertions defined in patch files
+@assert_changes
 ```
 
 ## Changelog 

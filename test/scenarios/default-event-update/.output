@@ -1,5 +1,9 @@
 Scanning packages for orphan patches
 Validation completed successfully
+Loading composer repositories with package information
+Updating dependencies (including require-dev)
+Nothing to install or update
+Generating autoload files
 Processing patches configuration
   - Applying patches for vaimo/composer-patches-sandbox (1)
     ~ vaimo/composer-patches-sandbox: patches/multiple-packages-single-file.patch [NEW]
@@ -12,9 +16,3 @@ Processing patches configuration
       Change: value17 => valueX
 
 Writing patch info to install file
-Loading composer repositories with package information
-Installing dependencies (including require-dev) from lock file
-Nothing to install or update
-Generating autoload files
-Processing patches configuration
-Nothing to patch

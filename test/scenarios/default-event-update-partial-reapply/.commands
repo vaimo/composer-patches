@@ -1,25 +1,18 @@
 patch:validate
-
-> before=$(md5sum composer.lock)
-
-update --lock
-
-@assert_changes
+patch:apply
 
 @queue_update vaimo/composer-patches-target2
-update --lock
 
-@assert_changes
+update
 
 @queue_update vaimo/composer-patches-target1
-update --lock
 
-@assert_changes
+update
 
 @queue_install vaimo/composer-patches-target2
-update --lock
 
-@assert_changes
+update
 
 @queue_install vaimo/composer-patches-target1
-update --lock
+
+update
