@@ -40,8 +40,14 @@ class Defaults
                 ),
                 'PATCH' => array(
                     'bin' => '[[resolver]] patch',
-                    'check' => '[[bin]] -t --verbose -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
-                    'patch' => '[[bin]] -t -p{{level}} --no-backup-if-mismatch < {{file}}'
+                    'check' => array(
+                        'default' => '[[bin]] -t --verbose -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}',
+                        'bsd' => '[[bin]] -t -p{{level}} --dry-run < {{file}}'
+                    ),
+                    'patch' => array(
+                        'default' => '[[bin]] -t -p{{level}} --no-backup-if-mismatch < {{file}}',
+                        'bsd' => '[[bin]] -t -p{{level}} < {{file}}'
+                    )
                 )
             ),
             Config::PATCHER_OPERATIONS => array(
