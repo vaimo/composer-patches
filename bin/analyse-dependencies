@@ -44,8 +44,8 @@ analyse_deps()
 
 validate_dependency()
 {
-    dependency=${1}
-    whitelist_root=${2}
+    local dependency=${1}
+    local whitelist_root=${2}
     
     local src_paths=$(get_autoload_paths "${dependency}")
 
@@ -57,35 +57,57 @@ validate_dependency()
         return 0
     fi
     
-    original_ifs=${IFS}
-    IFS=$'\n'
-    
     local full_path=$(cd vendor/${dependency} &>/dev/null && pwd)
-    
     local whitelist_path="${whitelist_root}/${code}"
     
-    if [ -f ${whitelist_path} ] ; then
-        local whitelist=$(cat ${whitelist_path})
+    local whitelists=
+    
+    if [ -d ${whitelist_path} ] ; then
+        whitelists=$(find ${whitelist_path} -type f)
+    elif [ -f ${whitelist_path} ] ; then
+        whitelists="${whitelist_path}"
+    fi
+    
+    if [ "${whitelists}" == "" ] ; then
+        return 1
+    fi
+    
+    local is_suitable_dependency=
+
+    local original_ifs=${IFS}
+    IFS=$'\n'
+    
+    local report_lines=$(cat ${report_file}|grep '^"'|cut -d':' -f2-)
+    
+    for whitelist in ${whitelists} ; do    
+        local whitelist_lines=$(cat ${whitelist})
         
-        for line in $(cat ${report_file}|grep '^"'|cut -d':' -f2-) ; do
+        is_suitable_dependency=1
+            
+        for line in ${report_lines} ; do        
             local file=$(echo ${line}|cut -d',' -f1|tr -d '"'|sed 's|'${full_path}'||g'|sed 's/^\/*//g')
             local row=$(echo ${line}|cut -d',' -f2)
             local col=$(echo ${line}|cut -d',' -f3)
             local issue=$(echo ${line}|cut -d',' -f6)
-        
-        
-            local match=$(echo "${whitelist}"|grep "${file},${row},${col},${issue}")
+
+            local footprint="${file},${row},${col},${issue}"
             
-            if [ "${match}" == "" ] ; then
-                return 1
+            local whitelist_match=$(echo "${whitelist_lines}"|grep "${footprint}")
+            
+            if [ "${whitelist_match}" == "" ] ; then
+                is_suitable_dependency=
+                    
+                break
             fi
         done
         
-        _warning "All encountered issues have been explicitly whitelisted"
-        
-        return 0
-    fi
+        if [ "${is_suitable_dependency}" == "1" ] ; then
+            _warning "All encountered issues have been explicitly whitelisted"
 
+            return 0            
+        fi
+    done
+        
     IFS=${original_ifs}
     
     return 1
@@ -93,7 +115,7 @@ validate_dependency()
 
 get_autoload_paths() 
 {
-    package_path=${1}
+    local package_path=${1}
     
     local package_root=$(cd "vendor/${dependency}" &>/dev/null && pwd)
 
@@ -117,12 +139,12 @@ SCRIPT
 
 is_production_dependency()
 {
-    root_name=${1}
-    dependency=${2}
+    local root_name=${1}
+    local dependency=${2}
     
-    items="${dependency}"
+    local items="${dependency}"
 
-    original_ifs=${IFS}
+    local original_ifs=${IFS}
     IFS=$'\n'
 
     for item in ${items} ; do
@@ -130,7 +152,7 @@ is_production_dependency()
             continue
         fi
         
-        results=$(composer why ${item}|grep -v 'for development'|cut -d' ' -f1)
+        local results=$(composer why ${item}|grep -v 'for development'|cut -d' ' -f1)
         
         if [ "${results}" == "" ] ; then
             continue
