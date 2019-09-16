@@ -70,8 +70,10 @@ absolutely everything
           */
 ```
 
-Full list of tag options (that cover all features of the plugin can be 
-found [HERE](#patches-patch-declaration-with-embedded-target-information))
+Full list of tag options (that cover all features of the plugin can be found [HERE](./docs/USAGE_BASIC.md#embedded-metadata)).
+
+Note that tags cover most of the features of the module so every explanation given for the json
+declaration of the patches applies for tags as well.
 
 ### Usage: JSON Declaration
 
@@ -119,7 +121,7 @@ additional patch appliers.
 In most cases there should not be much of a need to reconfigure the module as it does ship with reasonable
 defaults. The appliers supported by default: patch, git.
 
-More information on said topic can be found [HERE](./docs/PATCHER.md).
+More information on said topic can be found [HERE](./docs/CONFIGURATION.md).
 
 ## Upgrades
 
