@@ -111,7 +111,7 @@ Contents of patches/changes.patch:
           */
 ```
 
-### Applier configuration
+### Applier Configuration
 
 The way patches are applied can be manipulated by changing the configuration of the patcher or by introducing
 additional patch appliers.
@@ -121,7 +121,7 @@ defaults. The appliers supported by default: patch, git.
 
 More information on said topic can be found [HERE](./docs/PATCHER.md).
 
-## Upgrading The Module
+## Upgrades
 
 When upgrading the module, one might encounter odd crashes about classes not being found or class 
 constructor arguments being wrong. 
