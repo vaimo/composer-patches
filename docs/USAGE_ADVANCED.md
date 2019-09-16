@@ -2,6 +2,32 @@
 
 Detailed guide on how to use the advanced configuration options of the plugin to define patches. 
 
+## Patches: sequenced patches
+
+In case it's important to apply certain patches in a certain order, use before/after directives. Note that 
+you can use partial names (instead of using full path) and wildcards to target patches. 
+
+```json
+{
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "will be applied after my/other-file.patch": {
+          "source": "my/file.patch",
+          "after": "other-file"
+        },
+        "some change to another targeted package": {
+          "source": "my/other-file.patch"
+        }
+      }    
+    }
+  }
+}
+
+```
+
+Multiple dependencies can be defined when after/before value given as an array.
+
 ## Patches: version constraints
 
 There are several ways a version restriction for a patch can be defined, the choice on which one to use 

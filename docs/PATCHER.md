@@ -3,7 +3,7 @@
 Detailed guide on how to use the advanced configuration options of the plugin to manipulate the way patches
 are being applied.
 
-## Configuration: overview
+## Overview
 
 The plugin ships with a pre-configured configuration for the patch applier, but changes to said defaults
 can be made by defining overrides under the following keys.
@@ -17,12 +17,14 @@ can be made by defining overrides under the following keys.
 }
 ```
 
-## Overview
+## Structure
 
 In case it is needed for the patcher to apply the patches using some third-party application or to include
 some extra options, it's possible to declare new patcher commands or override the existing ones by adding 
-a new section to the "extra" of the composer.json of the project. Note that this example is a direct copy 
-of what is built into the plugin. Changes to existing definitions are applied recursively.
+a new section to the "extra" of the composer.json of the project. 
+
+Note that this example is a direct copy of what is built into the plugin. Changes to existing definitions 
+are applied recursively.
 
 _Note that by default, user does not really have to declare any of this, but everything can be overridden._ 
 
@@ -135,6 +137,19 @@ validation until validation success is hit. Note that each applier will be visit
 next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
+
+## Patcher: disabling patching
+
+In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
+to "false".
+
+```json
+{
+  "extra": {
+    "patcher": false
+  }
+}
+```
 
 ## Patcher: sources
 

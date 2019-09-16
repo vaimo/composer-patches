@@ -2,7 +2,7 @@
 
 Detailed guide on how to use the advanced configuration options of the plugin to define patches. 
 
-## Configuration: overview
+## Overview
 
 Patches are declared under the following keys in composer.json of the patch owner (may it be project or
 a package).
@@ -164,19 +164,6 @@ the patch would target it with
 ```
 
 _Path stripping levels can be defined/modifier/added to allow patches with different relative paths for targeted files to also apply._
-
-## Basic Usage: disabling patching
-
-In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
-to "false".
-
-```json
-{
-  "extra": {
-    "patcher": false
-  }
-}
-```
 
 ## Basic Usage: patch declaration with embedded target information
 
