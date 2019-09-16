@@ -9,10 +9,10 @@
             "allow defining OS-specific applier operation without overwriting the default operation value"
         ],
         "fix": [
-            "proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose"
+            "proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose [issues/38]"
         ],
         "maintenance": [
-            "documentation split to make it easier to read and work with updating it"
+            "documentation split to make it easier to read and work with updating it [issues/38]"
         ],
         "branch": "release/3"
     },

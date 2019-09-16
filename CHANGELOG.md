@@ -10,11 +10,11 @@ _This file has been auto-generated from the contents of changelog.json_
 
 ### Fix
 
-* proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose
+* proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose [issues/38]
 
 ### Maintenance
 
-* documentation split to make it easier to read and work with updating it
+* documentation split to make it easier to read and work with updating it [issues/38]
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.3...3.51.0)
 
