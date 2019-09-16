@@ -31,7 +31,7 @@ where patches are needed.
 
 Composer packages can be targeted with patches in two ways: 
 
-* Embedded metadata
+* Embedded metadata (recommended default approach)
 * JSON declaration and embedded (recommended for remote patches)
 
 ### Usage: Embedded Metadata
