@@ -2,7 +2,23 @@
 
 Detailed guide on how to use the advanced configuration options of the plugin to define patches. 
 
-## Patches: sequenced patches
+## Comments
+
+In case user wants to add extra comments to patch declaration file, any key that start with "_" can be
+used. Works on any level of the patch declaration.
+
+```json
+{
+  "_comment": "This patch file should hold patches that make world a better place",
+  "whole/world": {
+    "_excuse": "I really need this one",
+    "Fix: get closer to ending poverty": "patches/provide-affordable-education.patch"
+  },
+  "_note": "This is another comment"
+}
+```
+
+## Sequenced Patches
 
 In case it's important to apply certain patches in a certain order, use before/after directives. Note that 
 you can use partial names (instead of using full path) and wildcards to target patches. 
@@ -28,7 +44,7 @@ you can use partial names (instead of using full path) and wildcards to target p
 
 Multiple dependencies can be defined when after/before value given as an array.
 
-## Patches: version constraints
+## Version Constraints
 
 There are several ways a version restriction for a patch can be defined, the choice on which one to use 
 usually depends on a situation and how much extra information needs to be configured for the patch to 
@@ -92,7 +108,7 @@ It's also possible to branch this configuration when value is provided as an arr
 Note that 'default' and '*' are reserved for internal use where 'default' will be default fallback and
 '*' refers to bundled patches.
 
-## Patches: platform version restriction
+## Platform Version Restriction
 
 Patches can be defined to be only applied when certain platform constraint requirements are met.
 
@@ -113,7 +129,7 @@ Patches can be defined to be only applied when certain platform constraint requi
 }
 ```
 
-## Patches: version branching
+## Version Branching
 
 When there are almost identical patches for different version of some package, then they can be declared
 under same `label` or under `source` key depending on how complex rest of the declaration is.
@@ -141,7 +157,7 @@ under same `label` or under `source` key depending on how complex rest of the de
 }
 ```
 
-## Patches: base path variables
+## Base Path Variables
 
 Base path variables allow developers to shorten the definition of patch paths which might become cumbersome
 and repetitive.
@@ -232,7 +248,7 @@ The following little change will result the patches to be taken from following p
 Note the value-strip rules that have been defined for label which take care of not including "Fix: " prefix
 when using label as filename. 
 
-## Patches: bundled patches
+## Bundles
 
 In case there's a need to define a patch that targets multiple packages within a single patch file, 
 alternative patch definition format is recommended:
@@ -305,14 +321,14 @@ Note that using bundled patches may cause massive re-applying of patches for cer
 change due to the architecture of this plugin, which relies on re-installing the targeted packages to
 avoid potential errors that might be caused by the package's code being in an unexpected/tampered state. 
 
-## Patches: defining patches with strict path strip level
+## Strict Path Strip Level
 
 By default, the patcher will try to apply the patch with several path stripping options - in some cases 
 this is not something that one wants to allow - for example: if the patch is in full extent just creating 
 new files, it might end up creating them to wrong directories. 
 
-In some cases, some patches might have unconventional path definitions that derive from other project patches.
-Rather than changing the global settings, it's possible to define custom ones for just one patch.
+In some cases, some patches might have unconventional path definitions that derive from other project 
+patches. Rather than changing the global settings, it's possible to define custom ones for just one patch.
 
 ```json
 {
@@ -329,7 +345,7 @@ Rather than changing the global settings, it's possible to define custom ones fo
 }
 ```
 
-## Patches: local patch
+## Local Patch
 
 In case you would like a patch only to apply when working with some package directly (where the package 
 itself is ROOT package), a special flag can be defined to indicate such a thing.
@@ -357,7 +373,7 @@ In the context of this plugin, this flag will allow similar situation to be achi
 * When installing the owner of the patch as a dependency: patch is not applied
 * When cloning the owner separately and running composer install: patch will be applied
 
-## Patches: skipping patches
+## Skipping Patches
 
 In case there's a need to temporarily skip patches which is usually the case when going through
 maintenance or upgrade of the underlying project's framework, a skip flag can be used to pass 
@@ -378,7 +394,7 @@ over certain declaration lines.
 Note that in case patches-base is used, the #skip flag will be naturally be added to the end
 of the resolve patch path.
 
-## Patches: patch applier cwd options
+## Applier Cwd Options
 
 In cases where there's a need to apply a patch on a file that is mapped to the project root or vendor bin
 root, a patch applier working directory resolver mode can be defined (which technically would mean that the 
@@ -410,10 +426,11 @@ Available cwd options:
 4. **autoload** - uses path that the package has configured as autoloader root (will use first path when multiple
    paths defined). Falls back to using 'install' path when autoloader config not found.
 
-This is particularly useful when `targeted/package` introduces it's own file mapper mechanism that is triggered 
-by composer events (which might mean that files are copied away from the re-install package before patch applier kicks in).
+This is particularly useful when `targeted/package` introduces it's own file mapper mechanism that is 
+triggered by composer events (which might mean that files are copied away from the re-install package before 
+patch applier kicks in).
 
-## Patches: shared config
+## Shared Config
 
 In case all patches from certain owner package (the package where the patches originate from) require same
 setup for every one of them - a shared configuration could be defined (which will be used for all the patches).
@@ -454,7 +471,7 @@ applies in this case for all the patches is:
 If you have patches tucked away under different patches definitions files, then the config will not be 
 shared between them (will apply only to the patches in that particular patches definition file). 
 
-## Patches: exclusion
+## Exclusion
 
 In case some patches that are defined in packages have to be excluded from the project (project has 
 custom versions of the files, conflicts with other patches, etc), exclusions records can be defined 

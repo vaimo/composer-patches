@@ -2,7 +2,7 @@
 
 Examples on advanced usage of the module.
 
-## Example: defining a patch in a dependency package that targets another package
+## Defining a patch in a dependency package that targets another package
 
 Let's say that you have a root composer.json which requires two packages: A and B. The package B depends 
 on (requires) package A. In order to be able to use package B properly, package A needs to be patched.
