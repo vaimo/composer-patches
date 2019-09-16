@@ -52,7 +52,7 @@ class ConfigUtils
             : array();
 
         return $config;
-    }    
+    }
     
     private function mergeCustomFailures(array $config, array $updates)
     {
@@ -79,15 +79,15 @@ class ConfigUtils
 
             foreach ($updates[Config::PATCHER_APPLIERS][$code] as $operationCode => $operationConfig) {
                 if (!is_array($operations[$operationCode])) {
-                    $operations[$operationCode] = [
+                    $operations[$operationCode] = array(
                         'default' => $operations[$operationCode]
-                    ];
+                    );
                 }
 
                 if (!is_array($operationConfig)) {
-                    $operationConfig = [
+                    $operationConfig = array(
                         'default' => $operationConfig
-                    ];
+                    );
                 }
 
                 $operations[$operationCode] = array_filter(
