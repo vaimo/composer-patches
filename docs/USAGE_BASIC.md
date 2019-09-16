@@ -39,7 +39,7 @@ introducing two extra keys, where exact same rules apply as for normal patch dec
 
 The patches declared under those keys will NOT be applied when installing the project with `--no-dev` option.
 
-## Basic Usage: configuring a patch via composer.json
+## Declaration: composer.json
 
 The way of defining the patches works for:
 
@@ -83,7 +83,7 @@ in front of all file-path based patch definitions.
 In this case you can define patches without having to repeatedly use the same base-path for every patch 
 definition.
 
-## Basic Usage: configuring a separate patches file
+## Declaration: patches.json
 
 The way of defining the patches works for:
 
@@ -108,7 +108,7 @@ Where **path/to/patches.json** contains:
 }
 ```
 
-## Basic Usage: multiple patch list files
+## Declaration: multiple json files
 
 Note that to enable the developer to perform occasional cleanup and sub-grouping on the patches 
 declaration, multiple patches files can be defined:
@@ -125,23 +125,7 @@ The files are processed sequentially and merged in a way where all the patches i
 processed (meaning: even if the declaration in both files is exactly the same, both will be processed and 
 the merging will be done in very late state based on the absolute path of the patch file path).
 
-## Basic Usage: comments in patch declaration
-
-In case user wants to add extra comments to patch declaration file, any key that start with "_" can be
-used. Works on any level of the patch declaration.
-
-```json
-{
-  "_comment": "This patch file should hold patches that make world a better place",
-  "whole/world": {
-    "_excuse": "I really need this one",
-    "Fix: get closer to ending poverty": "patches/provide-affordable-education.patch"
-  },
-  "_note": "This is another comment"
-}
-```
-
-## Basic Usage: patch file format
+## Patch File Format
 
 Patches are applied relative to the root of the composer package that the patch is targeting: the file 
 paths in the patch should reflect that.
@@ -165,7 +149,7 @@ the patch would target it with
 
 _Path stripping levels can be defined/modifier/added to allow patches with different relative paths for targeted files to also apply._
 
-## Basic Usage: patch declaration with embedded target information
+## Embedded Metadata
 
 There's a way of declaring a patch for a project by not writing anything into a json file. This can be
 done by using embedded patch meta-data that is based on the following tags:

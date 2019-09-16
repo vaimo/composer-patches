@@ -138,7 +138,7 @@ next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
 
-## Patcher: disabling patching
+## Disabling patching
 
 In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
 to "false".
@@ -151,7 +151,7 @@ to "false".
 }
 ```
 
-## Patcher: sources
+## Sources
 
 These flags allow developer to have more control over the patch collector and omit certain sources when
 needed. All the sources are included by default.
@@ -209,7 +209,7 @@ _These flags do not affect the way 'patch' command works, which will apply patch
 been said to be disabled in composer.json; These flags indicate whether the patches will be applied on 
 'install' and 'update' calls_ 
 
-## Patcher: OS overrides
+## Overrides Based On OS Type 
 
 Achieved by prefixing the patcher config key with general operation-system name.
  
