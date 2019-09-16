@@ -22,8 +22,8 @@ where patches are needed.
 ## Full Documentation
 
 * [Basic Usage](./docs/USAGE_BASIC.md) - Defining patches via configuration files or embedded metadata  
-* [Advanced Usage](./docs/USAGE_ADVANCED.md) - Advanced configuration options
-* [Configuration](./docs/CONFIGURATION.md) - Advanced configuration options for the patch applier
+* [Advanced Usage](./docs/USAGE_ADVANCED.md) - Advanced usage options when defining patches
+* [Configuration](./docs/CONFIGURATION.md) - Configuration options for the patch applier
 * [Commands](./docs/COMMANDS.md) - Details on the CLI commands that ship with the plugin
 * [Development](./docs/DEVELOPMENT.md) - Details on the development workflow of the plugin
 * [Examples](./docs/EXAMPLES.md) - Examples on usage of the plugin
