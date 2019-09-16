@@ -119,7 +119,7 @@ patch:apply
 The module uses semantic versioning which means that developer should choose proper increment to current
 version that would reflect the nature of the change. More details about the topic can be found [HERE](https://semver.org).
 
-### Branch Allocation
+### Steps
 
 1. Choose proper version that would reflect the contents of the release and update changelog.json; Use branch 
    reference when release not done for the latest MAJOR version; When releasing new MAJOR version, list all
