@@ -17,7 +17,10 @@ the composer.json of the project.
 Note that the plugin is kept on very old PHP version as legacy software is usually the most common context
 where patches are needed.
 
-* [Usage](./docs/PATCHES.md) - Defining patches via configuration files or embedded metadata  
+## Documentation
+
+* [Basic Usage](./docs/PATCHES_BASIC.md) - Defining patches via configuration files or embedded metadata  
+* [Advanced Usage](./docs/PATCHES.md) - Advanced configuration options
 * [Commands](./docs/DEVELOPMENT.md) - Details on the CLI commands that ship with the plugin
 * [Configuration](./docs/PATCHER.md) - Advanced configuration options for the patch applier
 * [Development](./docs/DEVELOPMENT.md) - Details on the development workflow of the plugin
