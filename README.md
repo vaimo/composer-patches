@@ -34,7 +34,7 @@ Composer packages can be targeted with patches in two ways:
 * Embedded metadata
 * JSON declaration and embedded (recommended for remote patches)
 
-### Patch: Embedded Metadata
+### Usage: Embedded Metadata
 
 ```json
 {
@@ -73,7 +73,7 @@ absolutely everything
 Full list of tag options (that cover all features of the plugin can be 
 found [HERE](#patches-patch-declaration-with-embedded-target-information))
 
-### Patch: JSON Declaration
+### Usage: JSON Declaration
 
 ```json
 {
