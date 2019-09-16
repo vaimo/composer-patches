@@ -197,7 +197,7 @@ is_production_dependency()
         sed -i 's|_VERSION_|'${version_mm}'|g' $(pwd)/phpcs.xml
         
         _line '=' 80
-        _title "VALIDATE VIABILITY WITH" "PHP ${version_mm}" "code compatibility of required dependencies"
+        _title "CHECK VIABILITY WITH" "PHP ${version_mm}" "code compatibility of required dependencies"
         _line '=' 80
 
         composer config platform.php ${version}
