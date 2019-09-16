@@ -2,6 +2,26 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.20.0
+
+changes in this release forward-ported from 3.51.0
+
+### Feature
+
+* allow defining OS-specific applier operation without overwriting the default operation value
+
+
+### Fix
+
+* proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose [issues/38]
+
+
+### Maintenance
+
+* documentation split to make it easier to read and work with updating it [issues/38]
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.20.0) [diff](https://github.com/vaimo/composer-patches/compare/4.19.3...4.20.0)
+
 ## 4.19.3 (2019-09-05)
 
 changes in this release forward-ported from 3.50.3
@@ -617,7 +637,23 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.3...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.51.0...4.0.0)
+
+## 3.51.0 (2019-09-16)
+
+### Feature
+
+* allow defining OS-specific applier operation without overwriting the default operation value
+
+### Fix
+
+* proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose [issues/38]
+
+### Maintenance
+
+* documentation split to make it easier to read and work with updating it [issues/38]
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.3...3.51.0)
 
 ## 3.50.3 (2019-09-05)
 

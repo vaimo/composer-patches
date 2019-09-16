@@ -11,40 +11,24 @@ class ConfigUtils
 {
     public function mergeApplierConfig(array $config, array $updates)
     {
+        $config = $this->mergeAppliers($config, $updates);
+        $config = $this->mergeSources($config, $updates);
+        $config = $this->mergeCustomFailures($config, $updates);
+        $config = $this->mergeSequence($config, $updates);
+        
+        $this->overrideValue($config, $updates, Config::PATCHER_LEVELS);
         $this->overrideValue($config, $updates, Config::PATCHER_SECURE_HTTP);
         $this->overrideValue($config, $updates, Config::PATCHER_FORCE_RESET);
         $this->overrideValue($config, $updates, Config::PATCHER_GRACEFUL);
-        
-        foreach (array_keys($config[Config::PATCHER_APPLIERS]) as $code) {
-            if (!isset($updates[Config::PATCHER_APPLIERS][$code])) {
-                continue;
-            }
-
-            $config[Config::PATCHER_APPLIERS][$code] = array_replace(
-                $config[Config::PATCHER_APPLIERS][$code],
-                $updates[Config::PATCHER_APPLIERS][$code]
-            );
-        }
-
-        $this->mergeArrayValue($config, $updates, Config::PATCHER_SEQUENCE);
-
-        if (isset($updates[Config::PATCHER_SOURCES])) {
-            $config[Config::PATCHER_SOURCES] = $updates[Config::PATCHER_SOURCES]
-                ? array_replace($config[Config::PATCHER_SOURCES], $updates[Config::PATCHER_SOURCES])
-                : array();
-        }
-        
-        if (isset($updates[Config::PATCHER_FAILURES])) {
-            foreach ($updates[Config::PATCHER_FAILURES] as $code => $patterns) {
-                $config[Config::PATCHER_FAILURES][$code] = array_replace(
-                    $config[Config::PATCHER_FAILURES][$code],
-                    $patterns
-                );
-            }
-        }
-
         $this->mergeArrayValue($config, $updates, Config::PATCHER_OPERATIONS);
         
+        return $config;
+    }
+    
+    private function mergeSequence(array $config, array $updates)
+    {
+        $this->mergeArrayValue($config, $updates, Config::PATCHER_SEQUENCE);
+
         foreach (array_keys($config[Config::PATCHER_SEQUENCE]) as $sequenceName) {
             $origin = strtok($sequenceName, ':');
 
@@ -55,7 +39,65 @@ class ConfigUtils
             $config[$sequenceName] = $config[$origin];
         }
 
-        $this->overrideValue($config, $updates, Config::PATCHER_LEVELS);
+        return $config;
+    }
+    
+    private function mergeSources(array $config, array $updates)
+    {
+        if (!isset($updates[Config::PATCHER_SOURCES])) {
+            return $config;
+        }
+
+        $config[Config::PATCHER_SOURCES] = $updates[Config::PATCHER_SOURCES]
+            ? array_replace($config[Config::PATCHER_SOURCES], $updates[Config::PATCHER_SOURCES])
+            : array();
+
+        return $config;
+    }
+    
+    private function mergeCustomFailures(array $config, array $updates)
+    {
+        if (!isset($updates[Config::PATCHER_FAILURES])) {
+            return $config;
+        }
+
+        foreach ($updates[Config::PATCHER_FAILURES] as $code => $patterns) {
+            $config[Config::PATCHER_FAILURES][$code] = array_replace(
+                $config[Config::PATCHER_FAILURES][$code],
+                $patterns
+            );
+        }
+
+        return $config;
+    }
+    
+    private function mergeAppliers(array $config, array $updates)
+    {
+        foreach ($config[Config::PATCHER_APPLIERS] as $code => $operations) {
+            if (!isset($updates[Config::PATCHER_APPLIERS][$code])) {
+                continue;
+            }
+
+            foreach ($updates[Config::PATCHER_APPLIERS][$code] as $operationCode => $operationConfig) {
+                if (!is_array($operations[$operationCode])) {
+                    $operations[$operationCode] = array(
+                        'default' => $operations[$operationCode]
+                    );
+                }
+
+                if (!is_array($operationConfig)) {
+                    $operationConfig = array(
+                        'default' => $operationConfig
+                    );
+                }
+
+                $operations[$operationCode] = array_filter(
+                    array_replace($operations[$operationCode], $operationConfig)
+                );
+            }
+
+            $config[Config::PATCHER_APPLIERS][$code] = $operations;
+        }
 
         return $config;
     }
