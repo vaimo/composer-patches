@@ -4,6 +4,18 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.51.0": {
+        "feature": [
+            "allow defining OS-specific applier operation without overwriting the default operation value"
+        ],
+        "fix": [
+            "proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose"
+        ],
+        "maintenance": [
+            "documentation split to make it easier to read and work with updating it"
+        ],
+        "branch": "release/3"
+    },
     "3.50.3": {
         "fix": [
             "running 'composer update --lock' not cleaning up composer.lock afterwards when patches already applied. No such issue when no patches applied at all (running 'update' with --lock does not apply the patches); This situation resulted in patches being perceived as already applied when a package with such a lock was installed"
