@@ -1,8 +1,8 @@
-# Configuration: Patches
+# Advanced Usage
 
 Detailed guide on how to use the advanced configuration options of the plugin to define patches. 
 
-## Patches: version restriction
+## Patches: version constraints
 
 There are several ways a version restriction for a patch can be defined, the choice on which one to use 
 usually depends on a situation and how much extra information needs to be configured for the patch to 
@@ -401,7 +401,7 @@ applies in this case for all the patches is:
 If you have patches tucked away under different patches definitions files, then the config will not be 
 shared between them (will apply only to the patches in that particular patches definition file). 
 
-## Patches Exclude: configuration
+## Patches: exclusion
 
 In case some patches that are defined in packages have to be excluded from the project (project has 
 custom versions of the files, conflicts with other patches, etc), exclusions records can be defined 

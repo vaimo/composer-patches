@@ -32,5 +32,5 @@ composer patch --redo --from-source --filter compatibility-with-pack
 
 _The 'filter' part is really optional as you could also try to re-apply everything. the 'from-source' 
 makes the patches scan for patches directly in 'vendor' folder (which allows patches to be pre-tested 
-before [updating/committing changes to] a given package). The default behaviour is to scan for them 
+before updating/committing changes to a given package). The default behaviour is to scan for them 
 in installed.json_

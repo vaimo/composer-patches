@@ -1,4 +1,4 @@
-# Configuration: Patcher
+# Configuration 
 
 Detailed guide on how to use the advanced configuration options of the plugin to manipulate the way patches
 are being applied.

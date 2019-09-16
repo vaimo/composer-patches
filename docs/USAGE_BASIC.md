@@ -1,4 +1,4 @@
-# Configuration: Patches
+# Basic Usage
 
 Detailed guide on how to use the advanced configuration options of the plugin to define patches. 
 
