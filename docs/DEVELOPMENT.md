@@ -1,8 +1,23 @@
 # Development
 
-The module ships with several utility scripts that either deal with static code analysis or with running 
-the tests. Note that all these commands expect user to have installed all the dependencies of the package
-beforehand.
+This documentation covers topics like triggering code style checks, running the tests and creating new 
+releases.  
+
+## Branching
+
+The current latest MAJOR release is maintained and updated via commits to 'master' branches. 
+
+All older MAJOR releases are maintained through branches that follow the naming convention of `release/<MAJOR>`.
+
+## Workflow
+
+All work on the module should be done (if possible) by checking out the lowest MAJOR release branch,
+making the changes there and merging them upwards to newer MAJOR versions. 
+
+Note that when dealing with bug-fixes, developer MUST use the lowest MAJOR version as starting point that 
+has said bug/issue rather than just fixing it on the latest line.
+
+## Commands
 
 ```shell
 # Runs one or several static code analysis tools against the code-base
@@ -31,6 +46,12 @@ composer code:test using-file:skipped-patch
 composer code:deps
 ```
 
+## Testing
+
+The module ships with several utility scripts that either deal with static code analysis or with running 
+the tests. Note that all these commands expect user to have installed all the dependencies of the package
+beforehand.
+
 ### Components
 
 The tests have the following components:
@@ -54,7 +75,7 @@ commands provided in `.commands` and will use the description provided under `.l
 If the scenario has `.output` file, the whole Composer console output of the scenario will be compared 
 against the contents of that file. 
 
-#### Assertions
+### Assertions
 
 Note that assertions are taken from the patch files (or defined in `.commands`), where they should be defined 
 using following convention/template:
@@ -63,7 +84,7 @@ using following convention/template:
 @assert <package-name>,<before>,<after>
 ```
 
-#### Commands
+### Directives
 
 The different commands that one can use within `.commands` file:
 
@@ -92,3 +113,23 @@ patch:apply
 # Go through all the assertions defined in patch files
 @assert_changes
 ```
+
+## Creating Release
+
+The module uses semantic versioning which means that developer should choose proper increment to current
+version that would reflect the nature of the change. More details about the topic can be found [HERE](https://semver.org).
+
+### Branch Allocation
+
+1. Choose proper version that would reflect the contents of the release and update changelog.json; Use branch 
+   reference when release not done for the latest MAJOR version; When releasing new MAJOR version, list all
+   breaking changes under the topic of "breaking".
+
+2. Tag the release based on the same version that you added to changelog
+
+3. Update changelog output with `composer changelog:generate`
+
+4. Push the changes and the created tag(s).
+
+5. When feature was implemented on older MAJOR version, continue by checking out the higher MAJOR version 
+   branch, merge in the changes from lower branch and repeat the steps of this guide.   

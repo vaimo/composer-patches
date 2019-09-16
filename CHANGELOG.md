@@ -2,6 +2,22 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.51.0 (2019-09-16)
+
+### Feature
+
+* allow defining OS-specific applier operation without overwriting the default operation value
+
+### Fix
+
+* proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose
+
+### Maintenance
+
+* documentation split to make it easier to read and work with updating it
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.3...3.51.0)
+
 ## 3.50.3 (2019-09-05)
 
 ### Fix
