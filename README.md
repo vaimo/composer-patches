@@ -17,7 +17,7 @@ the composer.json of the project.
 Note that the plugin is kept on very old PHP version as legacy software is usually the most common context
 where patches are needed.
 
-## Documentation
+## Full Documentation
 
 * [Basic Usage](./docs/PATCHES_BASIC.md) - Defining patches via configuration files or embedded metadata  
 * [Advanced Usage](./docs/PATCHES.md) - Advanced configuration options
@@ -34,7 +34,7 @@ Composer packages can be targeted with patches in two ways:
 * Embedded metadata
 * JSON declaration and embedded (recommended for remote patches)
 
-### Embedded Metadata
+### Patch: Embedded Metadata
 
 ```json
 {
@@ -73,7 +73,7 @@ absolutely everything
 Full list of tag options (that cover all features of the plugin can be 
 found [HERE](#patches-patch-declaration-with-embedded-target-information))
 
-### JSON Declaration
+### Patch: JSON Declaration
 
 ```json
 {
@@ -110,6 +110,16 @@ Contents of patches/changes.patch:
           * rest of the logic of the function
           */
 ```
+
+### Applier configuration
+
+The way patches are applied can be manipulated by changing the configuration of the patcher or by introducing
+additional patch appliers.
+
+In most cases there should not be much of a need to reconfigure the module as it does ship with reasonable
+defaults. The appliers supported by default: patch, git.
+
+More information on said topic can be found [HERE](./docs/PATCHER.md).
 
 ## Upgrading The Module
 
