@@ -60,12 +60,12 @@ _Note that by default, user does not really have to declare any of this, but eve
         },
         "GIT": {
           "ping": "!cd .. && [[bin]] rev-parse --is-inside-work-tree",
-          "bin": "which git",
+          "bin": "[[resolver]] git",
           "check": "[[bin]] apply -p{{level}} --check {{file}}",
           "patch": "[[bin]] apply -p{{level}} {{file}}"
         },
         "PATCH": {
-          "bin": ["which custom-patcher", "which patch"],
+          "bin": "[[resolver]] patch",
           "check": {
             "default": "[[bin]] -t --verbose -p{{level}} --no-backup-if-mismatch --dry-run < {{file}}",
             "bsd": "[[bin]] -t -p{{level}} --dry-run < {{file}}"
@@ -84,12 +84,13 @@ _Note that by default, user does not really have to declare any of this, but eve
       },
       "operation-failures": {
         "check": {
-          "garbage": "/(\\n|^)Hmm\\.\\.\\.  Ignoring the trailing garbage/"
+          "garbage": "/(\\n|^)Hmm\\.\\.\\.  Ignoring the trailing garbage/",
+          "reversals": "/(\\n|^)Reversed \\(or previously applied\\) patch detected/"
         }
       },
       "sequence": {
         "appliers": ["PATCH", "GIT"],
-        "operations": ["bin", "ping", "check", "patch"],
+        "operations": ["resolver", "bin", "ping", "check", "patch"],
         "operations:sanity": ["resolver", "bin"]
       },
       "levels": [0, 1, 2]    
