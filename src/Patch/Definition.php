@@ -55,6 +55,12 @@ class Definition
     const STATUS_MATCH = 'match';
     const STATUS_LABEL = 'state_label';
     const STATUS_ERRORS = 'errors';
+    const STATUS_EXCLUDED = 'excluded';
+    const STATUS_REMOVED = 'removed';
+    const STATUS_APPLIED = 'applied';
+    const STATUS_AFFECTED = 'affected';
+
+    const STATUS_UNKNOWN = 'unknown';
     
     const OWNER_UNKNOWN = 'unknown';
     

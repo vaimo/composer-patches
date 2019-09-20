@@ -12,12 +12,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Composer\Script\ScriptEvents;
 
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Interfaces\ListResolverInterface;
-
+use Vaimo\ComposerPatches\Composer\Plugin\Behaviour;
 use Vaimo\ComposerPatches\Environment;
 
 /**
@@ -118,10 +117,11 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $isDevMode = !$input->getOption('no-dev');
 
         $behaviourFlags = $this->getBehaviourFlags($input);
-        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
+
+        $shouldUndo = !$behaviourFlags[Behaviour::REDO] && $behaviourFlags[Behaviour::UNDO];
         
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
-
+        
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
             Config::PATCHER_FORCE_REAPPLY => $behaviourFlags['redo'],
             Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source'),
@@ -184,10 +184,10 @@ class PatchCommand extends \Composer\Command\BaseCommand
     protected function getBehaviourFlags(InputInterface $input)
     {
         return array(
-            'redo' => $this->getOptionGraceful($input, 'redo'),
-            'undo' => $this->getOptionGraceful($input, 'undo'),
-            'force' => $this->getOptionGraceful($input, 'force'),
-            'explicit' => $this->getOptionGraceful($input, 'explicit')
+            Behaviour::REDO => $this->getOptionGraceful($input, 'redo'),
+            Behaviour::UNDO => $this->getOptionGraceful($input, 'undo'),
+            Behaviour::FORCE => $this->getOptionGraceful($input, 'force'),
+            Behaviour::EXPLICIT => $this->getOptionGraceful($input, 'explicit')
                 || $this->getOptionGraceful($input, 'show-reapplies')
         );
     }
@@ -206,7 +206,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $hasFilers = (bool)array_filter($filters);
 
-        if (!$hasFilers && $behaviourFlags['redo']) {
+        if (!$hasFilers && $behaviourFlags[Behaviour::REDO]) {
             $filters[Patch::SOURCE] = array('*');
         }
 
@@ -218,7 +218,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
 
         $runtimeUtils->setEnvironmentValues(array(
-            Environment::FORCE_RESET => (int)$behaviourFlags['force']
+            Environment::FORCE_RESET => (int)$behaviourFlags[Behaviour::FORCE]
         ));
     }
     
@@ -226,9 +226,9 @@ class PatchCommand extends \Composer\Command\BaseCommand
     {
         $hasFilers = (bool)array_filter($filters);
 
-        $isExplicit = $behaviourFlags['explicit'];
+        $isExplicit = $behaviourFlags[Behaviour::EXPLICIT];
         
-        if (!$hasFilers && $behaviourFlags['redo']) {
+        if (!$hasFilers && $behaviourFlags[Behaviour::REDO]) {
             $isExplicit = true;
         }
         
@@ -249,7 +249,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
     {
         $listResolver = new ListResolvers\FilteredListResolver($filters);
 
-        $isDefaultBehaviour = !$behaviourFlags['redo'] && !$behaviourFlags['undo'];
+        $isDefaultBehaviour = !$behaviourFlags[Behaviour::REDO] && !$behaviourFlags[Behaviour::UNDO];
 
         $listResolver = $this->attachBehaviourToListResolver($listResolver, $behaviourFlags);
         
@@ -262,7 +262,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
     
     private function attachBehaviourToListResolver(ListResolverInterface $listResolver, array $behaviourFlags)
     {
-        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
+        $shouldUndo = !$behaviourFlags[Behaviour::REDO] && $behaviourFlags[Behaviour::UNDO];
 
         if ($shouldUndo) {
             return new ListResolvers\InvertedListResolver($listResolver);

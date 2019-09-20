@@ -10,8 +10,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Vaimo\ComposerPatches\Interfaces\ListResolverInterface as ListResolver;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
@@ -105,8 +105,8 @@ class ListCommand extends \Composer\Command\BaseCommand
         $beBrief = $input->getOption('brief');
         
         $filters = array(
-            PatchDefinition::SOURCE => $input->getOption('filter'),
-            PatchDefinition::TARGETS => $input->getArgument('targets')
+            Patch::SOURCE => $input->getOption('filter'),
+            Patch::TARGETS => $input->getArgument('targets')
         );
 
         $statusFilters = array_map(
@@ -182,8 +182,8 @@ class ListCommand extends \Composer\Command\BaseCommand
         
         if ($beBrief) {
             $patches = $patchListUpdater->embedInfoToItems($patches, array(
-                PatchDefinition::LABEL => false,
-                PatchDefinition::OWNER => false
+                Patch::LABEL => false,
+                Patch::OWNER => false
             ));
         }
         
@@ -221,7 +221,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         if ($withAffected) {
             $additions = $patchListUpdater->embedInfoToItems(
                 $additions,
-                array(PatchDefinition::STATUS => 'affected'),
+                array(Patch::STATUS => 'affected'),
                 true
             );
         }
@@ -233,7 +233,7 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $filteredPatches = $patchListUpdater->embedInfoToItems(
             $filteredPatches,
-            array(PatchDefinition::STATUS => 'applied'),
+            array(Patch::STATUS => 'applied'),
             true
         );
 
@@ -247,7 +247,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             $filteredPatches = $patchListUtils->applyDefinitionKeyValueFilter(
                 $filteredPatches,
                 $filterUtils->composeRegex($statuses, '/'),
-                PatchDefinition::STATUS
+                Patch::STATUS
             );
         }
         
@@ -328,7 +328,7 @@ class ListCommand extends \Composer\Command\BaseCommand
                 $output->writeln($patchInfoLabel);
 
                 $descriptionLines = array_filter(
-                    explode(PHP_EOL, $info[PatchDefinition::LABEL])
+                    explode(PHP_EOL, $info[Patch::LABEL])
                 );
                 
                 foreach ($descriptionLines as $line) {
@@ -342,24 +342,24 @@ class ListCommand extends \Composer\Command\BaseCommand
     
     private function createStatusLabel($path, $info, array $statusDecorators)
     {
-        $status = isset($info[PatchDefinition::STATUS])
-            ? $info[PatchDefinition::STATUS]
-            : 'unknown';
+        $status = isset($info[Patch::STATUS])
+            ? $info[Patch::STATUS]
+            : Patch::STATUS_UNKNOWN;
 
-        $owner = $info[PatchDefinition::OWNER];
+        $owner = $info[Patch::OWNER];
 
         $stateDecorator = $statusDecorators[$status];
         
-        if ($status === PatchDefinition::STATUS_ERRORS) {
+        if ($status === Patch::STATUS_ERRORS) {
             $stateDecorator = sprintf(
                 $stateDecorator,
-                $info[PatchDefinition::STATE_LABEL] ? $info[PatchDefinition::STATE_LABEL] : 'ERROR'
+                $info[Patch::STATE_LABEL] ? $info[Patch::STATE_LABEL] : 'ERROR'
             );
         }
         
         $statusLabel = sprintf(' [%s]', $stateDecorator);
 
-        if ($owner === PatchDefinition::OWNER_UNKNOWN) {
+        if ($owner === Patch::OWNER_UNKNOWN) {
             return sprintf('  ~ %s%s', $path, $statusLabel);
         }
         

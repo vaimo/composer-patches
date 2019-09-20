@@ -26,15 +26,16 @@ class ConfigReader
         }
 
         $sourceData = file_get_contents($source);
-
-        try {
-            $result = $this->jsonDecoder->parse($sourceData, \Seld\JsonLint\JsonParser::PARSE_TO_ASSOC);
-        } catch (\Vaimo\ComposerPatches\Exceptions\DecoderException $exception) {
-            $message = sprintf('Failed to retrieve contents of %s', $source);
-
-            throw new \Vaimo\ComposerPatches\Exceptions\ReadException($message, 0, $exception);
+        
+        if ($sourceData === false) {
+            throw new \Vaimo\ComposerPatches\Exceptions\ReadException(
+                sprintf('Failed to retrieve contents: %s', $source)
+            );
         }
 
-        return $result;
+        return $this->jsonDecoder->parse(
+            $sourceData, 
+            \Seld\JsonLint\JsonParser::PARSE_TO_ASSOC
+        );
     }
 }

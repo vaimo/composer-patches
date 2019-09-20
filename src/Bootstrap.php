@@ -69,11 +69,7 @@ class Bootstrap
     ) {
         $this->composer = $composer;
         $this->configFactory = $configFactory;
-        
-        $logger = new \Vaimo\ComposerPatches\Logger($appIO);
-
         $this->listResolver = $listResolver;
-        
         $this->outputStrategy = $outputStrategy;
         
         $this->loaderComponents = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
@@ -81,8 +77,10 @@ class Bootstrap
             $appIO
         );
 
+        $logger = new \Vaimo\ComposerPatches\Logger($appIO);
+        
+        $this->configFactory = new Factories\ConfigFactory($composer);
         $this->loaderFactory = new Factories\PatchesLoaderFactory($composer);
-
         $this->applierFactory = new Factories\PatchesApplierFactory($composer, $logger);
         
         $this->repositoryProcessor = new \Vaimo\ComposerPatches\Repository\Processor($logger);

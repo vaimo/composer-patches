@@ -141,6 +141,7 @@ class PatchesApplier
      * @return bool
      * @throws \Vaimo\ComposerPatches\Exceptions\PackageNotFound
      * @throws \Vaimo\ComposerPatches\Exceptions\PackageResetException
+     * @throws \Vaimo\ComposerPatches\Exceptions\PatchFailureException
      */
     public function apply(Repository $repository, array $patches)
     {
@@ -160,7 +161,7 @@ class PatchesApplier
 
         $labels = array_diff_key(
             $this->statusConfig->getLabels(),
-            array('unknown' => true)
+            array(Patch::STATUS_UNKNOWN => true)
         );
 
         $applyQueue = $this->updateStatusLabels($applyQueue, $labels);
@@ -258,7 +259,7 @@ class PatchesApplier
             foreach ($group as $path => $item) {
                 $status = isset($item[Patch::STATUS])
                     ? $item[Patch::STATUS]
-                    : 'unknown';
+                    : Patch::STATUS_UNKNOWN;
 
                 if (!isset($labels[$status])) {
                     continue;
