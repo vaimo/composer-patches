@@ -123,11 +123,11 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
         
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
-            Config::PATCHER_FORCE_REAPPLY => $behaviourFlags['redo'],
+            Config::PATCHER_FORCE_REAPPLY => $behaviourFlags[Behaviour::REDO],
             Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source'),
             Config::PATCHER_GRACEFUL => (bool)$input->getOption('graceful')
-                || $behaviourFlags['redo']
-                || $behaviourFlags['undo'],
+                || $behaviourFlags[Behaviour::REDO]
+                || $behaviourFlags[Behaviour::UNDO],
             Config::PATCHER_SOURCES => $this->createSourcesEnablerConfig()
         ));
         
