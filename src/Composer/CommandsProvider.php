@@ -10,12 +10,12 @@ class CommandsProvider implements \Composer\Plugin\Capability\CommandProvider
     public function getCommands()
     {
         return array(
-            new \Vaimo\ComposerPatches\Composer\Commands\PatchCommand,
-            new \Vaimo\ComposerPatches\Composer\Commands\ListCommand,
-            new \Vaimo\ComposerPatches\Composer\Commands\ApplyCommand,
-            new \Vaimo\ComposerPatches\Composer\Commands\RedoCommand,
-            new \Vaimo\ComposerPatches\Composer\Commands\UndoCommand,
-            new \Vaimo\ComposerPatches\Composer\Commands\ValidateCommand
+            new \Vaimo\ComposerPatches\Composer\Commands\PatchCommand(),
+            new \Vaimo\ComposerPatches\Composer\Commands\ListCommand(),
+            new \Vaimo\ComposerPatches\Composer\Commands\ApplyCommand(),
+            new \Vaimo\ComposerPatches\Composer\Commands\RedoCommand(),
+            new \Vaimo\ComposerPatches\Composer\Commands\UndoCommand(),
+            new \Vaimo\ComposerPatches\Composer\Commands\ValidateCommand()
         );
     }
 }

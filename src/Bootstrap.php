@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Factories;
+use Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool;
 
 /**
  * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
@@ -73,22 +74,16 @@ class Bootstrap
         $config = array()
     ) {
         $this->composer = $composer;
-        $this->config = $config;
-        
-        $logger = new \Vaimo\ComposerPatches\Logger($appIO);
-
         $this->listResolver = $listResolver;
         $this->outputStrategy = $outputStrategy;
+        $this->config = $config;
+
+        $this->loaderComponents = new ComponentPool($composer, $appIO);
+
+        $logger = new \Vaimo\ComposerPatches\Logger($appIO);
         
         $this->configFactory = new Factories\ConfigFactory($composer);
-
-        $this->loaderComponents = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
-            $composer,
-            $appIO
-        );
-
         $this->loaderFactory = new Factories\PatchesLoaderFactory($composer);
-
         $this->applierFactory = new Factories\PatchesApplierFactory($composer, $logger);
         
         $this->repositoryProcessor = new \Vaimo\ComposerPatches\Repository\Processor($logger);
@@ -97,20 +92,20 @@ class Bootstrap
     public function applyPatches($devMode = false)
     {
         return $this->applyPatchesWithConfig(
-            $this->configFactory->create(array(
-                $this->config
-            )),
+            $this->configFactory->create(array($this->config)),
             $devMode
         );
     }
 
     public function stripPatches($devMode = false)
     {
+        $configSources = array(
+            $this->config,
+            array(PluginConfig::PATCHER_SOURCES => false)
+        );
+
         $this->applyPatchesWithConfig(
-            $this->configFactory->create(array(
-                $this->config,
-                array(PluginConfig::PATCHER_SOURCES => false)
-            )),
+            $this->configFactory->create($configSources),
             $devMode
         );
     }

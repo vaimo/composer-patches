@@ -48,7 +48,14 @@ class PatchApplier
         $this->outputStrategy = $outputStrategy;
         $this->logger = $logger;
     }
-    
+
+    /**
+     * @param PackageInterface $package
+     * @param array $patchesQueue
+     * @return array
+     * @throws \Exception
+     * @throws \Vaimo\ComposerPatches\Exceptions\PatchFailureException
+     */
     public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
         $appliedPatches = array();

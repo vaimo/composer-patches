@@ -13,7 +13,7 @@ use Vaimo\ComposerPatches\Patch\Definition as Patch;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Interfaces\ListResolverInterface;
-
+use Vaimo\ComposerPatches\Composer\Plugin\Behaviour;
 use Vaimo\ComposerPatches\Environment;
 
 /**
@@ -106,7 +106,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $isDevMode = !$input->getOption('no-dev');
 
         $behaviourFlags = $this->getBehaviourFlags($input);
-        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
+        $shouldUndo = !$behaviourFlags[Behaviour::REDO] && $behaviourFlags[Behaviour::UNDO];
 
         $filters = $this->resolveActiveFilters($input, $behaviourFlags);
         
@@ -138,7 +138,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
                 $runtimeUtils->setEnvironmentValues(array(
                     Environment::PREFER_OWNER => $input->getOption('from-source'),
-                    Environment::FORCE_REAPPLY => $behaviourFlags['redo']
+                    Environment::FORCE_REAPPLY => $behaviourFlags[Behaviour::REDO]
                 ));
 
                 return $bootstrap->applyPatches($isDevMode);
@@ -174,10 +174,10 @@ class PatchCommand extends \Composer\Command\BaseCommand
     protected function getBehaviourFlags(InputInterface $input)
     {
         return array(
-            'redo' => $this->getOptionGraceful($input, 'redo'),
-            'undo' => $this->getOptionGraceful($input, 'undo'),
-            'force' => $this->getOptionGraceful($input, 'force'),
-            'explicit' => $this->getOptionGraceful($input, 'explicit')
+            Behaviour::REDO => $this->getOptionGraceful($input, 'redo'),
+            Behaviour::UNDO => $this->getOptionGraceful($input, 'undo'),
+            Behaviour::FORCE => $this->getOptionGraceful($input, 'force'),
+            Behaviour::EXPLICIT => $this->getOptionGraceful($input, 'explicit')
                 || $this->getOptionGraceful($input, 'show-reapplies')
         );
     }
@@ -196,7 +196,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $hasFilers = (bool)array_filter($filters);
 
-        if (!$hasFilers && $behaviourFlags['redo']) {
+        if (!$hasFilers && $behaviourFlags[Behaviour::REDO]) {
             $filters[Patch::SOURCE] = array('*');
         }
 
@@ -207,7 +207,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
     {
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
 
-        if ($behaviourFlags['redo'] || $behaviourFlags['undo']) {
+        if ($behaviourFlags[Behaviour::REDO] || $behaviourFlags[Behaviour::UNDO]) {
             $runtimeUtils->setEnvironmentValues(array(
                 Environment::EXIT_ON_FAIL => 0,
                 'COMPOSER_EXIT_ON_PATCH_FAILURE' => 0
@@ -215,7 +215,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         }
 
         $runtimeUtils->setEnvironmentValues(array(
-            Environment::FORCE_RESET => (int)$behaviourFlags['force']
+            Environment::FORCE_RESET => (int)$behaviourFlags[Behaviour::FORCE]
         ));
     }
     
@@ -223,9 +223,9 @@ class PatchCommand extends \Composer\Command\BaseCommand
     {
         $hasFilers = (bool)array_filter($filters);
 
-        $isExplicit = $behaviourFlags['explicit'];
+        $isExplicit = $behaviourFlags[Behaviour::EXPLICIT];
         
-        if (!$hasFilers && $behaviourFlags['redo']) {
+        if (!$hasFilers && $behaviourFlags[Behaviour::REDO]) {
             $isExplicit = true;
         }
         
@@ -246,7 +246,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
     {
         $listResolver = new ListResolvers\FilteredListResolver($filters);
 
-        $isDefaultBehaviour = !$behaviourFlags['redo'] && !$behaviourFlags['undo'];
+        $isDefaultBehaviour = !$behaviourFlags[Behaviour::REDO] && !$behaviourFlags[Behaviour::UNDO];
 
         $listResolver = $this->attachBehaviourToListResolver($listResolver, $behaviourFlags);
         
@@ -259,7 +259,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
     
     private function attachBehaviourToListResolver(ListResolverInterface $listResolver, array $behaviourFlags)
     {
-        $shouldUndo = !$behaviourFlags['redo'] && $behaviourFlags['undo'];
+        $shouldUndo = !$behaviourFlags[Behaviour::REDO] && $behaviourFlags[Behaviour::UNDO];
 
         if ($shouldUndo) {
             return new ListResolvers\InvertedListResolver($listResolver);
