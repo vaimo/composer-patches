@@ -73,8 +73,6 @@ class ItemProcessor
             $this->dispatchEventForPackagePatch(Events::POST_APPLY, $package, $info);
 
             return true;
-        } catch (\Vaimo\ComposerPatches\Exceptions\RuntimeException $runtimeException) {
-            throw $runtimeException;
         } catch (\Exception $exception) {
             $this->logger->writeException($exception);
 
