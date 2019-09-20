@@ -218,3 +218,95 @@ Multiple values can be also used in the declaration by providing them as array o
 
 The key "patches-base", etc are not mandatory to be declared when using patches-search as the exact path
 of the patches will already be known.
+
+## Version Constraints
+
+There are several ways a version restriction for a patch can be defined, the choice on which one to use 
+usually depends on a situation and how much extra information needs to be configured for the patch to 
+apply correctly. 
+
+```json
+{
+  "extra": {
+    "patches": {
+      "targeted/package": {
+        "applies when targeted/package version is less than 1.2.3)": {
+          "<1.2.3": "example/some-fix.patch"
+        },
+        "same as first definition, but enabled more configuration options": {
+          "source": "example/some-fix.patch",
+          "version": "<1.2.3"
+        },
+        "applies when other/package's version is >=2.1.7": {
+          "source": "example/other-fix.patch",
+          "depends": {
+            "other/package": ">=2.1.7",
+            "php": ">=7.1.0"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+It's also possible to make all defined patches to depend on certain package as well by defining a following
+key under 'extras'. This is useful in projects where most of the targeted packages are strictly pulled in by 
+same meta-package (as is the case with Magento2 for example), one can force all the dependency versions to be 
+compared against that specific meta package.
+
+```json
+{
+  "extra": {
+    "patches-depend": "some/package"
+  }
+}
+```
+
+When it's defined, all versions defined in patch definition will target that package instead of targeting
+the package that the patch is for. This is useful in cases where most of the project's modules are pulled
+in by one single package. This setting will only affect patches within same composer.json
+
+It's also possible to branch this configuration when value is provided as an array
+
+```json
+{
+  "extra": {
+    "patches-depend": {
+        "default": "some/package",
+        "*": "some/meta-package",
+        "some/widget-*": "some/core-dependency"
+    }
+  }
+}
+``` 
+
+Note that 'default' and '*' are reserved for internal use where 'default' will be default fallback and
+'*' refers to bundled patches.
+
+When there are almost identical patches for different version of some package, then they can be declared
+under same `label` or under `source` key depending on how complex rest of the declaration is.
+
+```json
+{
+  "extra": {
+    "patches": {
+      "some/package": {
+        "having two patches for same fix": {
+          ">=1.0.0 <1.2.0": "some/path/legacy.patch",
+          ">=1.2.0": "some/path/current.patch"
+        }
+      },
+      "some/other-package": {
+        "same done for extended patch declaration format": {
+          "source": "some/path/legacy.patch", 
+          "version": [
+            ">=1.0.0 <1.2.0",
+            ">=1.2.0"          
+          ]
+        }
+      }
+    }
+  }
+}
+```
