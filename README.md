@@ -136,3 +136,7 @@ classes from the new version.
 
 Due to the fact that the patcher kicks in very late in the process of installing a project (before 
 auto-loader generation), developers are advised to re-execute `composer install`.
+
+Ideally, plugins should always be updated with explicit `--no-plugins` flag added to the `composer update`
+call to avoid issues that plugin usage with potentially mixed logic from two different plugin releases
+being in use.
