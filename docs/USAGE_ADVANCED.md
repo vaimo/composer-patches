@@ -2,21 +2,76 @@
 
 Detailed guide on how to use the advanced configuration options of the plugin to define patches. 
 
-## Comments
+## Bundles
 
-In case user wants to add extra comments to patch declaration file, any key that start with "_" can be
-used. Works on any level of the patch declaration.
+In case there's a need to define a patch that targets multiple packages within a single patch file, 
+alternative patch definition format is recommended:
 
 ```json
 {
-  "_comment": "This patch file should hold patches that make world a better place",
-  "whole/world": {
-    "_excuse": "I really need this one",
-    "Fix: get closer to ending poverty": "patches/provide-affordable-education.patch"
-  },
-  "_note": "This is another comment"
+  "extra": {
+    "patches": {  
+      "*": {
+        "fixes for multiple packages (packages explicitly mentioned)": {
+          "source": "example/bundled-fixes.patch",
+          "targets": [
+            "some/module",
+            "other/module"
+          ]
+        },
+        "same as above, but targets are auto-resolved from file contents": {
+          "source": "example/bundled-fixes.patch"
+        }
+      }
+    }
+  }
 }
 ```
+
+Where the `example/bundle.patch` content would have file paths defined in following manner:
+
+```diff
+--- some/module/Models/Example.php.org
++++ some/module/Models/Example.php
+
+@@ -31,7 +31,7 @@
+      */
+     protected function someFunction($someArg)
+     {
+-        $var1 = 123;
++        $var1 = 456;
+         /**
+          * rest of the logic of the function
+          */
+--- other/module/Logic.php.org
++++ other/module/Logic.php
+
+@@ -67,7 +67,7 @@
+      */
+     protected function otherFunction()
+     {
+-        $label = 'old';
++        $label = 'new';
+         /**
+          * some implementation
+          */
+```
+
+Note that if you plan to use bundled patches whilst also using patches-base, the following approach could
+be used:
+
+```json
+{
+  "extra": {
+    "patches-base": {
+      "default": "patches/{{VendorName}}_{{(Magento2|Module)ModuleName}}/{{file}}/version-{{version}}.patch",
+      "*": "patches/Bundled/{{file}}/version-{{version}}.patch"
+    }
+  }
+}
+```
+
+The first dependency version will be used for the bundled patches {{version}} value.
 
 ## Sequenced Patches
 
@@ -44,70 +99,6 @@ you can use partial names (instead of using full path) and wildcards to target p
 
 Multiple dependencies can be defined when after/before value given as an array.
 
-## Version Constraints
-
-There are several ways a version restriction for a patch can be defined, the choice on which one to use 
-usually depends on a situation and how much extra information needs to be configured for the patch to 
-apply correctly. 
-
-```json
-{
-  "extra": {
-    "patches": {
-      "targeted/package": {
-        "applies when targeted/package version is less than 1.2.3)": {
-          "<1.2.3": "example/some-fix.patch"
-        },
-        "same as first definition, but enabled more configuration options": {
-          "source": "example/some-fix.patch",
-          "version": "<1.2.3"
-        },
-        "applies when other/package's version is >=2.1.7": {
-          "source": "example/other-fix.patch",
-          "depends": {
-            "other/package": ">=2.1.7"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-It's also possible to make all defined patches to depend on certain package as well by defining a following
-key under 'extras'. This is useful in projects where most of the targeted packages are strictly pulled in by 
-same meta-package (as is the case with Magento2 for example), one can force all the dependency versions to be 
-compared against that specific meta package.
-
-```json
-{
-  "extra": {
-    "patches-depend": "some/package"
-  }
-}
-```
-
-When it's defined, all versions defined in patch definition will target that package instead of targeting
-the package that the patch is for. This is useful in cases where most of the project's modules are pulled
-in by one single package. This setting will only affect patches within same composer.json
-
-It's also possible to branch this configuration when value is provided as an array
-
-```json
-{
-  "extra": {
-    "patches-depend": {
-        "default": "some/package",
-        "*": "some/meta-package",
-        "some/widget-*": "some/core-dependency"
-    }
-  }
-}
-``` 
-
-Note that 'default' and '*' are reserved for internal use where 'default' will be default fallback and
-'*' refers to bundled patches.
-
 ## Platform Version Restriction
 
 Patches can be defined to be only applied when certain platform constraint requirements are met.
@@ -121,34 +112,6 @@ Patches can be defined to be only applied when certain platform constraint requi
           "source": "example/other-fix.patch",
           "depends": {
             "php": ">=7.1.0"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-## Version Branching
-
-When there are almost identical patches for different version of some package, then they can be declared
-under same `label` or under `source` key depending on how complex rest of the declaration is.
-
-```json
-{
-  "extra": {
-    "patches": {
-      "some/package": {
-        "having two patches for same fix": {
-          ">=1.0.0 <1.2.0": "some/path/legacy.patch",
-          ">=1.2.0": "some/path/current.patch"
-        }
-      },
-      "some/other-package": {
-        "same done for extended patch declaration format": {
-          "source": {
-            ">=1.0.0 <1.2.0": "some/path/legacy.patch",
-            ">=1.2.0": "some/path/current.patch"
           }
         }
       }
@@ -247,79 +210,6 @@ The following little change will result the patches to be taken from following p
 
 Note the value-strip rules that have been defined for label which take care of not including "Fix: " prefix
 when using label as filename. 
-
-## Bundles
-
-In case there's a need to define a patch that targets multiple packages within a single patch file, 
-alternative patch definition format is recommended:
-
-```json
-{
-  "extra": {
-    "patches": {  
-      "*": {
-        "fixes for multiple packages (packages explicitly mentioned)": {
-          "source": "example/bundled-fixes.patch",
-          "targets": [
-            "some/module",
-            "other/module"
-          ]
-        },
-        "same as above, but targets are auto-resolved from file contents": "example/bundled-fixes.patch"
-      }
-    }
-  }
-}
-```
-
-Where the `example/bundle.patch` content would have file paths defined in following manner:
-
-```diff
---- some/module/Models/Example.php.org
-+++ some/module/Models/Example.php
-
-@@ -31,7 +31,7 @@
-      */
-     protected function someFunction($someArg)
-     {
--        $var1 = 123;
-+        $var1 = 456;
-         /**
-          * rest of the logic of the function
-          */
---- other/module/Logic.php.org
-+++ other/module/Logic.php
-
-@@ -67,7 +67,7 @@
-      */
-     protected function otherFunction()
-     {
--        $label = 'old';
-+        $label = 'new';
-         /**
-          * some implementation
-          */
-```
-
-Note that if you plan to use bundled patches whilst also using patches-base, the following approach could
-be used:
-
-```json
-{
-  "extra": {
-    "patches-base": {
-      "default": "patches/{{VendorName}}_{{(Magento2|Module)ModuleName}}/{{file}}/version-{{version}}.patch",
-      "*": "patches/Bundled/{{file}}/version-{{version}}.patch"
-    }
-  }
-}
-```
-
-The first dependency version will be used for the bundled patches {{version}} value.
-
-Note that using bundled patches may cause massive re-applying of patches for certain modules when they 
-change due to the architecture of this plugin, which relies on re-installing the targeted packages to
-avoid potential errors that might be caused by the package's code being in an unexpected/tampered state. 
 
 ## Strict Path Strip Level
 
@@ -511,3 +401,19 @@ Will exclude the a patch that was defined in a package in following (or similar)
 
 The important part to note here is to remember that exclusion ignores patch target and focuses on the owner
 instead.
+
+## Comments
+
+In case user wants to add extra comments to patch declaration file, any key that start with "_" can be
+used. Works on any level of the patch declaration.
+
+```json
+{
+  "_comment": "This patch file should hold patches that make world a better place",
+  "whole/world": {
+    "_excuse": "I really need this one",
+    "Fix: get closer to ending poverty": "patches/provide-affordable-education.patch"
+  },
+  "_note": "This is another comment"
+}
+```
