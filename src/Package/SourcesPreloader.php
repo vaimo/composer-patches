@@ -45,7 +45,7 @@ class SourcesPreloader
         );
 
         foreach ($sourceFilePaths as $filePath) {
-            require_once($filePath);
+            class_exists($filePath);
         }
     }
 }

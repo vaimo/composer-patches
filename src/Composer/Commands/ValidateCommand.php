@@ -60,11 +60,14 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             Config::PATCHER_SOURCES => $this->createSourcesEnablerConfig($localOnly)
         );
 
+        $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
+        $composerContext = $contextFactory->create();
+        
         $repository = $composer->getRepositoryManager()->getLocalRepository();
 
         $pluginConfig = $configFactory->create(array($pluginConfig));
         
-        $patchesLoader = $this->createPatchesLoader($pluginConfig);
+        $patchesLoader = $this->createPatchesLoader($composerContext, $pluginConfig);
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
         
@@ -225,30 +228,31 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         );
     }
     
-    private function createPatchesLoader(\Vaimo\ComposerPatches\Config $pluginConfig)
+    private function createPatchesLoader(\Vaimo\ComposerPatches\Composer\Context $composerContext, \Vaimo\ComposerPatches\Config $pluginConfig)
     {
         $composer = $this->getComposer();
         
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
 
-        $loaderComponentsPool = $this->createLoaderPool(array(
+        $componentOverrides = array(
             'constraints' => false,
             'platform' => false,
             'targets-resolver' => false,
             'local-exclude' => false,
             'root-patch' => false,
             'global-exclude' => false
-        ));
+        );
+        
+        $loaderComponentsPool = $this->createLoaderPool($componentOverrides);
 
         return $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
     }
 
-    private function createLoaderPool(array $componentUpdates = array())
+    private function createLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext, array $componentUpdates = array())
     {
-        $composer = $this->getComposer();
         $appIO = $this->getIO();
 
-        $componentPool = new ComponentPool($composer, $appIO, true);
+        $componentPool = new ComponentPool($composerContext, $appIO, true);
 
         foreach ($componentUpdates as $componentName => $replacement) {
             $componentPool->registerComponent($componentName, $replacement);

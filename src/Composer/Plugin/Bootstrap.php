@@ -13,18 +13,25 @@ class Bootstrap
     private $composer;
 
     /**
+     * @var \Vaimo\ComposerPatches\Composer\Context 
+     */
+    private $composerContext;
+
+    /**
      * @param \Composer\Composer $composer
+     * @param \Vaimo\ComposerPatches\Composer\Context $composerContext
      */
     public function __construct(
-        \Composer\Composer $composer
+        \Composer\Composer $composer,
+        \Vaimo\ComposerPatches\Composer\Context $composerContext
     ) {
         $this->composer = $composer;
+        $this->composerContext = $composerContext;
     }
     
     public function preloadPluginClasses()
     {
         $installationManager = $this->composer->getInstallationManager();
-        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
         $composerConfig = $this->composer->getConfig();
 
         $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
@@ -38,8 +45,10 @@ class Bootstrap
 
         $sourcesPreloader = new \Vaimo\ComposerPatches\Package\SourcesPreloader($packageInfoResolver);
 
-        $sourcesPreloader->preload(
-            $packageResolver->resolveForNamespace($repository, __NAMESPACE__)
-        );
+        $packages = $this->composerContext->getActivePackages();
+        
+        $pluginPackage = $packageResolver->resolveForNamespace($packages, __CLASS__);
+        
+        $sourcesPreloader->preload($pluginPackage);
     }
 }
