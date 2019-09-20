@@ -48,18 +48,24 @@ class Plugin implements
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
     {
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
-        $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
-        
-        $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
+
+        $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
+        $composerContext = $contextFactory->create();
+
+        $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
         $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
+        
+        $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy($composerContext);
 
         $this->bootstrap = $this->bootstrapFactory->create();
 
-        $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer);
-
+        $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer, $composerContext);
         $pluginBootstrap->preloadPluginClasses();
-
-        if (!interface_exists('\Composer\Plugin\Capability\CommandProvider')) {
+        
+        if (
+            !interface_exists('\Composer\Plugin\Capability\CommandProvider') 
+            || !$this->bootstrapStrategy->shouldAllow()
+        ) {
             return;
         }
         

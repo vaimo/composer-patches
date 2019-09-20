@@ -122,8 +122,11 @@ class PatchCommand extends \Composer\Command\BaseCommand
         
         $outputTriggers = $this->resolveOutputTriggers($filters, $behaviourFlags);
 
+        $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
+        $composerContext = $contextFactory->create();
+        
         $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
         $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
 
         $bootstrap = $bootstrapFactory->create($listResolver, $outputStrategy, $config);

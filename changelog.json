@@ -4,6 +4,11 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.51.1": {
+        "fix": [
+            "allow the plugin to be installed as dependency to globally installed package (as part of dependency of some global package); previously caused every composer call to crash with class declaration conflict"
+        ]
+    },
     "3.51.0": {
         "feature": [
             "allow defining OS-specific applier operation without overwriting the default operation value"

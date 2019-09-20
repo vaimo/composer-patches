@@ -13,9 +13,9 @@ use Vaimo\ComposerPatches\Patch\Definition as Patch;
 class BootstrapFactory
 {
     /**
-     * @var \Composer\Composer
+     * @var \Vaimo\ComposerPatches\Composer\Context
      */
-    private $composer;
+    private $composerContext;
 
     /**
      * @var \Composer\IO\IOInterface
@@ -23,14 +23,14 @@ class BootstrapFactory
     private $appIO;
 
     /**
-     * @param \Composer\Composer $composer
+     * @param \Vaimo\ComposerPatches\Composer\Context $composerContext
      * @param \Composer\IO\IOInterface $appIO
      */
     public function __construct(
-        \Composer\Composer $composer,
+        \Vaimo\ComposerPatches\Composer\Context $composerContext,
         \Composer\IO\IOInterface $appIO
     ) {
-        $this->composer = $composer;
+        $this->composerContext = $composerContext;
         $this->appIO = $appIO;
     }
 
@@ -52,7 +52,7 @@ class BootstrapFactory
         }
 
         return new \Vaimo\ComposerPatches\Bootstrap(
-            $this->composer,
+            $this->composerContext,
             $this->appIO,
             $listResolver,
             $outputStrategy,
