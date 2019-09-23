@@ -29,24 +29,12 @@ class ComposerContextFactory
             $this->composer
         );
 
-        if (!$this->isGlobalComposer($this->composer)) {
-            if (self::$globalComposer === null) {
-                self::$globalComposer = \Composer\Factory::createGlobal(new \Composer\IO\NullIO(), true);
-            }
-            
-            array_unshift($instances, self::$globalComposer);
+        if (self::$globalComposer === null) {
+            self::$globalComposer = \Composer\Factory::createGlobal(new \Composer\IO\NullIO(), true);
         }
+
+        array_unshift($instances, self::$globalComposer);
         
         return new \Vaimo\ComposerPatches\Composer\Context($instances);
-    }
-    
-    private function isGlobalComposer()
-    {
-        $composerConfig = $this->composer->getConfig();
-
-        $vendorDir = $composerConfig->get('vendor-dir');
-        $homeDir = $composerConfig->get('home');
-
-        return strpos($vendorDir, $homeDir) === 0;
     }
 }
