@@ -2,6 +2,21 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.51.1 (2019-09-24)
+
+### Fix
+
+* allow the plugin to be installed as dependency to globally installed package (as part of dependency of some global package); previously caused every composer call to crash with class declaration conflict
+* patch error reporting includes patch creation date where just path should have been shown
+* patch errors caused by output analysis did not include the raw output line that caused the failure detector to trigger
+* outdated documentation reference in code when specifying unsecure URL endpoint for a patch to be downloaded from
+
+### Maintenance
+
+* new documentation page added to shed some light to different situations one might find themselves in when a patch applying fails
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.1) [diff](https://github.com/vaimo/composer-patches/compare/3.51.0...3.51.1)
+
 ## 3.51.0 (2019-09-16)
 
 ### Feature
