@@ -41,11 +41,11 @@ class OutputGenerator
             $this->logger->writeNotice('warning', $lines);
         }
     }
-    
+
     private function createOutputLines(array $errors)
     {
         $lines = array();
-        
+
         foreach ($errors as $type => $groups) {
             if (!empty($lines)) {
                 $lines[] = '';
@@ -59,7 +59,7 @@ class OutputGenerator
                     '!' => reset($messages)
                 );
 
-                foreach ($details as $marker => $value) {
+                foreach (array_filter($details) as $marker => $value) {
                     foreach (explode(PHP_EOL, $value) as $index => $item) {
                         $lines[] = sprintf('  %s %s', !$index ? $marker : ' ', $item);
                     }
