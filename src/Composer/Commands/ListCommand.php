@@ -116,11 +116,11 @@ class ListCommand extends \Composer\Command\BaseCommand
             'strtolower',
             array_filter((array)$input->getOption('status'))
         );
-        
-        $pluginConfig = $this->createConfigWithEnabledSources($composer);
 
         $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
         $composerContext = $contextFactory->create();
+
+        $pluginConfig = $this->createConfigWithEnabledSources($composerContext);
         
         $filteredPool = $this->createLoaderPool($composerContext);
         
@@ -264,8 +264,10 @@ class ListCommand extends \Composer\Command\BaseCommand
         return $filteredPatches;
     }
     
-    private function createConfigWithEnabledSources(Composer $composer)
+    private function createConfigWithEnabledSources(\Vaimo\ComposerPatches\Composer\Context $composerContext)
     {
+        $composer = $composerContext->getLocalComposer();
+        
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
 
         $defaultValues = $configDefaults->getPatcherConfig();
@@ -282,7 +284,9 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
         
-        return $configFactory->create(array($pluginConfig));
+        return $configFactory->create(
+            array($pluginConfig)
+        );
     }
     
     private function createStateGenerator(Composer $composer)

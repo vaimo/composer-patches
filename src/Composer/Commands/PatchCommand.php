@@ -119,8 +119,11 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $behaviourFlags = $this->getBehaviourFlags($input);
 
         $shouldUndo = !$behaviourFlags[Behaviour::REDO] && $behaviourFlags[Behaviour::UNDO];
-        
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
+
+        $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
+        $composerContext = $contextFactory->create();
+
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composerContext, array(
             Config::PATCHER_FORCE_REAPPLY => $behaviourFlags[Behaviour::REDO],
             Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source'),
             Config::PATCHER_GRACEFUL => (bool)$input->getOption('graceful')
@@ -136,10 +139,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $this->configureEnvironmentForBehaviour($behaviourFlags);
 
         $outputTriggers = $this->resolveOutputTriggers($filters, $behaviourFlags);
-
-        $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
-        $composerContext = $contextFactory->create();
-
+        
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
         
         $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
