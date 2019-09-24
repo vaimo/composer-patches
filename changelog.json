@@ -441,7 +441,8 @@
         ],
         "maintenance": [
             "new documentation page added to shed some light to different situations one might find themselves in when a patch applying fails"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.51.0": {
         "feature": [
