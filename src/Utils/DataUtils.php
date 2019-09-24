@@ -11,8 +11,8 @@ class DataUtils
     {
         $result = array();
 
-        $key = null;
-        
+        $key = '';
+
         foreach ($items as $item) {
             if (preg_match($keyMatcher, $item, $matches)) {
                 $key = isset($matches['match'])
@@ -22,14 +22,10 @@ class DataUtils
                 continue;
             }
 
-            if (!$key) {
-                continue;
-            }
-
             if (!isset($result[$key])) {
                 $result[$key] = array();
             }
-            
+
             $result[$key][] = $item;
         }
 

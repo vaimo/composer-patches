@@ -4,6 +4,13 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.20.2": {
+        "overview": "changes in this release forward-ported from 3.51.2",
+        "fix": [
+            "some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)",
+            "errors not listed when file reference not available within patch (affects brief reporting, everything worked as expected with -vvv)"
+        ]
+    },
     "4.20.1": {
         "overview": "changes in this release forward-ported from 3.51.1",
         "fix": [
@@ -432,6 +439,13 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.51.2": {
+        "fix": [
+            "some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)",
+            "errors not listed when file reference not available within patch (affects brief reporting, everything worked as expected with -vvv)"
+        ],
+        "branch": "release/3"
     },
     "3.51.1": {
         "fix": [

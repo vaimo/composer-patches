@@ -170,7 +170,7 @@ class Applier
             }
         }
 
-        $messages = $this->collectErrors($outputRecords, array(
+        $phrases = array(
             'failed',
             'unexpected',
             'malformed',
@@ -179,8 +179,13 @@ class Applier
             'can\'t find file',
             'patch unexpectedly ends',
             'due to output analysis',
-            'no file to patch'
-        ));
+            'no file to patch',
+            'seem to find a patch in there anywhere',
+            'Only garbage was found in the patch input',
+            'patch fragment without header at line'
+        );
+        
+        $messages = $this->collectErrors($outputRecords, $phrases);
         
         $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure();
         
