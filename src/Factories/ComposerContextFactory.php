@@ -35,6 +35,8 @@ class ComposerContextFactory
 
         array_unshift($instances, self::$globalComposer);
         
-        return new \Vaimo\ComposerPatches\Composer\Context($instances);
+        return new \Vaimo\ComposerPatches\Composer\Context(
+            array_filter($instances)
+        );
     }
 }
