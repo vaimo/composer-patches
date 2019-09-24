@@ -266,8 +266,6 @@ class ListCommand extends \Composer\Command\BaseCommand
     
     private function createConfigWithEnabledSources(\Vaimo\ComposerPatches\Composer\Context $composerContext)
     {
-        $composer = $composerContext->getLocalComposer();
-        
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
 
         $defaultValues = $configDefaults->getPatcherConfig();
@@ -282,7 +280,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             Config::PATCHER_SOURCES => array_fill_keys($sourceKeys, true)
         );
 
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer);
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composerContext);
         
         return $configFactory->create(
             array($pluginConfig)
