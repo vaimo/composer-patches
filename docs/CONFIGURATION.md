@@ -139,6 +139,21 @@ next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
 
+## Allowing Downloads From Insecure Locations
+
+Add the following to composer.json of the project (root package) to allow patches to be downloaded via
+unsecure URLs.
+ 
+```json
+{
+  "extra": {
+    "patcher": {
+      "secure-http": false
+    }
+  }
+}
+```
+
 ## Disabling patching
 
 In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
