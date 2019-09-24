@@ -47,21 +47,16 @@ class Plugin implements
     
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
     {
-        $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
-
         $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
         $composerContext = $contextFactory->create();
         
-        $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy();
-
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composerContext);
 
+        $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
-
         $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
-        
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy($composerContext);
-
+        
         $this->bootstrap = $this->bootstrapFactory->create($configFactory);
 
         $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer, $composerContext);
