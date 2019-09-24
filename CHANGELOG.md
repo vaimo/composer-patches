@@ -2,6 +2,17 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.20.2
+
+changes in this release forward-ported from 3.51.2
+
+### Fix
+
+* some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)
+* errors not listed when file reference not available within patch (affects brief reporting, everything worked as expected with -vvv)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.20.2) [diff](https://github.com/vaimo/composer-patches/compare/4.20.1...4.20.2)
+
 ## 4.20.1 (2019-09-24)
 
 changes in this release forward-ported from 3.51.1
@@ -655,7 +666,16 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.51.1...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.51.2...4.0.0)
+
+## 3.51.2 (2019-09-25)
+
+### Fix
+
+* some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)
+* errors not listed when file reference not available within patch (affects brief reporting, everything worked as expected with -vvv)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.2) [diff](https://github.com/vaimo/composer-patches/compare/3.51.1...3.51.2)
 
 ## 3.51.1 (2019-09-24)
 
