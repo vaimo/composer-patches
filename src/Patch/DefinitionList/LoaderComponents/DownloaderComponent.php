@@ -132,13 +132,17 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
         $statusLabel = sprintf('ERROR %s', $exception->getCode());
         
         if (strpos($exception->getMessage(), 'configuration does not allow connections') !== false) {
+            $docsUrl = 'https://github.com/vaimo/composer-patches/blob/master/docs/CONFIGURATION.md#%s';
+            $subjectReference = 'allow-downloads-from-unsecure-locations';
+                
+            $message = sprintf(
+                'Your configuration does not allow connections to %s. Override the \'secure-http\' to allow: %s',
+                $source,
+                sprintf($docsUrl, $subjectReference)
+            );
+            
             $exception = new \Composer\Downloader\TransportException(
-                sprintf(
-                    'Your configuration does not allow connections to %s. ' .
-                    'Override the \'secure-http\' to allow: ' .
-                    'https://github.com/vaimo/composer-patches#patcher-configuration',
-                    $source
-                ),
+                $message,
                 $exception->getCode()
             );
 

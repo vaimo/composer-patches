@@ -139,7 +139,7 @@ next path strip level, which result in sequence similar to this:
 
     PATCH:0 GIT:0 PATCH:1 GIT:1 PATCH:2 GIT:2 ...
 
-## Allowing Downloads From Insecure Locations
+## Allow Downloads From Unsecure Locations
 
 Add the following to composer.json of the project (root package) to allow patches to be downloaded via
 unsecure URLs.
@@ -154,7 +154,7 @@ unsecure URLs.
 }
 ```
 
-## Disabling patching
+## Disable Patching
 
 In case the functionality of the plugin has to be fully disabled, developer can just set "patcher"
 to "false".
@@ -167,7 +167,7 @@ to "false".
 }
 ```
 
-## Sources
+## Manage Sources
 
 These flags allow developer to have more control over the patch collector and omit certain sources when
 needed. All the sources are included by default.
