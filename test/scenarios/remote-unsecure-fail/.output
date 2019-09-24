@@ -1,8 +1,8 @@
 Processing patches configuration
 
-                                                                                                                                                                                                                                                                            
-  [Composer\Downloader\TransportException]                                                                                                                                                                                                                                  
-  Your configuration does not allow connections to https://github.com/vaimo/composer-patches/blob/master/docs/CONFIGURATION.md#allow-downloads-from-unsecure-locations  
-                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                
+  [Composer\Downloader\TransportException]                                                                                                                                                                                                                                                                                      
+  Your configuration does not allow connections to http://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-version.patch. Override the 'secure-http' to allow: https://github.com/vaimo/composer-patches/blob/master/docs/CONFIGURATION.md#allow-downloads-from-unsecure-locations  
+                                                                                                                                                                                                                                                                                                                                
 
 
