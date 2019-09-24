@@ -26,17 +26,14 @@ class OutputGenerator
             if (empty($errors)) {
                 return;
             }
+
+            $prioritizedErrors = $this->prioritizeErrors($errors);
             
-            $lines = $this->createOutputLines(
-                $this->prioritizeErrors($errors)
+            $lines = array_merge(
+                array('Probable causes for the failure:', ''),
+                $this->createOutputLines($prioritizedErrors),
+                array('', '(For full, unfiltered details please use: composer patch:apply -vvv)')
             );
-
-            $lines = array_merge(array('Probable causes for the failure:', ''), $lines);
-
-            $lines = array_merge($lines, array(
-                '',
-                '(For full, unfiltered details please use: composer patch:apply -vvv)'
-            ));
 
             $this->logger->writeNotice('warning', $lines);
         }
@@ -102,6 +99,14 @@ class OutputGenerator
             }
         }
 
-        return array_map('array_filter', $result);
+        return array_map(function (array $items) {
+            $filteredItems = array_filter($items);
+            
+            if (isset($filteredItems['']) && count($filteredItems) > 1) {
+                unset($filteredItems['']);
+            }
+            
+            return $filteredItems;
+        }, $result);
     }
 }
