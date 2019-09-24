@@ -7,8 +7,26 @@ namespace Vaimo\ComposerPatches\Strategies;
 
 class BootstrapStrategy
 {
+    /**
+     * @var \Vaimo\ComposerPatches\Composer\Context
+     */
+    private $composerContext;
+
+    /**
+     * @param \Vaimo\ComposerPatches\Composer\Context $composerContext
+     */
+    public function __construct(
+        \Vaimo\ComposerPatches\Composer\Context $composerContext
+    ) {
+        $this->composerContext = $composerContext;
+    }
+
     public function shouldAllow()
     {
+        if (!$this->isPluginAvailable()) {
+            return false;
+        }
+
         $lockUpdateArgument = 'lock';
         
         try {
@@ -21,5 +39,24 @@ class BootstrapStrategy
         }
 
         return false;
+    }
+    
+    private function isPluginAvailable()
+    {
+        $composer = $this->composerContext->getLocalComposer();
+
+        $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
+            array($composer->getPackage())
+        );
+
+        $repository = $composer->getRepositoryManager()->getLocalRepository();
+
+        try {
+            $packageResolver->resolveForNamespace($repository->getCanonicalPackages(), __NAMESPACE__);
+        } catch (\Vaimo\ComposerPatches\Exceptions\PackageResolverException $exception) {
+            return false;
+        }
+        
+        return true;
     }
 }

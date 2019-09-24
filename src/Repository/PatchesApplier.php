@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches\Repository;
 
 use Composer\Repository\WritableRepositoryInterface as Repository;
 use Composer\Package\PackageInterface as Package;
+
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 /**

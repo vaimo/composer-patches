@@ -46,7 +46,6 @@ class TemplateUtils
             }
 
             $argumentName = key($matches);
-
             $value = $arguments[$argumentName];
             
             if (preg_match_all(sprintf('/%s/i', reset($matches)), $arguments[$argumentName], $valueMatches)) {

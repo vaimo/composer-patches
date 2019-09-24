@@ -14,9 +14,9 @@ use Vaimo\ComposerPatches\Factories;
 class Bootstrap
 {
     /**
-     * @var \Composer\Composer
+     * @var \Vaimo\ComposerPatches\Composer\Context
      */
-    private $composer;
+    private $composerContext;
 
     /**
      * @var \Vaimo\ComposerPatches\Factories\ConfigFactory
@@ -54,32 +54,34 @@ class Bootstrap
     private $outputStrategy;
 
     /**
-     * @param \Composer\Composer $composer
+     * @param \Vaimo\ComposerPatches\Composer\Context $composerContext
      * @param \Composer\IO\IOInterface $appIO
      * @param \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
      * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy
      */
     public function __construct(
-        \Composer\Composer $composer,
+        \Vaimo\ComposerPatches\Composer\Context $composerContext,
         \Composer\IO\IOInterface $appIO,
         \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory,
         \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver = null,
         \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy = null
     ) {
-        $this->composer = $composer;
-        $this->configFactory = $configFactory;
+        $this->composerContext = $composerContext;
         $this->listResolver = $listResolver;
         $this->outputStrategy = $outputStrategy;
-        
+
+        $this->configFactory = $configFactory;
+
+        $logger = new \Vaimo\ComposerPatches\Logger($appIO);
+
         $this->loaderComponents = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
-            $composer,
+            $composerContext,
             $appIO
         );
 
-        $logger = new \Vaimo\ComposerPatches\Logger($appIO);
+        $composer = $this->composerContext->getLocalComposer();
         
-        $this->configFactory = new Factories\ConfigFactory($composer);
         $this->loaderFactory = new Factories\PatchesLoaderFactory($composer);
         $this->applierFactory = new Factories\PatchesApplierFactory($composer, $logger);
         
@@ -108,7 +110,8 @@ class Bootstrap
     
     private function applyPatchesWithConfig(PluginConfig $config, $devMode = false)
     {
-        $repository = $this->composer->getRepositoryManager()->getLocalRepository();
+        $composer = $this->composerContext->getLocalComposer();
+        $repository = $composer->getRepositoryManager()->getLocalRepository();
 
         $patchesLoader = $this->loaderFactory->create($this->loaderComponents, $config, $devMode);
         

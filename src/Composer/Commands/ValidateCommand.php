@@ -5,16 +5,17 @@
  */
 namespace Vaimo\ComposerPatches\Composer\Commands;
 
-use Composer\Repository\WritableRepositoryInterface as PackageRepository;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+
+use Composer\Repository\WritableRepositoryInterface as PackageRepository;
 
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
 use Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool;
+use Vaimo\ComposerPatches\Composer\Context as ComposerContext;
 use Vaimo\ComposerPatches\Utils\PathUtils;
 
 /**
@@ -59,7 +60,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             Config::PATCHER_SOURCES => $this->createSourcesEnablerConfig($localOnly)
         );
 
-        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
+        $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
+        $composerContext = $contextFactory->create();
+
+        $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composerContext, array(
             Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source')
         ));
         
@@ -67,7 +71,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $pluginConfig = $configFactory->create(array($pluginConfig));
         
-        $patchesLoader = $this->createPatchesLoader($pluginConfig);
+        $patchesLoader = $this->createPatchesLoader($composerContext, $pluginConfig);
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
         
@@ -213,7 +217,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
 
-        $pluginPackage = $packageResolver->resolveForNamespace($repository, __NAMESPACE__);
+        $pluginPackage = $packageResolver->resolveForNamespace(
+            $repository->getCanonicalPackages(),
+            __NAMESPACE__
+        );
 
         $pluginName = $pluginPackage->getName();
 
@@ -228,30 +235,31 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         );
     }
     
-    private function createPatchesLoader(\Vaimo\ComposerPatches\Config $pluginConfig)
+    private function createPatchesLoader(ComposerContext $composerContext, Config $pluginConfig)
     {
         $composer = $this->getComposer();
         
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
 
-        $loaderComponentsPool = $this->createLoaderPool(array(
+        $componentOverrides = array(
             'constraints' => false,
             'platform' => false,
             'targets-resolver' => false,
             'local-exclude' => false,
             'root-patch' => false,
             'global-exclude' => false
-        ));
+        );
+        
+        $loaderComponentsPool = $this->createLoaderPool($composerContext, $componentOverrides);
 
         return $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
     }
 
-    private function createLoaderPool(array $componentUpdates = array())
+    private function createLoaderPool(ComposerContext $composerContext, array $componentUpdates = array())
     {
-        $composer = $this->getComposer();
         $appIO = $this->getIO();
 
-        $componentPool = new ComponentPool($composer, $appIO, true);
+        $componentPool = new ComponentPool($composerContext, $appIO, true);
 
         foreach ($componentUpdates as $componentName => $replacement) {
             $componentPool->registerComponent($componentName, $replacement);

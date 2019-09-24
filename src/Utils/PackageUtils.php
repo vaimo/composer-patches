@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Utils;
 
 use Composer\Package\PackageInterface;
+
 use Vaimo\ComposerPatches\Config as PluginConfig;
 
 class PackageUtils

@@ -5,8 +5,6 @@
  */
 namespace Vaimo\ComposerPatches\Composer\Plugin;
 
-use Composer\Repository\WritableRepositoryInterface;
-
 class PackageResolver
 {
     /**
@@ -31,17 +29,14 @@ class PackageResolver
     }
 
     /**
-     * @param WritableRepositoryInterface $repository
+     * @param \Composer\Package\PackageInterface[] $packages
      * @param string $namespace
      * @return \Composer\Package\PackageInterface
-     * @throws \Exception
+     * @throws \Vaimo\ComposerPatches\Exceptions\PackageResolverException
      */
-    public function resolveForNamespace(WritableRepositoryInterface $repository, $namespace)
+    public function resolveForNamespace(array $packages, $namespace)
     {
-        $packages = array_merge(
-            $this->additionalPackages,
-            $repository->getCanonicalPackages()
-        );
+        $packages = array_merge($this->additionalPackages, $packages);
 
         foreach ($packages as $package) {
             if (!$this->packageAnalyser->isPluginPackage($package)) {
@@ -54,7 +49,7 @@ class PackageResolver
 
             return $package;
         }
-
+        
         throw new \Vaimo\ComposerPatches\Exceptions\PackageResolverException(
             'Failed to detect the plugin package'
         );

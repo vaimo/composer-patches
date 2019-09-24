@@ -6,7 +6,6 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionList\Loader;
 
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
-
 use Vaimo\ComposerPatches\Config as PluginConfig;
 
 /**
@@ -15,9 +14,9 @@ use Vaimo\ComposerPatches\Config as PluginConfig;
 class ComponentPool
 {
     /**
-     * @var \Composer\Composer
+     * @var \Vaimo\ComposerPatches\Composer\Context
      */
-    private $composer;
+    private $composerContext;
 
     /**
      * @var \Composer\IO\IOInterface
@@ -37,16 +36,16 @@ class ComponentPool
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      *
-     * @param \Composer\Composer $composer
+     * @param \Vaimo\ComposerPatches\Composer\Context $composerContext
      * @param \Composer\IO\IOInterface $appIO
      * @param bool $gracefulMode
      */
     public function __construct(
-        \Composer\Composer $composer,
+        \Vaimo\ComposerPatches\Composer\Context $composerContext,
         \Composer\IO\IOInterface $appIO,
         $gracefulMode = false
     ) {
-        $this->composer = $composer;
+        $this->composerContext = $composerContext;
         $this->appIO = $appIO;
         $this->gracefulMode = $gracefulMode;
     }
@@ -55,13 +54,15 @@ class ComponentPool
     {
         $patcherConfig = $pluginConfig->getPatcherConfig();
 
-        $composerConfig = clone $this->composer->getConfig();
+        $composer = $this->composerContext->getLocalComposer();
+        
+        $composerConfig = clone $composer->getConfig();
 
         $composerConfig->merge(array(
             'config' => array('secure-http' => $patcherConfig[PluginConfig::PATCHER_SECURE_HTTP])
         ));
         
-        $rootPackage = $this->composer->getPackage();
+        $rootPackage = $composer->getPackage();
         $extra = $rootPackage->getExtra();
         
         if (isset($extra['excluded-patches']) && !isset($extra[PluginConfig::EXCLUDED_PATCHES])) {
@@ -72,8 +73,7 @@ class ComponentPool
             ? $extra[PluginConfig::EXCLUDED_PATCHES]
             : array();
 
-        $installationManager = $this->composer->getInstallationManager();
-        $composerConfig = clone $this->composer->getConfig();
+        $installationManager = $composer->getInstallationManager();
 
         $cache = null;
         
@@ -101,13 +101,13 @@ class ComponentPool
         $platformPackages = $this->resolveConstraintPackages($composerConfig);
 
         $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
-            array($this->composer->getPackage())
+            array($composer->getPackage())
         );
 
-        $repositoryManager = $this->composer->getRepositoryManager();
+        $packages = $this->composerContext->getActivePackages();
 
         $pluginPackage = $packageResolver->resolveForNamespace(
-            $repositoryManager->getLocalRepository(),
+            $packages,
             __NAMESPACE__
         );
 
@@ -153,7 +153,7 @@ class ComponentPool
 
         $platformRepo = new \Composer\Repository\PlatformRepository(
             array(),
-            $platformOverrides ? $platformOverrides : array()
+            $platformOverrides ?: array()
         );
 
         $platformPackages = array();

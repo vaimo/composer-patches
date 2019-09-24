@@ -6,7 +6,6 @@
 namespace Vaimo\ComposerPatches\Utils;
 
 use Composer\Repository\WritableRepositoryInterface;
-use Vaimo\ComposerPatches\Composer\ConfigKeys as ComposerConfig;
 
 class RepositoryUtils
 {

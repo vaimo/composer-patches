@@ -5,8 +5,6 @@
  */
 namespace Vaimo\ComposerPatches\Patch\Definition;
 
-use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-
 class Normalizer
 {
     /**

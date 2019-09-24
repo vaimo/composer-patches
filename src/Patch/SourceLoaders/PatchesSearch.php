@@ -7,7 +7,6 @@ namespace Vaimo\ComposerPatches\Patch\SourceLoaders;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Vaimo\ComposerPatches\Config as PluginConfig;
-use Vaimo\ComposerPatches\Utils\PathUtils;
 
 class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface
 {

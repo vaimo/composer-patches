@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Patch;
 
 use Composer\Repository\WritableRepositoryInterface as PackageRepository;
+
 use Vaimo\ComposerPatches\Interfaces\PatchSourceListInterface;
 
 class SourcesResolver

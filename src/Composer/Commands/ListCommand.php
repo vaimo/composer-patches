@@ -5,17 +5,20 @@
  */
 namespace Vaimo\ComposerPatches\Composer\Commands;
 
-use Composer\Composer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
+
+use Composer\Composer;
 
 use Vaimo\ComposerPatches\Interfaces\ListResolverInterface as ListResolver;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
+use Vaimo\ComposerPatches\Composer\Context as ComposerContext;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -115,8 +118,11 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
         
         $pluginConfig = $this->createConfigWithEnabledSources($composer);
+
+        $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
+        $composerContext = $contextFactory->create();
         
-        $filteredPool = $this->createLoaderPool();
+        $filteredPool = $this->createLoaderPool($composerContext);
         
         $listResolver = new ListResolvers\FilteredListResolver($filters);
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
@@ -157,7 +163,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             );
         
         if ($shouldAddExcludes) {
-            $unfilteredPool = $this->createUnfilteredPatchLoaderPool($composer);
+            $unfilteredPool = $this->createUnfilteredPatchLoaderPool($composerContext);
 
             $unfilteredLoader = $loaderFactory->create($unfilteredPool, $pluginConfig, $isDevMode);
 
@@ -190,21 +196,25 @@ class ListCommand extends \Composer\Command\BaseCommand
         $this->generateOutput($output, $patches);
     }
     
-    private function createUnfilteredPatchLoaderPool(\Composer\Composer $composer)
+    private function createUnfilteredPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
     {
+        $composer = $composerContext->getLocalComposer();
+        
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
             $composer->getInstallationManager(),
             $composer->getConfig()->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR)
         );
 
-        return $this->createLoaderPool(array(
+        $componentOverrides =  array(
             'constraints' => false,
             'platform' => false,
             'local-exclude' => false,
             'root-patch' => false,
             'global-exclude' => false,
             'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver, true)
-        ));
+        );
+        
+        return $this->createLoaderPool($composerContext, $componentOverrides);
     }
     
     private function composerFilteredPatchesList($patches, $additions, $removals, $withAffected, $filters, $statuses)
@@ -298,10 +308,10 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
     }
     
-    private function createLoaderPool(array $componentUpdates = array())
+    private function createLoaderPool(ComposerContext $composerContext, array $componentUpdates = array())
     {
         $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
-            $this->getComposer(),
+            $composerContext,
             $this->getIO(),
             true
         );

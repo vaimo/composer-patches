@@ -11,9 +11,9 @@ use Vaimo\ComposerPatches\Environment;
 class ConfigFactory
 {
     /**
-     * @var \Composer\Composer
+     * @var \Vaimo\ComposerPatches\Composer\Context
      */
-    private $composer;
+    private $composerContext;
 
     /**
      * @var \Vaimo\ComposerPatches\Config\Defaults
@@ -41,14 +41,14 @@ class ConfigFactory
     private $dataUtils;
     
     /**
-     * @param \Composer\Composer $composer
+     * @param \Vaimo\ComposerPatches\Composer\Context $composerContext
      * @param array $defaults
      */
     public function __construct(
-        \Composer\Composer $composer,
+        \Vaimo\ComposerPatches\Composer\Context $composerContext,
         array $defaults = array()
     ) {
-        $this->composer = $composer;
+        $this->composerContext = $composerContext;
         $this->defaults = $defaults;
 
         $this->defaultsProvider = new \Vaimo\ComposerPatches\Config\Defaults();
@@ -65,7 +65,9 @@ class ConfigFactory
             array_filter(array(PluginConfig::PATCHER_GRACEFUL => (bool)getenv(Environment::GRACEFUL_MODE)))
         );
 
-        $extra = $this->composer->getPackage()->getExtra();
+        $composer = $this->composerContext->getLocalComposer();
+        
+        $extra = $composer->getPackage()->getExtra();
 
         if (isset($extra['patcher-config']) && !isset($extra[PluginConfig::PATCHER_CONFIG_ROOT])) {
             $extra[PluginConfig::PATCHER_CONFIG_ROOT] = $extra['patcher-config'];

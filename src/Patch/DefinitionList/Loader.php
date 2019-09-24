@@ -6,8 +6,8 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionList;
 
 use Composer\Repository\WritableRepositoryInterface as PackageRepository;
+
 use Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface as ListLoader;
-use Vaimo\ComposerPatches\Interfaces\PatchSourceListInterface;
 
 class Loader
 {

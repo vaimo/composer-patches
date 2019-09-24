@@ -9,10 +9,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+
 use Composer\Script\ScriptEvents;
 
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
-
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Interfaces\ListResolverInterface;
@@ -120,8 +120,6 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $shouldUndo = !$behaviourFlags[Behaviour::REDO] && $behaviourFlags[Behaviour::UNDO];
         
-        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composer, $appIO);
-        
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composer, array(
             Config::PATCHER_FORCE_REAPPLY => $behaviourFlags[Behaviour::REDO],
             Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source'),
@@ -138,6 +136,12 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $this->configureEnvironmentForBehaviour($behaviourFlags);
 
         $outputTriggers = $this->resolveOutputTriggers($filters, $behaviourFlags);
+
+        $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
+        $composerContext = $contextFactory->create();
+
+        $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
+        
         $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
         $bootstrap = $bootstrapFactory->create($configFactory, $listResolver, $outputStrategy);
 
