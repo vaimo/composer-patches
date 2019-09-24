@@ -62,8 +62,7 @@ class Plugin implements
         $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer, $composerContext);
         $pluginBootstrap->preloadPluginClasses();
         
-        if (
-            !interface_exists('\Composer\Plugin\Capability\CommandProvider') 
+        if (!interface_exists('\Composer\Plugin\Capability\CommandProvider')
             || !$this->bootstrapStrategy->shouldAllow()
         ) {
             return;

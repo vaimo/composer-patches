@@ -85,9 +85,11 @@ class Bootstrap
             $appIO
         );
 
-        $this->configFactory = new Factories\ConfigFactory($this->composerContext->getLocalComposer());
-        $this->loaderFactory = new Factories\PatchesLoaderFactory($this->composerContext->getLocalComposer());
-        $this->applierFactory = new Factories\PatchesApplierFactory($this->composerContext->getLocalComposer(), $logger);
+        $composer = $this->composerContext->getLocalComposer();
+        
+        $this->configFactory = new Factories\ConfigFactory($composer);
+        $this->loaderFactory = new Factories\PatchesLoaderFactory($composer);
+        $this->applierFactory = new Factories\PatchesApplierFactory($composer, $logger);
         
         $this->repositoryProcessor = new \Vaimo\ComposerPatches\Repository\Processor($logger);
     }

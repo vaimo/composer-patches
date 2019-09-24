@@ -15,6 +15,7 @@ use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool;
 use Vaimo\ComposerPatches\Patch\Definition as Patch;
 use Vaimo\ComposerPatches\Config;
+use Vaimo\ComposerPatches\Composer\Context as ComposerContext;
 use Vaimo\ComposerPatches\Utils\PathUtils;
 
 /**
@@ -214,7 +215,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
 
         $pluginPackage = $packageResolver->resolveForNamespace(
-            $repository->getCanonicalPackages(), 
+            $repository->getCanonicalPackages(),
             __NAMESPACE__
         );
 
@@ -231,7 +232,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         );
     }
     
-    private function createPatchesLoader(\Vaimo\ComposerPatches\Composer\Context $composerContext, \Vaimo\ComposerPatches\Config $pluginConfig)
+    private function createPatchesLoader(ComposerContext $composerContext, Config $pluginConfig)
     {
         $composer = $this->getComposer();
         
@@ -251,7 +252,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         return $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
     }
 
-    private function createLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext, array $componentUpdates = array())
+    private function createLoaderPool(ComposerContext $composerContext, array $componentUpdates = array())
     {
         $appIO = $this->getIO();
 

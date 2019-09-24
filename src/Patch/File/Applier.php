@@ -41,7 +41,7 @@ class Applier
     private $dataUtils;
 
     /**
-     * @var \Vaimo\ComposerPatches\Console\OutputAnalyser 
+     * @var \Vaimo\ComposerPatches\Console\OutputAnalyser
      */
     private $outputAnalyser;
     
@@ -300,7 +300,7 @@ class Applier
             list($result, $output) = $this->resultCache[$resultKey];
 
             if ($result) {
-                $this->validateOutput($output, $operationFailures); 
+                $this->validateOutput($output, $operationFailures);
             }
 
             if ($passOnFailure) {

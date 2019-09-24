@@ -24,7 +24,7 @@ class Context
     
     public function getActivePackages()
     {
-        return array_reduce($this->getPackageMap(), 'array_replace', []);
+        return array_reduce($this->getPackageMap(), 'array_replace', array());
     }
     
     public function getLocalComposer()
@@ -53,7 +53,6 @@ class Context
 
                     $result[$name] = true;
                     $this->packages[$instanceIndex][$name] = $package;
-
                 }
             }
         }

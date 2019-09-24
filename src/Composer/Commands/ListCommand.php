@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
+use Vaimo\ComposerPatches\Composer\Context as ComposerContext;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -304,7 +305,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
     }
     
-    private function createLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext, array $componentUpdates = array())
+    private function createLoaderPool(ComposerContext $composerContext, array $componentUpdates = array())
     {
         $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
             $composerContext,

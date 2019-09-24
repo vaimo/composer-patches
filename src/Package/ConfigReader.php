@@ -34,7 +34,7 @@ class ConfigReader
         }
 
         return $this->jsonDecoder->parse(
-            $sourceData, 
+            $sourceData,
             \Seld\JsonLint\JsonParser::PARSE_TO_ASSOC
         );
     }

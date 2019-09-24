@@ -13,7 +13,7 @@ class Bootstrap
     private $composer;
 
     /**
-     * @var \Vaimo\ComposerPatches\Composer\Context 
+     * @var \Vaimo\ComposerPatches\Composer\Context
      */
     private $composerContext;
 
