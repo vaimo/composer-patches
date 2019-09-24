@@ -5,11 +5,11 @@
  */
 namespace Vaimo\ComposerPatches\Composer\Commands;
 
-use Composer\Repository\WritableRepositoryInterface as PackageRepository;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+
+use Composer\Repository\WritableRepositoryInterface as PackageRepository;
 
 use Vaimo\ComposerPatches\Composer\ConfigKeys;
 use Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool;

@@ -6,7 +6,6 @@
 namespace Vaimo\ComposerPatches\Patch\DefinitionList\Loader;
 
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
-
 use Vaimo\ComposerPatches\Config as PluginConfig;
 
 /**

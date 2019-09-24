@@ -5,8 +5,9 @@
  */
 namespace Vaimo\ComposerPatches\Patcher;
 
-use Vaimo\ComposerPatches\Config as Keys;
 use Composer\Package\PackageInterface;
+
+use Vaimo\ComposerPatches\Config as Keys;
 
 class ConfigReader
 {

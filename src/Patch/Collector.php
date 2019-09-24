@@ -6,9 +6,10 @@
 namespace Vaimo\ComposerPatches\Patch;
 
 use Composer\Package\RootPackage;
+use Composer\Package\PackageInterface;
+
 use Vaimo\ComposerPatches\Interfaces\PatchSourceLoaderInterface;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
-use Composer\Package\PackageInterface;
 
 class Collector
 {

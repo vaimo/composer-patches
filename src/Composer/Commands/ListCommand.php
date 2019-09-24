@@ -5,13 +5,14 @@
  */
 namespace Vaimo\ComposerPatches\Composer\Commands;
 
-use Composer\Composer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Vaimo\ComposerPatches\Patch\Definition as Patch;
-
-use Vaimo\ComposerPatches\Interfaces\ListResolverInterface as ListResolver;
 use Symfony\Component\Console\Input\InputOption;
+
+use Composer\Composer;
+
+use Vaimo\ComposerPatches\Patch\Definition as Patch;
+use Vaimo\ComposerPatches\Interfaces\ListResolverInterface as ListResolver;
 use Vaimo\ComposerPatches\Repository\PatchesApplier\ListResolvers;
 use Vaimo\ComposerPatches\Config;
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;

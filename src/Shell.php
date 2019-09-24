@@ -40,7 +40,6 @@ class Shell
         }
         
         $processExecutor = $this->getProcessExecutor();
-
         $logger = $this->logger;
 
         $output = '';
@@ -66,7 +65,6 @@ class Shell
     private function getProcessExecutor()
     {
         $output = $this->logger->getOutputInstance();
-
         $isMutedFlag = (int)$this->logger->isMuted();
         
         if (!isset($this->processExecutors[$isMutedFlag])) {

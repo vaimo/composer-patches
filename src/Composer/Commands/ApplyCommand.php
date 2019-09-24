@@ -5,8 +5,6 @@
  */
 namespace Vaimo\ComposerPatches\Composer\Commands;
 
-use Symfony\Component\Console\Input\InputInterface;
-
 class ApplyCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
 {
     protected function configure()

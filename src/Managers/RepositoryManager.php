@@ -8,9 +8,7 @@ namespace Vaimo\ComposerPatches\Managers;
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\Package\PackageInterface;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Vaimo\ComposerPatches\Composer\ResetOperation;
-use Vaimo\ComposerPatches\Composer\OutputUtils;
 
 class RepositoryManager
 {

@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Console;
 
 use Symfony\Component\Console\Output\OutputInterface;
+
 use Vaimo\ComposerPatches\Composer\OutputUtils;
 
 class Silencer

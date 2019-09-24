@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Repository;
 
 use Composer\Repository\WritableRepositoryInterface as PackageRepository;
+
 use Vaimo\ComposerPatches\Config as PluginConfig;
 
 class StateGenerator

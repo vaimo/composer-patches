@@ -7,7 +7,6 @@ namespace Vaimo\ComposerPatches;
 
 use Vaimo\ComposerPatches\Config as PluginConfig;
 use Vaimo\ComposerPatches\Factories;
-use Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool;
 
 /**
  * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
@@ -118,9 +117,8 @@ class Bootstrap
     private function applyPatchesWithConfig(PluginConfig $config, $devMode = false)
     {
         $composer = $this->composerContext->getLocalComposer();
-        
         $repository = $composer->getRepositoryManager()->getLocalRepository();
-        
+
         $patchesLoader = $this->loaderFactory->create($this->loaderComponents, $config, $devMode);
         
         $patchesApplier = $this->applierFactory->create(

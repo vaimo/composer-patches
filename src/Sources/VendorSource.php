@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches\Sources;
 
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\Package\PackageInterface;
+
 use Vaimo\ComposerPatches\Composer\Constants as ComposerConstants;
 
 class VendorSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceListInterface

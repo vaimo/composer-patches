@@ -6,6 +6,7 @@
 namespace Vaimo\ComposerPatches\Repository;
 
 use Composer\Repository\WritableRepositoryInterface as Repository;
+
 use Vaimo\ComposerPatches\Repository\PatchesApplier as Applier;
 use Vaimo\ComposerPatches\Patch\DefinitionList\Loader;
 
