@@ -2,6 +2,15 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.51.2 (2019-09-25)
+
+### Fix
+
+* some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)
+* errors not listed when file reference not available within patch (affects brief reporting, everything worked as expected with -vvv)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.2) [diff](https://github.com/vaimo/composer-patches/compare/3.51.1...3.51.2)
+
 ## 3.51.1 (2019-09-24)
 
 ### Fix
