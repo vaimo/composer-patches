@@ -27,20 +27,9 @@ class OutputGenerator
                 return;
             }
             
-            $lines = array();
-
-            foreach ($this->prioritizeErrors($errors) as $type => $groups) {
-                if (!empty($lines)) {
-                    $lines[] = '';
-                }
-
-                $lines[] = sprintf('> %s', $type);
-                
-                foreach ($groups as $path => $messages) {
-                    $lines[] = sprintf('  @ %s', $path);
-                    $lines[] = sprintf('  ! %s', reset($messages));
-                }
-            }
+            $lines = $this->createOutputLines(
+                $this->prioritizeErrors($errors)
+            );
 
             $lines = array_merge(array('Probable causes for the failure:', ''), $lines);
 
@@ -51,6 +40,34 @@ class OutputGenerator
 
             $this->logger->writeNotice('warning', $lines);
         }
+    }
+    
+    private function createOutputLines(array $errors)
+    {
+        $lines = array();
+        
+        foreach ($errors as $type => $groups) {
+            if (!empty($lines)) {
+                $lines[] = '';
+            }
+
+            $lines[] = sprintf('> %s', $type);
+
+            foreach ($groups as $path => $messages) {
+                $details = array(
+                    '@' => $path,
+                    '!' => reset($messages)
+                );
+
+                foreach ($details as $marker => $value) {
+                    foreach (explode(PHP_EOL, $value) as $index => $item) {
+                        $lines[] = sprintf('  %s %s', !$index ? $marker : ' ', $item);
+                    }
+                }
+            }
+        }
+
+        return $lines;
     }
     
     private function prioritizeErrors(array $errors)

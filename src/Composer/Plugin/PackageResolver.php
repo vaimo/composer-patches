@@ -5,8 +5,6 @@
  */
 namespace Vaimo\ComposerPatches\Composer\Plugin;
 
-use Composer\Repository\WritableRepositoryInterface;
-
 class PackageResolver
 {
     /**

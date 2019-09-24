@@ -15,7 +15,9 @@ class DataUtils
         
         foreach ($items as $item) {
             if (preg_match($keyMatcher, $item, $matches)) {
-                $key = $matches[1];
+                $key = isset($matches['match']) 
+                    ? $matches['match'] 
+                    : $matches[1];
 
                 continue;
             }

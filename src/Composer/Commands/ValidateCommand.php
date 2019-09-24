@@ -213,7 +213,10 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
 
-        $pluginPackage = $packageResolver->resolveForNamespace($repository, __NAMESPACE__);
+        $pluginPackage = $packageResolver->resolveForNamespace(
+            $repository->getCanonicalPackages(), 
+            __NAMESPACE__
+        );
 
         $pluginName = $pluginPackage->getName();
 
@@ -243,7 +246,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             'global-exclude' => false
         );
         
-        $loaderComponentsPool = $this->createLoaderPool($componentOverrides);
+        $loaderComponentsPool = $this->createLoaderPool($composerContext, $componentOverrides);
 
         return $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
     }

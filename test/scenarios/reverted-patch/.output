@@ -9,6 +9,7 @@ Processing patches configuration
                                                                           
       > PATCH                                                             
         @ src/example.txt                                                 
-        ! Success changed to FAILURE due to output analysis (reversals)   
+        ! Success changed to FAILURE due to output analysis (reversals):  
+          Reversed (or previously applied) patch detected!  Assuming -R.  
                                                                           
       (For full, unfiltered details please use: composer patch:apply -vvv)

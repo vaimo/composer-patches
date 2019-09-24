@@ -6,7 +6,12 @@
     ],
     "3.51.1": {
         "fix": [
-            "allow the plugin to be installed as dependency to globally installed package (as part of dependency of some global package); previously caused every composer call to crash with class declaration conflict"
+            "allow the plugin to be installed as dependency to globally installed package (as part of dependency of some global package); previously caused every composer call to crash with class declaration conflict",
+            "patch error reporting includes patch creation date where just path should have been shown",
+            "patch errors caused by output analysis did not include the raw output line that caused the failure detector to trigger"
+        ],
+        "maintenance": [
+            "new documentation page added to shed some light to different situations one might find themselves in when a patch applying fails"
         ]
     },
     "3.51.0": {
