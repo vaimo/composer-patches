@@ -23,7 +23,7 @@ class BootstrapStrategy
 
     public function shouldAllow()
     {
-        if (getenv('VAIMO_COMPOSER_PATCHER_ALLOW_GLOBAL_COMMANDS', true)) {
+        if (getenv('VAIMO_COMPOSER_PATCHER_ALLOW_GLOBAL_COMMANDS')) {
             return true;
         }
 
