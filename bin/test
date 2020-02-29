@@ -415,12 +415,12 @@ fi
     package_root=$(pwd)
      
     cd ${package_root}/test &>/dev/null
-    
+
     sandbox_root=$(pwd)
-    
-    installations=$(ls installations -1)
-    scenarios=$(ls scenarios -1)
-    
+
+    installations=$(ls -1 installations)
+    scenarios=$(ls -1 scenarios)
+
     if [ "${PURGE}" == "1" ] ; then
         for installation in ${installations} ; do
             installation_root=$(get_installation_root ${installation})
