@@ -267,7 +267,7 @@ process_assertions() {
     return 0
 }
 
-function apply_patches() {   
+apply_patches() {
     local args=${1}
     local out_file=${2}
  
@@ -339,7 +339,7 @@ assertion_error() {
     _error "ASSERTION: ${before} => ${after}"        
 }
 
-function reset_packages() {
+reset_packages() {
     local installation_root=${1}
     local install_info_path="${installation_root}/vendor/composer/installed.json"
     
