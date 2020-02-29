@@ -9,7 +9,6 @@ script_root=$(dirname $(test -L ${script_path} && readlink -f ${script_path} || 
 
 source ${script_root}/lib/output.sh
 
-
 run_tests() {
     local scenario_root=${1}
         
@@ -359,7 +358,7 @@ reset_packages() {
     local lock_path="${installation_root}/composer.lock"
 
     if [ -f ${install_info_path} ] ; then
-        sed -i.org 's|\(\s"name":\s"\)\(vaimo/composer-patches-target\)\(.*\)",|\1__\2\3",|g' \
+        perl -i.org -pe 's|(\s"name":\s")(vaimo/composer-patches-target)(.*)",|\1__\2\3",|g' \
             ${install_info_path}
 
         rm ${install_info_path}.org
