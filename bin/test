@@ -189,11 +189,25 @@ assert_patches() {
     return 1
 }
 
+_is_macosx() {
+    if [[ "${OSTYPE}" == "darwin"* ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
 assert_scenario_output() {
     local scenario_root=${1}
     local output_file=${2}
     
     local expected_output_file="${scenario_root}/.output"
+
+    if _is_macosx ; then
+        if [ -f ${expected_output_file}-darwin ] ; then
+            expected_output_file="${expected_output_file}-darwin"
+        fi
+    fi
  
     if [ ! -f ${output_file} ] ; then
         return 0

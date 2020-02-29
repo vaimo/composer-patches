@@ -1,4 +1,4 @@
 patch:validate
 patch:apply
->sed -i 's/\+valueX/+valueZ/' patches/1_second-change.patch
+>sed -i.org 's/\+valueX/+valueZ/' patches/1_second-change.patch
 patch:apply
