@@ -189,14 +189,6 @@ assert_patches() {
     return 1
 }
 
-_is_macosx() {
-    if [[ "${OSTYPE}" == "darwin"* ]]; then
-        return 0
-    fi
-
-    return 1
-}
-
 assert_scenario_output() {
     local scenario_root=${1}
     local output_file=${2}
@@ -208,8 +200,7 @@ assert_scenario_output() {
     fi
 
     cat ${output_file} \
-        |sed -E "s/[[:cntrl:]]\[[0-9]{1,3}m//g" \
-        |sed -E "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" \
+        |perl -pe 's/\e\[[0-9;]*m(?:\e\[K)?//g' \
         |grep -v "^\s\s\s\s[0-9]\+/[0-9]\+:" \
         |grep -v "^\s\s\s\sFinished:\ssuccess:\s" \
         |grep -v "^You are running composer with xdebug enabled" \
