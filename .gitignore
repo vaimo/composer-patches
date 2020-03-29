@@ -10,3 +10,4 @@ test/installations/**/modules
 test/installations/**/patches
 test/installations/**/patches.json
 test/dependencies/modules
+*.org

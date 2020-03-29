@@ -9,7 +9,6 @@ script_root=$(dirname $(test -L ${script_path} && readlink -f ${script_path} || 
 
 source ${script_root}/lib/output.sh
 
-
 run_tests() {
     local scenario_root=${1}
         
@@ -189,19 +188,32 @@ assert_patches() {
     return 1
 }
 
+_is_macosx() {
+    if [[ "${OSTYPE}" == "darwin"* ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
 assert_scenario_output() {
     local scenario_root=${1}
     local output_file=${2}
     
     local expected_output_file="${scenario_root}/.output"
+
+    if _is_macosx ; then
+        if [ -f ${expected_output_file}-darwin ] ; then
+            expected_output_file="${expected_output_file}-darwin"
+        fi
+    fi
  
     if [ ! -f ${output_file} ] ; then
         return 0
     fi
- 
+
     cat ${output_file} \
-        |sed -r "s/[[:cntrl:]]\[[0-9]{1,3}m//g" \
-        |sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" \
+        |perl -pe 's/\e\[[0-9;]*m(?:\e\[K)?//g' \
         |grep -v "^\s\s\s\s[0-9]\+/[0-9]\+:" \
         |grep -v "^\s\s\s\sFinished:\ssuccess:\s" \
         |grep -v "^You are running composer with xdebug enabled" \
@@ -267,7 +279,7 @@ process_assertions() {
     return 0
 }
 
-function apply_patches() {   
+apply_patches() {
     local args=${1}
     local out_file=${2}
  
@@ -339,35 +351,36 @@ assertion_error() {
     _error "ASSERTION: ${before} => ${after}"        
 }
 
-function reset_packages() {
+reset_packages() {
     local installation_root=${1}
     local install_info_path="${installation_root}/vendor/composer/installed.json"
     
     local lock_path="${installation_root}/composer.lock"
-    
+
     if [ -f ${install_info_path} ] ; then
-        sudo sed -i 's|\(\s"name":\s"\)\(vaimo/composer-patches-target\)\(.*\)",|\1__\2\3",|g' \
+        perl -i.org -pe 's|(\s"name":\s")(vaimo/composer-patches-target)(.*)",|\1__\2\3",|g' \
             ${install_info_path}
+
+        rm ${install_info_path}.org
             
-            local php_script=$(cat <<EOF
-                if (file_exists('${lock_path}')) {
-                
-                    \$config = json_decode(file_get_contents('${lock_path}'), true);
+        local php_script=$(cat <<EOF
+            if (file_exists('${lock_path}')) {
+                \$config = json_decode(file_get_contents('${lock_path}'), true);
                     
-                    foreach (['packages', 'packages-dev'] as \$group) {
-                        \$names = array_column(\$config[\$group], 'name');                    
-                        \$matches = preg_grep('|vaimo/composer-patches-target|', \$names);
+                foreach (['packages', 'packages-dev'] as \$group) {
+                    \$names = array_column(\$config[\$group], 'name');
+                    \$matches = preg_grep('|vaimo/composer-patches-target|', \$names);
                         
-                        foreach (array_keys(\$matches) as \$index) {
-                            \$config[\$group][\$index]['extra']['patches_applied'] = [];
-                        }  
+                    foreach (array_keys(\$matches) as \$index) {
+                        \$config[\$group][\$index]['extra']['patches_applied'] = [];
                     }
-                
-                    file_put_contents('${lock_path}', json_encode(\$config, JSON_PRETTY_PRINT));                
                 }
+                
+                file_put_contents('${lock_path}', json_encode(\$config, JSON_PRETTY_PRINT));
+            }
 EOF
 )            
-        
+
         php -r "${php_script}"        
     fi
     
@@ -415,12 +428,12 @@ fi
     package_root=$(pwd)
      
     cd ${package_root}/test &>/dev/null
-    
+
     sandbox_root=$(pwd)
-    
-    installations=$(ls installations -1)
-    scenarios=$(ls scenarios -1)
-    
+
+    installations=$(ls -1 installations)
+    scenarios=$(ls -1 scenarios)
+
     if [ "${PURGE}" == "1" ] ; then
         for installation in ${installations} ; do
             installation_root=$(get_installation_root ${installation})
@@ -448,17 +461,17 @@ fi
         
         (
             cd ${installation_root}
-        
+
             sanitize
 
             ln -s ${sandbox_root}/modules ${installation_root}
-            
+
             if [ ! -f composer.lock ] ; then
                 composer install --ansi --no-plugins
             else
                 composer install --ansi --no-plugins &>/dev/null
             fi
-    
+
             for scenario in ${scenarios} ; do
                 if [ "${scenarios_skip}" != "" ] && echo "${scenarios_skip}"|grep -q "^${scenario}$" ; then
                     continue
@@ -467,11 +480,11 @@ fi
                 if ! echo ${scenario}|grep -q "${scenario_filter}" ; then
                     continue
                 fi
-            
+
                 reset_packages "${installation_root}"
 
                 scenario_root=${sandbox_root}/scenarios/${scenario}
-                        
+
                 if ! run_tests "${scenario_root}" ; then
                     sanitize
                     
@@ -486,7 +499,7 @@ fi
             echo ''
         
             sanitize
-            
+
             exit 0
         )
         

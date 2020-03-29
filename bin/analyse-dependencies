@@ -194,7 +194,7 @@ is_production_dependency()
 
         version_mm=$(echo ${version}|cut -d'.' -f1-2)
 
-        sed -i 's|_VERSION_|'${version_mm}'|g' $(pwd)/phpcs.xml
+        sed -i.org 's|_VERSION_|'${version_mm}'|g' $(pwd)/phpcs.xml
         
         _line '=' 80
         _title "CHECK VIABILITY WITH" "PHP ${version_mm}" "code compatibility of required dependencies"

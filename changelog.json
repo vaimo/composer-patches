@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "DEV-3.51.3": {
+        "maintenance": [
+            "make it possible to run tests while developing the module on MacOS"
+        ],
+        "branch": "release/3"
+    },
     "3.51.2": {
         "fix": [
             "some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)",
