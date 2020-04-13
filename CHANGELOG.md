@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## DEV-3.51.3
+
+### Maintenance
+
+* make it possible to run tests while developing the module on MacOS
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/DEV-3.51.3) [diff](https://github.com/vaimo/composer-patches/compare/3.51.2...DEV-3.51.3)
+
 ## 3.51.2 (2019-09-25)
 
 ### Fix
