@@ -30,6 +30,12 @@ where patches are needed.
 * [Examples](./docs/EXAMPLES.md) - Examples on usage of the plugin
 * [Changes](./CHANGELOG.md) - List of changes/fixes per plugin release
 
+## Installation
+
+Require the package in your composer.json:
+
+`composer require vaimo/composer-patches`
+
 ## Quick Start
 
 Composer packages can be targeted with patches in two ways: 
