@@ -35,7 +35,7 @@ class DefaultResetStrategy implements \Vaimo\ComposerPatches\Interfaces\PackageR
 
     public function shouldAllowReset(\Composer\Package\PackageInterface $package)
     {
-        $downloader = $this->downloader->getDownloaderForInstalledPackage($package);
+        $downloader = $this->downloader->getDownloaderForPackage($package);
 
         if ($downloader instanceof ChangeReportCapable
             && $downloader instanceof VcsCapable

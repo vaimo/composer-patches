@@ -11,12 +11,12 @@ class RepositoryUtils
 {
     public function filterByDependency(WritableRepositoryInterface $repository, $dependencyName)
     {
-        $compositeRepository = new \Composer\Repository\CompositeRepository(array(
+        $installedRepo = new \Composer\Repository\InstalledRepository(array(
             $repository
         ));
 
         return array_filter(
-            array_map('reset', $compositeRepository->getDependents($dependencyName))
+            array_map('reset', $installedRepo->getDependents($dependencyName))
         );
     }
 }
