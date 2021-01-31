@@ -6,9 +6,10 @@
     ],
     "DEV-3.51.3": {
         "fix": [
-            "strpos() empty needle errors can occur with certain configurations (pull/53)",
             "added /F switch to where to add double quotes to windows commands (pull/44)",
-            "added no-scripts option to avoid executing post-install-cmd (pull/48)"
+            "added no-scripts option to avoid executing post-install-cmd (pull/48)",
+            "strpos() empty needle errors can occur with certain configurations (pull/53)",
+            "patches-searches path containing .patch fails (pull/58)"
         ],
         "maintenance": [
             "make it possible to run tests while developing the module on MacOS",
