@@ -21,8 +21,7 @@
             "make sure output assertions on tests don't fail on small terminal windows when composer output gets wrapped",
             "update compatibility checker not to fail on false-negatives",
             "fix normaliser script not executing as expected after code:deps run"
-        ],
-        "branch": "release/3"
+        ]
     },
     "4.20.2": {
         "overview": "changes in this release forward-ported from 3.51.2",
