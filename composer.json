@@ -104,6 +104,7 @@
         "code:analyse": "bin/analyse",
         "code:deps": "bin/analyse-dependencies",
         "code:normalise": "bin/normalise",
+        "ci:build": "composer code:analyse && composer code:deps && composer code:test",
         "pre-install-cmd": "bin/bootstrap-test-env",
         "post-install-cmd": "bin/bootstrap",
         "post-update-cmd" : "bin/bootstrap"

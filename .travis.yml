@@ -15,6 +15,4 @@ install:
   - composer install
 
 script:
-  - composer code:deps
-  - composer code:analyse
-  - composer test
+  - composer ci:build
