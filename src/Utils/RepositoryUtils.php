@@ -11,9 +11,7 @@ class RepositoryUtils
 {
     public function filterByDependency(WritableRepositoryInterface $repository, $dependencyName)
     {
-        $compositeRepository = new \Composer\Repository\CompositeRepository(array(
-            $repository
-        ));
+        $compositeRepository = new \Composer\Repository\CompositeRepository(array($repository));
 
         return array_filter(
             array_map('reset', $compositeRepository->getDependents($dependencyName))

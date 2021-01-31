@@ -2,6 +2,21 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.21.1
+
+changes in this release forward-ported from 3.52.1
+
+### Fix
+
+* remove patch availability validation crash under certain package setups
+
+
+### Maintenance
+
+* improve test coverage to include scenarios where the patches are owned by a sub-package rather than the root
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.21.1) [diff](https://github.com/vaimo/composer-patches/compare/4.21.0...4.21.1)
+
 ## 4.21.0
 
 changes in this release forward-ported from 3.52.0
@@ -25,7 +40,7 @@ changes in this release forward-ported from 3.52.0
 * make it possible to run tests while developing the module on MacOS
 * make sure output assertions on tests don't fail on small terminal windows when composer output gets wrapped
 * update compatibility checker not to fail on false-negatives
-* fix normaliser script not executing as expected after code:deps run
+* fix normalizer script not executing as expected after code:deps run
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.21.0) [diff](https://github.com/vaimo/composer-patches/compare/4.20.2...4.21.0)
 
@@ -89,7 +104,7 @@ changes in this release forward-ported from 3.50.3
 
 ### Maintenance
 
-* the state of the test installation not properly reset when composer.lock got corrupted (a'la: 'patches_applied' key ended up there)
+* the state of the test installation not properly reset when composer.lock got corrupted (example: 'patches_applied' key ended up there)
 * test run output improvements; less output from composer calls that are not directly relevant to scenarios
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.3) [diff](https://github.com/vaimo/composer-patches/compare/4.19.2...4.19.3)
@@ -110,7 +125,7 @@ changes in this release forward-ported from 3.50.2
 * removed lock files from tests to make sure that initial setup always ends up installing the latest package dependencies
 * make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)
 * run tests (including the test that the module can be installed) on multiple PHP versions: 5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3
-* run Compatibility ruleset on all installations
+* run Compatibility rule-set on all installations
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.2) [diff](https://github.com/vaimo/composer-patches/compare/4.19.1...4.19.2)
 
@@ -365,8 +380,8 @@ all features and fixes in this release are forward-ported from 3.47.1
 
 ### Maintenance
 
-* improved early autoloader setup within proxy plugin
-* code normalised according to coding standards
+* improved early auto-loader setup within proxy plugin
+* code normalized according to coding standards
 * simple integration tests added that test the patch applying in sandbox Composer project
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.16.1) [diff](https://github.com/vaimo/composer-patches/compare/4.16.0...4.16.1)
@@ -403,7 +418,7 @@ All features and fixes in this release are forward-ported from 3.46.0
 
 * bundled patches partially reset when removing some dev-only (with --no-dev option) patches that targeted same packages as bundles did; Issue caused by only partially recursive lookup on an impact of re-installing certain composer package
 * the alias argument for --explicit, --show-reapplies did not trigger explicit output
-* make sure that repeated patch:undo calls don't reinstall previously undo'd patches
+* make sure that repeated patch:undo calls don't reinstall previously reverted patches
 * make sure that patch:list uses same functionality that the main patch applier uses, thus guaranteeing that path:list will list the things as they'd be processed in actual patch apply run
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.15.0) [diff](https://github.com/vaimo/composer-patches/compare/4.14.0...4.15.0)
@@ -429,7 +444,7 @@ all features and fixes in this release are forward-ported from 3.44.0
 
 ### Feature
 
-* Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)
+* Allow declaration of patches that only apply when owner package is used as ROOT package (README/Patches: local patch)
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.13.0) [diff](https://github.com/vaimo/composer-patches/compare/4.12.0...4.13.0)
 
@@ -681,9 +696,9 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 
 ### Breaking
 
-* logic: installation/update/applying patches fails on first patch failure (used to be activated by COMPOSER_PATCHES_FATAL_FAIL); old default behaviour usable via COMPOSER_PATCHES_GRACEFUL or using --graceful flag
+* logic: installation/update/applying patches fails on first patch failure (used to be activated by COMPOSER_PATCHES_FATAL_FAIL); old default behavior usable via COMPOSER_PATCHES_GRACEFUL or using --graceful flag
 * config: removed COMPOSER_PATCHES_REAPPLY_ALL, COMPOSER_FORCE_PATCH_REAPPLY; replaced by 'composer patch:redo'
-* config: removed COMPOSER_PATCHES_FATAL_FAIL, COMPOSER_EXIT_ON_PATCH_FAILURE; replaceb by COMPOSER_PATCHES_GRACEFUL
+* config: removed COMPOSER_PATCHES_FATAL_FAIL, COMPOSER_EXIT_ON_PATCH_FAILURE; replaced by COMPOSER_PATCHES_GRACEFUL
 * config: removed COMPOSER_PATCHES_FROM_SOURCE, COMPOSER_PATCHES_PREFER_OWNER; replaced with --from-source flag on commands (was meant for testing out a patch)
 * config: removed COMPOSER_SKIP_PATCH_PACKAGES, COMPOSER_PATCHES_SKIP_PACKAGES; never really used for anything, could be achieved via using patcher configuration
 
@@ -693,7 +708,19 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.52.0...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.52.1...4.0.0)
+
+## 3.52.1
+
+### Fix
+
+* remove patch availability validation crash under certain package setups
+
+### Maintenance
+
+* improve test coverage to include scenarios where the patches are owned by a sub-package rather than the root
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.52.1) [diff](https://github.com/vaimo/composer-patches/compare/3.52.0...3.52.1)
 
 ## 3.52.0 (2021-01-31)
 

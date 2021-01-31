@@ -2,8 +2,8 @@ patch:validate
 
 patch:apply
 
->rm patches/*
->echo '{}' > patches.json
+>rm {{OWNER-ROOT}}/patches/*
+>echo '{}' > {{OWNER-ROOT}}/patches.json
 
 patch:apply
 

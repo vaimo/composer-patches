@@ -1,5 +1,5 @@
 Scanning packages for orphan patches
-  - vaimo/composer-patches-sandbox
+  - {{PATCHES-OWNER}}
     ~ https://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-version.patch [ERROR 404]
     ~ http://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-version.patch [UNSECURE]
 Orphans found!

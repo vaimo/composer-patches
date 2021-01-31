@@ -1,7 +1,6 @@
 Change: valueC => valueX
 
 @package vaimo/composer-patches-target1
-
 @assert vaimo/composer-patches-target1,valueC,valueX
 
 --- src/example.txt.org

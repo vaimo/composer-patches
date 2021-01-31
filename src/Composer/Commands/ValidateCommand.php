@@ -90,13 +90,9 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         );
         
         $matches = $this->resolveValidationTargets($repository, $pluginConfig);
-
         $installPaths = $this->collectInstallPaths($matches);
-        
         $fileMatches = $this->collectPatchFilesFromPackages($matches, $pluginConfig);
-        
         $groups = $this->collectOrphans($fileMatches, $patchDefines, $installPaths, $patchStatuses);
-        
         $this->outputOrphans($output, $groups);
 
         $output->writeln(
@@ -288,16 +284,24 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $ownerName = $config[Patch::OWNER];
             $installPath = $paths[$ownerName];
             
+            if (!isset($groups[$ownerName])) {
+                continue;
+            }
+
             $groups[$ownerName][] = array(
                 'issue' => 'NO CONFIG',
                 'path' => $config[Patch::URL] ?: PathUtils::reducePathLeft($path, $installPath)
             );
         }
-        
+
         foreach ($orphanConfig as $path => $config) {
             $ownerName = $config[Patch::OWNER];
             $installPath = $paths[$ownerName];
             
+            if (!isset($groups[$ownerName])) {
+                continue;
+            }
+
             $groups[$ownerName][] = array(
                 'issue' => isset($statuses[$path]) && $statuses[$path]
                     ? $statuses[$path]

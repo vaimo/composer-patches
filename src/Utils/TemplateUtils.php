@@ -12,9 +12,11 @@ class TemplateUtils
         $result = array();
 
         foreach ($patterns as $pattern) {
+            $usedVariables = array();
             preg_match_all('/' . sprintf($pattern, '([^\}]+)') . '/', $template, $usedVariables);
 
             foreach ($usedVariables[1] as $variableName) {
+                $valueRules = array();
                 if (!preg_match_all('/\(([^\)]+)\)/', $variableName, $valueRules)) {
                     continue;
                 }
@@ -48,6 +50,7 @@ class TemplateUtils
             $argumentName = key($matches);
             $value = $arguments[$argumentName];
             
+            $valueMatches = array();
             if (preg_match_all(sprintf('/%s/i', reset($matches)), $arguments[$argumentName], $valueMatches)) {
                 $value = reset($valueMatches[1]);
             }

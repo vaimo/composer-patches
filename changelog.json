@@ -4,6 +4,15 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.21.1": {
+        "overview": "changes in this release forward-ported from 3.52.1",
+        "fix": [
+            "remove patch availability validation crash under certain package setups"
+        ],
+        "maintenance": [
+            "improve test coverage to include scenarios where the patches are owned by a sub-package rather than the root"
+        ]
+    },
     "4.21.0": {
         "overview": "changes in this release forward-ported from 3.52.0",
         "feature": [
@@ -20,7 +29,7 @@
             "make it possible to run tests while developing the module on MacOS",
             "make sure output assertions on tests don't fail on small terminal windows when composer output gets wrapped",
             "update compatibility checker not to fail on false-negatives",
-            "fix normaliser script not executing as expected after code:deps run"
+            "fix normalizer script not executing as expected after code:deps run"
         ]
     },
     "4.20.2": {
@@ -60,7 +69,7 @@
             "running 'composer update --lock' not cleaning up composer.lock afterwards when patches already applied. No such issue when no patches applied at all (running 'update' with --lock does not apply the patches); This situation resulted in patches being perceived as already applied when a package with such a lock was installed"
         ],
         "maintenance": [
-            "the state of the test installation not properly reset when composer.lock got corrupted (a'la: 'patches_applied' key ended up there)",
+            "the state of the test installation not properly reset when composer.lock got corrupted (example: 'patches_applied' key ended up there)",
             "test run output improvements; less output from composer calls that are not directly relevant to scenarios"
         ]
     },
@@ -75,7 +84,7 @@
             "removed lock files from tests to make sure that initial setup always ends up installing the latest package dependencies",
             "make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)",
             "run tests (including the test that the module can be installed) on multiple PHP versions: 5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3",
-            "run Compatibility ruleset on all installations"
+            "run Compatibility rule-set on all installations"
         ]
     },
     "4.19.1": {
@@ -232,8 +241,8 @@
             "log output typos corrected"
         ],
         "maintenance": [
-            "improved early autoloader setup within proxy plugin",
-            "code normalised according to coding standards",
+            "improved early auto-loader setup within proxy plugin",
+            "code normalized according to coding standards",
             "simple integration tests added that test the patch applying in sandbox Composer project"
         ]
     },
@@ -260,7 +269,7 @@
         "fix": [
             "bundled patches partially reset when removing some dev-only (with --no-dev option) patches that targeted same packages as bundles did; Issue caused by only partially recursive lookup on an impact of re-installing certain composer package",
             "the alias argument for --explicit, --show-reapplies did not trigger explicit output",
-            "make sure that repeated patch:undo calls don't reinstall previously undo'd patches",
+            "make sure that repeated patch:undo calls don't reinstall previously reverted patches",
             "make sure that patch:list uses same functionality that the main patch applier uses, thus guaranteeing that path:list will list the things as they'd be processed in actual patch apply run"
         ]
     },
@@ -276,7 +285,7 @@
     "4.13.0": {
         "overview": "all features and fixes in this release are forward-ported from 3.44.0",
         "feature": [
-            "Allow declaration of pathces that only apply when owner package is used as ROOT package (README/Patches: local patch)"
+            "Allow declaration of patches that only apply when owner package is used as ROOT package (README/Patches: local patch)"
         ]
     },
     "4.12.0": {
@@ -447,9 +456,9 @@
     },
     "4.0.0": {
         "breaking": [
-            "logic: installation/update/applying patches fails on first patch failure (used to be activated by COMPOSER_PATCHES_FATAL_FAIL); old default behaviour usable via COMPOSER_PATCHES_GRACEFUL or using --graceful flag",
+            "logic: installation/update/applying patches fails on first patch failure (used to be activated by COMPOSER_PATCHES_FATAL_FAIL); old default behavior usable via COMPOSER_PATCHES_GRACEFUL or using --graceful flag",
             "config: removed COMPOSER_PATCHES_REAPPLY_ALL, COMPOSER_FORCE_PATCH_REAPPLY; replaced by 'composer patch:redo'",
-            "config: removed COMPOSER_PATCHES_FATAL_FAIL, COMPOSER_EXIT_ON_PATCH_FAILURE; replaceb by COMPOSER_PATCHES_GRACEFUL",
+            "config: removed COMPOSER_PATCHES_FATAL_FAIL, COMPOSER_EXIT_ON_PATCH_FAILURE; replaced by COMPOSER_PATCHES_GRACEFUL",
             "config: removed COMPOSER_PATCHES_FROM_SOURCE, COMPOSER_PATCHES_PREFER_OWNER; replaced with --from-source flag on commands (was meant for testing out a patch)",
             "config: removed COMPOSER_SKIP_PATCH_PACKAGES, COMPOSER_PATCHES_SKIP_PACKAGES; never really used for anything, could be achieved via using patcher configuration"
         ],
@@ -458,6 +467,15 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.52.1": {
+        "fix": [
+            "remove patch availability validation crash under certain package setups"
+        ],
+        "maintenance": [
+            "improve test coverage to include scenarios where the patches are owned by a sub-package rather than the root"
+        ],
+        "branch": "release/3"
     },
     "3.52.0": {
         "feature": [

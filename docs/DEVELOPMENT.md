@@ -21,22 +21,22 @@ has said bug/issue rather than just fixing it on the latest line.
 
 ```shell
 # Runs one or several static code analysis tools against the code-base
-composer code:analyse
+composer code:lint
 
-# Runs just one type of code analyser
-composer code:analyse phpmd
+# Runs just one type of code linter
+composer code:lint phpmd
 
 # Fixes as many issues as possible automatically (phpcs auto-fixer)
-composer code:normalise
+composer code:fix
 
 # Runs several integration-tests against the application
 composer code:test
 
-# Runs just one scenario for all test installations
+# Runs just one scenario (that matches with the filter) for all test installations
 composer code:test sequence
 
 # Runs all scenarios on one specific installation
-composer code:test using-file:.*
+composer code:test using-file:
 
 # Runs just one scenario for just one installation
 composer code:test using-file:skipped-patch

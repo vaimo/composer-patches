@@ -2,7 +2,7 @@ Scanning packages for orphan patches
 Validation completed successfully
 Processing patches configuration
   - Applying patches for vaimo/composer-patches-target1 (1)
-    ~ vaimo/composer-patches-sandbox: patches/1_second-change.patch [NEW]
+    ~ {{PATCHES-OWNER}}: patches/1_second-change.patch [NEW]
       Change: valueC => valueX
 
 Writing patch info to install file

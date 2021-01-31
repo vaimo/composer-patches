@@ -11,29 +11,45 @@ source ${script_root}/lib/output.sh
 
 run_tests() {
     local scenario_root=${1}
+    local copy_target=${2}
         
     local scenario_label=$(cat ${scenario_root}/.label)
-    local commands=$(cat ${scenario_root}/.commands)
-        
+
     _line '-' 80
     _info "SCENARIO:" "${scenario}" "${scenario_label}"
     _line '-' 80
-            
+
     rm -rf patches 2>/dev/null
     rm patches.json 2>/dev/null
     rm output.out 2>/dev/null
     rm output.txt 2>/dev/null
 
     local original_ifs=${IFS}
+
+    local php_script=$(cat <<EOF
+        if (file_exists('${copy_target}/composer.json')) {
+            \$config = json_decode(file_get_contents('${copy_target}/composer.json'), true);
+            echo \$config['name'];
+        }
+EOF
+)
+    patches_owner=$(php -r "${php_script}")
+    local commands=$(
+        cat ${scenario_root}/.commands \
+        |sed 's|{{OWNER-ROOT}}|'${copy_target}'|g' \
+        |sed 's|{{PATCHES-OWNER}}|'${patches_owner}'|g' \
+    )
+
     IFS=$'\n'
-    
-    for dependency in $(ls -1 ${scenario_root}/files) ; do
-        cp -R ${scenario_root}/files/${dependency} ${dependency}
+    for file in $(ls -1 ${scenario_root}/files) ; do
+        cp -R ${scenario_root}/files/${file} ${copy_target}/${file}
     done 
-    
+    IFS=${original_ifs}
+
     local should_fail
     local system_call
 
+    IFS=$'\n'
     for line in ${commands} ; do
         should_fail=0
         system_call=0
@@ -62,7 +78,8 @@ run_tests() {
                 local php_script=$(cat <<EOF
                 if (file_exists('${installed_config}')) {
                     \$config = json_decode(file_get_contents('${installed_config}'), true);                
-                    \$index = array_search('${target}', array_column(\$config, 'name'), true);
+                    \$names = array_map(function (\$item) { return \$item['name']; }, \$config);
+                    \$index = array_search('${target}', \$names, true);
                                 
                     if (\$index !== false) {
                         \$config[\$index]['version'] = '0.0.0';
@@ -81,7 +98,8 @@ EOF
                 local php_script=$(cat <<EOF
                 if (file_exists('${installed_config}')) {
                     \$config = json_decode(file_get_contents('${installed_config}'), true);
-                    \$index = array_search('${target}', array_column(\$config, 'name'), true);
+                    \$names = array_map(function (\$item) { return \$item['name']; }, \$config);
+                    \$index = array_search('${target}', \$names, true);
                 
                     if (\$index !== false) {
                         unset(\$config[\$index]);
@@ -98,7 +116,7 @@ EOF
             fi
             
             if [ "${command}" == "assert_changes" ] ; then
-                if assert_patches ; then
+                if assert_patches "${copy_target}" ; then
                     continue
                 fi
                 
@@ -154,14 +172,13 @@ EOF
 
         return 1
     done
-
     IFS=${original_ifs}
     
-    if ! assert_patches ; then
+    if ! assert_patches "${copy_target}" ; then
         return 1
     fi
     
-    if ! assert_scenario_output "${scenario_root}" "output.out" ; then
+    if ! assert_scenario_output "${patches_owner}" "${scenario_root}" "output.out" ; then
         return 1
     fi 
     
@@ -169,10 +186,11 @@ EOF
 }
 
 assert_patches() {
+    local patches_root=${1}
     local assertions=
 
-    if [ -d patches ] ; then
-        for patch_file in $(find -L patches -type f) ; do
+    if [ -d ${patches_root}/patches ] ; then
+        for patch_file in $(find -L ${patches_root}/patches -type f) ; do
             assertions=${assertions}$'\n'$(cat ${patch_file}|grep '@assert'|sed 's/^@assert //g')
         done
     fi
@@ -197,8 +215,9 @@ _is_macosx() {
 }
 
 assert_scenario_output() {
-    local scenario_root=${1}
-    local output_file=${2}
+    local patches_owner=${1}
+    local scenario_root=${2}
+    local output_file=${3}
     
     local expected_output_file="${scenario_root}/.output"
 
@@ -229,6 +248,8 @@ assert_scenario_output() {
         |grep -v "^patch:redo" \
         |grep -v "^patch:undo" \
         |grep -v "You are using an outdated version of Composer" \
+        |grep -v "packages you are using are looking for funding" \
+        |grep -v "Use the \`composer fund\` command to find out more" \
         > output.txt
         
     rm ${output_file} 2>/dev/null
@@ -237,7 +258,9 @@ assert_scenario_output() {
         return 0
     fi
 
-    local diff_out=$(diff -u ${expected_output_file} output.txt|grep -v '^\(+++\|---\|@@\)')
+    cat ${expected_output_file}|sed 's|{{PATCHES-OWNER}}|'${patches_owner}'|g' > output.exp
+
+    local diff_out=$(diff -u output.exp output.txt|grep -v '^\(+++\|---\|@@\)')
                 
     if [ "${diff_out}" == "" ] ; then
         return 0
@@ -260,8 +283,7 @@ process_assertions() {
 
     local original_ifs=${IFS}
     IFS=$'\n'
-        
-    for assertion in ${assertions} ; do        
+    for assertion in ${assertions} ; do
         if [ "${assertion}" == "" ] ; then
             continue
         fi
@@ -371,7 +393,7 @@ reset_packages() {
                 \$config = json_decode(file_get_contents('${lock_path}'), true);
                     
                 foreach (['packages', 'packages-dev'] as \$group) {
-                    \$names = array_column(\$config[\$group], 'name');
+                    \$names = array_map(function (\$item) { return \$item['name']; }, \$config[\$group]);
                     \$matches = preg_grep('|vaimo/composer-patches-target|', \$names);
                         
                     foreach (array_keys(\$matches) as \$index) {
@@ -391,17 +413,21 @@ EOF
 }
 
 sanitize() {
-    rm -rf patches 2>/dev/null
+    local copy_target=${1}
+
+    rm -rf ${copy_target}/patches 2>/dev/null
+    rm ${copy_target}/patches.json 2>/dev/null    
+
     rm -rf modules 2>/dev/null
     rm -rf scenarios 2>/dev/null
-    rm patches.json 2>/dev/null    
 }
 
 sanitize_scenario() {    
     local scenario_root=${1}
+    local copy_target=${2}
     
-    for dependency in $(ls -1 ${scenario_root}/files) ; do
-        rm -rf ${dependency} 2>/dev/null   
+    for file in $(ls -1 ${scenario_root}/files) ; do
+        rm -rf ${copy_target}/${file} 2>/dev/null   
     done 
 }
 
@@ -460,14 +486,20 @@ fi
         _title "INSTALLATION:" "${installation}" "${installation_label}"
         _line '=' 80
         
-        failed_scenario=
-        
         (
             cd ${installation_root}
+            copy_target=$(cat .target 2>/dev/null)
 
-            sanitize
+            if [ "${copy_target}" != "" ] ; then
+                copy_target="${installation_root}/${copy_target}"
+            else
+                copy_target="${installation_root}"
+            fi
 
-            ln -s ${sandbox_root}/modules ${installation_root}
+            sanitize "${copy_target}"
+
+            rm -rf ${installation_root}/modules
+            cp -R ${sandbox_root}/modules ${installation_root}
 
             if [ ! -f composer.lock ] ; then
                 composer install --ansi --no-plugins
@@ -475,7 +507,10 @@ fi
                 composer install --ansi --no-plugins &>/dev/null
             fi
 
-            for scenario in ${scenarios} ; do
+            cp composer.json composer.json.org
+            cp composer.lock composer.lock.org
+
+            for scenario in ${scenarios} ; do                
                 if [ "${scenarios_skip}" != "" ] && echo "${scenarios_skip}"|grep -q "^${scenario}$" ; then
                     continue
                 fi
@@ -485,17 +520,31 @@ fi
                 fi
 
                 reset_packages "${installation_root}"
-
                 scenario_root=${sandbox_root}/scenarios/${scenario}
 
-                if ! run_tests "${scenario_root}" ; then
-                    sanitize
-                    
-                    sanitize_scenario ${scenario_root}
-                    
+                if ! run_tests "${scenario_root}" "${copy_target}" ; then
+                    cdiff=$(diff composer.json.org composer.json)
+                    cp composer.json.org composer.json
+                    cp composer.lock.org composer.lock
+                    if [ "${cdiff}" != "" ] ; then
+                        _info "RESTORING INSTALLATION"
+                        composer install --no-plugins
+                    fi
+
+                    sanitize "${copy_target}"
+                    sanitize_scenario "${scenario_root}" "${copy_target}"
+                    _error "FAILED: $(basename $(pwd)):$(basename ${scenario_root})"
                     exit 1
                 else 
-                    sanitize_scenario ${scenario_root}
+                    cdiff=$(diff composer.json.org composer.json)
+                    cp composer.json.org composer.json
+                    cp composer.lock.org composer.lock
+                    if [ "${cdiff}" != "" ] ; then
+                        _info "RESTORING INSTALLATION"
+                        composer install --no-plugins
+                    fi
+                    
+                    sanitize_scenario "${scenario_root}" "${copy_target}"
                 fi
             done
             
