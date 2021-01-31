@@ -14,12 +14,11 @@ run_tests() {
     local copy_target=${2}
         
     local scenario_label=$(cat ${scenario_root}/.label)
-    local commands=$(cat ${scenario_root}/.commands|sed 's|{{OWNER-ROOT}}|'${copy_target}'|g')
 
     _line '-' 80
     _info "SCENARIO:" "${scenario}" "${scenario_label}"
     _line '-' 80
-            
+
     rm -rf patches 2>/dev/null
     rm patches.json 2>/dev/null
     rm output.out 2>/dev/null
@@ -35,6 +34,11 @@ run_tests() {
 EOF
 )
     patches_owner=$(php -r "${php_script}")
+    local commands=$(
+        cat ${scenario_root}/.commands \
+        |sed 's|{{OWNER-ROOT}}|'${copy_target}'|g' \
+        |sed 's|{{PATCHES-OWNER}}|'${patches_owner}'|g' \
+    )
 
     IFS=$'\n'
     for file in $(ls -1 ${scenario_root}/files) ; do
@@ -524,7 +528,7 @@ fi
                     cp composer.lock.org composer.lock
                     if [ "${cdiff}" != "" ] ; then
                         _info "RESTORING INSTALLATION"
-                        composer install
+                        composer install --no-plugins
                     fi
 
                     sanitize "${copy_target}"
@@ -537,7 +541,7 @@ fi
                     cp composer.lock.org composer.lock
                     if [ "${cdiff}" != "" ] ; then
                         _info "RESTORING INSTALLATION"
-                        composer install
+                        composer install --no-plugins
                     fi
                     
                     sanitize_scenario "${scenario_root}" "${copy_target}"

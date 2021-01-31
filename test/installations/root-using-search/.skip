@@ -7,4 +7,5 @@ remote-sha1-fail
 remote-unsecure-fail
 remote-validate-fail
 remote-list-fail
-owner-remove
+owner-remove-keep
+owner-remove-reset

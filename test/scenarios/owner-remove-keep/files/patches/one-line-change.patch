@@ -1,7 +1,6 @@
-Change: value8 => value8
+Change: value8 => valueC (expecting revert on owner removal)
 
 @package vaimo/composer-patches-target1
-@assert vaimo/composer-patches-target1,value8,value8
 
 --- src/example.txt.org
 +++ src/example.txt
