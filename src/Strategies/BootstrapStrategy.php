@@ -23,6 +23,10 @@ class BootstrapStrategy
 
     public function shouldAllow()
     {
+        if (getenv('COMPOSER_PATCHER_ALLOW_GLOBAL_USAGE')) {
+            return true;
+        }
+
         if (!$this->isPluginAvailable()) {
             return false;
         }

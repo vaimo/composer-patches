@@ -11,6 +11,7 @@ cache:
     - "$HOME/.composer/cache"
 
 install:
+  - composer self-update 1.8.4
   - composer install
 
 script:

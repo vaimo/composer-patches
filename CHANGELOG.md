@@ -2,6 +2,33 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.21.0
+
+changes in this release forward-ported from 3.52.0
+
+### Feature
+
+* allow global usage of the plugin when explicitly enabled via environment variable: COMPOSER_PATCHER_ALLOW_GLOBAL_USAGE (pull/45)
+
+
+### Fix
+
+* added /F switch to where to add double quotes to windows commands (pull/44)
+* added no-scripts option to avoid executing post-install-cmd (pull/48)
+* strpos() empty needle errors can occur with certain configurations (pull/53)
+* patches-searches path containing .patch fails (pull/58) (with extra modifications)
+
+
+### Maintenance
+
+* CI config fixed to use Composer 1.X
+* make it possible to run tests while developing the module on MacOS
+* make sure output assertions on tests don't fail on small terminal windows when composer output gets wrapped
+* update compatibility checker not to fail on false-negatives
+* fix normaliser script not executing as expected after code:deps run
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.21.0) [diff](https://github.com/vaimo/composer-patches/compare/4.20.2...4.21.0)
+
 ## 4.20.2 (2019-09-25)
 
 changes in this release forward-ported from 3.51.2
@@ -666,7 +693,30 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.51.2...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.52.0...4.0.0)
+
+## 3.52.0 (2021-01-31)
+
+### Feature
+
+* allow global usage of the plugin when explicitly enabled via environment variable: COMPOSER_PATCHER_ALLOW_GLOBAL_USAGE (pull/45)
+
+### Fix
+
+* added /F switch to where to add double quotes to windows commands (pull/44)
+* added no-scripts option to avoid executing post-install-cmd (pull/48)
+* strpos() empty needle errors can occur with certain configurations (pull/53)
+* patches-searches path containing .patch fails (pull/58) (with extra modifications)
+
+### Maintenance
+
+* CI config fixed to use Composer 1.X
+* make it possible to run tests while developing the module on MacOS
+* make sure output assertions on tests don't fail on small terminal windows when composer output gets wrapped
+* update compatibility checker not to fail on false-negatives
+* fix normaliser script not executing as expected after code:deps run
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.52.0) [diff](https://github.com/vaimo/composer-patches/compare/3.51.2...3.52.0)
 
 ## 3.51.2 (2019-09-25)
 

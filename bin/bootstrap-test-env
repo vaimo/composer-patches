@@ -8,11 +8,12 @@ COPYRIGHT
 mkdir test/modules/composer-patches 2>/dev/null
 
 if [ ! -L test/modules/composer-patches/src ] ; then
-    ln -s $(readlink -f src) test/modules/composer-patches/src 2>/dev/null
+    ln -s $(cd src &>/dev/null && pwd) test/modules/composer-patches/src 2>/dev/null
 fi
 
 cp composer.json test/modules/composer-patches 2>/dev/null
 
-sed -i 's|composer-patches"|composer-patches-local"|g' test/modules/composer-patches/composer.json
+sed -i.org 's|composer-patches"|composer-patches-local"|g' test/modules/composer-patches/composer.json
+rm test/modules/composer-patches/composer.json.org 2>/dev/null
 
 exit 0

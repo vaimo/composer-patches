@@ -8,7 +8,7 @@ script_path=${BASH_SOURCE[0]}
 script_root=$(dirname $(test -L ${script_path} && readlink -f ${script_path} || echo ${script_path}))
 
 package="vaimo/composer-patches-local"
-versions="5.3.9 5.4.45 5.5.38 5.6.40 7.0.33 7.1.32 7.2.22 7.3.9"
+versions="5.3.9 5.4.45 5.5.38 5.6.40 7.0.33 7.1.32 7.2.22 7.3.25 7.4.13 8.0.0"
 
 source ${script_root}/lib/output.sh
 
@@ -23,7 +23,7 @@ analyse_deps()
 
     local has_errors=
     
-    for dependency in $(find vendor/ -mindepth 2 -maxdepth 2 -type d|sed 's|[^/]*\/||') ; do
+    for dependency in $(find vendor -mindepth 2 -maxdepth 2 -type d|sed 's|[^/]*\/||') ; do
         if ! is_production_dependency "${root_package}" "${dependency}" ; then
             continue
         fi
@@ -194,7 +194,7 @@ is_production_dependency()
 
         version_mm=$(echo ${version}|cut -d'.' -f1-2)
 
-        sed -i 's|_VERSION_|'${version_mm}'|g' $(pwd)/phpcs.xml
+        sed -i.org 's|_VERSION_|'${version_mm}'|g' $(pwd)/phpcs.xml
         
         _line '=' 80
         _title "CHECK VIABILITY WITH" "PHP ${version_mm}" "code compatibility of required dependencies"

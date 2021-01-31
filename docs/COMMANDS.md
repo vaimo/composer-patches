@@ -73,13 +73,3 @@ having to trigger `composer update` or `composer install`.
 Note that 'validate' command will also validate patches with constraints or with #skip flag in their
 path (or in embedded data).
 
-## Environment Variables
-
-* **COMPOSER_PATCHES_GRACEFUL** - continue applying patches even if some of them fail (default behaviour
-  is to exit on first failure).
-* **COMPOSER_PATCHES_SKIP_CLEANUP** - Will leave packages patched even when vaimo/composer-patches is 
-  removed. By default, patched packages are re-installed to reset the patches (useful when creating 
-  immutable build artifacts without any unnecessary modules installed).
-* **COMPOSER_PATCHES_FORCE_RESET** - Allows patcher to reset patch-targeted packages that have local 
-  changes. Default behaviour will lead to the process to be halted to avoid developers from losing their
-  work.
