@@ -105,7 +105,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
     private function createSourcesEnablerConfig($localOnly)
     {
-        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+        $configDefaults = new Config\Defaults();
 
         $defaultValues = $configDefaults->getPatcherConfig();
         
@@ -184,8 +184,8 @@ class ValidateCommand extends \Composer\Command\BaseCommand
                 '/'
             );
 
-            $filter = sprintf('%s/i', rtrim($filter, '/') . \Vaimo\ComposerPatches\Config::PATCH_FILE_REGEX_MATCHER);
-            $searchResult = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
+            $filter = sprintf('%s/i', rtrim($filter, '/') . Config::PATCH_FILE_REGEX_MATCHER);
+            $searchResult = $fileSystemUtils->collectFilePathsRecursively($installPath, $filter);
 
             $fileMatchGroups[] = array_fill_keys($searchResult, array(
                 Patch::OWNER => $packageName,
