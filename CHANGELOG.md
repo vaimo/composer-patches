@@ -2,7 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 3.52.0
+## DEV-3.52.1
+
+### Maintenance
+
+* improve build script to validate properly that the plugin works on all major PHP releases
+* improve test coverage to include scenarios where the patches are owned by a sub-package rather than the root
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/DEV-3.52.1) [diff](https://github.com/vaimo/composer-patches/compare/3.52.0...DEV-3.52.1)
+
+## 3.52.0 (2021-01-31)
 
 ### Feature
 

@@ -1,17 +1,19 @@
 # Copyright (c) Vaimo Group. All rights reserved.
 # See LICENSE_VAIMO.txt for license details.
 language: php
-php:
-  - '5.3.9' 
-  - '5.4.45' 
-  - '5.5.38' 
-  - '5.6.40' 
-  - '7.0.33' 
-  - '7.1.32' 
-  - '7.2.22' 
-  - '7.3.25'
-  - '7.4.13'
-  - '8.0.0'
+matrix:
+  include:
+    - php: 5.3
+      dist: precise
+    - php: 5.4
+    - php: 5.5
+    - php: 5.6
+    - php: 7.0
+    - php: 7.1
+    - php: 7.2
+    - php: 7.3
+    - php: 7.4
+    - php: 8.0
   
 git:
   depth: 1
