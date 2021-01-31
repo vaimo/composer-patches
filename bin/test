@@ -14,7 +14,9 @@ run_tests() {
         
     local scenario_label=$(cat ${scenario_root}/.label)
     local commands=$(cat ${scenario_root}/.commands)
-        
+
+    return 0
+
     _line '-' 80
     _info "SCENARIO:" "${scenario}" "${scenario_label}"
     _line '-' 80
@@ -25,15 +27,17 @@ run_tests() {
     rm output.txt 2>/dev/null
 
     local original_ifs=${IFS}
+
     IFS=$'\n'
-    
     for dependency in $(ls -1 ${scenario_root}/files) ; do
         cp -R ${scenario_root}/files/${dependency} ${dependency}
     done 
-    
+    IFS=${original_ifs}
+
     local should_fail
     local system_call
 
+    IFS=$'\n'
     for line in ${commands} ; do
         should_fail=0
         system_call=0
@@ -156,7 +160,6 @@ EOF
 
         return 1
     done
-
     IFS=${original_ifs}
     
     if ! assert_patches ; then
@@ -393,17 +396,21 @@ EOF
 }
 
 sanitize() {
-    rm -rf patches 2>/dev/null
+    local copy_target=${1}
+
+    rm -rf ${copy_target}/patches 2>/dev/null
+    rm ${copy_target}/patches.json 2>/dev/null    
+
     rm -rf modules 2>/dev/null
     rm -rf scenarios 2>/dev/null
-    rm patches.json 2>/dev/null    
 }
 
 sanitize_scenario() {    
     local scenario_root=${1}
+    local copy_target=${2}
     
-    for dependency in $(ls -1 ${scenario_root}/files) ; do
-        rm -rf ${dependency} 2>/dev/null   
+    for file in $(ls -1 ${scenario_root}/files) ; do
+        rm -rf ${copy_target}/${file} 2>/dev/null   
     done 
 }
 
@@ -466,8 +473,15 @@ fi
         
         (
             cd ${installation_root}
+            copy_target=$(cat .target 2>/dev/null)
 
-            sanitize
+            if [ "${copy_target}" != "" ] ; then
+                copy_target="${sandbox_root}/${copy_target}"
+            else
+                copy_target="${installation_root}"
+            fi
+
+            sanitize ${copy_target}
 
             ln -s ${sandbox_root}/modules ${installation_root}
 
@@ -487,17 +501,15 @@ fi
                 fi
 
                 reset_packages "${installation_root}"
-
                 scenario_root=${sandbox_root}/scenarios/${scenario}
 
                 if ! run_tests "${scenario_root}" ; then
-                    sanitize
-                    
-                    sanitize_scenario ${scenario_root}
+                    sanitize ${copy_target}
+                    sanitize_scenario ${scenario_root} ${copy_target}
                     
                     exit 1
                 else 
-                    sanitize_scenario ${scenario_root}
+                    sanitize_scenario ${scenario_root} ${copy_target}
                 fi
             done
             

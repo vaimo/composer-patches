@@ -2,7 +2,7 @@
     "name": "vaimo/composer-patches-sandbox",
     "type": "library",
     "license": "MIT",
-    "description": "Sandbox module for testing out patch applier functionality",
+    "description": "Sandbox module for testing out patch applier functionality (using root search)",
     "require": {
         "vaimo/composer-patches-local": "@dev",
         "vaimo/composer-patches-target1": "1.0.0",
@@ -23,7 +23,7 @@
         }
     ],
     "extra": {
-        "patches-file": "patches.json"
+        "patches-search": "patches"
     },
     "config": {
         "process-timeout": 3000

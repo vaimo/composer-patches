@@ -1,0 +1,10 @@
+{
+    "name": "vaimo/patches-search-owner",
+    "type": "library",
+    "version": "1.0.0",
+    "description": "Mock module that is used to test applying patches from a dependency",
+    "license": "MIT",
+    "extra": {
+        "patches-search": "patches"
+    }
+}
