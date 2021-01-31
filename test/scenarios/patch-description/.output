@@ -2,7 +2,7 @@ Scanning packages for orphan patches
 Validation completed successfully
 Processing patches configuration
   - Applying patches for vaimo/composer-patches-target1 (1)
-    ~ vaimo/composer-patches-sandbox: patches/single-package-single-file.patch [NEW]
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file.patch [NEW]
       Change: value8 => valueC with some corrupting %s description %1 %s
 
 Writing patch info to install file

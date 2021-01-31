@@ -4,6 +4,9 @@
     "version": "1.0.0",
     "description": "Mock module that is used to test applying patches from a dependency",
     "license": "MIT",
+    "require": {
+        "vaimo/composer-patches-local": "@dev"
+    },
     "extra": {
         "patches-file": "patches.json"
     }

@@ -7,3 +7,4 @@ remote-sha1-fail
 remote-unsecure-fail
 remote-validate-fail
 remote-list-fail
+owner-remove

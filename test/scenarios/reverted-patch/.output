@@ -2,7 +2,7 @@ Scanning packages for orphan patches
 Validation completed successfully
 Processing patches configuration
   - Applying patches for vaimo/composer-patches-target1 (1)
-    ~ vaimo/composer-patches-sandbox: patches/some-changes.patch [NEW]
+    ~ {{PATCHES-OWNER}}: patches/some-changes.patch [NEW]
       Change: value8 => valueC
       Failed to apply the patch. Halting execution!
       Probable causes for the failure:                                    
