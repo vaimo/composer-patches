@@ -107,7 +107,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         foreach ($source as $item) {
             $paths = $this->fileSystemUtils->collectPathsRecursively(
                 $basePath . DIRECTORY_SEPARATOR . $item,
-                PluginConfig::PATCH_FILE_REGEX_MATCHER
+                sprintf('/%s/i', PluginConfig::PATCH_FILE_REGEX_MATCHER)
             );
 
             $groups = array();

@@ -184,8 +184,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
                 '/'
             );
 
-            $filter = sprintf('%s.+\.patch/i', rtrim($filter, '/'));
-
+            $filter = sprintf('%s/i', rtrim($filter, '/') . \Vaimo\ComposerPatches\Config::PATCH_FILE_REGEX_MATCHER);
             $searchResult = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
 
             $fileMatchGroups[] = array_fill_keys($searchResult, array(

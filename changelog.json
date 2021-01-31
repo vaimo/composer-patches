@@ -9,7 +9,7 @@
             "added /F switch to where to add double quotes to windows commands (pull/44)",
             "added no-scripts option to avoid executing post-install-cmd (pull/48)",
             "strpos() empty needle errors can occur with certain configurations (pull/53)",
-            "patches-searches path containing .patch fails (pull/58)"
+            "patches-searches path containing .patch fails (pull/58) (with extra modifications)"
         ],
         "maintenance": [
             "make it possible to run tests while developing the module on MacOS",
