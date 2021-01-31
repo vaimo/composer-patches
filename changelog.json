@@ -12,9 +12,11 @@
             "patches-searches path containing .patch fails (pull/58) (with extra modifications)"
         ],
         "maintenance": [
+            "CI config fixed to use Composer 1.X",
             "make it possible to run tests while developing the module on MacOS",
             "make sure output assertions on tests don't fail on small terminal windows when composer output gets wrapped",
-            "update compatibility checker not to fail on false-negatives"
+            "update compatibility checker not to fail on false-negatives",
+            "fix normaliser script not executing as expected after code:deps run"
         ],
         "branch": "release/3"
     },

@@ -11,7 +11,7 @@ class FileSystemUtils
     {
         $paths = $this->collectPathsRecursively($rootPath, $pattern);
 
-        return array_filter($paths, function($item) {
+        return array_filter($paths, function ($item) {
             return is_file($item);
         });
     }

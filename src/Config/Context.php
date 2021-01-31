@@ -11,7 +11,8 @@ use drupol\phposinfo\Enum\FamilyName;
 
 class Context
 {
-    public function __construct() {
+    public function __construct()
+    {
         OsInfo::register();
     }
 

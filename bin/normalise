@@ -4,6 +4,9 @@
  See LICENSE_VAIMO.txt for license details.
 COPYRIGHT
 
+vendor/bin/phpcs --config-set error_severity 1
+vendor/bin/phpcs --config-set default_standard 'PSR2'
+
 vendor/bin/phpcbf -p src
 
 exit 0
