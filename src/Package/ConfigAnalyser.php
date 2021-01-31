@@ -27,7 +27,7 @@ class ConfigAnalyser
         return (bool)array_filter(
             $this->namespacesExtractor->getConfig($package, ''),
             function ($item) use ($namespace) {
-                return strpos($namespace, rtrim($item, '\\')) === 0;
+                return $item && strpos($namespace, rtrim($item, '\\')) === 0;
             }
         );
     }
