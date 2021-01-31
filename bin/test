@@ -11,6 +11,7 @@ source ${script_root}/lib/output.sh
 
 run_tests() {
     local scenario_root=${1}
+    local copy_target=${2}
         
     local scenario_label=$(cat ${scenario_root}/.label)
     local commands=$(cat ${scenario_root}/.commands)
@@ -29,8 +30,8 @@ run_tests() {
     local original_ifs=${IFS}
 
     IFS=$'\n'
-    for dependency in $(ls -1 ${scenario_root}/files) ; do
-        cp -R ${scenario_root}/files/${dependency} ${dependency}
+    for file in $(ls -1 ${scenario_root}/files) ; do
+        cp -R ${scenario_root}/files/${file} ${copy_target}/${file}
     done 
     IFS=${original_ifs}
 
@@ -481,7 +482,7 @@ fi
                 copy_target="${installation_root}"
             fi
 
-            sanitize ${copy_target}
+            sanitize "${copy_target}"
 
             ln -s ${sandbox_root}/modules ${installation_root}
 
@@ -503,13 +504,13 @@ fi
                 reset_packages "${installation_root}"
                 scenario_root=${sandbox_root}/scenarios/${scenario}
 
-                if ! run_tests "${scenario_root}" ; then
-                    sanitize ${copy_target}
-                    sanitize_scenario ${scenario_root} ${copy_target}
+                if ! run_tests "${scenario_root}" "${copy_target}" ; then
+                    sanitize "${copy_target}"
+                    sanitize_scenario "${scenario_root}" "${copy_target}"
                     
                     exit 1
                 else 
-                    sanitize_scenario ${scenario_root} ${copy_target}
+                    sanitize_scenario "${scenario_root}" "${copy_target}"
                 fi
             done
             
