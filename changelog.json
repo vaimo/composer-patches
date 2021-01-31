@@ -4,7 +4,7 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
-    "DEV-3.52.0": {
+    "3.52.0": {
         "feature": [
             "allow global usage of the plugin when explicitly enabled via environment variable: COMPOSER_PATCHER_ALLOW_GLOBAL_USAGE (pull/45)"
         ],
