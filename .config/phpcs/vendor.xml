@@ -6,7 +6,9 @@
 <ruleset name="LOCAL">
     <description>PHP CodeSniffer rules for Composer Patches</description>
     
-    <rule ref="PHPCompatibility" />
+    <rule ref="PHPCompatibility">
+        <exclude name="PHPCompatibility.Upgrade.LowPHP.BelowRecommended_5_4"/>
+    </rule>
 
     <config name="testVersion" value="_VERSION_-_VERSION_" />
 </ruleset>

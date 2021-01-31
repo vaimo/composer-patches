@@ -62,7 +62,8 @@ run_tests() {
                 local php_script=$(cat <<EOF
                 if (file_exists('${installed_config}')) {
                     \$config = json_decode(file_get_contents('${installed_config}'), true);                
-                    \$index = array_search('${target}', array_column(\$config, 'name'), true);
+                    \$names = array_map(function ($item) { return $item['name']; }, \$config);
+                    \$index = array_search('${target}', \$names, true);
                                 
                     if (\$index !== false) {
                         \$config[\$index]['version'] = '0.0.0';
@@ -81,7 +82,8 @@ EOF
                 local php_script=$(cat <<EOF
                 if (file_exists('${installed_config}')) {
                     \$config = json_decode(file_get_contents('${installed_config}'), true);
-                    \$index = array_search('${target}', array_column(\$config, 'name'), true);
+                    \$names = array_map(function ($item) { return $item['name']; }, \$config);
+                    \$index = array_search('${target}', \$names, true);
                 
                     if (\$index !== false) {
                         unset(\$config[\$index]);
@@ -371,7 +373,7 @@ reset_packages() {
                 \$config = json_decode(file_get_contents('${lock_path}'), true);
                     
                 foreach (['packages', 'packages-dev'] as \$group) {
-                    \$names = array_column(\$config[\$group], 'name');
+                    \$names = array_map(function ($item) { return $item['name']; }, \$config[\$group]);
                     \$matches = preg_grep('|vaimo/composer-patches-target|', \$names);
                         
                     foreach (array_keys(\$matches) as \$index) {
