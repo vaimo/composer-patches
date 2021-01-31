@@ -7,9 +7,6 @@ COPYRIGHT
 script_path=${BASH_SOURCE[0]}
 script_root=$(dirname $(test -L ${script_path} && readlink -f ${script_path} || echo ${script_path}))
 
-# Required to make sure that output assertions don't fail randomly based on terminal size
-stty rows 50 cols 1000
-
 source ${script_root}/lib/output.sh
 
 run_tests() {
@@ -231,6 +228,7 @@ assert_scenario_output() {
         |grep -v "^patch:validate" \
         |grep -v "^patch:redo" \
         |grep -v "^patch:undo" \
+        |grep -v "You are using an outdated version of Composer" \
         > output.txt
         
     rm ${output_file} 2>/dev/null
@@ -296,7 +294,9 @@ apply_patches() {
         command="${command} &> >(tee -a ${out_file})"
     fi
  
-    eval "${command}; return \${PIPESTATUS[0]}"
+    (
+        eval "${command}; return \${PIPESTATUS[0]}"
+    )
         
     local result=${?}
     

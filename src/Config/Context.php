@@ -11,6 +11,10 @@ use drupol\phposinfo\Enum\FamilyName;
 
 class Context
 {
+    public function __construct() {
+        OsInfo::register();
+    }
+
     public function getOperationSystemTypeCode()
     {
         return preg_replace(
