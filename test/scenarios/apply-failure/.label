@@ -1,1 +1,1 @@
-patch apply should encounter a failure
+patch apply should encounter a failure and report causes

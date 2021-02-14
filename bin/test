@@ -12,7 +12,8 @@ source ${script_root}/lib/output.sh
 run_tests() {
     local scenario_root=${1}
     local copy_target=${2}
-        
+    local composer_version=$(composer --version|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f1)
+
     local scenario_label=$(cat ${scenario_root}/.label)
 
     _line '-' 80
@@ -74,16 +75,32 @@ EOF
             if [ "${command}" == "queue_update" ] ; then
                 local target=$(echo ${args}|cut -d' ' -f2)
                 local installed_config="vendor/composer/installed.json"
-                
+
                 local php_script=$(cat <<EOF
                 if (file_exists('${installed_config}')) {
                     \$config = json_decode(file_get_contents('${installed_config}'), true);                
-                    \$names = array_map(function (\$item) { return \$item['name']; }, \$config);
+
+                    if (version_compare('${composer_version}', '2.0', '<')) {
+                        \$packagesConfig = \$config;
+                    } else {
+                        \$packagesConfig = \$config['packages'];
+                    }
+
+                    \$names = array_map(function (\$item) { 
+                        return isset(\$item['name']) ? \$item['name'] : ''; 
+                    }, \$packagesConfig);
                     \$index = array_search('${target}', \$names, true);
                                 
                     if (\$index !== false) {
-                        \$config[\$index]['version'] = '0.0.0';
-                        \$config[\$index]['version_normalized'] = '0.0.0';
+                        \$packagesConfig[\$index]['version'] = '0.0.0';
+                        \$packagesConfig[\$index]['version_normalized'] = '0.0.0';
+
+                        if (version_compare('${composer_version}', '2.0', '<')) {
+                            \$config = \$packagesConfig;
+                        } else {
+                            \$config['packages'] = \$packagesConfig;
+                        }
+
                         file_put_contents('${installed_config}', json_encode(\$config, JSON_PRETTY_PRINT));                
                     }
                 }                
@@ -98,11 +115,27 @@ EOF
                 local php_script=$(cat <<EOF
                 if (file_exists('${installed_config}')) {
                     \$config = json_decode(file_get_contents('${installed_config}'), true);
-                    \$names = array_map(function (\$item) { return \$item['name']; }, \$config);
+
+                    if (version_compare('${composer_version}', '2.0', '<')) {
+                        \$packagesConfig = \$config;
+                    } else {
+                        \$packagesConfig = \$config['packages'];
+                    }
+
+                    \$names = array_map(function (\$item) { 
+                        return isset(\$item['name']) ? \$item['name'] : ''; 
+                    }, \$packagesConfig);
                     \$index = array_search('${target}', \$names, true);
                 
                     if (\$index !== false) {
-                        unset(\$config[\$index]);
+                        unset(\$packagesConfig[\$index]);
+
+                        if (version_compare('${composer_version}', '2.0', '<')) {
+                            \$config = \$packagesConfig;
+                        } else {
+                            \$config['packages'] = \$packagesConfig;
+                        }
+
                         file_put_contents('${installed_config}', json_encode(\$config, JSON_PRETTY_PRINT));                
                     }                
                 }
@@ -218,15 +251,21 @@ assert_scenario_output() {
     local patches_owner=${1}
     local scenario_root=${2}
     local output_file=${3}
-    
+    local composer_version=$(composer --version|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f1)
+    local composer_major=${composer_version%%.*}
+
     local expected_output_file="${scenario_root}/.output"
 
     if _is_macosx ; then
-        if [ -f ${expected_output_file}-darwin ] ; then
+        if [ "${composer_major}" = "2" ] && [ -f ${expected_output_file}-v2-darwin ] ; then
+            expected_output_file="${expected_output_file}-v2-darwin"
+        elif [ -f ${expected_output_file}-darwin ] ; then
             expected_output_file="${expected_output_file}-darwin"
         fi
+    elif [ "${composer_major}" = "2" ] && [ -f ${expected_output_file}-v2 ] ; then
+        expected_output_file="${expected_output_file}-v2"
     fi
- 
+
     if [ ! -f ${output_file} ] ; then
         return 0
     fi
@@ -250,6 +289,13 @@ assert_scenario_output() {
         |grep -v "You are using an outdated version of Composer" \
         |grep -v "packages you are using are looking for funding" \
         |grep -v "Use the \`composer fund\` command to find out more" \
+        |grep -v "^Composer is operating slower than normal because you have Xdebug enabled" \
+        |grep -v "Xdebug: \[Step Debug\] Could not connect to debugging client" \
+        |grep -v "^Installing dependencies from lock file" \
+        |grep -v "^Verifying lock file contents can be installed on current platform" \
+        |grep -v "^Nothing to install, update or remove" \
+        |grep -v "^Updating dependencies" \
+        |grep -v "^Nothing to modify in lock file" \
         > output.txt
         
     rm ${output_file} 2>/dev/null
@@ -267,8 +313,10 @@ assert_scenario_output() {
     fi
     
     echo ''
-    _error "ERROR: output differs from what is expected:"            
-    
+    _error "ERROR: output differs from what is expected:"
+    echo "- EXPECTED"
+    echo "+ ACTUAL"
+
     _line '↓' 80
     echo "${diff_out}"
     _line '↑' 80

@@ -157,8 +157,11 @@ class PatchCommand extends \Composer\Command\BaseCommand
             },
             function () use ($composer, $lockSanitizer, $isDevMode) {
                 $repository = $composer->getRepositoryManager()->getLocalRepository();
-
-                $repository->write($isDevMode, $composer->getInstallationManager());
+                if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+                    $repository->write();
+                } else {
+                    $repository->write($isDevMode, $composer->getInstallationManager());
+                }
                 $lockSanitizer->sanitize();
             }
         );

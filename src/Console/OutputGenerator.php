@@ -31,7 +31,7 @@ class OutputGenerator
             
             $lines = array_merge(
                 array('Probable causes for the failure:', ''),
-                $this->createOutputLines($prioritizedErrors),
+                $this->createOutputRows($prioritizedErrors),
                 array('', '(For full, unfiltered details please use: composer patch:apply -vvv)')
             );
 
@@ -39,7 +39,7 @@ class OutputGenerator
         }
     }
 
-    private function createOutputLines(array $errors)
+    private function createOutputRows(array $errors)
     {
         $lines = array();
 

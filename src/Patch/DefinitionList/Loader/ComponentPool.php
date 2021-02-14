@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches\Patch\DefinitionList\Loader;
 
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Config as PluginConfig;
+use Composer\Downloader\FileDownloader;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -56,11 +57,8 @@ class ComponentPool
     public function getList(PluginConfig $pluginConfig)
     {
         $skippedPackages = $pluginConfig->getSkippedPackages();
-
         $patcherConfig = $pluginConfig->getPatcherConfig();
-
         $composer = $this->composerContext->getLocalComposer();
-
         $composerConfig = clone $composer->getConfig();
 
         $composerConfig->merge(array(
@@ -79,7 +77,6 @@ class ComponentPool
             : array();
 
         $installationManager = $composer->getInstallationManager();
-
         $cache = null;
 
         if ($composerConfig->get('cache-files-ttl') > 0) {
@@ -90,40 +87,27 @@ class ComponentPool
             );
         }
 
-        $httpDownloader = \Composer\Factory::createHttpDownloader($this->appIO, $composerConfig);
-
-        $fileDownloader = new \Composer\Downloader\FileDownloader(
-            $this->appIO,
-            $composerConfig,
-            $httpDownloader,
-            null,
-            $cache
-        );
+        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+            $fileDownloader = new FileDownloader($this->appIO, $composerConfig, null, $cache);
+        } else {
+            $httpDownloader = \Composer\Factory::createHttpDownloader($this->appIO, $composerConfig);
+            $fileDownloader = new FileDownloader($this->appIO, $composerConfig, $httpDownloader, null, $cache);
+        }
 
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
-
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
             $installationManager,
             $vendorRoot
         );
-
         $configExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\VendorConfigExtractor(
             $packageInfoResolver
         );
-
         $platformPackages = $this->resolveConstraintPackages($composerConfig);
-
         $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
             array($composer->getPackage())
         );
-
         $packages = $this->composerContext->getActivePackages();
-
-        $pluginPackage = $packageResolver->resolveForNamespace(
-            $packages,
-            __NAMESPACE__
-        );
-
+        $pluginPackage = $packageResolver->resolveForNamespace($packages, __NAMESPACE__);
         $consoleSilencer = new \Vaimo\ComposerPatches\Console\Silencer($this->appIO);
 
         $defaults = array(
@@ -149,9 +133,7 @@ class ComponentPool
         );
 
         return array_values(
-            array_filter(
-                array_replace($defaults, $this->components)
-            )
+            array_filter(array_replace($defaults, $this->components))
         );
     }
 

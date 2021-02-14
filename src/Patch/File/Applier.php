@@ -71,14 +71,11 @@ class Applier
     public function applyFile($filename, $cwd, array $config = array())
     {
         $applierConfig = $this->applierUtils->mergeApplierConfig($this->config, array_filter($config));
-
         $applierConfig = $this->applierUtils->sortApplierConfig($applierConfig);
-
         $patchers = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_APPLIERS);
         $operations = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_OPERATIONS);
         $levels = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_LEVELS);
         $failureMessages = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_FAILURES);
-
         $sanityOperations = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_SANITY);
 
         try {
@@ -139,7 +136,7 @@ class Applier
     }
 
     private function executeOperations(
-        $patchers,
+        array $patchers,
         array $operations,
         array $args = array(),
         array $failures = array()

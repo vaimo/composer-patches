@@ -11,10 +11,16 @@ class RepositoryUtils
 {
     public function filterByDependency(WritableRepositoryInterface $repository, $dependencyName)
     {
-        $compositeRepository = new \Composer\Repository\CompositeRepository(array($repository));
+        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+            $depsRepository = new \Composer\Repository\CompositeRepository(array($repository));
+        } else {
+            $depsRepository = new \Composer\Repository\InstalledRepository(array($repository));
+        }
+
+        $packages = $depsRepository->getDependents($dependencyName);
 
         return array_filter(
-            array_map('reset', $installedRepo->getDependents($dependencyName))
+            array_map('reset', $packages)
         );
     }
 }
