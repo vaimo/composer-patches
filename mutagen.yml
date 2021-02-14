@@ -6,11 +6,11 @@ sync:
       vcs: true
   vscode:
     alpha: "./.devcontainer/vscode"
-    beta: "docker://composer-changelogs/module/.vscode"
+    beta: "docker://composer-patches/module/.vscode"
     mode: two-way-resolved
   project:
     alpha: "."
-    beta: "docker://composer-changelogs/module"
+    beta: "docker://composer-patches/module"
     mode: two-way-resolved
     ignore:
       paths:

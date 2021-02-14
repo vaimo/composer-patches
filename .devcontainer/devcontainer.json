@@ -1,5 +1,5 @@
 {
-  "name": "Changelogs",
+  "name": "Patches",
   "dockerComposeFile": [
     "../docker-compose.yml"
   ],
