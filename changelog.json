@@ -4,9 +4,17 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "DEV-3.53.0": {
+        "feature": [
+            "add support for Composer 2 [issues/59]"
+        ],
+        "maintenance": [
+            "introduce ready-to-use development environment setup for quicker developer onboarding [issues/65]"
+        ]
+    },
     "3.52.1": {
         "fix": [
-            "remove patch availability validation crash under certain package setups"
+            "remote patch availability validation crash under certain package setups"
         ],
         "maintenance": [
             "improve test coverage to include scenarios where the patches are owned by a sub-package rather than the root"
@@ -18,10 +26,10 @@
             "allow global usage of the plugin when explicitly enabled via environment variable: COMPOSER_PATCHER_ALLOW_GLOBAL_USAGE (pull/45)"
         ],
         "fix": [
-            "added /F switch to where to add double quotes to windows commands (pull/44)",
-            "added no-scripts option to avoid executing post-install-cmd (pull/48)",
-            "strpos() empty needle errors can occur with certain configurations (pull/53)",
-            "patches-searches path containing .patch fails (pull/58) (with extra modifications)"
+            "added /F switch to where to add double quotes to windows commands [pull/44]",
+            "added no-scripts option to avoid executing post-install-cmd [pull/48]",
+            "strpos() empty needle errors can occur with certain configurations [pull/53]",
+            "patches-searches path containing .patch fails [pull/58] (with extra modifications)"
         ],
         "maintenance": [
             "CI config fixed to use Composer 1.X",
