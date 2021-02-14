@@ -1,0 +1,20 @@
+sync:
+  defaults:
+    symlink:
+      mode: ignore
+    ignore:
+      vcs: true
+  vscode:
+    alpha: "./.devcontainer/vscode"
+    beta: "docker://composer-changelogs/module/.vscode"
+    mode: two-way-resolved
+  project:
+    alpha: "."
+    beta: "docker://composer-changelogs/module"
+    mode: two-way-resolved
+    ignore:
+      paths:
+        - "/.vscode"
+        - "/.history"
+        - "/vendor"
+        - "/src"

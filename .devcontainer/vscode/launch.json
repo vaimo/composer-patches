@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for XDebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": {
+        "/module/": "${workspaceRoot}/"
+      },
+      "log": true,
+      "env": { "XDEBUG_TRIGGER": "1" }
+    }
+  ]
+}

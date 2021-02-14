@@ -1,0 +1,36 @@
+{
+  "name": "Changelogs",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  "shutdownAction": "none",
+  "service": "devbox",
+  "workspaceFolder": "/module",
+  "runServices": ["devbox"],
+  "initializeCommand": "${localWorkspaceFolder}/.devcontainer/scripts/trigger-host.sh ${localWorkspaceFolder}",
+  "postAttachCommand": "${containerWorkspaceFolder}/src/.scripts/trigger-guest.sh",
+	"settings": { 
+		"terminal.integrated.shell.linux": "/bin/bash",
+    "files.autoSave": "onFocusChange",
+    "editor.renderWhitespace": "all",
+    "eslint.codeActionsOnSave.mode": "all",
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true
+    },
+    "workbench.tree.indent": 20,
+    "search.useIgnoreFiles": false,
+    "search.exclude": {
+      "**/*.history": true
+    }
+	},
+	"extensions": [
+		"felixfbecker.php-debug",
+		"felixfbecker.php-intellisense",
+    "EditorConfig.EditorConfig",
+    "xyz.local-history",
+    "file-icons.file-icons",
+    "zainchen.json",
+    "pixelfear.composer-links",
+    "ikappas.composer"
+	]
+}

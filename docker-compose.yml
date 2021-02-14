@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  devbox:
+    container_name: composer-changelogs
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - ./src:/module/src
+    entrypoint: tail -f /dev/null
