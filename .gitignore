@@ -11,3 +11,9 @@ test/installations/**/patches
 test/installations/**/patches.json
 test/dependencies/modules
 *.org
+.history
+output.exp
+.devcontainer
+Dockerfile
+mutagen*
+docker-compose.yml

@@ -109,6 +109,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
 
                 $prettyVersion = $this->packageUtils->getPrettyVersion($targetRootPackage);
                 
+                $matches = array();
                 preg_match('/.* as (.*)$/', $prettyVersion, $matches);
 
                 if (isset($matches[1])) {

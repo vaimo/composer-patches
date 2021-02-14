@@ -39,10 +39,7 @@ class LabelVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
                 continue;
             }
 
-            $items[] = array(
-                $label,
-                array(PatchDefinition::VERSION => $version)
-            );
+            $items[] = array($label, array(PatchDefinition::VERSION => $version));
         }
 
         return $items;

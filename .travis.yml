@@ -1,7 +1,7 @@
 # Copyright (c) Vaimo Group. All rights reserved.
 # See LICENSE_VAIMO.txt for license details.
 language: php
-
+  
 git:
   depth: 1
   
@@ -11,9 +11,8 @@ cache:
     - "$HOME/.composer/cache"
 
 install:
+  - composer self-update 1.8.4
   - composer install
 
 script:
-  - "composer code:deps"
-  - "composer code:analyse"
-  - "composer test"
+  - composer ci:build

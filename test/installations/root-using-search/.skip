@@ -1,0 +1,11 @@
+remote-success
+remote-fail
+validation-error-files
+remote-bundle-success
+remote-sha1-success
+remote-sha1-fail
+remote-unsecure-fail
+remote-validate-fail
+remote-list-fail
+owner-remove-keep
+owner-remove-reset

@@ -28,6 +28,7 @@ class Shell
 
     /**
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      *
      * @param string $command
      * @param null|string $cwd
@@ -43,14 +44,10 @@ class Shell
         $logger = $this->logger;
 
         $output = '';
-        
+
         $outputHandler = function ($type, $data) use ($logger, &$output) {
             $output .= $data;
-            
-            $logger->writeVerbose(
-                'comment',
-                trim($data)
-            );
+            $logger->writeVerbose('comment', trim($data));
         };
         
         if ($this->logger->getOutputInstance()->isVerbose()) {

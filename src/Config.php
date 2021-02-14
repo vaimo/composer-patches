@@ -58,8 +58,8 @@ class Config
     const PATCHER_ARG_FILE = 'file';
     const PATCHER_ARG_CWD = 'cwd';
 
-    const PATCH_FILE_REGEX_MATCHER = '/^.+\.patch/i';
-
+    const PATCH_FILE_REGEX_MATCHER = '.+\.patch$';
+    
     /**
      * @var array
      */

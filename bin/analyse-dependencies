@@ -6,11 +6,15 @@ COPYRIGHT
 
 script_path=${BASH_SOURCE[0]}
 script_root=$(dirname $(test -L ${script_path} && readlink -f ${script_path} || echo ${script_path}))
+source ${script_root}/lib/output.sh
 
 package="vaimo/composer-patches-local"
-versions="5.3.9 5.4.45 5.5.38 5.6.40 7.0.33 7.1.32 7.2.22 7.3.9"
 
-source ${script_root}/lib/output.sh
+if [ "${1}" != "current" ] ; then
+    versions="5.3.9 5.4.45 5.5.38 5.6.40 7.0.33 7.1.32 7.2.22 7.3.25 7.4.13 8.0.0"
+else
+    versions=$(php -r 'echo phpversion();'|cut -d '-' -f1)
+fi
 
 bin/bootstrap-test-env
 
@@ -23,7 +27,7 @@ analyse_deps()
 
     local has_errors=
     
-    for dependency in $(find vendor/ -mindepth 2 -maxdepth 2 -type d|sed 's|[^/]*\/||') ; do
+    for dependency in $(find vendor -mindepth 2 -maxdepth 2 -type d|sed 's|[^/]*\/||') ; do
         if ! is_production_dependency "${root_package}" "${dependency}" ; then
             continue
         fi
@@ -125,7 +129,13 @@ get_autoload_paths()
             true
         ); 
                 
-        echo implode(\PHP_EOL, \$config['autoload']['psr-4']);
+        if (isset(\$config['autoload']['psr-4'])) {
+            echo implode(\PHP_EOL, \$config['autoload']['psr-4']);
+        }
+
+        if (isset(\$config['autoload']['psr-0'])) {
+            echo implode(\PHP_EOL, \$config['autoload']['psr-0']);
+        }
 SCRIPT
 )
     local src_paths=
@@ -195,6 +205,7 @@ is_production_dependency()
         version_mm=$(echo ${version}|cut -d'.' -f1-2)
 
         sed -i.org 's|_VERSION_|'${version_mm}'|g' $(pwd)/phpcs.xml
+        rm $(pwd)/phpcs.xml.org
         
         _line '=' 80
         _title "CHECK VIABILITY WITH" "PHP ${version_mm}" "code compatibility of required dependencies"
@@ -213,5 +224,3 @@ is_production_dependency()
         analyse_deps "${package}" "${package_root}/.config"
     done
 )
-
-

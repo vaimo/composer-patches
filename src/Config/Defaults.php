@@ -29,7 +29,7 @@ class Defaults
                 'DEFAULT' => array(
                     'resolver' => array(
                         'default' => '< which',
-                        'windows' => '< where'
+                        'windows' => '< where /F'
                     )
                 ),
                 'GIT' => array(

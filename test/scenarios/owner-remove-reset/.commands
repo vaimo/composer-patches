@@ -1,0 +1,4 @@
+patch:validate
+patch:apply
+>composer remove {{PATCHES-OWNER}}
+@assert vaimo/composer-patches-target1,value8,value8

@@ -90,6 +90,13 @@ class PatchCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Force package reset even when it has local change'
         );
+
+        $this->addOption(
+            '--no-scripts',
+            null,
+            InputOption::VALUE_NONE,
+            'Skips the execution of all scripts defined in composer.json file.'
+        );
     }
 
     /**
@@ -156,7 +163,9 @@ class PatchCommand extends \Composer\Command\BaseCommand
             }
         );
 
-        $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
+        if (!$input->getOption('no-scripts')) {
+            $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_INSTALL_CMD, $isDevMode);
+        }
 
         return (int)!$result;
     }

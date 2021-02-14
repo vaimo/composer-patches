@@ -87,13 +87,9 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         );
         
         $matches = $this->resolveValidationTargets($repository, $pluginConfig);
-
         $installPaths = $this->collectInstallPaths($matches);
-        
         $fileMatches = $this->collectPatchFilesFromPackages($matches, $pluginConfig);
-        
         $groups = $this->collectOrphans($fileMatches, $patchDefines, $installPaths, $patchStatuses);
-        
         $this->outputOrphans($output, $groups);
 
         $output->writeln(
@@ -105,7 +101,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
     private function createSourcesEnablerConfig($localOnly)
     {
-        $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
+        $configDefaults = new Config\Defaults();
 
         $defaultValues = $configDefaults->getPatcherConfig();
         
@@ -184,9 +180,8 @@ class ValidateCommand extends \Composer\Command\BaseCommand
                 '/'
             );
 
-            $filter = sprintf('%s.+\.patch/i', rtrim($filter, '/'));
-
-            $searchResult = $fileSystemUtils->collectPathsRecursively($installPath, $filter);
+            $filter = sprintf('%s/i', rtrim($filter, '/') . Config::PATCH_FILE_REGEX_MATCHER);
+            $searchResult = $fileSystemUtils->collectFilePathsRecursively($installPath, $filter);
 
             $fileMatchGroups[] = array_fill_keys($searchResult, array(
                 Patch::OWNER => $packageName,
@@ -286,16 +281,24 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $ownerName = $config[Patch::OWNER];
             $installPath = $paths[$ownerName];
             
+            if (!isset($groups[$ownerName])) {
+                continue;
+            }
+
             $groups[$ownerName][] = array(
                 'issue' => 'NO CONFIG',
                 'path' => $config[Patch::URL] ?: PathUtils::reducePathLeft($path, $installPath)
             );
         }
-        
+
         foreach ($orphanConfig as $path => $config) {
             $ownerName = $config[Patch::OWNER];
             $installPath = $paths[$ownerName];
             
+            if (!isset($groups[$ownerName])) {
+                continue;
+            }
+
             $groups[$ownerName][] = array(
                 'issue' => isset($statuses[$path]) && $statuses[$path]
                     ? $statuses[$path]

@@ -61,6 +61,7 @@ class Transformer
 
                 $labelConfig = explode(',', $label);
 
+                $matches = array();
                 preg_match($labelInfoMatcher, trim(end($labelConfig)), $matches);
 
                 $result[$target][$path] = array(

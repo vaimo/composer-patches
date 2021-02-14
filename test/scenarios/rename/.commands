@@ -1,5 +1,5 @@
 patch:validate
 patch:apply
->mv patches/1_second-change.patch patches/1_renamed-patch.patch
->sed -i.org 's/valueX/valueZ/' patches/1_renamed-patch.patch
+>mv {{OWNER-ROOT}}/patches/1_second-change.patch {{OWNER-ROOT}}/patches/1_renamed-patch.patch
+>sed -i.org 's/valueX/valueZ/' {{OWNER-ROOT}}/patches/1_renamed-patch.patch
 patch:apply

@@ -45,9 +45,7 @@ class VersionRangesConfigComponent implements \Vaimo\ComposerPatches\Interfaces\
         foreach ($data[PatchDefinition::VERSION] as $version) {
             $items[] = array(
                 $label,
-                array_replace($data, array(
-                    PatchDefinition::VERSION => $version,
-                ))
+                array_replace($data, array(PatchDefinition::VERSION => $version))
             );
         }
 

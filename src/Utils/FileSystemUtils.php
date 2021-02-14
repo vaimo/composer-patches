@@ -7,6 +7,15 @@ namespace Vaimo\ComposerPatches\Utils;
 
 class FileSystemUtils
 {
+    public function collectFilePathsRecursively($rootPath, $pattern)
+    {
+        $paths = $this->collectPathsRecursively($rootPath, $pattern);
+
+        return array_filter($paths, function ($item) {
+            return is_file($item);
+        });
+    }
+
     public function collectPathsRecursively($rootPath, $pattern)
     {
         if (!is_dir($rootPath)) {
