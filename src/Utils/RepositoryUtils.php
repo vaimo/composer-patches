@@ -14,7 +14,7 @@ class RepositoryUtils
         $compositeRepository = new \Composer\Repository\CompositeRepository(array($repository));
 
         return array_filter(
-            array_map('reset', $compositeRepository->getDependents($dependencyName))
+            array_map('reset', $installedRepo->getDependents($dependencyName))
         );
     }
 }
