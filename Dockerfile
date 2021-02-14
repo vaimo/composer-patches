@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer self-update 1.10.20
 RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1001 developer
 RUN chown -R developer:root /module
 
