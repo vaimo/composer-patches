@@ -6,7 +6,7 @@
     "require": {
         "php": ">=5.3.0",
         "ext-json": "*",
-        "composer-plugin-api": "^2.0",
+        "composer-plugin-api": "^1.0 || ^2.0",
         "drupol/phposinfo": "^1.6",
         "seld/jsonlint": "^1.7.1",
         "vaimo/topological-sort": "^1.0"
