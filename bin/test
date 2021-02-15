@@ -364,11 +364,16 @@ apply_patches() {
         command="${command} &> >(tee -a ${out_file})"
     fi
  
+    cols=$(tput cols)
+    rows=$(tput lines)
+    
     (
+        stty rows 50 cols 1000
         eval "${command}; return \${PIPESTATUS[0]}"
     )
         
     local result=${?}
+    stty rows ${rows} cols ${cols}
     
     return ${result};
 }

@@ -11,6 +11,11 @@ use Vaimo\ComposerPatches\Utils\PathUtils;
 class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface
 {
     /**
+     * @var \Composer\Composer
+     */
+    private $composer;
+
+    /**
      * @var bool
      */
     private $gracefulMode;
@@ -45,12 +50,14 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
      * @param bool $gracefulMode
      */
     public function __construct(
+        \Composer\Composer $composer,
         \Composer\Package\PackageInterface $ownerPackage,
         \Composer\Downloader\FileDownloader $downloadManager,
         \Vaimo\ComposerPatches\Console\Silencer $consoleSilencer,
         $vendorDir,
         $gracefulMode = false
     ) {
+        $this->composer = $composer;
         $this->ownerPackage = $ownerPackage;
         $this->fileDownloader = $downloadManager;
         $this->consoleSilencer = $consoleSilencer;
@@ -70,6 +77,7 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
 
         $relativePath = PathUtils::composePath($ownerName, 'downloads');
         $absolutePath = PathUtils::composePath($this->vendorDir, $relativePath);
+        $errors = array();
         
         foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
@@ -92,8 +100,26 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                     $downloader = $this->fileDownloader;
 
                     $this->consoleSilencer->applyToCallback(
-                        function () use ($downloader, $package, $destinationFolder) {
-                            $downloader->download($package, $destinationFolder, false);
+                        function () use ($downloader, $package, $destinationFolder, $source, &$patchData, &$errors) {
+                            if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+                                $downloader->download($package, $destinationFolder, false);
+                            } else {
+                                $promise = $downloader->download($package, $destinationFolder, null, false);
+                                $promise->then(function ($path) use (&$patchData) {
+                                    $patchData[PatchDefinition::PATH] = $path;
+                                }, function (\Exception $exception) use ($source, &$patchData, &$errors) {
+                                    try {
+                                        if (!$exception instanceof \Composer\Downloader\TransportException) {
+                                            throw $exception;
+                                        }
+                                        $patchData[PatchDefinition::STATUS_LABEL] = $this->handleTransportError($source, $exception);
+                                    } catch (\Exception $error) {
+                                        $errors[] = $error;
+                                        throw $error;
+                                    }
+                                    $patchData[PatchDefinition::STATUS] = PatchDefinition::STATUS_ERRORS;
+                                });
+                            }
                         }
                     );
                 } catch (\Composer\Downloader\TransportException $exception) {
@@ -101,11 +127,21 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                     $patchData[PatchDefinition::STATUS] = PatchDefinition::STATUS_ERRORS;
                 }
 
-                $patchData[PatchDefinition::PATH] = $destinationFile;
+                if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+                    $patchData[PatchDefinition::PATH] = $destinationFile;
+                }
+
                 $patchData[PatchDefinition::TMP] = true;
             }
         }
 
+        if (version_compare(\Composer\Composer::VERSION, '2.0', '>=')) {
+            $this->composer->getLoop()->getHttpDownloader()->wait();
+            if (count($errors) > 0) {
+                throw array_shift($errors);
+            }
+        }
+        
         return $patches;
     }
     

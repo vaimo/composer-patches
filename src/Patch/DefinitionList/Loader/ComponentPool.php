@@ -59,7 +59,7 @@ class ComponentPool
         $skippedPackages = $pluginConfig->getSkippedPackages();
         $patcherConfig = $pluginConfig->getPatcherConfig();
         $composer = $this->composerContext->getLocalComposer();
-        $composerConfig = clone $composer->getConfig();
+        $composerConfig = clone $composer->getConfig();        
 
         $composerConfig->merge(array(
             'config' => array('secure-http' => $patcherConfig[PluginConfig::PATCHER_SECURE_HTTP])
@@ -90,7 +90,7 @@ class ComponentPool
         if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
             $fileDownloader = new FileDownloader($this->appIO, $composerConfig, null, $cache);
         } else {
-            $httpDownloader = \Composer\Factory::createHttpDownloader($this->appIO, $composerConfig);
+            $httpDownloader = $composer->getLoop()->getHttpDownloader();
             $fileDownloader = new FileDownloader($this->appIO, $composerConfig, $httpDownloader, null, $cache);
         }
 
@@ -120,6 +120,7 @@ class ComponentPool
             'platform' => new LoaderComponents\PlatformComponent($platformPackages),
             'constraints' => new LoaderComponents\ConstraintsComponent($configExtractor),
             'downloader' => new LoaderComponents\DownloaderComponent(
+                $composer,
                 $pluginPackage,
                 $fileDownloader,
                 $consoleSilencer,

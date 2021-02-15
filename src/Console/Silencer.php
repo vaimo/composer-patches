@@ -27,10 +27,11 @@ class Silencer
     
     public function applyToCallback(\Closure $callback)
     {
-        $verbosityLevel = OutputUtils::resetVerbosity(
-            $this->appIO,
-            OutputInterface::VERBOSITY_QUIET
-        );
+        if ($this->appIO->isVerbose()) {
+            return $callback();
+        }
+
+        $verbosityLevel = OutputUtils::resetVerbosity($this->appIO, OutputInterface::VERBOSITY_QUIET);    
 
         try {
             $result = $callback();

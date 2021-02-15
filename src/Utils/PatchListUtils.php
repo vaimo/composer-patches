@@ -34,9 +34,16 @@ class PatchListUtils
                     continue;
                 }
 
-                unlink($patchInfo[Patch::PATH]);
+                if (file_exists($patchInfo[Patch::PATH])) {
+                    unlink($patchInfo[Patch::PATH]);
+                }
 
                 $dirName = dirname($patchInfo[Patch::PATH]);
+                
+                if (!is_dir($dirName)) {
+                    continue;
+                }
+
                 $iterator = new \FilesystemIterator($dirName);
                 
                 if (!$iterator->valid()) {
