@@ -17,10 +17,8 @@ class RepositoryUtils
             $depsRepository = new \Composer\Repository\InstalledRepository(array($repository));
         }
 
-        $packages = $depsRepository->getDependents($dependencyName);
-
         return array_filter(
-            array_map('reset', $packages)
+            array_map('reset', $$depsRepository->getDependents($dependencyName))
         );
     }
 }
