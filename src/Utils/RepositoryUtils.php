@@ -18,7 +18,7 @@ class RepositoryUtils
         }
 
         return array_filter(
-            array_map('reset', $$depsRepository->getDependents($dependencyName))
+            array_map('reset', $depsRepository->getDependents($dependencyName))
         );
     }
 }
