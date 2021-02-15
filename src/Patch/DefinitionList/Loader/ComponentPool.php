@@ -59,7 +59,7 @@ class ComponentPool
         $skippedPackages = $pluginConfig->getSkippedPackages();
         $patcherConfig = $pluginConfig->getPatcherConfig();
         $composer = $this->composerContext->getLocalComposer();
-        $composerConfig = clone $composer->getConfig();        
+        $composerConfig = clone $composer->getConfig();
 
         $composerConfig->merge(array(
             'config' => array('secure-http' => $patcherConfig[PluginConfig::PATCHER_SECURE_HTTP])

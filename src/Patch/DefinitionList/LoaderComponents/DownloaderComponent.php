@@ -93,26 +93,31 @@ class DownloaderComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
 
                 $package = $this->createPackage($source, $sourceHash, $relativePath, $checksum);
                 
-                $destinationFolder = PathUtils::composePath($absolutePath, $sourceHash);
-                $destinationFile = PathUtils::composePath($destinationFolder, basename($source));
+                $destDir = PathUtils::composePath($absolutePath, $sourceHash);
+                $destinationFile = PathUtils::composePath($destDir, basename($source));
+                $component = $this;
                 
                 try {
                     $downloader = $this->fileDownloader;
 
                     $this->consoleSilencer->applyToCallback(
-                        function () use ($downloader, $package, $destinationFolder, $source, &$patchData, &$errors) {
+                        function () use ($downloader, $package, $destDir, $source, &$patchData, &$errors, $component) {
                             if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
-                                $downloader->download($package, $destinationFolder, false);
+                                $downloader->download($package, $destDir, false);
                             } else {
-                                $promise = $downloader->download($package, $destinationFolder, null, false);
+                                $promise = $downloader->download($package, $destDir, null, false);
                                 $promise->then(function ($path) use (&$patchData) {
                                     $patchData[PatchDefinition::PATH] = $path;
-                                }, function (\Exception $exception) use ($source, &$patchData, &$errors) {
+                                }, function (\Exception $exception) use ($source, &$patchData, &$errors, $component) {
                                     try {
                                         if (!$exception instanceof \Composer\Downloader\TransportException) {
                                             throw $exception;
                                         }
-                                        $patchData[PatchDefinition::STATUS_LABEL] = $this->handleTransportError($source, $exception);
+
+                                        $patchData[PatchDefinition::STATUS_LABEL] = $component->handleTransportError(
+                                            $source,
+                                            $exception
+                                        );
                                     } catch (\Exception $error) {
                                         $errors[] = $error;
                                         throw $error;

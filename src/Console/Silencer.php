@@ -31,7 +31,7 @@ class Silencer
             return $callback();
         }
 
-        $verbosityLevel = OutputUtils::resetVerbosity($this->appIO, OutputInterface::VERBOSITY_QUIET);    
+        $verbosityLevel = OutputUtils::resetVerbosity($this->appIO, OutputInterface::VERBOSITY_QUIET);
 
         try {
             $result = $callback();
