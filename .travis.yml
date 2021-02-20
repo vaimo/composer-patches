@@ -11,17 +11,17 @@ cache:
     - "$HOME/.composer/cache"
 
 before_install:
-  
+  - apt-get install -y git
+
+jobs:
+  - COMPOSER_VERSION=1.8.4
+  - COMPOSER_VERSION=2.0.9
 
 script:
-  - cp composer.lock composer-v2.lock
-  - cp composer-v1.lock composer.lock
-  - composer self-update 1.8.4
-  - composer install
-  - composer ci:build
+  - git --version
   - rm -rf vendor
   - rm -rf $HOME/.composer/cache
-  - cp composer-v2.lock composer.lock
-  - composer self-update 2.0.9
+  - cp composer-v${COMPOSER_VERSION:0:1}.lock composer.lock 2>/dev/null && exit 0
+  - composer self-update $COMPOSER_VERSION
   - composer install
   - composer ci:build
