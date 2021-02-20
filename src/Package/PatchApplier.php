@@ -66,11 +66,8 @@ class PatchApplier
                 : null;
 
             $patchInfo = array_replace($info, array(Patch::SOURCE => $source));
-
             $this->detailsLogger->outputPatchSource($patchInfo);
-
             $loggerIndentation = $this->logger->push();
-
             $this->detailsLogger->outputPatchDescription($patchInfo);
 
             try {

@@ -8,11 +8,6 @@ addons:
 
 git:
   depth: 1
-  
-cache:
-  directories:
-    - "$HOME/.cache/composer"
-    - "$HOME/.composer/cache"
 
 before_install:
   - sudo apt-get -y install git
@@ -23,8 +18,8 @@ env:
     - COMPOSER_VERSION=2.0.9
 
 script:
-  - rm -rf vendor
-  - rm -rf $HOME/.composer/cache
+  # removed to allow GIT applier to trigger as well (tests output does cover it)
+  - rm -rf .git
   - composer self-update ${COMPOSER_VERSION}
   - cp composer-v${COMPOSER_VERSION:0:1}.lock composer.lock 2>/dev/null || true
   - composer install

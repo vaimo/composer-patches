@@ -59,13 +59,9 @@ class QueueGenerator
     public function generateApplyQueue(array $patches, array $repositoryState)
     {
         $patchesQueue = $this->listResolver->resolvePatchesQueue($patches);
-
         $initialState = $this->listResolver->resolveInitialState($patchesQueue, $repositoryState);
-
         list($includes, $removals) = $this->resolveChangesInState($patches, $patchesQueue, $initialState);
-
         list($includesQueue, $removalsQueue) = $this->buildChangeQueues($includes, $removals, $patchesQueue);
-
         $affectedPatches = $this->resolveAffectedPatches($includes, $removals, $patches);
 
         $queue = array_reduce(
@@ -143,7 +139,6 @@ class QueueGenerator
         );
 
         $affectedPatches = $this->patchListAnalyser->getRelatedPatches($patches, $queueTargets);
-
         $patchesByTarget = $this->patchListTransformer->createTargetsList($affectedPatches);
 
         return $this->patchListTransformer->createOriginList(
@@ -154,7 +149,6 @@ class QueueGenerator
     private function resolveChangesInState($patches, $patchesQueue, $repositoryState)
     {
         $relevantPatches = $this->listResolver->resolveRelevantPatches($patches, $patchesQueue);
-
         $removals = $this->repoStateAnalyser->collectPatchRemovals($repositoryState, $relevantPatches);
         $includes = $this->repoStateAnalyser->collectPatchIncludes($repositoryState, $relevantPatches);
 
@@ -164,7 +158,6 @@ class QueueGenerator
     private function buildChangeQueues($includes, $removals, $patchesQueue)
     {
         $patchesQueueByTarget = $this->patchListTransformer->createTargetsList($patchesQueue);
-
         $includesQueue = $this->patchListTransformer->createOriginList(
             $this->patchListUtils->intersectListsByName($patchesQueueByTarget, $includes)
         );
@@ -177,9 +170,7 @@ class QueueGenerator
     public function generateRemovalQueue(array $patches, array $repositoryState)
     {
         $state = $this->patchListTransformer->createDetailedList($repositoryState);
-
         $stateMatches = $this->patchListUtils->intersectListsByName($state, $patches);
-
         $state = $this->patchListTransformer->createSimplifiedList($stateMatches);
 
         $removals = $this->repoStateAnalyser->collectPatchRemovals(
@@ -199,7 +190,6 @@ class QueueGenerator
     public function generateResetQueue(array $patches)
     {
         $directTargets = array_keys($patches);
-
         $declaredTargets = $this->patchListAnalyser->getAllTargets(
             array_map('array_filter', $patches)
         );

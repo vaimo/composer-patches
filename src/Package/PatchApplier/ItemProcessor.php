@@ -65,17 +65,13 @@ class ItemProcessor
 
         try {
             $installPath = $this->packageInfoResolver->getInstallPath($package, $info[Patch::CWD]);
-
             $this->dispatchEventForPackagePatch(Events::PRE_APPLY, $package, $info);
-
             $this->fileApplier->applyFile($info[Patch::PATH], $installPath, $info[Patch::CONFIG]);
-
             $this->dispatchEventForPackagePatch(Events::POST_APPLY, $package, $info);
 
             return true;
         } catch (\Exception $exception) {
             $this->logger->writeException($exception);
-
             $this->failureHandler->execute($exception, $source);
         }
 

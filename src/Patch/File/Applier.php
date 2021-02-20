@@ -78,6 +78,10 @@ class Applier
         $failureMessages = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_FAILURES);
         $sanityOperations = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_SANITY);
 
+        $operations = array_filter($operations, function ($item) {
+            return $item !== false;
+        });
+
         try {
             $this->applierUtils->validateConfig($applierConfig);
         } catch (\Vaimo\ComposerPatches\Exceptions\ConfigValidationException $exception) {
@@ -183,9 +187,7 @@ class Applier
         );
 
         $messages = $this->collectErrors($outputRecords, $phrases);
-
         $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure();
-
         $failure->setErrors($messages);
 
         throw $failure;
@@ -201,7 +203,6 @@ class Applier
         );
 
         $pathMatcher = sprintf('/^%s/i', $pathMarker);
-
         $result = array();
 
         foreach ($outputRecords as $code => $output) {
@@ -219,7 +220,6 @@ class Applier
     private function processOperationItems($patcher, $operations, $args, $failures)
     {
         $operationResults = array_fill_keys(array_keys($operations), '');
-
         $result = true;
 
         foreach (array_keys($operations) as $operationCode) {
@@ -228,18 +228,12 @@ class Applier
             }
 
             $args = array_replace($args, $operationResults);
-
+            $operationFailures = $this->extractArrayValue($failures, $operationCode);
             $applierOperations = is_array($patcher[$operationCode])
                 ? $patcher[$operationCode]
                 : array($patcher[$operationCode]);
 
-            $operationFailures = $this->extractArrayValue($failures, $operationCode);
-
-            list($result, $output) = $this->resolveOperationOutput(
-                $applierOperations,
-                $args,
-                $operationFailures
-            );
+            list($result, $output) = $this->resolveOperationOutput($applierOperations, $args, $operationFailures);
 
             if ($output !== false) {
                 $operationResults[$operationCode] = $output;
@@ -250,7 +244,6 @@ class Applier
             }
 
             $failure = new \Vaimo\ComposerPatches\Exceptions\OperationFailure($operationCode);
-
             $failure->setOutput(explode(PHP_EOL, $output));
 
             throw $failure;
@@ -271,11 +264,8 @@ class Applier
         foreach ($applierOperations as $operation) {
             $passOnFailure = strpos($operation, '!') === 0;
             $operation = ltrim($operation, '!');
-
             $command = $this->templateUtils->compose($operation, $args, $variableFormats);
-
             $cwd = $this->extractStringValue($args, PluginConfig::PATCHER_ARG_CWD);
-
             $resultKey = sprintf('%s | %s', $cwd, $command);
 
             if ($passOnFailure) {
