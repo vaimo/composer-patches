@@ -23,6 +23,7 @@ env:
     - COMPOSER_VERSION=2.0.9
 
 script:
+  - git --version
   - rm -rf vendor
   - rm -rf $HOME/.composer/cache
   - cp composer-v${COMPOSER_VERSION:0:1}.lock composer.lock 2>/dev/null && exit 0
