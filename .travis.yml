@@ -2,6 +2,10 @@
 # See LICENSE_VAIMO.txt for license details.
 language: php
   
+addons:
+  apt:
+    update: true
+
 git:
   depth: 1
   
@@ -11,14 +15,13 @@ cache:
     - "$HOME/.composer/cache"
 
 before_install:
-  - apt-get install -y git
+  - sudo apt-get -y install git
 
 jobs:
   - COMPOSER_VERSION=1.8.4
   - COMPOSER_VERSION=2.0.9
 
 script:
-  - git --version
   - rm -rf vendor
   - rm -rf $HOME/.composer/cache
   - cp composer-v${COMPOSER_VERSION:0:1}.lock composer.lock 2>/dev/null && exit 0
