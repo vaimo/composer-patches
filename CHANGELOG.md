@@ -2,11 +2,26 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 3.52.1
+## DEV-3.53.0
+
+### Feature
+
+* add support for Composer 2 [issues/59]
+* allow patcher operations to be optionally disabled by re-declarng them with label replaced with: false
+
+### Maintenance
+
+* introduce ready-to-use development environment setup for quicker developer onboarding [issues/65]
+* improved linter rules to be a it less forgiving on excessive use of whitespace
+* fix an issue where GIT applier was polled within the tests (due to there being repo-within-repo situation which made the applier to be excluded)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/DEV-3.53.0) [diff](https://github.com/vaimo/composer-patches/compare/3.52.1...DEV-3.53.0)
+
+## 3.52.1 (2021-01-31)
 
 ### Fix
 
-* remove patch availability validation crash under certain package setups
+* remote patch availability validation crash under certain package setups
 
 ### Maintenance
 
@@ -22,10 +37,10 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.52.1) [diff](https
 
 ### Fix
 
-* added /F switch to where to add double quotes to windows commands (pull/44)
-* added no-scripts option to avoid executing post-install-cmd (pull/48)
-* strpos() empty needle errors can occur with certain configurations (pull/53)
-* patches-searches path containing .patch fails (pull/58) (with extra modifications)
+* added /F switch to where to add double quotes to windows commands [pull/44]
+* added no-scripts option to avoid executing post-install-cmd [pull/48]
+* strpos() empty needle errors can occur with certain configurations [pull/53]
+* patches-searches path containing .patch fails [pull/58] (with extra modifications)
 
 ### Maintenance
 
