@@ -10,7 +10,7 @@ class FatalHandler implements \Vaimo\ComposerPatches\Interfaces\PatchFailureHand
     public function execute($error, $path)
     {
         $isException = $error instanceof \Exception;
-        
+
         throw new \Vaimo\ComposerPatches\Exceptions\PatchFailureException(
             $path,
             'Failed to apply the patch. Halting execution!',

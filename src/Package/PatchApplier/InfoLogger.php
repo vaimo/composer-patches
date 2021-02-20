@@ -13,7 +13,7 @@ class InfoLogger
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Logger $logger
      */
@@ -22,20 +22,20 @@ class InfoLogger
     ) {
         $this->logger = $logger;
     }
-    
+
     public function outputPatchSource(array $patch)
     {
         $label = '';
-        
+
         if (isset($patch[Patch::STATUS_LABEL]) && $patch[Patch::STATUS_LABEL]) {
             $label = $patch[Patch::STATUS_LABEL];
         }
 
         $label = $label ? sprintf(' [<info>%s</info>]', $label) : '';
-        
+
         $messageTemplate = '%s%s';
         $args = array($patch[Patch::SOURCE], $label);
-        
+
         if ($patch[Patch::OWNER] && $patch[Patch::OWNER] !== Patch::OWNER_UNKNOWN) {
             $messageTemplate = '<info>%s</info>: ' . $messageTemplate;
             array_unshift($args, $patch[Patch::OWNER]);
@@ -56,7 +56,7 @@ class InfoLogger
             $this->logger->write('comment', $line);
         }
     }
-    
+
     public function outputPatchInfo(array $patch)
     {
         $this->outputPatchSource($patch);
@@ -64,10 +64,10 @@ class InfoLogger
         $loggerIndentation = $this->logger->push();
 
         $this->outputPatchDescription($patch);
-        
+
         $this->logger->reset($loggerIndentation);
     }
-    
+
     private function resolveLabelLines(array $patch)
     {
         $lines = explode(PHP_EOL, trim($patch[Patch::LABEL], PHP_EOL));
@@ -86,17 +86,17 @@ class InfoLogger
 
         return array(sprintf('%s (<fg=default;options=underscore>%s</>)', reset($lines), $reference));
     }
-    
+
     private function resolveReferenceInfo(array $patch)
     {
         if (isset($patch[Patch::LINK]) && $patch[Patch::LINK]) {
             return $patch[Patch::LINK];
         }
-        
+
         if (isset($patch[Patch::ISSUE]) && $patch[Patch::ISSUE]) {
             return $patch[Patch::ISSUE];
         }
-        
+
         return false;
     }
 }

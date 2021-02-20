@@ -24,7 +24,7 @@ class BaseComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNorma
                 : array($target)
         );
     }
-    
+
     private function extractValue(array $data, $key, $default = null)
     {
         return isset($data[$key])

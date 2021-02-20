@@ -15,7 +15,7 @@ class StateGenerator
      * @var \Vaimo\ComposerPatches\Package\Collector
      */
     private $packageCollector;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\PackageListUtils
      */
@@ -28,14 +28,14 @@ class StateGenerator
         \Vaimo\ComposerPatches\Package\Collector $packageCollector
     ) {
         $this->packageCollector = $packageCollector;
-        
+
         $this->packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
     }
 
     public function generate(PackageRepository $repository)
     {
         $packages = $this->packageCollector->collect($repository);
-        
+
         return $this->packageListUtils->extractDataFromExtra(
             $packages,
             PluginConfig::APPLIED_FLAG,

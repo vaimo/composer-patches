@@ -24,13 +24,13 @@ class ConfigReader
     ) {
         $this->infoExtractor = $infoExtractor;
     }
-    
+
     public function readFromPackage(PackageInterface $package)
     {
         $config = array_filter(
             (array)$this->infoExtractor->getConfig($package, Keys::CONFIG_ROOT)
         );
-        
+
         return $this->mirrorConfigValues($config, array(
             Keys::PATCHER_FILE_DEV => Keys::DEV_DEFINITIONS_FILE,
             Keys::PATCHER_FILE => Keys::DEFINITIONS_FILE,
@@ -40,7 +40,7 @@ class ConfigReader
             Keys::PATCHER_BASE_PATHS => Keys::PATCHES_BASE,
         ));
     }
-    
+
     private function mirrorConfigValues(array $config, array $keyMap)
     {
         if (isset($config[Keys::PATCHER_CONFIG_ROOT])) {
@@ -52,7 +52,7 @@ class ConfigReader
                 }
             }
         }
-        
+
         return $config;
     }
 }

@@ -11,22 +11,22 @@ namespace Vaimo\ComposerPatches;
 class Logger
 {
     const TYPE_NONE = 'none';
-    
+
     /**
      * @var \Composer\IO\IOInterface $appIO
      */
     private $appIO;
-    
+
     /**
      * @var array
      */
     private $indentationStack = array();
-    
+
     /**
      * @var int
      */
     private $muteDepth = 0;
-    
+
     /**
      * @param \Composer\IO\IOInterface $appIO
      */
@@ -35,13 +35,13 @@ class Logger
     ) {
         $this->appIO = $appIO;
     }
-    
+
     public function writeRaw($message, array $args = array())
     {
         if ($this->muteDepth) {
             return;
         }
-        
+
         $prefix = $this->getIndentationString();
 
         $lines = array_map(function ($line) use ($prefix) {
@@ -49,12 +49,12 @@ class Logger
         }, explode(PHP_EOL, $message));
 
         $prefixedMessage = implode(PHP_EOL, $lines);
-        
+
         $this->appIO->write(
             !$args ? $prefixedMessage : vsprintf($prefixedMessage, $args)
         );
     }
-    
+
     public function write($type, $message, array $args = array())
     {
         $this->writeRaw($this->createTag($type, $message), $args);
@@ -67,31 +67,31 @@ class Logger
         }
 
         $length = 0;
-        
+
         foreach ($message as $item) {
             $length = max(min(80, strlen($item)), $length);
         }
-        
+
         foreach ($message as $item) {
             $this->write($type, str_pad($item, $length, ' '), $args);
         }
     }
-    
+
     public function writeVerbose($type, $message, array $args = array())
     {
         if (!$this->appIO->isVerbose()) {
             return;
         }
-        
+
         $this->write($type, $message, $args);
     }
-    
+
     public function writeException(\Exception $exception)
     {
         if (!$this->appIO->isVerbose()) {
             return;
         }
-        
+
         $this->write('error', trim($exception->getMessage(), PHP_EOL . ' '));
         $this->write('', trim($exception->getTraceAsString(), PHP_EOL . ' '));
     }
@@ -101,19 +101,19 @@ class Logger
         if ($this->muteDepth) {
             return;
         }
-        
+
         $this->appIO->write('');
     }
-    
+
     private function createTag($type, $contents)
     {
         if (!$type || $type === \Vaimo\ComposerPatches\Logger::TYPE_NONE) {
             return $contents;
         }
-        
+
         return '<' . $type . '>' . $contents . '</' . $type . '>';
     }
-    
+
     private function getIndentationString()
     {
         return str_pad('', count($this->indentationStack) * 2, ' ') . end($this->indentationStack);
@@ -124,13 +124,13 @@ class Logger
         if ($this->muteDepth) {
             return;
         }
-        
+
         $this->appIO->write(
             $this->getIndentationString(),
             false
         );
     }
-    
+
     public function reset($index = 0)
     {
         $this->indentationStack = array_slice($this->indentationStack, 0, $index);
@@ -139,9 +139,9 @@ class Logger
     public function push($prefix = '')
     {
         $index = count($this->indentationStack);
-        
+
         $this->indentationStack[] = $prefix ? ($prefix . ' ') : '';
-        
+
         return $index;
     }
 

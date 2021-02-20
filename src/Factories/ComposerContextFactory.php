@@ -16,13 +16,13 @@ class ComposerContextFactory
      * @var \Composer\Composer
      */
     private static $globalComposer;
-    
+
     public function __construct(
         \Composer\Composer $composer
     ) {
         $this->composer = $composer;
     }
-    
+
     public function create()
     {
         $instances = array(
@@ -34,7 +34,7 @@ class ComposerContextFactory
         }
 
         array_unshift($instances, self::$globalComposer);
-        
+
         return new \Vaimo\ComposerPatches\Composer\Context(
             array_filter($instances)
         );

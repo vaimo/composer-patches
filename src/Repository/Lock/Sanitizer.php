@@ -31,11 +31,11 @@ class Sanitizer
 
         $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
-    
+
     public function sanitize()
     {
         $lockData = $this->lockerManager->readLockData();
-        
+
         if (!$lockData) {
             return;
         }

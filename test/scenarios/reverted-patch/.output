@@ -12,4 +12,7 @@ Processing patches configuration
         ! Success changed to FAILURE due to output analysis (reversals):  
           Reversed (or previously applied) patch detected!  Assuming -R.  
                                                                           
+      > GIT                                                               
+        ! error: patch failed: src/example.txt:5                          
+                                                                          
       (For full, unfiltered details please use: composer patch:apply -vvv)

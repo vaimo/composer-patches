@@ -18,7 +18,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
      * @var \Vaimo\ComposerPatches\Patch\File\Loader
      */
     private $patchFileLoader;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Patch\File\Analyser
      */
@@ -63,7 +63,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                 if (!in_array(PatchDefinition::BUNDLE_TARGET, $targets, true)) {
                     continue;
                 }
-                
+
                 if (count($targets) > 1) {
                     continue;
                 }
@@ -78,9 +78,9 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
                 $paths = $this->patchFileAnalyser->getAllPaths(
                     $this->patchFileLoader->loadWithNormalizedLineEndings($path)
                 );
-                
+
                 $bundleTargets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths);
-                
+
                 if (!$bundleTargets && !$this->gracefulMode) {
                     throw $this->createError('zero matches', $source);
                 }
@@ -91,7 +91,7 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
 
         return $patches;
     }
-    
+
     private function createError($reason, $source)
     {
         return new \Vaimo\ComposerPatches\Exceptions\LoaderException(

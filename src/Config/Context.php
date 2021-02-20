@@ -28,7 +28,7 @@ class Context
             ), '-')
         );
     }
-    
+
     public function getOperationSystemName()
     {
         $typeId = OsInfo::os();
@@ -85,7 +85,7 @@ class Context
         // @codingStandardsIgnoreStart
         $familyId = OsInfo::family(); // phpcs:ignore PHPCompatibility.Extensions.RemovedExtensions
         // @codingStandardsIgnoreEnd
-        
+
         $labels = array(
             FamilyName::BSD => 'unix',
             FamilyName::DARWIN => 'unix',

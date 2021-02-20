@@ -38,22 +38,22 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
     {
         /** @var \Composer\Package\CompletePackageInterface $rootPackage */
         $packages = $this->constraintPackages;
-        
+
         foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
                 $patchConstraints = $patchData[PatchDefinition::DEPENDS];
 
                 $this->resolveComparisonResults($patchConstraints, $packages);
-                
+
                 $comparisonResults = $this->resolveComparisonResults($patchConstraints, $packages);
-                
+
                 if (!$comparisonResults) {
                     continue;
                 }
 
                 if (count(array_filter($comparisonResults)) !== count($comparisonResults)) {
                     $patchData = false;
-                    
+
                     continue;
                 }
 
@@ -68,7 +68,7 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
 
         return array_filter($patches);
     }
-    
+
     private function resolveComparisonResults(array $patchConstraints, array $packages)
     {
         $comparisonResults = array();
@@ -96,7 +96,7 @@ class PlatformComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionL
 
             $comparisonResults[$constraintTarget] = $matchResult;
         }
-        
+
         return $comparisonResults;
     }
 }

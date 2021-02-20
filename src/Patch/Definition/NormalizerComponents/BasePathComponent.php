@@ -47,7 +47,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         }
 
         $template = $this->resolveTemplate($ownerConfig, $target);
-        
+
         list ($sourcePath, $sourceTags) = $this->deconstructSource($source);
 
         $nameParts = explode(ComposerConstants::PACKAGE_SEPARATOR, $target);
@@ -65,7 +65,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             'package' => 'module name',
             'label' => 'label value'
         );
-        
+
         $extraVariables = array(
             'version' => preg_replace(
                 '/[^A-Za-z0-9.-]/',
@@ -91,13 +91,13 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             $templateVariables,
             array_fill_keys(array($variablePattern), array())
         );
-        
+
         return array(
             PatchDefinition::LABEL => $this->normalizeLabelForSourcePath($label, $sourcePath),
             PatchDefinition::SOURCE => $sourcePath
         );
     }
-    
+
     private function normalizeLabelForSourcePath($label, $sourcePath)
     {
         $filename = basename($sourcePath);
@@ -109,10 +109,10 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
                 $label
             );
         }
-        
+
         return $label;
     }
-    
+
     private function deconstructSource($source)
     {
         $sourceTags = '';
@@ -123,10 +123,10 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             $sourceTags = array_pop($sourceSegments);
             $source = implode('#', $sourceSegments);
         }
-        
+
         return array($source, $sourceTags);
     }
-    
+
     private function prepareTemplateValues($template, $variablePattern, $variableValues)
     {
         $mutationRules = $this->templateUtils->collectValueMutationRules(
@@ -143,7 +143,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             $variableValues
         );
     }
-    
+
     private function expandPathVariables(array $pathVariables, array $mutationNamesMap)
     {
         $normalizedVariables = array_map(function ($part) {
@@ -170,7 +170,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
                 $pathVariables[$mutationName] = $mutationApplier($value);
             }
         }
-        
+
         return $pathVariables;
     }
 

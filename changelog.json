@@ -6,10 +6,13 @@
     ],
     "DEV-3.53.0": {
         "feature": [
-            "add support for Composer 2 [issues/59]"
+            "add support for Composer 2 [issues/59]",
+            "allow patcher operations to be optionally disabled by re-declarng them with label replaced with: false"
         ],
         "maintenance": [
-            "introduce ready-to-use development environment setup for quicker developer onboarding [issues/65]"
+            "introduce ready-to-use development environment setup for quicker developer onboarding [issues/65]",
+            "improved linter rules to be a it less forgiving on excessive use of whitespace",
+            "fix an issue where GIT applier was polled within the tests (due to there being repo-within-repo situation which made the applier to be excluded)"
         ]
     },
     "3.52.1": {
@@ -410,8 +413,8 @@
             "allow multiple types to be combined in embedded info (@type dev+bundle)"
         ],
         "fix": [
-           "multi-line description not presented properly when using composer patch:list command",
-           "bundled patches not included as expected when using embedded patch target info"
+            "multi-line description not presented properly when using composer patch:list command",
+            "bundled patches not included as expected when using embedded patch target info"
         ],
         "branch": "release/3"
     },

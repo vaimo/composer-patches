@@ -13,7 +13,7 @@ interface DefinitionExploderComponentInterface
      * @return bool
      */
     public function shouldProcess($label, $data);
-    
+
     /**
      * @param string $label
      * @param mixed $data

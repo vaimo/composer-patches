@@ -36,10 +36,13 @@ composer code:test
 composer code:test sequence
 
 # Runs all scenarios on one specific installation
-composer code:test using-file:
+composer code:test root-using-file:
 
 # Runs just one scenario for just one installation
-composer code:test using-file:skipped-patch
+composer code:test root-using-file:apply-single
+
+# Runs just one scenario for just one installation (verbose output)
+VERBOSE=1 composer code:test root-using-file:apply-single
 
 # Validate that all production-level dependencies are compatible 
 # with the system requirements of this package 

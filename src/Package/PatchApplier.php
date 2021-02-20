@@ -15,7 +15,7 @@ class PatchApplier
      * @var \Vaimo\ComposerPatches\Package\PatchApplier\ItemProcessor
      */
     private $fileProcessor;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger
      */
@@ -25,7 +25,7 @@ class PatchApplier
      * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy
      */
     private $outputStrategy;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Logger
      */
@@ -59,25 +59,22 @@ class PatchApplier
     public function applyPatches(PackageInterface $package, array $patchesQueue)
     {
         $appliedPatches = array();
-        
+
         foreach ($patchesQueue as $source => $info) {
             $muteDepth = !$this->outputStrategy->shouldAllowForPatches(array($info))
                 ? $this->logger->mute()
                 : null;
 
             $patchInfo = array_replace($info, array(Patch::SOURCE => $source));
-            
             $this->detailsLogger->outputPatchSource($patchInfo);
-
             $loggerIndentation = $this->logger->push();
-
             $this->detailsLogger->outputPatchDescription($patchInfo);
 
             try {
                 $result = $this->fileProcessor->processFileInfo($package, $patchInfo);
             } catch (\Exception $exception) {
                 $this->logger->reset($loggerIndentation);
-                
+
                 if ($muteDepth !== null) {
                     $this->logger->unMute($muteDepth);
                 }
@@ -86,7 +83,7 @@ class PatchApplier
             }
 
             $this->logger->reset($loggerIndentation);
-            
+
             if ($muteDepth !== null) {
                 $this->logger->unMute($muteDepth);
             }

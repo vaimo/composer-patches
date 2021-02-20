@@ -16,7 +16,7 @@ class PatcherStateManager
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
@@ -38,7 +38,7 @@ class PatcherStateManager
 
         foreach ($patchQueue as $target => $items) {
             $package = $repository->findPackage($target, Constraint::ANY);
-            
+
             if (!$package) {
                 continue;
             }

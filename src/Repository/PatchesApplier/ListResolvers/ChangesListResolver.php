@@ -18,7 +18,7 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $baseResolver
      */
@@ -29,12 +29,12 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
 
         $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
     }
-    
+
     public function resolvePatchesQueue(array $patches)
     {
         return $this->baseResolver->resolvePatchesQueue($patches);
     }
-    
+
     public function resolveRelevantPatches(array $patches, array $subset)
     {
         return $this->baseResolver->resolveRelevantPatches($patches, $subset);
@@ -44,7 +44,7 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
     {
         $patchesByTarget = $this->patchListTransformer->groupItemsByTarget($patches);
         $unpackedState = $this->patchListTransformer->createDetailedList($state);
-        
+
         $matches = array();
 
         foreach ($patchesByTarget as $target => $items) {
@@ -54,7 +54,7 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
                 }
 
                 $stateItem = $unpackedState[$target][$path];
-                
+
                 if ($stateItem[Patch::HASH] === $item[Patch::HASH]) {
                     continue;
                 }
@@ -70,7 +70,7 @@ class ChangesListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResol
         }
 
         $state = $this->patchListTransformer->createSimplifiedList($unpackedState);
-        
+
         return $this->baseResolver->resolveInitialState($matches, $state);
     }
 }

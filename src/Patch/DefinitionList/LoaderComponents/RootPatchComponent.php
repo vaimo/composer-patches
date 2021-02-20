@@ -18,7 +18,7 @@ class RootPatchComponent implements \Vaimo\ComposerPatches\Interfaces\Definition
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
-    
+
     /**
      * @param \Composer\Package\PackageInterface $package
      */
@@ -26,7 +26,7 @@ class RootPatchComponent implements \Vaimo\ComposerPatches\Interfaces\Definition
         \Composer\Package\PackageInterface $package
     ) {
         $this->package = $package;
-        
+
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
 
@@ -49,7 +49,7 @@ class RootPatchComponent implements \Vaimo\ComposerPatches\Interfaces\Definition
                 if ($packageName === $patchData[PatchDefinition::OWNER]) {
                     return true;
                 }
-                
+
                 return false;
             }
         );

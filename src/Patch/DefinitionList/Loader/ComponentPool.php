@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches\Patch\DefinitionList\Loader;
 
 use Vaimo\ComposerPatches\Patch\DefinitionList\LoaderComponents;
 use Vaimo\ComposerPatches\Config as PluginConfig;
+use Composer\Downloader\FileDownloader;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -22,7 +23,7 @@ class ComponentPool
      * @var \Composer\IO\IOInterface
      */
     private $appIO;
-    
+
     /**
      * @var bool[]|\Vaimo\ComposerPatches\Interfaces\DefinitionListLoaderComponentInterface[]
      */
@@ -50,23 +51,23 @@ class ComponentPool
         $this->gracefulMode = $gracefulMode;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function getList(PluginConfig $pluginConfig)
     {
         $skippedPackages = $pluginConfig->getSkippedPackages();
-        
         $patcherConfig = $pluginConfig->getPatcherConfig();
-
         $composer = $this->composerContext->getLocalComposer();
-        
         $composerConfig = clone $composer->getConfig();
 
         $composerConfig->merge(array(
             'config' => array('secure-http' => $patcherConfig[PluginConfig::PATCHER_SECURE_HTTP])
         ));
-        
+
         $rootPackage = $composer->getPackage();
         $extra = $rootPackage->getExtra();
-        
+
         if (isset($extra['excluded-patches']) && !isset($extra[PluginConfig::EXCLUDED_PATCHES])) {
             $extra[PluginConfig::EXCLUDED_PATCHES] = $extra['excluded-patches'];
         }
@@ -76,9 +77,8 @@ class ComponentPool
             : array();
 
         $installationManager = $composer->getInstallationManager();
-
         $cache = null;
-        
+
         if ($composerConfig->get('cache-files-ttl') > 0) {
             $cache = new \Composer\Cache(
                 $this->appIO,
@@ -86,35 +86,31 @@ class ComponentPool
                 'a-z0-9_./'
             );
         }
-        
-        $fileDownloader = new \Composer\Downloader\FileDownloader($this->appIO, $composerConfig, null, $cache);
-        
+
+        $composerDependencies = new \Vaimo\ComposerPatches\Compatibility\DependenciesFactory();
+        $fileDownloader = $composerDependencies->createFileDownloader(
+            $this->appIO,
+            $composer,
+            $composerConfig,
+            $cache
+        );
+
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
-        
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
             $installationManager,
             $vendorRoot
         );
-
         $configExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\VendorConfigExtractor(
             $packageInfoResolver
         );
-        
         $platformPackages = $this->resolveConstraintPackages($composerConfig);
-
         $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
             array($composer->getPackage())
         );
-
         $packages = $this->composerContext->getActivePackages();
-
-        $pluginPackage = $packageResolver->resolveForNamespace(
-            $packages,
-            __NAMESPACE__
-        );
-
+        $pluginPackage = $packageResolver->resolveForNamespace($packages, __NAMESPACE__);
         $consoleSilencer = new \Vaimo\ComposerPatches\Console\Silencer($this->appIO);
-        
+
         $defaults = array(
             'bundle' => new LoaderComponents\BundleComponent($rootPackage),
             'global-exclude' => $excludes ? new LoaderComponents\GlobalExcludeComponent($excludes) : false,
@@ -125,6 +121,7 @@ class ComponentPool
             'platform' => new LoaderComponents\PlatformComponent($platformPackages),
             'constraints' => new LoaderComponents\ConstraintsComponent($configExtractor),
             'downloader' => new LoaderComponents\DownloaderComponent(
+                $composer,
                 $pluginPackage,
                 $fileDownloader,
                 $consoleSilencer,
@@ -138,9 +135,7 @@ class ComponentPool
         );
 
         return array_values(
-            array_filter(
-                array_replace($defaults, $this->components)
-            )
+            array_filter(array_replace($defaults, $this->components))
         );
     }
 
@@ -149,7 +144,7 @@ class ComponentPool
         $platformOverrides = array_filter(
             (array)$composerConfig->get('platform')
         );
-        
+
         if (!empty($platformOverrides)) {
             $platformOverrides = array();
         }
@@ -164,10 +159,10 @@ class ComponentPool
         foreach ($platformRepo->getPackages() as $package) {
             $platformPackages[$package->getName()] = $package;
         }
-        
+
         return $platformPackages;
     }
-    
+
     public function registerComponent($name, $instance)
     {
         $this->components[$name] = $instance;
