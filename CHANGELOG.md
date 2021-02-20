@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.53.1 (2021-02-20)
+
+### Fix
+
+* minor issue addressed with V2-style call being in code without version-check (said call is currently backwards-compatible with V1, but you nevenr know ...)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.1) [diff](https://github.com/vaimo/composer-patches/compare/3.53.0...3.53.1)
+
 ## 3.53.0 (2021-02-20)
 
 ### Feature
