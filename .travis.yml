@@ -11,8 +11,16 @@ cache:
     - "$HOME/.composer/cache"
 
 install:
-  - composer self-update 1.8.4
-  - composer install
 
 script:
+  - cp composer.lock composer-v2.lock
+  - cp composer-v1.lock composer.lock
+  - composer self-update 1.8.4
+  - composer install
+  - composer ci:build
+  - rm -rf vendor
+  - rm -rf $HOME/.composer/cache
+  - cp composer-v2.lock composer.lock
+  - composer self-update --rollback
+  - composer install
   - composer ci:build

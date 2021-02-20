@@ -104,10 +104,10 @@
         "code:lint": "bin/analyse",
         "code:deps": "bin/analyse-dependencies",
         "code:fix": "bin/normalise",
-        "ci:build": "composer code:lint && composer code:deps && composer code:test",
+        "ci:build": "composer code:lint && composer code:deps && composer code:test!",
         "pre-install-cmd": "bin/bootstrap-test-env",
         "post-install-cmd": "bin/bootstrap",
-        "post-update-cmd" : "bin/bootstrap"
+        "post-update-cmd": "bin/bootstrap"
     },
     "autoload": {
         "psr-4": {

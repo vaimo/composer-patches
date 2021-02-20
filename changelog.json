@@ -9,7 +9,8 @@
             "add support for Composer 2 [issues/59]"
         ],
         "maintenance": [
-            "introduce ready-to-use development environment setup for quicker developer onboarding [issues/65]"
+            "introduce ready-to-use development environment setup for quicker developer onboarding [issues/65]",
+            "improved linter rules to be a it less forgiving on excessive use of whitespace"
         ]
     },
     "3.52.1": {
@@ -410,8 +411,8 @@
             "allow multiple types to be combined in embedded info (@type dev+bundle)"
         ],
         "fix": [
-           "multi-line description not presented properly when using composer patch:list command",
-           "bundled patches not included as expected when using embedded patch target info"
+            "multi-line description not presented properly when using composer patch:list command",
+            "bundled patches not included as expected when using embedded patch target info"
         ],
         "branch": "release/3"
     },
