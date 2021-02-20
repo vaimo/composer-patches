@@ -27,20 +27,20 @@ class PackageSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceList
         array $packages = array()
     ) {
         $this->packages = $packages;
-        
+
         $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
     }
 
     public function getItems(WritableRepositoryInterface $repository)
     {
         $packages = $repository->getPackages();
-        
+
         if (empty($this->packages)) {
             return $packages;
         }
 
         $filter = $this->filterUtils->composeRegex($this->packages, '/');
-        
+
         return array_filter(
             $packages,
             function (PackageInterface $package) use ($filter) {

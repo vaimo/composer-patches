@@ -44,7 +44,7 @@ class Applier
      * @var \Vaimo\ComposerPatches\Console\OutputAnalyser
      */
     private $outputAnalyser;
-    
+
     /**
      * @var array
      */
@@ -71,15 +71,16 @@ class Applier
     public function applyFile($filename, $cwd, array $config = array())
     {
         $applierConfig = $this->applierUtils->mergeApplierConfig($this->config, array_filter($config));
-
         $applierConfig = $this->applierUtils->sortApplierConfig($applierConfig);
-
         $patchers = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_APPLIERS);
         $operations = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_OPERATIONS);
         $levels = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_LEVELS);
         $failureMessages = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_FAILURES);
-
         $sanityOperations = $this->extractArrayValue($applierConfig, PluginConfig::PATCHER_SANITY);
+
+        $operations = array_filter($operations, function ($item) {
+            return $item !== false;
+        });
 
         try {
             $this->applierUtils->validateConfig($applierConfig);
@@ -102,7 +103,7 @@ class Applier
 
             throw new \Vaimo\ComposerPatches\Exceptions\RuntimeException($message);
         }
-        
+
         $errorGroups = array();
 
         foreach ($levels as $patchLevel) {
@@ -117,7 +118,7 @@ class Applier
                 $errorGroups[] = $exception->getErrors();
                 continue;
             }
-            
+
             $this->logger->writeVerbose(
                 'info',
                 'SUCCESS with type=%s (p=%s)',
@@ -126,26 +127,26 @@ class Applier
 
             return;
         }
-        
+
         $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure(
             sprintf('Cannot apply patch %s', $filename)
         );
-        
+
         $failure->setErrors(
             array_reduce($errorGroups, 'array_merge_recursive', array())
         );
-        
+
         throw $failure;
     }
 
     private function executeOperations(
-        $patchers,
+        array $patchers,
         array $operations,
         array $args = array(),
         array $failures = array()
     ) {
         $outputRecords = array();
-        
+
         foreach ($patchers as $type => $patcher) {
             if (!$patcher) {
                 continue;
@@ -159,7 +160,7 @@ class Applier
                     : PatcherOperation::TYPE_UNKNOWN;
 
                 $outputRecords[$type] = $exception->getOutput();
-                    
+
                 $messageArgs = array(
                     strtoupper($operationReference),
                     $type,
@@ -184,45 +185,41 @@ class Applier
             'Only garbage was found in the patch input',
             'patch fragment without header at line'
         );
-        
+
         $messages = $this->collectErrors($outputRecords, $phrases);
-        
         $failure = new \Vaimo\ComposerPatches\Exceptions\ApplierFailure();
-        
         $failure->setErrors($messages);
 
         throw $failure;
     }
-    
+
     private function collectErrors(array $outputRecords, array $filters)
     {
         $pathMarker = '\|\+\+\+\s(?P<match>.*?)(\t|$)';
-        
+
         $errorMatcher = sprintf(
             '/(%s)/i',
             implode('|', array_merge($filters, array($pathMarker)))
         );
 
         $pathMatcher = sprintf('/^%s/i', $pathMarker);
-
         $result = array();
-        
+
         foreach ($outputRecords as $code => $output) {
             $lines = is_array($output) ? $output : explode(PHP_EOL, $output);
-            
+
             $result[$code] = $this->dataUtils->listToGroups(
                 preg_grep($errorMatcher, $lines),
                 $pathMatcher
             );
         }
-        
+
         return $result;
     }
 
     private function processOperationItems($patcher, $operations, $args, $failures)
     {
         $operationResults = array_fill_keys(array_keys($operations), '');
-
         $result = true;
 
         foreach (array_keys($operations) as $operationCode) {
@@ -231,19 +228,12 @@ class Applier
             }
 
             $args = array_replace($args, $operationResults);
-
+            $operationFailures = $this->extractArrayValue($failures, $operationCode);
             $applierOperations = is_array($patcher[$operationCode])
                 ? $patcher[$operationCode]
                 : array($patcher[$operationCode]);
 
-
-            $operationFailures = $this->extractArrayValue($failures, $operationCode);
-
-            list($result, $output) = $this->resolveOperationOutput(
-                $applierOperations,
-                $args,
-                $operationFailures
-            );
+            list($result, $output) = $this->resolveOperationOutput($applierOperations, $args, $operationFailures);
 
             if ($output !== false) {
                 $operationResults[$operationCode] = $output;
@@ -254,9 +244,8 @@ class Applier
             }
 
             $failure = new \Vaimo\ComposerPatches\Exceptions\OperationFailure($operationCode);
-
             $failure->setOutput(explode(PHP_EOL, $output));
-            
+
             throw $failure;
         }
 
@@ -271,15 +260,12 @@ class Applier
         );
 
         $output = '';
-        
+
         foreach ($applierOperations as $operation) {
             $passOnFailure = strpos($operation, '!') === 0;
             $operation = ltrim($operation, '!');
-
             $command = $this->templateUtils->compose($operation, $args, $variableFormats);
-
             $cwd = $this->extractStringValue($args, PluginConfig::PATCHER_ARG_CWD);
-
             $resultKey = sprintf('%s | %s', $cwd, $command);
 
             if ($passOnFailure) {
@@ -297,7 +283,7 @@ class Applier
                     sprintf('(using cached result for: %s = %s)', $command, reset($this->resultCache[$resultKey]))
                 );
             }
-            
+
             if (!isset($this->resultCache[$resultKey])) {
                 $this->resultCache[$resultKey] = $this->shell->execute($command, $cwd);
             }
@@ -321,18 +307,18 @@ class Applier
 
         return array(false, $output);
     }
-    
+
     private function validateOutput($output, $operationFailures)
     {
         $pathMarker = '\|\+\+\+\s(?P<match>.*?)(\t|$)';
         $pathMatcher = sprintf('/^%s/', $pathMarker);
-        
+
         $failures = $this->outputAnalyser->scanOutputForFailures($output, $pathMatcher, $operationFailures);
-        
+
         if (!$failures) {
             return;
         }
-        
+
         foreach ($failures as $patternCode => $items) {
             foreach ($items as $index => $item) {
                 if (preg_match($pathMatcher, $item)) {
@@ -345,21 +331,21 @@ class Applier
                 );
 
                 $failures[$patternCode][$index] = implode(PHP_EOL, array($message, $item));
-                
+
                 $this->logger->writeVerbose(
                     'warning',
                     sprintf('%s: %s', $message, $operationFailures[$patternCode])
                 );
             }
         }
-        
+
         $failure = new \Vaimo\ComposerPatches\Exceptions\OperationFailure('Output analysis failed');
 
         throw $failure->setOutput(
             array_reduce($failures, 'array_merge', array())
         );
     }
-    
+
     private function extractArrayValue($data, $key)
     {
         return $this->extractValue($data, $key, array());

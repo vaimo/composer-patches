@@ -12,7 +12,7 @@ class PatchListUtils
     public function compareLists(array $listA, array $listB, \Closure $logicProvider)
     {
         $matches = array();
-        
+
         foreach ($listB as $name => $itemsB) {
             $itemsA = isset($listA[$name]) ? $listA[$name] : array();
 
@@ -25,7 +25,7 @@ class PatchListUtils
 
         return $matches;
     }
-    
+
     public function sanitizeFileSystem(array $patches)
     {
         foreach ($patches as $patchGroup) {
@@ -34,31 +34,38 @@ class PatchListUtils
                     continue;
                 }
 
-                unlink($patchInfo[Patch::PATH]);
+                if (file_exists($patchInfo[Patch::PATH])) {
+                    unlink($patchInfo[Patch::PATH]);
+                }
 
                 $dirName = dirname($patchInfo[Patch::PATH]);
+
+                if (!is_dir($dirName)) {
+                    continue;
+                }
+
                 $iterator = new \FilesystemIterator($dirName);
-                
+
                 if (!$iterator->valid()) {
                     rmdir($dirName);
                 }
             }
         }
     }
-    
+
     public function applyDefinitionFilter(array $patches, \Closure $logicProvider)
     {
         foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
                 $result = $logicProvider($patchData);
-                
+
                 if ($result) {
                     continue;
                 }
 
                 $patchData = false;
             }
-            
+
             unset($patchData);
 
             $packagePatches = array_filter($packagePatches);
@@ -66,17 +73,17 @@ class PatchListUtils
 
         return array_filter($patches);
     }
-    
+
     public function applyDefinitionKeyValueFilter(array $patches, $filter, $key)
     {
         foreach ($patches as &$packagePatches) {
             foreach ($packagePatches as &$patchInfo) {
                 if (!isset($patchInfo[$key])) {
                     $patchInfo = false;
-                    
+
                     continue;
                 }
-                
+
                 if ($this->shouldIncludePatch($patchInfo[$key], $filter)) {
                     continue;
                 }
@@ -89,7 +96,7 @@ class PatchListUtils
             array_map('array_filter', $patches)
         );
     }
-    
+
     private function shouldIncludePatch($value, $filter)
     {
         if (is_array($value) && preg_grep($filter, $value)) {
@@ -103,10 +110,10 @@ class PatchListUtils
         if (is_bool($filter) && $value === $filter) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     public function filterListByTargets(array $patches, array $targets)
     {
         foreach ($patches as $target => $group) {
@@ -118,10 +125,10 @@ class PatchListUtils
                 unset($patches[$target][$path]);
             }
         }
-        
+
         return array_filter($patches);
     }
-    
+
     public function mergeLists(array $listA, array $listB)
     {
         $result = array();
@@ -129,7 +136,7 @@ class PatchListUtils
         $keys = array_unique(
             array_merge(array_keys($listA), array_keys($listB))
         );
-        
+
         foreach ($keys as $key) {
             $result[$key] = array_replace(
                 isset($listA[$key]) ? $listA[$key] : array(),
@@ -139,7 +146,7 @@ class PatchListUtils
 
         return $result;
     }
-    
+
     public function diffListsByPath(array $listA, array $listB)
     {
         $pathFlags = array_fill_keys($this->getAllPaths($listB), true);
@@ -149,13 +156,13 @@ class PatchListUtils
                 $group,
                 function (array $item) use ($pathFlags) {
                     $path = $item[Patch::PATH] ? $item[Patch::PATH] : $item[Patch::URL];
-                    
+
                     return !isset($pathFlags[$path]);
                 }
             );
         }, $listA);
     }
-    
+
     public function intersectListsByPath(array $listA, array $listB)
     {
         $pathFlags = array_fill_keys($this->getAllPaths($listB), true);
@@ -188,12 +195,12 @@ class PatchListUtils
     public function intersectListsByName(array $listA, array $listB)
     {
         $result = array();
-        
+
         foreach ($listB as $target => $group) {
             if (!isset($listA[$target])) {
                 continue;
             }
-            
+
             $result[$target] = array_intersect_key($listA[$target], $group);
         }
 

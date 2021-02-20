@@ -42,7 +42,7 @@ class Definition
     const CONFIG = 'config';
     const PATCHER = 'patcher';
     const LEVEL = 'level';
-    
+
     const TYPE = 'type';
     const TYPE_SEPARATOR = '+';
 
@@ -61,10 +61,10 @@ class Definition
     const STATUS_AFFECTED = 'affected';
 
     const STATUS_UNKNOWN = 'unknown';
-    
+
     const OWNER_UNKNOWN = 'unknown';
-    
+
     const SOURCE_INFO_SEPARATOR = '::::';
-    
+
     const STATUS = 'state';
 }

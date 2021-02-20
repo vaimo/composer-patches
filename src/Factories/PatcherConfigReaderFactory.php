@@ -33,7 +33,7 @@ class PatcherConfigReaderFactory
         $infoExtractor = $pluginConfig->shouldPreferOwnerPackageConfig()
             ? new ConfigExtractors\VendorConfigExtractor($packageInfoResolver)
             : new ConfigExtractors\InstalledConfigExtractor();
-        
+
         return new \Vaimo\ComposerPatches\Patcher\ConfigReader($infoExtractor);
     }
 }

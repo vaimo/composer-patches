@@ -33,9 +33,9 @@ class SourcesPreloader
     public function preload(PackageInterface $package)
     {
         $sourcePaths = $this->infoResolver->getAutoLoadPaths($package);
-        
+
         $matchGroups = array();
-        
+
         foreach ($sourcePaths as $sourcePath) {
             $matchGroups[] = $this->fileSystemUtils->collectPathsRecursively($sourcePath, '/.*\.php/');
         }

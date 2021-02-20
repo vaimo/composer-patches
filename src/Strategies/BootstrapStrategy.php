@@ -32,7 +32,7 @@ class BootstrapStrategy
         }
 
         $lockUpdateArgument = 'lock';
-        
+
         try {
             $input = new \Symfony\Component\Console\Input\ArgvInput();
 
@@ -44,7 +44,7 @@ class BootstrapStrategy
 
         return false;
     }
-    
+
     private function isPluginAvailable()
     {
         $composer = $this->composerContext->getLocalComposer();
@@ -60,7 +60,7 @@ class BootstrapStrategy
         } catch (\Vaimo\ComposerPatches\Exceptions\PackageResolverException $exception) {
             return false;
         }
-        
+
         return true;
     }
 }

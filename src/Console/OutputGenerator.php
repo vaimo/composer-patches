@@ -11,7 +11,7 @@ class OutputGenerator
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
-    
+
     public function __construct(
         \Vaimo\ComposerPatches\Logger $logger
     ) {
@@ -22,16 +22,16 @@ class OutputGenerator
     {
         if ($exception instanceof \Vaimo\ComposerPatches\Exceptions\ApplierFailure) {
             $errors = array_filter($exception->getErrors());
-            
+
             if (empty($errors)) {
                 return;
             }
 
             $prioritizedErrors = $this->prioritizeErrors($errors);
-            
+
             $lines = array_merge(
                 array('Probable causes for the failure:', ''),
-                $this->createOutputLines($prioritizedErrors),
+                $this->createOutputRows($prioritizedErrors),
                 array('', '(For full, unfiltered details please use: composer patch:apply -vvv)')
             );
 
@@ -39,7 +39,7 @@ class OutputGenerator
         }
     }
 
-    private function createOutputLines(array $errors)
+    private function createOutputRows(array $errors)
     {
         $lines = array();
 
@@ -66,7 +66,7 @@ class OutputGenerator
 
         return $lines;
     }
-    
+
     private function prioritizeErrors(array $errors)
     {
         $filters = array(
@@ -101,11 +101,11 @@ class OutputGenerator
 
         return array_map(function (array $items) {
             $filteredItems = array_filter($items);
-            
+
             if (isset($filteredItems['']) && count($filteredItems) > 1) {
                 unset($filteredItems['']);
             }
-            
+
             return $filteredItems;
         }, $result);
     }

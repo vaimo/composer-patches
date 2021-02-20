@@ -60,7 +60,7 @@ class RepositoryManager
         }
 
         $installer = $this->installationManager;
-        
+
         $this->consoleSilencer->applyToCallback(
             function () use ($installer, $repository, $operation) {
                 $installer->install($repository, $operation);

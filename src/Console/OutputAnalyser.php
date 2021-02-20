@@ -28,7 +28,7 @@ class OutputAnalyser
             if (!isset($matches[$pattern])) {
                 $matches[$patternCode] = array();
             }
-            
+
             foreach ($lines as $line) {
                 if (preg_match($separatorMatcher, $line)) {
                     $matches[$patternCode][] = $line;
@@ -43,7 +43,7 @@ class OutputAnalyser
                 $matches[$patternCode][] = $line;
             }
         }
-        
+
         return $matches;
     }
 }

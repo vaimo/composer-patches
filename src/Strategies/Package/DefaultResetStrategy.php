@@ -22,8 +22,14 @@ class DefaultResetStrategy implements \Vaimo\ComposerPatches\Interfaces\PackageR
     private $downloader;
 
     /**
+     * @var \Vaimo\ComposerPatches\Compatibility\DependenciesFactory
+     */
+    private $dependencyFactory;
+
+    /**
      * @param \Composer\Installer\InstallationManager $installer
      * @param \Composer\Downloader\DownloadManager $downloader
+     * @param \Vaimo\ComposerPatches\Compatibility\DependenciesFactory
      */
     public function __construct(
         \Composer\Installer\InstallationManager $installer,
@@ -31,11 +37,12 @@ class DefaultResetStrategy implements \Vaimo\ComposerPatches\Interfaces\PackageR
     ) {
         $this->installer = $installer;
         $this->downloader = $downloader;
+        $this->dependencyFactory = new \Vaimo\ComposerPatches\Compatibility\DependenciesFactory();
     }
 
     public function shouldAllowReset(\Composer\Package\PackageInterface $package)
     {
-        $downloader = $this->downloader->getDownloaderForInstalledPackage($package);
+        $downloader = $this->dependencyFactory->createPackageDownloader($this->downloader, $package);
 
         if ($downloader instanceof ChangeReportCapable
             && $downloader instanceof VcsCapable

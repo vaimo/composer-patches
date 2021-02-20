@@ -49,7 +49,7 @@ class PackageResolver
 
             return $package;
         }
-        
+
         throw new \Vaimo\ComposerPatches\Exceptions\PackageResolverException(
             'Failed to detect the plugin package'
         );

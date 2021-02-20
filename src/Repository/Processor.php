@@ -32,22 +32,22 @@ class Processor
 
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
-    
+
     public function process(Repository $repository, Loader $loader, Applier $applier)
     {
         $this->logger->write('info', 'Processing patches configuration');
-        
+
         $patches = $loader->loadFromPackagesRepository($repository);
 
         $loggerIndentation = $this->logger->push('-');
-            
+
         try {
             $packagesUpdated = $applier->apply($repository, $patches);
         } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
             $this->logger->reset($loggerIndentation);
-            
+
             $this->patchListUtils->sanitizeFileSystem($patches);
-            
+
             return false;
         }
 
@@ -55,16 +55,16 @@ class Processor
 
         $type = '';
         $message = 'Nothing to patch';
-        
+
         if ($packagesUpdated) {
             $type = 'info';
             $message = 'Writing patch info to install file';
         }
 
         $this->logger->write($type, $message);
-        
+
         $this->patchListUtils->sanitizeFileSystem($patches);
-        
+
         return true;
     }
 }

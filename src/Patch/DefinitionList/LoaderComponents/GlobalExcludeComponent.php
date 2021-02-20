@@ -31,7 +31,7 @@ class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
         array $config
     ) {
         $this->config = $config;
-        
+
         $this->filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
         $this->patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
     }
@@ -44,16 +44,16 @@ class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
     public function process(array $patches, array $packagesByName)
     {
         $excludedPatches = array();
-        
+
         foreach ($this->config as $patchOwner => $patchPaths) {
             if (!isset($excludedPatches[$patchOwner])) {
                 $excludedPatches[$patchOwner] = array();
             }
-            
+
             if (!$patchPaths) {
                 continue;
             }
-            
+
             $excludedPatches[$patchOwner] = $this->filterUtils->composeRegex($patchPaths, '/');
         }
 
@@ -74,7 +74,7 @@ class GlobalExcludeComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
                 if (!preg_match($excludedPatches[$owner], $source)) {
                     return true;
                 }
-                
+
                 return false;
             }
         );

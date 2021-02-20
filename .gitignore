@@ -13,3 +13,9 @@ test/dependencies/modules
 *.org
 .history
 output.exp
+.devcontainer
+bin/phpcs 
+bin/phpcbf
+Dockerfile
+mutagen*
+docker-compose.yml

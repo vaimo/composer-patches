@@ -50,7 +50,7 @@ class SourcesResolverFactory
             )
         );
     }
-    
+
     private function resolveSourceConfig($patcherConfig)
     {
         $sourceConfig = $patcherConfig[PluginConfig::PATCHER_SOURCES];
@@ -65,7 +65,7 @@ class SourcesResolverFactory
                 $sourceConfig['vendors'] = false;
             }
         }
-        
+
         return $sourceConfig;
     }
 }

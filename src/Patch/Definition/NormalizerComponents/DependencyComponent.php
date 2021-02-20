@@ -21,7 +21,7 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                 $dependsTarget = $target;
 
                 $dependsPatterns = $this->generateDependencyMatchPatterns($ownerConfig);
-                
+
                 if ($dependsPatterns) {
                     $matches = array_filter(
                         array_keys($dependsPatterns),
@@ -29,7 +29,7 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                             return preg_match('#' . $pattern . '#', $target);
                         }
                     );
-                    
+
                     if (!empty($matches)) {
                         $dependsTarget = $dependsPatterns[reset($matches)];
                     }
@@ -45,16 +45,16 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                 $data[PatchDefinition::VERSION]
             );
         }
-        
+
         return array(
             PatchDefinition::DEPENDS => $depends
         );
     }
-    
+
     private function generateDependencyMatchPatterns(array $config)
     {
         $dependsConfig = array();
-        
+
         if (isset($config[PluginConfig::PATCHES_DEPENDS])) {
             $dependsConfig = $config[PluginConfig::PATCHES_DEPENDS];
 
@@ -64,7 +64,7 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                 );
             }
         }
-        
+
         $patterns = array_map(function ($candidate) {
             return trim($candidate, '*')
                 ? str_replace(chr(32), '.*', preg_quote(str_replace('*', chr(32), $candidate), '#'))
@@ -78,10 +78,10 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
                 $patternValues,
                 array('.*' => $patternValues[PluginConfig::PATCHES_CONFIG_DEFAULT])
             );
-            
+
             unset($patternValues[PluginConfig::PATCHES_CONFIG_DEFAULT]);
         }
-        
+
         return $patternValues;
     }
 }

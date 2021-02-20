@@ -26,14 +26,14 @@ class Collector
         array $extraPackages = array()
     ) {
         $this->extraPackages = $extraPackages;
-        
+
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
     }
-    
+
     public function collect(WritableRepositoryInterface $repository)
     {
         $packages = $this->extraPackages;
-        
+
         foreach ($repository->getPackages() as $package) {
             $packages[] = $this->packageUtils->getRealPackage($package);
         }

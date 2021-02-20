@@ -29,7 +29,7 @@ class VendorSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceListI
     public function getItems(WritableRepositoryInterface $repository)
     {
         $packages = $repository->getPackages();
-        
+
         if (empty($this->vendors)) {
             return $packages;
         }
@@ -39,7 +39,7 @@ class VendorSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceListI
             $packages,
             function (PackageInterface $package) use ($allowedVendors) {
                 $vendorName = strtok($package->getName(), ComposerConstants::PACKAGE_SEPARATOR);
-                
+
                 return isset($allowedVendors[$vendorName]);
             }
         );

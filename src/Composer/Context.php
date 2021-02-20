@@ -16,22 +16,22 @@ class Context
      * @var \Composer\Package\PackageInterface[][]
      */
     private $packages;
-    
+
     public function __construct($instances)
     {
         $this->instances = $instances;
     }
-    
+
     public function getActivePackages()
     {
         return array_reduce($this->getPackageMap(), 'array_replace', array());
     }
-    
+
     public function getLocalComposer()
     {
         return end($this->instances);
     }
-    
+
     private function getPackageMap()
     {
         if ($this->packages === null) {
@@ -59,17 +59,17 @@ class Context
 
         return $this->packages;
     }
-    
+
     public function getInstanceForPackage(\Composer\Package\PackageInterface $package)
     {
         $name = $package->getName();
         $packageMap = $this->getPackageMap();
-        
+
         foreach ($packageMap as $index => $packages) {
             if (!isset($packages[$name])) {
                 continue;
             }
-            
+
             return $this->instances[$index];
         }
 

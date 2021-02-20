@@ -24,7 +24,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
      * @var \Vaimo\ComposerPatches\Patch\File\Loader
      */
     private $patchFileLoader;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Patch\File\Analyser
      */
@@ -75,7 +75,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
 
         $this->patchFileLoader = new \Vaimo\ComposerPatches\Patch\File\Loader();
         $this->fileAnalyser = new \Vaimo\ComposerPatches\Patch\File\Analyser();
-        
+
         $this->patchHeaderParser = new \Vaimo\ComposerPatches\Patch\File\Header\Parser();
         $this->fileSystemUtils = new \Vaimo\ComposerPatches\Utils\FileSystemUtils();
 
@@ -161,11 +161,11 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         );
 
         list($target, $depends, $flags) = $this->resolveBaseInfo($data);
-        
+
         if (array_intersect_key($flags, array_flip($this->bundledModeTypes))) {
             $target = PatchDefinition::BUNDLE_TARGET;
         }
-        
+
         if (!$target) {
             return array();
         }
@@ -173,11 +173,11 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         if (array_intersect_key($flags, array_flip($this->localTypes))) {
             $values[PatchDefinition::LOCAL] = true;
         }
-        
+
         if (!$this->devMode && array_intersect_key($flags, array_flip($this->devModeTypes))) {
             $data[PatchDefinition::SKIP] = true;
         }
-        
+
         return array_replace(array(
             PatchDefinition::LABEL => implode(
                 PHP_EOL,
@@ -199,7 +199,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             PatchDefinition::CATEGORY => $this->extractSingleValue($data, PatchDefinition::CATEGORY)
         ), $values);
     }
-    
+
     private function resolveBaseInfo(array $data)
     {
         $target = false;
@@ -214,7 +214,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $depends = trim(array_shift($valueParts));
             $version = trim(implode(':', $valueParts));
         }
-        
+
         if (strpos($package, ':') !== false) {
             $valueParts = explode(':', $package);
 
@@ -239,7 +239,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             array(sprintf('%s:%s', $depends, $version)),
             $this->extractValueList($data, PatchDefinition::DEPENDS)
         );
-        
+
         $patchTypeFlags = array_fill_keys(
             explode(
                 PatchDefinition::TYPE_SEPARATOR,
@@ -247,14 +247,14 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             ),
             true
         );
-        
+
         return array(
             $target,
             $this->normalizeDependencies($dependsList),
             $patchTypeFlags
         );
     }
-    
+
     private function normalizeDependencies($dependsList)
     {
         $dependsNormalized = array_map(

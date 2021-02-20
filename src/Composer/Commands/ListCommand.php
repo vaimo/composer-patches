@@ -74,14 +74,14 @@ class ListCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Mark patches that would get re-applied when changed/new patches are added (due to package reinstall)'
         );
-        
+
         $this->addOption(
             '--brief',
             null,
             InputOption::VALUE_NONE,
             'Show more compact output of the list (remove description, owner , etc)'
         );
-        
+
         $this->addOption(
             '--status',
             null,
@@ -106,7 +106,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         $withExcluded = $input->getOption('excluded') || $input->getOption('with-excludes');
         $withAffected = $input->getOption('with-affected');
         $beBrief = $input->getOption('brief');
-        
+
         $filters = array(
             Patch::SOURCE => $input->getOption('filter'),
             Patch::TARGETS => $input->getArgument('targets')
@@ -121,18 +121,18 @@ class ListCommand extends \Composer\Command\BaseCommand
         $composerContext = $contextFactory->create();
 
         $pluginConfig = $this->createConfigWithEnabledSources($composerContext);
-        
+
         $filteredPool = $this->createLoaderPool($composerContext);
-        
+
         $listResolver = new ListResolvers\FilteredListResolver($filters);
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
-        
+
         $repository = $composer->getRepositoryManager()->getLocalRepository();
-        
+
         $repoStateGenerator = $this->createStateGenerator($composer);
         $queueGenerator = $this->createQueueGenerator($listResolver);
         $filteredLoader = $loaderFactory->create($filteredPool, $pluginConfig, $isDevMode);
-        
+
         $filteredPatches = $filteredLoader->loadFromPackagesRepository($repository);
         $repositoryState = $repoStateGenerator->generate($repository);
 
@@ -151,7 +151,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             $filters,
             $statusFilters
         );
-        
+
         $patches = array_filter($filteredPatches);
 
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
@@ -161,16 +161,16 @@ class ListCommand extends \Composer\Command\BaseCommand
                 empty($statusFilters)
                 || preg_match($filterUtils->composeRegex($statusFilters, '/'), 'excluded')
             );
-        
+
         if ($shouldAddExcludes) {
             $unfilteredPool = $this->createUnfilteredPatchLoaderPool($composerContext);
 
             $unfilteredLoader = $loaderFactory->create($unfilteredPool, $pluginConfig, $isDevMode);
 
             $allPatches = $unfilteredLoader->loadFromPackagesRepository($repository);
-            
+
             $patchesQueue = $listResolver->resolvePatchesQueue($allPatches);
-            
+
             $excludedPatches = $patchListUpdater->updateStatuses(
                 array_filter($patchListUtils->diffListsByPath($patchesQueue, $filteredPatches)),
                 'excluded'
@@ -185,21 +185,21 @@ class ListCommand extends \Composer\Command\BaseCommand
                 ksort($group);
             }, $patches);
         }
-        
+
         if ($beBrief) {
             $patches = $patchListUpdater->embedInfoToItems($patches, array(
                 Patch::LABEL => false,
                 Patch::OWNER => false
             ));
         }
-        
+
         $this->generateOutput($output, $patches);
     }
-    
+
     private function createUnfilteredPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
     {
         $composer = $composerContext->getLocalComposer();
-        
+
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
             $composer->getInstallationManager(),
             $composer->getConfig()->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR)
@@ -213,16 +213,16 @@ class ListCommand extends \Composer\Command\BaseCommand
             'global-exclude' => false,
             'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver, true)
         );
-        
+
         return $this->createLoaderPool($composerContext, $componentOverrides);
     }
-    
+
     private function composerFilteredPatchesList($patches, $additions, $removals, $withAffected, $filters, $statuses)
     {
         $hasFilers = (bool)array_filter($filters);
 
         $listResolver = new ListResolvers\FilteredListResolver($filters);
-        
+
         $patchListUtils = new \Vaimo\ComposerPatches\Utils\PatchListUtils();
         $patchListUpdater = new \Vaimo\ComposerPatches\Patch\DefinitionList\Updater();
 
@@ -250,7 +250,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         if ($hasFilers) {
             $filteredPatches = $listResolver->resolvePatchesQueue($filteredPatches);
         }
-        
+
         if (!empty($statuses)) {
             $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
 
@@ -260,10 +260,10 @@ class ListCommand extends \Composer\Command\BaseCommand
                 Patch::STATUS
             );
         }
-        
+
         return $filteredPatches;
     }
-    
+
     private function createConfigWithEnabledSources(\Vaimo\ComposerPatches\Composer\Context $composerContext)
     {
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
@@ -281,12 +281,10 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
 
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composerContext);
-        
-        return $configFactory->create(
-            array($pluginConfig)
-        );
+
+        return $configFactory->create(array($pluginConfig));
     }
-    
+
     private function createStateGenerator(Composer $composer)
     {
         $packageCollector = new \Vaimo\ComposerPatches\Package\Collector(
@@ -297,19 +295,19 @@ class ListCommand extends \Composer\Command\BaseCommand
             $packageCollector
         );
     }
-    
+
     private function createQueueGenerator(ListResolver $listResolver)
     {
         $changesListResolver = new ListResolvers\ChangesListResolver($listResolver);
-        
+
         $stateAnalyser = new \Vaimo\ComposerPatches\Repository\State\Analyser();
-        
+
         return new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
             $changesListResolver,
             $stateAnalyser
         );
     }
-    
+
     private function createLoaderPool(ComposerContext $composerContext, array $componentUpdates = array())
     {
         $componentPool = new \Vaimo\ComposerPatches\Patch\DefinitionList\Loader\ComponentPool(
@@ -321,28 +319,28 @@ class ListCommand extends \Composer\Command\BaseCommand
         foreach ($componentUpdates as $componentName => $replacement) {
             $componentPool->registerComponent($componentName, $replacement);
         }
-        
+
         return $componentPool;
     }
-    
+
     private function generateOutput(OutputInterface $output, array $list)
     {
         $statusConfig = new \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig();
 
         $statusDecorators = $statusConfig->getLabels();
-        
+
         foreach ($list as $packageName => $patches) {
             $output->writeln(sprintf('<info>%s</info>', $packageName));
 
             foreach ($patches as $path => $info) {
                 $patchInfoLabel = $this->createStatusLabel($path, $info, $statusDecorators);
-                
+
                 $output->writeln($patchInfoLabel);
 
                 $descriptionLines = array_filter(
                     explode(PHP_EOL, $info[Patch::LABEL])
                 );
-                
+
                 foreach ($descriptionLines as $line) {
                     $output->writeln(sprintf('    <comment>%s</comment>', $line));
                 }
@@ -351,7 +349,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             $output->writeln('');
         }
     }
-    
+
     private function createStatusLabel($path, $info, array $statusDecorators)
     {
         $status = isset($info[Patch::STATUS])
@@ -361,20 +359,20 @@ class ListCommand extends \Composer\Command\BaseCommand
         $owner = $info[Patch::OWNER];
 
         $stateDecorator = $statusDecorators[$status];
-        
+
         if ($status === Patch::STATUS_ERRORS) {
             $stateDecorator = sprintf(
                 $stateDecorator,
                 $info[Patch::STATE_LABEL] ? $info[Patch::STATE_LABEL] : 'ERROR'
             );
         }
-        
+
         $statusLabel = sprintf(' [%s]', $stateDecorator);
 
         if ($owner === Patch::OWNER_UNKNOWN) {
             return sprintf('  ~ %s%s', $path, $statusLabel);
         }
-        
+
         if ($owner) {
             return sprintf('  ~ <info>%s</info>: %s%s', $owner, $path, $statusLabel);
         }

@@ -44,30 +44,30 @@ class Plugin implements
      * @var string[]
      */
     private $capabilitiesConfig = array();
-    
+
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
     {
         $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
         $composerContext = $contextFactory->create();
-        
+
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composerContext);
 
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
         $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy($composerContext);
-        
+
         $this->bootstrap = $this->bootstrapFactory->create($configFactory);
 
         $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer, $composerContext);
         $pluginBootstrap->preloadPluginClasses();
-        
+
         if (!interface_exists('\Composer\Plugin\Capability\CommandProvider')
             || !$this->bootstrapStrategy->shouldAllow()
         ) {
             return;
         }
-        
+
         $this->capabilitiesConfig = array(
             'Composer\Plugin\Capability\CommandProvider' => '\Vaimo\ComposerPatches\Composer\CommandsProvider',
         );
@@ -93,30 +93,31 @@ class Plugin implements
 
             return;
         }
-        
+
         if (!$this->bootstrapStrategy->shouldAllow()) {
             $this->lockSanitizer->sanitize();
-            
+
             return;
         }
 
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
+        $compExecutor = new \Vaimo\ComposerPatches\Compatibility\Executor();
 
         $lockSanitizer = $this->lockSanitizer;
         $bootstrap = $this->bootstrap;
-        
+
         $result = $runtimeUtils->executeWithPostAction(
             function () use ($bootstrap, $event) {
                 return $bootstrap->applyPatches($event->isDevMode());
             },
-            function () use ($event, $lockSanitizer) {
+            function () use ($event, $lockSanitizer, $compExecutor) {
                 $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
-
-                $repository->write();
+                $installationManager = $event->getComposer()->getInstallationManager();
+                $compExecutor->repositoryWrite($repository, $installationManager, $event->isDevMode());
                 $lockSanitizer->sanitize();
             }
         );
-        
+
         if ($result) {
             return;
         }
@@ -135,5 +136,19 @@ class Plugin implements
         }
 
         $this->bootstrap = null;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function deactivate(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
+    {
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function uninstall(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
+    {
     }
 }

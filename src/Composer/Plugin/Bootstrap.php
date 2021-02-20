@@ -28,7 +28,7 @@ class Bootstrap
         $this->composer = $composer;
         $this->composerContext = $composerContext;
     }
-    
+
     public function preloadPluginClasses()
     {
         $installationManager = $this->composer->getInstallationManager();
@@ -46,9 +46,9 @@ class Bootstrap
         $sourcesPreloader = new \Vaimo\ComposerPatches\Package\SourcesPreloader($packageInfoResolver);
 
         $packages = $this->composerContext->getActivePackages();
-        
+
         $pluginPackage = $packageResolver->resolveForNamespace($packages, __CLASS__);
-        
+
         $sourcesPreloader->preload($pluginPackage);
     }
 }

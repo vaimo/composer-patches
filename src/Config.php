@@ -34,10 +34,10 @@ class Config
     const PATCHER_SOURCES = 'sources';
     const PATCHER_SECURE_HTTP = 'secure-http';
     const PATCHER_GRACEFUL = 'graceful';
-    
+
     const OS_DEFAULT = 'default';
     const APPLIER_DEFAULT = 'DEFAULT';
-    
+
     const PATCHER_FORCE_RESET = 'force-reset';
 
     const PATCHER_TARGETS = 'depends';
@@ -63,7 +63,6 @@ class Config
 
     const PATCHER_FROM_SOURCE = 'from-source';
     const PATCHER_FORCE_REAPPLY = 'force-reapply';
-
     /**
      * @var array
      */

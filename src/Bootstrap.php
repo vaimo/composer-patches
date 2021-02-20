@@ -81,10 +81,9 @@ class Bootstrap
         );
 
         $composer = $this->composerContext->getLocalComposer();
-        
         $this->loaderFactory = new Factories\PatchesLoaderFactory($composer);
         $this->applierFactory = new Factories\PatchesApplierFactory($composer, $logger);
-        
+
         $this->repositoryProcessor = new \Vaimo\ComposerPatches\Repository\Processor($logger);
     }
 
@@ -101,20 +100,20 @@ class Bootstrap
         $configSources = array(
             array(\Vaimo\ComposerPatches\Config::PATCHER_SOURCES => false)
         );
-        
+
         $this->applyPatchesWithConfig(
             $this->configFactory->create($configSources),
             $devMode
         );
     }
-    
+
     private function applyPatchesWithConfig(PluginConfig $config, $devMode = false)
     {
         $composer = $this->composerContext->getLocalComposer();
         $repository = $composer->getRepositoryManager()->getLocalRepository();
 
         $patchesLoader = $this->loaderFactory->create($this->loaderComponents, $config, $devMode);
-        
+
         $patchesApplier = $this->applierFactory->create(
             $config,
             $this->listResolver,

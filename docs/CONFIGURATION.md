@@ -283,3 +283,21 @@ configuration that differs from the default.
   }
 }
 ```
+## Skipping operation
+
+Operations can be skipped by re-declaring an operation with very same key and providing bool FALSE instead
+of a label. So if for example user wants to force GIT patcher to always try to apply the patch (which would
+always fail when there are nested git repositories), the following configuration change will configure the
+applier to skip the operation that deals with such a pre-check.
+
+```json
+{
+  "extra": {
+    "patcher": {
+      "operations": {
+        "ping": false
+      }
+    }
+  }
+}
+```
