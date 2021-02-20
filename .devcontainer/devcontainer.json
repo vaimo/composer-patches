@@ -6,31 +6,47 @@
   "shutdownAction": "none",
   "service": "devbox",
   "workspaceFolder": "/module",
-  "runServices": ["devbox"],
+  "runServices": [
+    "devbox"
+  ],
   "initializeCommand": "${localWorkspaceFolder}/.devcontainer/scripts/trigger-host.sh ${localWorkspaceFolder}",
   "postAttachCommand": "${containerWorkspaceFolder}/src/.scripts/trigger-guest.sh",
-	"settings": { 
-		"terminal.integrated.shell.linux": "/bin/bash",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash",
     "files.autoSave": "onFocusChange",
     "editor.renderWhitespace": "all",
     "eslint.codeActionsOnSave.mode": "all",
     "editor.codeActionsOnSave": {
       "source.fixAll": true
     },
+    "editor.wordSeparators": "`~!@#%^&*()-=+[{]}\\|;:'\",.<>/?",
+    "phpSniffer.autoDetect": true,
+    "editor.formatOnSave": true,
+    "phpSniffer.executablesFolder": "vendor/bin",
+    "phpmd.rules": "phpmd.xml",
+    "php.suggest.basic": false,
+    "[php]": {
+      "editor.defaultFormatter": "wongjn.php-sniffer",
+    },
     "workbench.tree.indent": 20,
     "search.useIgnoreFiles": false,
     "search.exclude": {
-      "**/*.history": true
+      "**/*.history": true,
+      "**/test/modules/composer-patches": true
     }
-	},
-	"extensions": [
-		"felixfbecker.php-debug",
-		"felixfbecker.php-intellisense",
+  },
+  "extensions": [
+    "felixfbecker.php-debug",
+    "felixfbecker.php-intellisense",
     "EditorConfig.EditorConfig",
     "xyz.local-history",
     "file-icons.file-icons",
     "zainchen.json",
     "pixelfear.composer-links",
-    "ikappas.composer"
-	]
+    "ikappas.composer",
+    "bmewburn.vscode-intelephense-client",
+    "ms-azuretools.vscode-docker",
+    "ecodes.vscode-phpmd",
+    "wongjn.php-sniffer",
+  ]
 }

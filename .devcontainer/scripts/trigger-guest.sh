@@ -11,6 +11,10 @@ touch ${ping}
 
 echo "Waiting: ${pong}"
 while test ! -f ${pong} ; do
+    if [ ! -f ${ping} ] ; then
+      break
+    fi
+    
     echo "Polling Mutagen ..."
     sleep 1
 done
