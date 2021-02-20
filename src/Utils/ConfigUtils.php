@@ -21,7 +21,7 @@ class ConfigUtils
         $this->overrideValue($config, $updates, Config::PATCHER_FORCE_RESET);
         $this->overrideValue($config, $updates, Config::PATCHER_GRACEFUL);
         $this->mergeArrayValue($config, $updates, Config::PATCHER_OPERATIONS);
-        
+
         return $config;
     }
 

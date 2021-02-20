@@ -49,14 +49,14 @@ class Plugin implements
     {
         $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
         $composerContext = $contextFactory->create();
-        
+
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composerContext);
 
         $this->operationAnalyser = new \Vaimo\ComposerPatches\Package\OperationAnalyser();
         $this->bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
         $this->lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
         $this->bootstrapStrategy = new \Vaimo\ComposerPatches\Strategies\BootstrapStrategy($composerContext);
-        
+
         $this->bootstrap = $this->bootstrapFactory->create($configFactory);
 
         $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer, $composerContext);

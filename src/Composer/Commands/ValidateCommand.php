@@ -51,9 +51,9 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $output->writeln('<info>Scanning packages for orphan patches</info>');
 
         $composer = $this->getComposer();
-        
+
         $localOnly = $input->getOption('local');
-        
+
         $patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
 
         $pluginConfig = array(
@@ -66,7 +66,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composerContext, array(
             Config::PATCHER_FROM_SOURCE => (bool)$input->getOption('from-source')
         ));
-        
+
         $repository = $composer->getRepositoryManager()->getLocalRepository();
 
         $pluginConfig = $configFactory->create(array($pluginConfig));

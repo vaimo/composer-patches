@@ -100,7 +100,7 @@ class Bootstrap
         $configSources = array(
             array(\Vaimo\ComposerPatches\Config::PATCHER_SOURCES => false)
         );
-        
+
         $this->applyPatchesWithConfig(
             $this->configFactory->create($configSources),
             $devMode

@@ -34,12 +34,12 @@ class ConfigFactory
      * @var array
      */
     private $defaults;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\DataUtils
      */
     private $dataUtils;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Composer\Context $composerContext
      * @param array $defaults
@@ -66,7 +66,7 @@ class ConfigFactory
         );
 
         $composer = $this->composerContext->getLocalComposer();
-        
+
         $extra = $composer->getPackage()->getExtra();
 
         if (isset($extra['patcher-config']) && !isset($extra[PluginConfig::PATCHER_CONFIG_ROOT])) {

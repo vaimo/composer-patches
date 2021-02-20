@@ -106,7 +106,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             'Skips the execution of all scripts defined in composer.json file.'
         );
     }
-    
+
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      *
@@ -138,7 +138,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
                 || $behaviourFlags[Behaviour::UNDO],
             Config::PATCHER_SOURCES => $this->createSourcesEnablerConfig()
         ));
-        
+
         $filters = $this->resolveActiveFilters($input, $behaviourFlags);
 
         $listResolver = $this->createListResolver($behaviourFlags, $filters);
@@ -146,7 +146,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         $outputTriggers = $this->resolveOutputTriggers($filters, $behaviourFlags);
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
-        
+
         $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
         $bootstrap = $bootstrapFactory->create($configFactory, $listResolver, $outputStrategy);
         $compatExecutor = new \Vaimo\ComposerPatches\Compatibility\Executor();
@@ -155,7 +155,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
         $repository = $composer->getRepositoryManager()->getLocalRepository();
         $installationManager = $composer->getInstallationManager();
-        
+
         $result = $runtimeUtils->executeWithPostAction(
             function () use ($shouldUndo, $filters, $bootstrap, $isDevMode) {
                 if ($shouldUndo && !array_filter($filters)) {

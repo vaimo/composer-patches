@@ -263,7 +263,7 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         return $filteredPatches;
     }
-    
+
     private function createConfigWithEnabledSources(\Vaimo\ComposerPatches\Composer\Context $composerContext)
     {
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
@@ -281,7 +281,7 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
 
         $configFactory = new \Vaimo\ComposerPatches\Factories\ConfigFactory($composerContext);
-        
+
         return $configFactory->create(array($pluginConfig));
     }
 
