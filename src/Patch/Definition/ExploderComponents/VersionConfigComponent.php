@@ -18,7 +18,7 @@ class VersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\Defini
      * @var \Vaimo\ComposerPatches\Patch\Definition\Constraint\Exploder
      */
     private $definitionExploder;
-    
+
     public function __construct()
     {
         $this->valueAnalyser = new \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser();

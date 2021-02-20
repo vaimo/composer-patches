@@ -24,7 +24,7 @@ class Silencer
     ) {
         $this->appIO = $appIO;
     }
-    
+
     public function applyToCallback(\Closure $callback)
     {
         if ($this->appIO->isVerbose()) {

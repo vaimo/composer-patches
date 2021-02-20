@@ -31,12 +31,12 @@ class BundleComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
     public function process(array $patches, array $packagesByName)
     {
         $rootName = $this->rootPackage->getName();
-        
+
         if (isset($patches[PatchDefinition::BUNDLE_TARGET])) {
             if (!isset($patches[$rootName])) {
                 $patches[$rootName] = array();
             }
-            
+
             $patches[$rootName] = array_merge(
                 $patches[$rootName],
                 $patches[PatchDefinition::BUNDLE_TARGET]
@@ -44,7 +44,7 @@ class BundleComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionLis
 
             unset($patches[PatchDefinition::BUNDLE_TARGET]);
         }
-        
+
         return $patches;
     }
 }

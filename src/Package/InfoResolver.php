@@ -13,7 +13,7 @@ use Vaimo\ComposerPatches\Patch\Definition as Patch;
 class InfoResolver
 {
     const DEFAULT_PATH = '.';
-    
+
     /**
      * @var \Composer\Installer\InstallationManager
      */
@@ -28,7 +28,7 @@ class InfoResolver
      * @var array
      */
     private $installPathCache = array();
-    
+
     /**
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param string $vendorRoot
@@ -53,7 +53,7 @@ class InfoResolver
             ? $this->installationManager->getInstallPath($package)
             : realpath(dirname(\Composer\Factory::getComposerFile()));
     }
-    
+
     public function resolveNamesFromPaths(array $packagesByName, array $paths)
     {
         $paths = array_unique(
@@ -61,7 +61,7 @@ class InfoResolver
         );
 
         $names = array();
-        
+
         foreach ($paths as $path) {
             $segments = explode(DIRECTORY_SEPARATOR, $path);
 
@@ -79,10 +79,10 @@ class InfoResolver
                 break;
             }
         }
-        
+
         return $names;
     }
-    
+
     public function getInstallPath(PackageInterface $package, $resolveMode)
     {
         $key = $package->getName() . '|' . $resolveMode;
@@ -99,14 +99,14 @@ class InfoResolver
                     $autoloadConfig = $package->getAutoload();
 
                     $installPath = $this->getInstallPath($package, Patch::CWD_INSTALL);
-                    
+
                     if (!isset($autoloadConfig[ConfigKeys::PSR4_CONFIG])) {
                         return $installPath;
                     }
 
                     $this->installPathCache[$key] = $installPath . DIRECTORY_SEPARATOR .
                         reset($autoloadConfig[ConfigKeys::PSR4_CONFIG]);
-                    
+
                     break;
                 case Patch::CWD_INSTALL:
                 default:
@@ -120,11 +120,11 @@ class InfoResolver
 
         return $this->installPathCache[$key];
     }
-    
+
     public function getAutoLoadPaths(PackageInterface $package)
     {
         $autoloadConfig = $package->getAutoload();
-        
+
         if (!isset($autoloadConfig[ConfigKeys::PSR4_CONFIG])) {
             return array();
         }
@@ -137,7 +137,7 @@ class InfoResolver
             },
             $autoloadConfig[ConfigKeys::PSR4_CONFIG]
         );
-        
+
         return array_values($sourcePaths);
     }
 }

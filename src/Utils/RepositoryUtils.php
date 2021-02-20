@@ -9,16 +9,21 @@ use Composer\Repository\WritableRepositoryInterface;
 
 class RepositoryUtils
 {
+    /**
+     * @var \Vaimo\ComposerPatches\Compatibility\DependenciesFactory
+     */
+    private $composerDependencies;
+
+    public function __construct()
+    {
+        $this->composerDependencies = new \Vaimo\ComposerPatches\Compatibility\DependenciesFactory();
+    }
+
     public function filterByDependency(WritableRepositoryInterface $repository, $dependencyName)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
-            $depsRepository = new \Composer\Repository\CompositeRepository(array($repository));
-        } else {
-            $depsRepository = new \Composer\Repository\InstalledRepository(array($repository));
-        }
+        $depsRepository = $this->composerDependencies->createCompositeRepository($repository);
+        $dependentsList = array_map('reset', $depsRepository->getDependents($dependencyName));
 
-        return array_filter(
-            array_map('reset', $depsRepository->getDependents($dependencyName))
-        );
+        return array_filter($dependentsList);
     }
 }

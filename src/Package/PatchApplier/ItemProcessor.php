@@ -58,7 +58,7 @@ class ItemProcessor
         $this->fileApplier = $fileApplier;
         $this->logger = $logger;
     }
-    
+
     public function processFileInfo(PackageInterface $package, array $info)
     {
         $source = $info[Patch::SOURCE];

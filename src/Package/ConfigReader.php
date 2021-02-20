@@ -26,7 +26,7 @@ class ConfigReader
         }
 
         $sourceData = file_get_contents($source);
-        
+
         if ($sourceData === false) {
             throw new \Vaimo\ComposerPatches\Exceptions\ReadException(
                 sprintf('Failed to retrieve contents: %s', $source)

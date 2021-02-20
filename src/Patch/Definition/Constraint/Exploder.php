@@ -18,17 +18,17 @@ class Exploder
      * @var PatchDefinition\Exploder\ItemBuilder
      */
     private $itemBuilder;
-    
+
     public function __construct()
     {
         $this->valueAnalyser = new \Vaimo\ComposerPatches\Patch\Definition\Value\Analyser();
         $this->itemBuilder = new \Vaimo\ComposerPatches\Patch\Definition\Exploder\ItemBuilder();
     }
-    
+
     public function process($label, array $items, array $defaults = array())
     {
         $result = array();
-        
+
         foreach ($items as $constraint => $source) {
             if (!$this->valueAnalyser->isConstraint($constraint)) {
                 continue;
@@ -43,7 +43,7 @@ class Exploder
                 )
             );
         }
-        
+
         return $result;
     }
 }

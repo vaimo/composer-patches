@@ -19,7 +19,7 @@ class PackageUtils
 
         return $package;
     }
-    
+
     public function hasPatchChanges(PackageInterface $package, array $patches)
     {
         $extra = $package->getExtra();
@@ -71,11 +71,11 @@ class PackageUtils
         while ($package instanceof \Composer\Package\AliasPackage) {
             $package = $package->getAliasOf();
         }
-        
+
         if (method_exists($package, 'getPrettyVersion')) {
             return $package->getPrettyVersion();
         }
-        
+
         if (method_exists($package, 'getPrettyConstraint')) {
             return $package->getPrettyConstraint();
         }

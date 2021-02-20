@@ -13,7 +13,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
      * @var \Vaimo\ComposerPatches\Interfaces\PackageConfigExtractorInterface
      */
     private $configExtractor;
-    
+
     /**
      * @var \Composer\Package\Version\VersionParser
      */
@@ -62,7 +62,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
             $rootPackage->getRequires(),
             $rootPackage->getDevRequires()
         );
-        
+
         foreach ($patches as $target => &$packagePatches) {
             foreach ($packagePatches as &$patchData) {
                 if ($target !== PatchDefinition::BUNDLE_TARGET && !isset($packagesByName[$target])) {
@@ -88,11 +88,11 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
 
         return array_filter($patches);
     }
-    
+
     private function resolveComparisonResults(array $patchConstraints, array $packages, array $rootRequires)
     {
         $comparisonResults = array();
-        
+
         foreach ($patchConstraints as $constraintTarget => $version) {
             if (!isset($packages[$constraintTarget])) {
                 continue;
@@ -108,7 +108,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
                 $targetRootPackage = $rootRequires[$constraintTarget];
 
                 $prettyVersion = $this->packageUtils->getPrettyVersion($targetRootPackage);
-                
+
                 $matches = array();
                 preg_match('/.* as (.*)$/', $prettyVersion, $matches);
 
@@ -141,7 +141,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
 
             $comparisonResults[] = $matchResult;
         }
-        
+
         return $comparisonResults;
     }
 }

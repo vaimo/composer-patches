@@ -65,12 +65,12 @@ class ConfigFactory
             $configRootKey = PluginConfig::PATCHER_CONFIG_ROOT . ($key ? ('-' . $key) : '');
 
             $patcherConfig = $this->resolvePatcherConfigBase($extra, $configRootKey);
-            
+
             if (isset($patcherConfig['patchers']) && !isset($patcherConfig[PluginConfig::PATCHER_APPLIERS])) {
                 $patcherConfig[PluginConfig::PATCHER_APPLIERS] = $patcherConfig['patchers'];
                 unset($patcherConfig['patchers']);
             }
-            
+
             if ($patcherConfig) {
                 array_unshift($configSources, $patcherConfig);
             }
@@ -81,12 +81,12 @@ class ConfigFactory
             array($this->configUtils, 'mergeApplierConfig'),
             $defaults
         );
-        
+
         return new PluginConfig(
             $this->resolveValidSubOperations($config, $subConfigKeys)
         );
     }
-    
+
     private function resolvePatcherConfigBase(array $extra, $rootKey)
     {
         $patcherConfig = isset($extra[$rootKey]) ? $extra[$rootKey] : array();
@@ -96,7 +96,7 @@ class ConfigFactory
                 PluginConfig::PATCHER_SOURCES => false
             );
         }
-        
+
         if (!isset($patcherConfig[PluginConfig::PATCHER_SOURCES])) {
             if (isset($extra['enable-patching']) && !$extra['enable-patching']) {
                 $patcherConfig[PluginConfig::PATCHER_SOURCES] = false;
@@ -104,10 +104,10 @@ class ConfigFactory
                 $patcherConfig[PluginConfig::PATCHER_SOURCES] = array('packages' => false, 'vendors' => false);
             }
         }
-        
+
         return $patcherConfig;
     }
-    
+
     private function resolveValidSubOperations(array $config, array $subConfigKeys)
     {
         $subOperationKeys = array_merge(
@@ -142,7 +142,7 @@ class ConfigFactory
                 $config[PluginConfig::PATCHER_APPLIERS][$applierCode][$opCode] = reset($subOperations);
             }
         }
-        
+
         return $config;
     }
 }

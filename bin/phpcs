@@ -1,0 +1,14 @@
+#!/bin/sh
+cmd=${@}
+
+if echo ${cmd}|grep -q 'stdin-path' ; then
+    path=$(echo ${cmd}|sed 's/.*--stdin-path=\(.*\)/\1/g')
+    vendor/bin/phpcs --report=json -q --encoding=UTF-8 --warning-severity=5 --error-severity=5 \
+        --standard=/module/phpcs.xml \
+        --stdin-path=${path} \
+        -p ${path} \
+        2>/dev/null
+else
+    eval vendor/bin/phpcs ${cmd} 2>/dev/null
+fi
+

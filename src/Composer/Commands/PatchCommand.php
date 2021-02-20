@@ -137,6 +137,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
         $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
+        $compatExecutor = new \Vaimo\ComposerPatches\Compatibility\Executor();
 
         $bootstrap = $bootstrapFactory->create($listResolver, $outputStrategy, $config);
 
@@ -155,13 +156,9 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
                 return $bootstrap->applyPatches($isDevMode);
             },
-            function () use ($composer, $lockSanitizer, $isDevMode) {
+            function () use ($composer, $lockSanitizer, $isDevMode, $compatExecutor) {
                 $repository = $composer->getRepositoryManager()->getLocalRepository();
-                if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
-                    $repository->write();
-                } else {
-                    $repository->write($isDevMode, $composer->getInstallationManager());
-                }
+                $compatExecutor->repositoryWrite($repository, $composer->getInstallationManager(), $isDevMode);
                 $lockSanitizer->sanitize();
             }
         );

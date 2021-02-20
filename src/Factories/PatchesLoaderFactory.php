@@ -97,7 +97,7 @@ class PatchesLoaderFactory
         );
 
         $configReader = $configReaderFactory->create($pluginConfig);
-        
+
         $patchesCollector = new Patch\Collector(
             $listNormalizer,
             $configReader,

@@ -87,12 +87,13 @@ class ComponentPool
             );
         }
 
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
-            $fileDownloader = new FileDownloader($this->appIO, $composerConfig, null, $cache);
-        } else {
-            $httpDownloader = $composer->getLoop()->getHttpDownloader();
-            $fileDownloader = new FileDownloader($this->appIO, $composerConfig, $httpDownloader, null, $cache);
-        }
+        $composerDependencies = new \Vaimo\ComposerPatches\Compatibility\DependenciesFactory();
+        $fileDownloader = $composerDependencies->createFileDownloader(
+            $this->appIO,
+            $composer,
+            $composerConfig,
+            $cache
+        );
 
         $vendorRoot = $composerConfig->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR);
         $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(

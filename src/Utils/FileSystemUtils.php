@@ -21,12 +21,12 @@ class FileSystemUtils
         if (!is_dir($rootPath)) {
             return array();
         }
-        
+
         $directoryIterator = new \RecursiveDirectoryIterator(
             $rootPath,
             \RecursiveDirectoryIterator::FOLLOW_SYMLINKS
         );
-        
+
         $recursiveIterator = new \RecursiveIteratorIterator($directoryIterator);
 
         $filesIterator = new \RegexIterator(
@@ -43,7 +43,7 @@ class FileSystemUtils
         }
 
         $sequence = array_keys($files);
-        
+
         natsort($sequence);
 
         return array_replace(

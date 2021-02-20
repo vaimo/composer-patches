@@ -13,7 +13,7 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
      * @var \Vaimo\ComposerPatches\Package\InfoResolver
      */
     private $packageInfoResolver;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Package\ConfigReader
      */
@@ -26,7 +26,7 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
         \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
     ) {
         $this->packageInfoResolver = $packageInfoResolver;
-        
+
         $this->configLoader = new \Vaimo\ComposerPatches\Package\ConfigReader();
     }
 
@@ -35,7 +35,7 @@ class VendorConfigExtractor implements \Vaimo\ComposerPatches\Interfaces\Package
         $source = $this->packageInfoResolver->getSourcePath($package)
             . DIRECTORY_SEPARATOR
             . Config::PACKAGE_CONFIG_FILE;
-        
+
         if (!file_exists($source)) {
             return null;
         }

@@ -11,7 +11,7 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
@@ -21,7 +21,7 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
      * @var \Vaimo\ComposerPatches\Interfaces\ListResolverInterface
      */
     private $baseResolver;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $baseResolver
      */
@@ -37,7 +37,7 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
     public function resolvePatchesQueue(array $patches)
     {
         $exclusions = $this->baseResolver->resolvePatchesQueue($patches);
-        
+
         foreach ($exclusions as $target => $items) {
             $patches[$target] = array_diff_key($patches[$target], $items);
         }
@@ -52,11 +52,11 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
     public function resolveInitialState(array $patches, array $state)
     {
         $patchesByTarget = $this->patchListTransformer->groupItemsByTarget($patches);
-        
+
         $unpackedState = $this->patchListTransformer->createDetailedList($state);
 
         $updates = array();
-        
+
         foreach ($patchesByTarget as $target => $group) {
             foreach ($group as $path => $item) {
                 if (isset($unpackedState[$target][$path])) {
@@ -66,11 +66,11 @@ class InvertedListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
                 if (!isset($updates[$target])) {
                     $updates[$target] = array();
                 }
-                
+
                 $updates[$target][$path] = $item;
             }
         }
-        
+
         return $this->patchListUtils->mergeLists(
             $state,
             $this->patchListTransformer->createSimplifiedList($updates)

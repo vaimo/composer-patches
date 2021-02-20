@@ -16,7 +16,7 @@ class FullResetResolver implements \Vaimo\ComposerPatches\Interfaces\PatchPackag
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
-    
+
     public function __construct()
     {
         $this->patchDataUtils = new \Vaimo\ComposerPatches\Utils\PackagePatchDataUtils();
@@ -26,7 +26,7 @@ class FullResetResolver implements \Vaimo\ComposerPatches\Interfaces\PatchPackag
     public function resolve(array $patches, array $repositoryState)
     {
         $patchDataUtils = $this->patchDataUtils;
-        
+
         return $this->patchListUtils->compareLists(
             $patches,
             $repositoryState,

@@ -11,7 +11,7 @@ class DirectListResolver implements \Vaimo\ComposerPatches\Interfaces\ListResolv
     {
         return array_filter($patches);
     }
-    
+
     public function resolveRelevantPatches(array $patches, array $subset)
     {
         return $patches;

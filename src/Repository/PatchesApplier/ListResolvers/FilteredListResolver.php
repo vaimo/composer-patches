@@ -13,7 +13,7 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
      * @var array
      */
     private $filters;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
@@ -23,7 +23,7 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Updater
      */
     private $patchListUpdater;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\FilterUtils
      */
@@ -74,13 +74,13 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
     {
         return $patches;
     }
-    
+
     public function resolveInitialState(array $patches, array $state)
     {
         $unpackedState = $this->patchListTransformer->createDetailedList($state);
-        
+
         $patchesByTarget = $this->patchListTransformer->groupItemsByTarget($patches);
-        
+
         foreach ($patchesByTarget as $items) {
             foreach ($items as $path => $item) {
                 if (!$item[Patch::STATUS_MATCH]) {
@@ -92,7 +92,7 @@ class FilteredListResolver implements \Vaimo\ComposerPatches\Interfaces\ListReso
                 }
             }
         }
-        
+
         return $this->patchListTransformer->createSimplifiedList($unpackedState);
     }
 }

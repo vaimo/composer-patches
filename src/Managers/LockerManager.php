@@ -20,7 +20,7 @@ class LockerManager
     ) {
         $this->appIO = $appIO;
     }
-    
+
     public function readLockData()
     {
         $lockFile = $this->getLockFile();
@@ -28,10 +28,10 @@ class LockerManager
         if (!$lockFile->exists()) {
             return null;
         }
-        
+
         return $lockFile->read();
     }
-    
+
     public function writeLockData(array $lock)
     {
         $lockFile = $this->getLockFile();
@@ -39,7 +39,7 @@ class LockerManager
         if (!$lockFile->exists()) {
             return;
         }
-        
+
         $lockFile->write($lock);
     }
 
@@ -54,7 +54,7 @@ class LockerManager
 
         $configExtension = 'json';
         $lockExtension = 'lock';
-        
+
         $lockFile = $configExtension === pathinfo($composerFile, PATHINFO_EXTENSION)
             ? substr($composerFile, 0, -4) . $lockExtension
             : sprintf('%s.%s', $composerFile, $lockExtension);

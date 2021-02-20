@@ -44,7 +44,7 @@ class BootstrapFactory
                 new ListResolvers\DirectListResolver()
             );
         }
-        
+
         if ($outputStrategy === null) {
             $outputStrategy = new OutputStrategy(
                 array(Patch::STATUS_NEW, Patch::STATUS_CHANGED, Patch::STATUS_MATCH)

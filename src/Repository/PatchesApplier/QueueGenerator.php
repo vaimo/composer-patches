@@ -23,7 +23,7 @@ class QueueGenerator
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser
      */
     private $patchListAnalyser;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Updater
      */
@@ -33,12 +33,12 @@ class QueueGenerator
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver,
      * @param \Vaimo\ComposerPatches\Repository\State\Analyser $repoStateAnalyser
@@ -63,9 +63,9 @@ class QueueGenerator
         $initialState = $this->listResolver->resolveInitialState($patchesQueue, $repositoryState);
 
         list($includes, $removals) = $this->resolveChangesInState($patches, $patchesQueue, $initialState);
-        
+
         list($includesQueue, $removalsQueue) = $this->buildChangeQueues($includes, $removals, $patchesQueue);
-        
+
         $affectedPatches = $this->resolveAffectedPatches($includes, $removals, $patches);
 
         $queue = array_reduce(
@@ -73,10 +73,10 @@ class QueueGenerator
             array($this->patchListUtils, 'mergeLists'),
             array()
         );
-        
+
         return $this->updateStatusMarkers($queue, $repositoryState);
     }
-    
+
     private function updateStatusMarkers($patches, $repositoryState)
     {
         $patchesByTarget = $this->patchListTransformer->createTargetsList(array_map('array_filter', $patches));
@@ -84,12 +84,12 @@ class QueueGenerator
 
         $staticItems = array();
         $changedItems = array();
-        
+
         foreach ($patchFootprints as $target => $footprints) {
             if (!isset($repositoryState[$target])) {
                 continue;
             }
-            
+
             $staticItems[$target] = array_intersect_assoc($footprints, $repositoryState[$target]);
             $changedItems[$target] = array_diff_key(
                 array_intersect_key($footprints, $repositoryState[$target]),
@@ -99,26 +99,26 @@ class QueueGenerator
 
         $changedItems = $this->patchListTransformer->createDetailedList($changedItems);
         $staticItems = $this->patchListTransformer->createDetailedList($staticItems);
-        
+
         foreach ($patchesByTarget as $target => $items) {
             foreach ($items as $path => $item) {
                 $item = array_replace($item, array(
                     Patch::STATUS_NEW => !isset($staticItems[$target][$path]) && !isset($changedItems[$target][$path]),
                     Patch::STATUS_CHANGED => isset($changedItems[$target][$path])
                 ));
-                
+
                 $patchesByTarget[$target][$path] = array_replace($item, array(
                     Patch::STATUS => $this->resolveStatusCode($item)
                 ));
             }
         }
-        
+
         return $this->patchListUtils->mergeLists(
             $patches,
             $this->patchListTransformer->createOriginList($patchesByTarget)
         );
     }
-    
+
     private function resolveStatusCode(array $item)
     {
         $status = isset($item[Patch::STATUS])
@@ -132,10 +132,10 @@ class QueueGenerator
         if ($item[Patch::STATUS_CHANGED] && !$status) {
             $status = 'changed';
         }
-        
+
         return $status;
     }
-    
+
     private function resolveAffectedPatches($includes, $removals, $patches)
     {
         $queueTargets = $this->patchListAnalyser->getAllTargets(
@@ -145,35 +145,35 @@ class QueueGenerator
         $affectedPatches = $this->patchListAnalyser->getRelatedPatches($patches, $queueTargets);
 
         $patchesByTarget = $this->patchListTransformer->createTargetsList($affectedPatches);
-        
+
         return $this->patchListTransformer->createOriginList(
             $this->patchListUtils->diffListsByName($patchesByTarget, $removals)
         );
     }
-    
+
     private function resolveChangesInState($patches, $patchesQueue, $repositoryState)
     {
         $relevantPatches = $this->listResolver->resolveRelevantPatches($patches, $patchesQueue);
 
         $removals = $this->repoStateAnalyser->collectPatchRemovals($repositoryState, $relevantPatches);
         $includes = $this->repoStateAnalyser->collectPatchIncludes($repositoryState, $relevantPatches);
-        
+
         return array(array_filter($includes), array_filter($removals));
     }
-    
+
     private function buildChangeQueues($includes, $removals, $patchesQueue)
     {
         $patchesQueueByTarget = $this->patchListTransformer->createTargetsList($patchesQueue);
-        
+
         $includesQueue = $this->patchListTransformer->createOriginList(
             $this->patchListUtils->intersectListsByName($patchesQueueByTarget, $includes)
         );
 
         $removalsQueue = $this->patchListUpdater->embedInfoToItems($removals, false);
-        
+
         return array($includesQueue, $removalsQueue);
     }
-    
+
     public function generateRemovalQueue(array $patches, array $repositoryState)
     {
         $state = $this->patchListTransformer->createDetailedList($repositoryState);
@@ -181,12 +181,12 @@ class QueueGenerator
         $stateMatches = $this->patchListUtils->intersectListsByName($state, $patches);
 
         $state = $this->patchListTransformer->createSimplifiedList($stateMatches);
-        
+
         $removals = $this->repoStateAnalyser->collectPatchRemovals(
             $state,
             array_map('array_filter', $patches)
         );
-        
+
         return $this->patchListUpdater->embedInfoToItems(
             array_filter($removals),
             array(
@@ -195,15 +195,15 @@ class QueueGenerator
             )
         );
     }
-    
+
     public function generateResetQueue(array $patches)
     {
         $directTargets = array_keys($patches);
-        
+
         $declaredTargets = $this->patchListAnalyser->getAllTargets(
             array_map('array_filter', $patches)
         );
-        
+
         return array_unique(
             array_merge($directTargets, $declaredTargets)
         );

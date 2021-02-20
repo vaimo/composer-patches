@@ -32,18 +32,18 @@ class DataUtils
 
         return $result;
     }
-    
+
     public function embedGroupKeyToItems(array $groups, $template = '%s:%s')
     {
         $result = array();
-        
+
         foreach ($groups as $key => $items) {
             $result[$key] = $this->prefixArrayValues($items, $key, $template);
         }
 
         return $result;
     }
-    
+
     public function extractOrderedItems(array $items, array $targets)
     {
         $targets = array_flip($targets);
@@ -53,7 +53,7 @@ class DataUtils
             array_intersect_key($items, $targets)
         );
     }
-    
+
     public function prefixArrayValues(array $data, $prefix, $template = '%s%s')
     {
         return array_map(
@@ -63,7 +63,7 @@ class DataUtils
             $data
         );
     }
-    
+
     public function extractItems(array &$data, array $keys)
     {
         $subset = array_intersect($data, $keys);
@@ -78,7 +78,7 @@ class DataUtils
             ? $data[$key]
             : $default;
     }
-    
+
     public function removeKeysByPrefix(array $data, $prefix)
     {
         $whitelist = array_filter(
@@ -87,7 +87,7 @@ class DataUtils
                 return strpos($key, $prefix) !== 0;
             }
         );
-        
+
         return array_intersect_key(
             $data,
             array_flip($whitelist)
@@ -108,7 +108,7 @@ class DataUtils
 
         return $list;
     }
-    
+
     public function getNodeReferencesByPaths(array &$data, array $paths)
     {
         $stack = array();
@@ -118,7 +118,7 @@ class DataUtils
         }
 
         $result = array();
-        
+
         while ($item = array_shift($stack)) {
             $segment = array_shift($item[1]);
 
@@ -130,11 +130,11 @@ class DataUtils
                 } elseif (isset($node[$segment])) {
                     $stack[] = array(array(&$node[$segment]), $item[1]);
                 }
-                
+
                 unset($node);
             }
         }
-        
+
         return $result;
     }
 
@@ -147,7 +147,7 @@ class DataUtils
         foreach ($path as $key) {
             if (is_array($data) && array_key_exists($key, $data)) {
                 $data = $data[$key];
-                
+
                 continue;
             }
 
