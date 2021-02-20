@@ -8,7 +8,7 @@ changes in this release forward-ported from 3.53.1
 
 ### Fix
 
-* minor issue addressed with V2-style call being in code without version-check (said call is currently backwards-compatible with V1, but you nevenr know ...)
+* minor issue addressed with V2-style call being in code without version-check (said call is currently backwards-compatible with V1, but you never know ...)
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.1) [diff](https://github.com/vaimo/composer-patches/compare/4.22.0...4.22.1)
 
