@@ -54,7 +54,7 @@ class PatchesApplier
      * @var \Vaimo\ComposerPatches\Strategies\OutputStrategy
      */
     private $outputStrategy;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Logger
      */
@@ -64,17 +64,17 @@ class PatchesApplier
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser
      */
     private $patchListAnalyser;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer
      */
     private $patchListTransformer;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig
      */
     private $statusConfig;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\PackageUtils
      */
@@ -89,7 +89,7 @@ class PatchesApplier
      * @var \Vaimo\ComposerPatches\Console\OutputGenerator
      */
     private $outputGenerator;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Package\Collector $packageCollector
      * @param \Vaimo\ComposerPatches\Managers\RepositoryManager $repositoryManager
@@ -124,7 +124,7 @@ class PatchesApplier
         );
 
         $this->outputGenerator = new \Vaimo\ComposerPatches\Console\OutputGenerator($logger);
-        
+
         $this->patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
         $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
         $this->statusConfig = new \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig();
@@ -151,13 +151,13 @@ class PatchesApplier
         $packagesUpdated = false;
 
         $repositoryState = $this->repoStateGenerator->generate($repository);
-        
+
         $applyQueue = $this->queueGenerator->generateApplyQueue($patches, $repositoryState);
         $removeQueue = $this->queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);
         $resetQueue = $this->queueGenerator->generateResetQueue($applyQueue);
-        
+
         $applyQueue = array_map('array_filter', $applyQueue);
-        
+
         $patchQueueFootprints = $this->patchListTransformer->createSimplifiedList($applyQueue);
 
         $labels = array_diff_key(
@@ -167,7 +167,7 @@ class PatchesApplier
 
         $applyQueue = $this->updateStatusLabels($applyQueue, $labels);
         $removeQueue = $this->updateStatusLabels($removeQueue, $labels);
-        
+
         foreach ($packages as $packageName => $package) {
             $hasPatches = !empty($applyQueue[$packageName]);
 
@@ -176,14 +176,14 @@ class PatchesApplier
                 : array($packageName);
 
             $itemsToReset = $this->dataUtils->extractItems($resetQueue, $patchTargets);
-            
+
             $resetResult = array();
 
             foreach ($itemsToReset as $targetName) {
                 $resetTarget = $packages[$targetName];
 
                 $resetPatches = $this->packageUtils->resetAppliedPatches($resetTarget);
-                
+
                 $resetResult[$targetName] = is_array($resetPatches)
                     ? $resetPatches
                     : array();
@@ -197,15 +197,15 @@ class PatchesApplier
 
                 $this->repositoryManager->resetPackage($repository, $resetTarget);
             }
-            
+
             $packagesUpdated = $packagesUpdated || (bool)array_filter($resetResult);
 
             if (!$hasPatches) {
                 continue;
             }
-            
+
             $changedTargets = $this->resolveChangedTargets($packages, $patchTargets, $patchQueueFootprints);
-            
+
             if (empty($changedTargets)) {
                 continue;
             }
@@ -216,26 +216,26 @@ class PatchesApplier
                     return array_intersect($data[Patch::TARGETS], $changedTargets);
                 }
             );
-    
+
             $this->updatePackage(
                 $package,
                 $repository,
                 $queuedPatches,
                 $this->dataUtils->extractValue($removeQueue, $packageName, array())
             );
-            
+
             $packagesUpdated = true;
         }
 
         return $packagesUpdated;
     }
-    
+
     private function updatePackage(Package $package, Repository $repository, array $additions, array $removals)
     {
         $muteDepth = null;
 
         $packageName = $package->getName();
-        
+
         if (!$this->shouldAllowOutput($additions, $removals)) {
             $muteDepth = $this->logger->mute();
         }
@@ -246,7 +246,7 @@ class PatchesApplier
         );
 
         $this->processQueues($package, $repository, $additions, $removals);
-        
+
         $this->logger->writeNewLine();
 
         if ($muteDepth !== null) {
@@ -272,7 +272,7 @@ class PatchesApplier
 
         return $queue;
     }
-    
+
     private function processQueues(Package $package, Repository $repository, $additions, $removals)
     {
         try {
@@ -293,7 +293,7 @@ class PatchesApplier
             throw $exception;
         }
     }
-    
+
     private function resolveChangedTargets(array $packages, array $patchTargets, array $patchFootprints)
     {
         $changesMap = array();
@@ -323,7 +323,7 @@ class PatchesApplier
 
         return array_keys(array_filter($changesMap));
     }
-    
+
     private function processPatchesForPackage(Repository $repository, Package $package, array $patchesQueue)
     {
         $processIndentation = $this->logger->push('~');
@@ -336,11 +336,11 @@ class PatchesApplier
             $this->logger->reset($processIndentation);
         } catch (\Vaimo\ComposerPatches\Exceptions\PatchFailureException $exception) {
             $this->logger->push();
-            
+
             $this->logger->write('error', $exception->getMessage());
 
             $previousError = $exception->getPrevious();
-            
+
             if ($previousError) {
                 $this->outputGenerator->generateForException($previousError);
             }
@@ -348,7 +348,7 @@ class PatchesApplier
             $failedPath = $exception->getFailedPatchPath();
 
             $paths = array_keys($patchesQueue);
-            
+
             $failureIndex = array_search($failedPath, $paths, true);
 
             $appliedPatches = array();
@@ -367,7 +367,7 @@ class PatchesApplier
             throw $exception;
         }
     }
-    
+
     private function shouldAllowOutput(array $patches, array $removals)
     {
         return $this->outputStrategy->shouldAllowForPatches($patches)

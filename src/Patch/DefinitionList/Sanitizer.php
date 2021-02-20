@@ -16,7 +16,7 @@ class Sanitizer
     {
         $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
     }
-    
+
     public function getSanitizedList(array $patches)
     {
         $dataUtils = $this->dataUtils;

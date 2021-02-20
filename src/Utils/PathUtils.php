@@ -21,7 +21,7 @@ class PathUtils
             array_filter($pathSegments)
         );
     }
-    
+
     public static function reducePathLeft($path, $target)
     {
         return ltrim(substr($path, strlen($target)), DIRECTORY_SEPARATOR);

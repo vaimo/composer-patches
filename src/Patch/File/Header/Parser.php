@@ -24,17 +24,17 @@ class Parser
                 }
 
                 $key = ltrim($tag, '@');
-                
+
                 $line = ltrim(strstr($line, ' '), ' ');
             }
-            
+
             if (!isset($data[$key])) {
                 $data[$key] = array();
             }
 
             $data[$key][] = $line;
         }
-        
+
         return array_diff_key($data, array(''));
     }
 }

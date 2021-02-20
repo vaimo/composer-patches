@@ -17,7 +17,7 @@ class Collector
      * @var \Vaimo\ComposerPatches\Patch\ListNormalizer
      */
     private $listNormalizer;
-    
+
     /**
      * @var PatchSourceLoaderInterface[]
      */
@@ -32,7 +32,7 @@ class Collector
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Updater
      */
     private $patchListUpdater;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Patch\ListNormalizer $listNormalizer
      * @param \Vaimo\ComposerPatches\Patcher\ConfigReader $patcherConfigReader
@@ -67,13 +67,13 @@ class Collector
             /** @var PatchSourceLoaderInterface[] $sourceLoaders */
             $sourceLoaders = array_intersect_key($this->sourceLoaders, $config);
             $ownerConfig = array_diff_key($config, $this->sourceLoaders);
-            
+
             $loadedPatches = array();
-            
+
             if (empty($sourceLoaders)) {
                 continue;
             }
-            
+
             foreach ($sourceLoaders as $loaderName => $source) {
                 $resultGroups = $source->load($package, $config[$loaderName]);
 
@@ -82,25 +82,25 @@ class Collector
                     $ownerConfig
                 );
             }
-            
+
             $patches = array_reduce(
                 array_reduce($loadedPatches, 'array_merge', array()),
                 'array_merge_recursive',
                 array()
             );
-            
+
             $patchesByOwner[$ownerName] = $this->updatePackagePatchesConfig($package, $patches);
         }
-        
+
         return array_reduce($patchesByOwner, 'array_merge_recursive', array());
     }
-    
+
     private function applyListManipulators(array $resultGroups, array $ownerConfig)
     {
         $normalizer = $this->listNormalizer;
 
         $that = $this;
-        
+
         return array_map(
             function (array $results) use ($that, $ownerConfig, $normalizer) {
                 $normalizedList = $normalizer->normalize($results, $ownerConfig);
@@ -110,7 +110,7 @@ class Collector
             $resultGroups
         );
     }
-    
+
     public function applySharedConfig(array $configOrigin, array $patches)
     {
         $baseConfig = isset($configOrigin['_config']) ? $configOrigin['_config'] : array();
@@ -124,7 +124,7 @@ class Collector
             if (empty($updates) || !isset($patches[$target])) {
                 continue;
             }
-            
+
             $patches[$target] = array_map(
                 function ($config) use ($updates) {
                     return array_replace($config, $updates);
@@ -132,10 +132,10 @@ class Collector
                 $patches[$target]
             );
         }
-        
+
         return $patches;
     }
-    
+
     private function updatePackagePatchesConfig(PackageInterface $package, array $patches)
     {
         return $this->patchListUpdater->embedInfoToItems($patches, array(

@@ -44,7 +44,7 @@ class Plugin implements
      * @var string[]
      */
     private $capabilitiesConfig = array();
-    
+
     public function activate(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
     {
         $contextFactory = new \Vaimo\ComposerPatches\Factories\ComposerContextFactory($composer);
@@ -61,13 +61,13 @@ class Plugin implements
 
         $pluginBootstrap = new \Vaimo\ComposerPatches\Composer\Plugin\Bootstrap($composer, $composerContext);
         $pluginBootstrap->preloadPluginClasses();
-        
+
         if (!interface_exists('\Composer\Plugin\Capability\CommandProvider')
             || !$this->bootstrapStrategy->shouldAllow()
         ) {
             return;
         }
-        
+
         $this->capabilitiesConfig = array(
             'Composer\Plugin\Capability\CommandProvider' => '\Vaimo\ComposerPatches\Composer\CommandsProvider',
         );
@@ -93,10 +93,10 @@ class Plugin implements
 
             return;
         }
-        
+
         if (!$this->bootstrapStrategy->shouldAllow()) {
             $this->lockSanitizer->sanitize();
-            
+
             return;
         }
 
@@ -104,7 +104,7 @@ class Plugin implements
 
         $lockSanitizer = $this->lockSanitizer;
         $bootstrap = $this->bootstrap;
-        
+
         $result = $runtimeUtils->executeWithPostAction(
             function () use ($bootstrap, $event) {
                 return $bootstrap->applyPatches($event->isDevMode());
@@ -112,11 +112,11 @@ class Plugin implements
             function () use ($event, $lockSanitizer) {
                 $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
 
-                $repository->write();
+                $repository->write($event->isDevMode(), $event->getComposer()->getInstallationManager());
                 $lockSanitizer->sanitize();
             }
         );
-        
+
         if ($result) {
             return;
         }
@@ -135,5 +135,19 @@ class Plugin implements
         }
 
         $this->bootstrap = null;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function deactivate(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
+    {
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function uninstall(\Composer\Composer $composer, \Composer\IO\IOInterface $appIO)
+    {
     }
 }

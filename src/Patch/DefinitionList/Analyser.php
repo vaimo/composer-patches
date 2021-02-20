@@ -97,7 +97,7 @@ class Analyser
     public function extractDictionary(array $patches, array $keys)
     {
         $keyFlags = array_fill_keys($keys, null);
-        
+
         return array_reduce(
             $patches,
             function (array $result, array $items) use ($keyFlags) {

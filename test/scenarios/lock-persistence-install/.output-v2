@@ -1,0 +1,50 @@
+Scanning packages for orphan patches
+Validation completed successfully
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-sandbox (1)
+    ~ {{PATCHES-OWNER}}: patches/multiple-packages-single-file.patch [NEW]
+      Change: value17 => valueB; value5 => valueA
+
+  - Applying patches for vaimo/composer-patches-target1 (2)
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
+      Change: value8 => valueC
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-wildcard-version.patch [NEW]
+      Change: value17 => valueX
+
+Writing patch info to install file
+Package operations: 0 installs, 1 update, 0 removals
+  - Upgrading vaimo/composer-patches-target2 (0.0.0 => 1.2.0): Mirroring from modules/composer-patches-target2
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-sandbox (1)
+    ~ {{PATCHES-OWNER}}: patches/multiple-packages-single-file.patch [NEW]
+      Change: value17 => valueB; value5 => valueA
+
+Writing patch info to install file
+Package operations: 0 installs, 1 update, 0 removals
+  - Upgrading vaimo/composer-patches-target1 (0.0.0 => 1.0.0): Mirroring from modules/composer-patches-target1
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-target1 (2)
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
+      Change: value8 => valueC
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-wildcard-version.patch [NEW]
+      Change: value17 => valueX
+
+Writing patch info to install file
+Package operations: 1 install, 0 updates, 0 removals
+  - Installing vaimo/composer-patches-target2 (1.2.0): Mirroring from modules/composer-patches-target2
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-sandbox (1)
+    ~ {{PATCHES-OWNER}}: patches/multiple-packages-single-file.patch [NEW]
+      Change: value17 => valueB; value5 => valueA
+
+Writing patch info to install file
+Package operations: 1 install, 0 updates, 0 removals
+  - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-target1 (2)
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
+      Change: value8 => valueC
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-wildcard-version.patch [NEW]
+      Change: value17 => valueX
+
+Writing patch info to install file

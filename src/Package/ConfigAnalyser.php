@@ -21,7 +21,7 @@ class ConfigAnalyser
     {
         return $package->getType() === \Vaimo\ComposerPatches\Composer\ConfigKeys::COMPOSER_PLUGIN_TYPE;
     }
-    
+
     public function ownsNamespace(\Composer\Package\PackageInterface $package, $namespace)
     {
         return (bool)array_filter(

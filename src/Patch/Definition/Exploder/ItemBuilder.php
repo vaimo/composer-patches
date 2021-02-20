@@ -14,7 +14,7 @@ class ItemBuilder
             array_replace($item, $updates)
         );
     }
-    
+
     public function createMultiple($label, array $data, $keyName)
     {
         $items = array();

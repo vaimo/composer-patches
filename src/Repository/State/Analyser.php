@@ -16,7 +16,7 @@ class Analyser
     {
         $this->patchListTransformer = new \Vaimo\ComposerPatches\Patch\DefinitionList\Transformer();
     }
-    
+
     public function collectPatchRemovals(array $repositoryState, array $patches)
     {
         $patchesByTarget = $this->patchListTransformer->groupItemsByTarget($patches);
@@ -24,14 +24,14 @@ class Analyser
         $result = array();
 
         $unpackedState = $this->patchListTransformer->createDetailedList($repositoryState);
-        
+
         foreach ($unpackedState as $target => $items) {
             $result[$target] = array_diff_key(
                 $items,
                 isset($patchesByTarget[$target]) ? $patchesByTarget[$target] : array()
             );
         }
-        
+
         return $result;
     }
 

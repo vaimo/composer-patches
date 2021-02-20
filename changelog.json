@@ -4,6 +4,18 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.22.0": {
+        "overview": "changes in this release forward-ported from 3.53.0",
+        "feature": [
+            "add support for Composer 2 [issues/59]",
+            "allow patcher operations to be optionally disabled by re-declarng them with label replaced with: false"
+        ],
+        "maintenance": [
+            "introduce ready-to-use development environment setup for quicker developer onboarding [issues/65]",
+            "improved linter rules to be a it less forgiving on excessive use of whitespace",
+            "fix an issue where GIT applier was polled within the tests (due to there being repo-within-repo situation which made the applier to be excluded)"
+        ]
+    },
     "4.21.1": {
         "overview": "changes in this release forward-ported from 3.52.1",
         "fix": [
@@ -468,9 +480,20 @@
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
     },
+    "3.53.0": {
+        "feature": [
+            "add support for Composer 2 [issues/59]",
+            "allow patcher operations to be optionally disabled by re-declarng them with label replaced with: false"
+        ],
+        "maintenance": [
+            "introduce ready-to-use development environment setup for quicker developer onboarding [issues/65]",
+            "improved linter rules to be a it less forgiving on excessive use of whitespace",
+            "fix an issue where GIT applier was polled within the tests (due to there being repo-within-repo situation which made the applier to be excluded)"
+        ]
+    },
     "3.52.1": {
         "fix": [
-            "remove patch availability validation crash under certain package setups"
+            "remote patch availability validation crash under certain package setups"
         ],
         "maintenance": [
             "improve test coverage to include scenarios where the patches are owned by a sub-package rather than the root"
@@ -482,10 +505,10 @@
             "allow global usage of the plugin when explicitly enabled via environment variable: COMPOSER_PATCHER_ALLOW_GLOBAL_USAGE (pull/45)"
         ],
         "fix": [
-            "added /F switch to where to add double quotes to windows commands (pull/44)",
-            "added no-scripts option to avoid executing post-install-cmd (pull/48)",
-            "strpos() empty needle errors can occur with certain configurations (pull/53)",
-            "patches-searches path containing .patch fails (pull/58) (with extra modifications)"
+            "added /F switch to where to add double quotes to windows commands [pull/44]",
+            "added no-scripts option to avoid executing post-install-cmd [pull/48]",
+            "strpos() empty needle errors can occur with certain configurations [pull/53]",
+            "patches-searches path containing .patch fails [pull/58] (with extra modifications)"
         ],
         "maintenance": [
             "CI config fixed to use Composer 1.X",
@@ -647,7 +670,7 @@
         "fix": [
             "basePatch templates not being applied after code changes from last release"
         ],
-        "branch": "release/3"    
+        "branch": "release/3"
     },
     "3.48.4": {
         "fix": [
@@ -871,7 +894,6 @@
         ],
         "branch": "release/3"
     },
-
     "3.35.3": {
         "fix": [
             "backwards compatibility problems with composer.lock contents for projects that upgraded to latest releases of the plugin and had patches previously applied (boolean values for patches_applied no longer tolerated)"

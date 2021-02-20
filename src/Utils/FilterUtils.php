@@ -9,7 +9,7 @@ class FilterUtils
 {
     const AFFIRMATION = 0;
     const NEGATION = 1;
-    
+
     const NEGATION_PREFIX = '!';
 
     public function composeRegex(array $filters, $delimiter)
@@ -49,14 +49,14 @@ class FilterUtils
         }
 
         $query = sprintf($pattern, implode('|', $semanticGroups[self::AFFIRMATION]));
-        
+
         return $delimiter . $query . $delimiter;
     }
 
     public function invertRules(array $filters)
     {
         $that = $this;
-        
+
         return array_map(
             function ($filter) use ($that) {
                 return (!$that->isInvertedFilter($filter) ? FilterUtils::NEGATION_PREFIX : '') .
@@ -65,7 +65,7 @@ class FilterUtils
             $filters
         );
     }
-    
+
     public function isInvertedFilter($filter)
     {
         return strpos($filter, FilterUtils::NEGATION_PREFIX) === 0;

@@ -3,9 +3,9 @@ Processing patches configuration
     ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
       Change: value8 => valueC
       Failed to apply the patch. Halting execution!
-      Probable causes for the failure:                                    
-                                                                          
-      > PATCH                                                             
-        ! can't find file to patch at input line 7                        
-                                                                          
+      Probable causes for the failure:
+
+      > PATCH
+        ! can't find file to patch at input line 7
+
       (For full, unfiltered details please use: composer patch:apply -vvv)

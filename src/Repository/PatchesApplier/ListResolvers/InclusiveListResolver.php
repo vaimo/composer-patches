@@ -16,12 +16,12 @@ class InclusiveListResolver implements \Vaimo\ComposerPatches\Interfaces\ListRes
      * @var \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser
      */
     private $patchListAnalyser;
-    
+
     /**
      * @var \Vaimo\ComposerPatches\Utils\PatchListUtils
      */
     private $patchListUtils;
-    
+
     /**
      * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $baseResolver
      */

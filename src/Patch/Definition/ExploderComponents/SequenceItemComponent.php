@@ -13,7 +13,7 @@ class SequenceItemComponent implements \Vaimo\ComposerPatches\Interfaces\Definit
      * @var \Vaimo\ComposerPatches\Patch\Definition\Exploder\ItemBuilder
      */
     private $itemBuilder;
-    
+
     public function __construct()
     {
         $this->itemBuilder = new \Vaimo\ComposerPatches\Patch\Definition\Exploder\ItemBuilder();
@@ -24,7 +24,7 @@ class SequenceItemComponent implements \Vaimo\ComposerPatches\Interfaces\Definit
         if (!is_array($data)) {
             return false;
         }
-        
+
         return is_numeric($label)
             && isset($data[PatchDefinition::LABEL], $data[PatchDefinition::SOURCE])
             && is_array($data[PatchDefinition::SOURCE])

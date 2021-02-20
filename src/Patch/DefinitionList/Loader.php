@@ -55,7 +55,7 @@ class Loader
         $sources = $this->sourcesResolver->resolvePackages($repository);
 
         $patches = $this->patchesCollector->collect($sources);
-        
+
         $processedPatches = array_reduce(
             $this->listLoaders,
             function (array $patches, ListLoader $listLoader) use ($packages) {

@@ -16,13 +16,13 @@ class SourceResolver
                 PatchDefinition::SOURCE => (string)$data
             );
         }
-        
+
         if (isset($data[PatchDefinition::SOURCE])) {
             unset($data[PatchDefinition::URL]);
 
             return $data;
         }
-        
+
         if (isset($data[PatchDefinition::URL])) {
             $data[PatchDefinition::SOURCE] = $data[PatchDefinition::URL];
 

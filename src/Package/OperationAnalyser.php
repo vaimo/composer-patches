@@ -24,7 +24,7 @@ class OperationAnalyser
         if (!$operation instanceof \Composer\DependencyResolver\Operation\UninstallOperation) {
             return false;
         }
-        
+
         return $this->configAnalyser->ownsNamespace($operation->getPackage(), __NAMESPACE__);
     }
 }

@@ -11,14 +11,14 @@ class OperationFailure extends \Exception
      * @var array
      */
     private $output;
-    
+
     public function setOutput($output)
     {
         $this->output = $output;
-        
+
         return $this;
     }
-    
+
     public function getOutput()
     {
         return $this->output;

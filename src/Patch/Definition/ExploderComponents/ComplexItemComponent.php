@@ -13,7 +13,7 @@ class ComplexItemComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
      * @var \Vaimo\ComposerPatches\Patch\Definition\Exploder\ItemBuilder
      */
     private $itemBuilder;
-    
+
     public function __construct()
     {
         $this->itemBuilder = new \Vaimo\ComposerPatches\Patch\Definition\Exploder\ItemBuilder();

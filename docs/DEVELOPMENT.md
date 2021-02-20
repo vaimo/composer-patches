@@ -36,10 +36,13 @@ composer code:test
 composer code:test sequence
 
 # Runs all scenarios on one specific installation
-composer code:test using-file:
+composer code:test root-using-file:
 
 # Runs just one scenario for just one installation
-composer code:test using-file:skipped-patch
+composer code:test root-using-file:apply-single
+
+# Runs just one scenario for just one installation (verbose output)
+VERBOSE=1 composer code:test root-using-file:apply-single
 
 # Validate that all production-level dependencies are compatible 
 # with the system requirements of this package 
@@ -114,7 +117,7 @@ patch:apply
 @assert_changes
 ```
 
-## Creating Release
+## Creating A New Release
 
 The module uses semantic versioning which means that developer should choose proper increment to current
 version that would reflect the nature of the change. More details about the topic can be found [HERE](https://semver.org).
@@ -124,12 +127,37 @@ version that would reflect the nature of the change. More details about the topi
 1. Choose proper version that would reflect the contents of the release and update changelog.json; Use branch 
    reference when release not done for the latest MAJOR version; When releasing new MAJOR version, list all
    breaking changes under the topic of "breaking".
-
 2. Tag the release based on the same version that you added to changelog
-
 3. Update changelog output with `composer changelog:generate`
-
 4. Push the changes and the created tag(s).
-
 5. When feature was implemented on older MAJOR version, continue by checking out the higher MAJOR version 
    branch, merge in the changes from lower branch and repeat the steps of this guide.   
+
+## Development Container
+
+The modules ships with a dedicated development branch [devbox](https://github.com/vaimo/composer-changelogs/tree/devbox) 
+which contains configuration for spinning up a dedicated development environment that can be used together 
+with VSCode's [Remote Containers](https://code.visualstudio.com/docs/remote/containers).
+
+Note that there is no strict requirement to use such a setup, but it's what was used to author the plugin
+and if you want to be sure that you have everything up and running without hick-ups, you can just as well
+take the shortcut.
+
+System requirements:
+
+1. Have Docker installed.
+2. Have VSCode installed with 'Remote - Containers' extension.
+3. Have Mutagen installed (used for selecting syncing).
+
+Setup:
+
+4. `git checkout devbox .devcontainer Dockerfile docker-compose.yml mutagen.yml`
+5. `git reset .devcontainer Dockerfile docker-compose.yml mutagen.yml`
+6. [open the project with VSCode that has Remote Container extension installed]
+7. [use the 'Reopen in Container' option that is given in a prompt that opens]
+8. (only on Windows) `mutagen project start`
+9. Use 'Terminal > New Terminal' to open a terminal within the IDE.
+10. [from the terminal you can install the packages, trigger debugger, etc]
+
+Note this setup does come with a pre-bootstrapped xDebugger, you just have to use the Run menu 
+in VSCode and start listening and trigger a command via the terminal.

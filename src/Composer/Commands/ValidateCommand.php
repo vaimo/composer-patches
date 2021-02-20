@@ -45,7 +45,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             'Only validate patches that are owned by the ROOT package'
         );
     }
-    
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Scanning packages for orphan patches</info>');
@@ -55,7 +55,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $localOnly = $input->getOption('local');
         
         $patchListAnalyser = new \Vaimo\ComposerPatches\Patch\DefinitionList\Analyser();
-        
+
         $pluginConfig = array(
             Config::PATCHER_SOURCES => $this->createSourcesEnablerConfig($localOnly)
         );
@@ -70,25 +70,25 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $repository = $composer->getRepositoryManager()->getLocalRepository();
 
         $pluginConfig = $configFactory->create(array($pluginConfig));
-        
+
         $patchesLoader = $this->createPatchesLoader($composerContext, $pluginConfig);
 
         $patches = $patchesLoader->loadFromPackagesRepository($repository);
-        
+
         $patchPaths = $patchListAnalyser->extractValue($patches, array(Patch::PATH, Patch::SOURCE));
-        
+
         $patchDefines = array_combine(
             $patchPaths,
             $patchListAnalyser->extractDictionary($patches, array(Patch::OWNER, Patch::URL))
         );
-        
+
         $patchStatuses = array_filter(
             array_combine(
                 $patchPaths,
                 $patchListAnalyser->extractValue($patches, array(Patch::STATUS_LABEL))
             ) ?: array()
         );
-        
+
         $matches = $this->resolveValidationTargets($repository, $pluginConfig);
         $installPaths = $this->collectInstallPaths($matches);
         $fileMatches = $this->collectPatchFilesFromPackages($matches, $pluginConfig);
@@ -98,7 +98,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $output->writeln(
             $groups ? '<error>Orphans found!</error>' : '<info>Validation completed successfully</info>'
         );
-        
+
         return (int)(bool)$groups;
     }
 
@@ -107,7 +107,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $configDefaults = new Config\Defaults();
 
         $defaultValues = $configDefaults->getPatcherConfig();
-        
+
         if (isset($defaultValues[Config::PATCHER_SOURCES]) && is_array($defaultValues[Config::PATCHER_SOURCES])) {
             $sourceKeys = array_keys((array)$defaultValues[Config::PATCHER_SOURCES]);
 
@@ -118,21 +118,21 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         return array();
     }
-    
+
     private function collectInstallPaths(array $matches)
     {
         $composer = $this->getComposer();
         $projectRoot = getcwd();
 
         $installationManager = $composer->getInstallationManager();
-        
+
         $installPaths = array();
         foreach ($matches as $packageName => $package) {
             $installPaths[$packageName] = $package instanceof \Composer\Package\RootPackage
                 ? $projectRoot
                 : $installationManager->getInstallPath($package);
         }
-        
+
         return $installPaths;
     }
 
@@ -153,11 +153,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             substr($vendorRoot, strlen($projectRoot)),
             DIRECTORY_SEPARATOR
         );
-        
+
         $defaultIgnores = array($vendorPath, '.hg', '.git', '.idea');
 
         $patcherConfigReader = $configReaderFactory->create($pluginConfig);
-        
+
         $installPaths = $this->collectInstallPaths($matches);
 
         $fileMatchGroups = array();
@@ -194,7 +194,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         return array_reduce($fileMatchGroups, 'array_replace', array());
     }
-    
+
     private function resolveValidationTargets(PackageRepository $repository, Config $pluginConfig)
     {
         $composer = $this->getComposer();
@@ -202,12 +202,12 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
             array($composer->getPackage())
         );
-        
+
         $srcResolverFactory = new \Vaimo\ComposerPatches\Factories\SourcesResolverFactory($composer);
         $packageListUtils = new \Vaimo\ComposerPatches\Utils\PackageListUtils();
 
         $srcResolver = $srcResolverFactory->create($pluginConfig);
-        
+
         $sources = $srcResolver->resolvePackages($repository);
 
         $repositoryUtils = new \Vaimo\ComposerPatches\Utils\RepositoryUtils();
@@ -229,11 +229,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             $packageListUtils->listToNameDictionary($pluginUsers)
         );
     }
-    
+
     private function createPatchesLoader(ComposerContext $composerContext, Config $pluginConfig)
     {
         $composer = $this->getComposer();
-        
+
         $loaderFactory = new \Vaimo\ComposerPatches\Factories\PatchesLoaderFactory($composer);
 
         $componentOverrides = array(
@@ -244,7 +244,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             'root-patch' => false,
             'global-exclude' => false
         );
-        
+
         $loaderComponentsPool = $this->createLoaderPool($composerContext, $componentOverrides);
 
         return $loaderFactory->create($loaderComponentsPool, $pluginConfig, true);
@@ -262,7 +262,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         return $componentPool;
     }
-    
+
     private function collectOrphans(array $files, array $patches, array $paths, array $statuses)
     {
         $orphanFiles = array_diff_key($files, $patches);
@@ -279,11 +279,11 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         );
 
         $groups = array_fill_keys(array_keys($paths), array());
-        
+
         foreach ($orphanFiles as $path => $config) {
             $ownerName = $config[Patch::OWNER];
             $installPath = $paths[$ownerName];
-            
+
             if (!isset($groups[$ownerName])) {
                 continue;
             }
@@ -297,7 +297,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         foreach ($orphanConfig as $path => $config) {
             $ownerName = $config[Patch::OWNER];
             $installPath = $paths[$ownerName];
-            
+
             if (!isset($groups[$ownerName])) {
                 continue;
             }
@@ -316,7 +316,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
     private function outputOrphans(OutputInterface $output, array $groups)
     {
         $lines = array();
-        
+
         foreach ($groups as $packageName => $items) {
             $lines[] = sprintf('  - <info>%s</info>', $packageName);
 
@@ -328,7 +328,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
                 );
             }
         }
-        
+
         foreach ($lines as $line) {
             $output->writeln($line);
         }

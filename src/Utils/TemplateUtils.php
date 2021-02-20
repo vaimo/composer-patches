@@ -42,14 +42,14 @@ class TemplateUtils
 
         foreach ($mutations as $mutationName => $mutation) {
             $matches = array_intersect_key($mutation, $arguments);
-            
+
             if (empty($matches)) {
                 continue;
             }
 
             $argumentName = key($matches);
             $value = $arguments[$argumentName];
-            
+
             $valueMatches = array();
             if (preg_match_all(sprintf('/%s/i', reset($matches)), $arguments[$argumentName], $valueMatches)) {
                 $value = reset($valueMatches[1]);
@@ -64,16 +64,16 @@ class TemplateUtils
     public function compose($template, array $arguments, array $variableFormats)
     {
         $updateGroups = array();
-        
+
         foreach ($variableFormats as $format => $escapers) {
             $templateArguments = $arguments;
-            
+
             if ($escapers) {
                 foreach ($escapers as $escaper) {
                     $templateArguments = array_map($escaper, $arguments);
                 }
             }
-            
+
             $updateGroups[] = array_combine(
                 array_map(
                     function ($item) use ($format) {
@@ -86,9 +86,9 @@ class TemplateUtils
         }
 
         $variables = array_reduce($updateGroups, 'array_replace', array());
-        
+
         $names = array_keys($variables);
-        
+
         $values = array_map(
             function ($value) {
                 return trim(
@@ -97,7 +97,7 @@ class TemplateUtils
             },
             $variables
         );
-        
+
         return str_replace($names, $values, $template);
     }
 }

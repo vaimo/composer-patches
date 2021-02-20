@@ -25,7 +25,7 @@ class PatchesApplierFactory
      * @var \Vaimo\ComposerPatches\Logger
      */
     private $logger;
-    
+
     /**
      * @param \Composer\Composer $composer
      * @param \Vaimo\ComposerPatches\Logger $logger
@@ -74,7 +74,7 @@ class PatchesApplierFactory
             $patchFileApplier,
             $this->logger
         );
-        
+
         $packagePatchApplier = new \Vaimo\ComposerPatches\Package\PatchApplier(
             $patchProcessor,
             $patchDetailsLogger,
@@ -92,13 +92,13 @@ class PatchesApplierFactory
             $listResolver,
             $stateAnalyser
         );
-        
+
         $patcherStateManager = new \Vaimo\ComposerPatches\Managers\PatcherStateManager();
 
         $packageResetStrategy = $pluginConfig->shouldForcePackageReset()
             ? new Strategies\Package\ForcedResetStrategy()
             : new Strategies\Package\DefaultResetStrategy($installer, $downloader);
-        
+
         $repositoryManager = new \Vaimo\ComposerPatches\Managers\RepositoryManager(
             $installer,
             $packageResetStrategy,

@@ -9,7 +9,7 @@ class Analyser
 {
     const REMOVAL_MARKER = '--- ';
     const ADDITION_MARKER = '+++ ';
-    
+
     public function getAllPaths($contents)
     {
         $paths = array();

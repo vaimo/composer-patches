@@ -13,7 +13,7 @@ class UrlComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNormal
      * @var \Vaimo\ComposerPatches\Utils\DataUtils
      */
     private $dataUtils;
-    
+
     public function __construct()
     {
         $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
@@ -25,7 +25,7 @@ class UrlComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionNormal
 
         $pathInfo = parse_url($source);
         $includesScheme = isset($pathInfo['scheme']) && $pathInfo['scheme'];
-        
+
         return array(
             PatchDefinition::URL => $includesScheme ? $source : false,
             PatchDefinition::CHECKSUM => $this->dataUtils->extractValue($data, 'sha1', '') ?: ''

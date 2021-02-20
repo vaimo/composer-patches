@@ -27,11 +27,11 @@ class GracefulHandler implements \Vaimo\ComposerPatches\Interfaces\PatchFailureH
 
         $this->outputGenerator = new \Vaimo\ComposerPatches\Console\OutputGenerator($logger);
     }
-    
+
     public function execute($error, $path)
     {
         $this->logger->write('error', 'Failed to apply the patch. Skipping!');
-        
+
         if (!$error instanceof \Exception) {
             return;
         }

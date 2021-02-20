@@ -11,7 +11,7 @@ class ProjectSource implements \Vaimo\ComposerPatches\Interfaces\PatchSourceList
      * @var \Composer\Package\RootPackageInterface
      */
     private $rootPackage;
-    
+
     /**
      * @param \Composer\Package\RootPackageInterface $rootPackage
      */

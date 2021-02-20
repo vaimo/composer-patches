@@ -63,7 +63,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
             'Apply only those patch files/sources that match with provided filter'
         );
-        
+
         $this->addOption(
             '--explicit',
             null,
@@ -77,7 +77,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Alias for \'explicit\' argument'
         );
-        
+
         $this->addOption(
             '--from-source',
             null,
@@ -120,7 +120,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $composer = $this->getComposer();
 
         $appIO = $this->getIO();
-        
+
         $isDevMode = !$input->getOption('no-dev');
 
         $behaviourFlags = $this->getBehaviourFlags($input);
@@ -140,34 +140,34 @@ class PatchCommand extends \Composer\Command\BaseCommand
         ));
         
         $filters = $this->resolveActiveFilters($input, $behaviourFlags);
-        
+
         $listResolver = $this->createListResolver($behaviourFlags, $filters);
-        
         $this->configureEnvironmentForBehaviour($behaviourFlags);
 
         $outputTriggers = $this->resolveOutputTriggers($filters, $behaviourFlags);
-        
         $bootstrapFactory = new \Vaimo\ComposerPatches\Factories\BootstrapFactory($composerContext, $appIO);
         
         $outputStrategy = new \Vaimo\ComposerPatches\Strategies\OutputStrategy($outputTriggers);
         $bootstrap = $bootstrapFactory->create($configFactory, $listResolver, $outputStrategy);
+        $compatExecutor = new \Vaimo\ComposerPatches\Compatibility\Executor();
 
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
         $lockSanitizer = new \Vaimo\ComposerPatches\Repository\Lock\Sanitizer($appIO);
         $repository = $composer->getRepositoryManager()->getLocalRepository();
+        $installationManager = $composer->getInstallationManager();
         
         $result = $runtimeUtils->executeWithPostAction(
             function () use ($shouldUndo, $filters, $bootstrap, $isDevMode) {
                 if ($shouldUndo && !array_filter($filters)) {
                     $bootstrap->stripPatches($isDevMode);
-                    
+
                     return true;
                 }
 
                 return $bootstrap->applyPatches($isDevMode);
             },
-            function () use ($repository, $lockSanitizer) {
-                $repository->write();
+            function () use ($installationManager, $repository, $lockSanitizer, $isDevMode, $compatExecutor) {
+                $compatExecutor->repositoryWrite($repository, $installationManager, $isDevMode);
                 $lockSanitizer->sanitize();
             }
         );
@@ -178,13 +178,13 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         return (int)!$result;
     }
-    
+
     private function createSourcesEnablerConfig()
     {
         $configDefaults = new \Vaimo\ComposerPatches\Config\Defaults();
 
         $defaultValues = $configDefaults->getPatcherConfig();
-        
+
         if (isset($defaultValues[Config::PATCHER_SOURCES]) && is_array($defaultValues[Config::PATCHER_SOURCES])) {
             $sourceTypes = array_keys((array)$defaultValues[Config::PATCHER_SOURCES]);
 
@@ -204,12 +204,12 @@ class PatchCommand extends \Composer\Command\BaseCommand
                 || $this->getOptionGraceful($input, 'show-reapplies')
         );
     }
-    
+
     private function getOptionGraceful(InputInterface $input, $name)
     {
         return $input->hasOption($name) && $input->getOption($name);
     }
-    
+
     private function resolveActiveFilters(InputInterface $input, array $behaviourFlags)
     {
         $filters = array(
@@ -225,7 +225,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
 
         return $filters;
     }
-    
+
     private function configureEnvironmentForBehaviour(array $behaviourFlags)
     {
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
@@ -234,17 +234,17 @@ class PatchCommand extends \Composer\Command\BaseCommand
             Environment::FORCE_RESET => (int)$behaviourFlags[Behaviour::FORCE]
         ));
     }
-    
+
     private function resolveOutputTriggers(array $filters, array $behaviourFlags)
     {
         $hasFilers = (bool)array_filter($filters);
 
         $isExplicit = $behaviourFlags[Behaviour::EXPLICIT];
-        
+
         if (!$hasFilers && $behaviourFlags[Behaviour::REDO]) {
             $isExplicit = true;
         }
-        
+
         $outputTriggerFlags = array(
             Patch::STATUS_NEW => !$hasFilers,
             Patch::STATUS_CHANGED => !$hasFilers,
@@ -257,7 +257,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
             array_filter($outputTriggerFlags)
         );
     }
-    
+
     private function createListResolver(array $behaviourFlags, array $filters)
     {
         $listResolver = new ListResolvers\FilteredListResolver($filters);
@@ -265,14 +265,14 @@ class PatchCommand extends \Composer\Command\BaseCommand
         $isDefaultBehaviour = !$behaviourFlags[Behaviour::REDO] && !$behaviourFlags[Behaviour::UNDO];
 
         $listResolver = $this->attachBehaviourToListResolver($listResolver, $behaviourFlags);
-        
+
         if ($isDefaultBehaviour) {
             $listResolver = new ListResolvers\ChangesListResolver($listResolver);
         }
-        
+
         return $listResolver;
     }
-    
+
     private function attachBehaviourToListResolver(ListResolverInterface $listResolver, array $behaviourFlags)
     {
         $shouldUndo = !$behaviourFlags[Behaviour::REDO] && $behaviourFlags[Behaviour::UNDO];
