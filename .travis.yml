@@ -15,12 +15,13 @@ before_install:
 env:
   jobs:
     - COMPOSER_VERSION=1.8.4
-  #  - COMPOSER_VERSION=2.0.9
+    - COMPOSER_VERSION=2.0.9
 
 script:
   # removed to allow GIT applier to trigger as well (tests output does cover it)
   - rm -rf .git
   - composer self-update ${COMPOSER_VERSION}
-  - cp composer-v${COMPOSER_VERSION:0:1}.lock composer.lock 2>/dev/null || true
+  - cp test/files/composer-v${COMPOSER_VERSION:0:1}.json composer.json 2>/dev/null || true
+  - cp test/files/composer-v${COMPOSER_VERSION:0:1}.lock composer.lock 2>/dev/null || true
   - composer install
   - composer ci:build

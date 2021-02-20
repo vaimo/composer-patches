@@ -1,8 +1,8 @@
 Processing patches configuration
 
-                                                                                                                                                                                  
-  [Composer\Downloader\TransportException]                                                                                                                                        
-  The "https://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-version.patch" file could not be downloaded (HTTP/1.1 404 Not Found)  
-                                                                                                                                                                                  
+      
+  [Composer\Downloader\TransportException]
+  The "https://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-version.patch" file could not be downloaded (404)
+
 
 
