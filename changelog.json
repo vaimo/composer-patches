@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "3.53.1": {
+        "fix": [
+            "minor issue addressed with V2-style call being in code without version-check (said call is currently backwards-compatible with V1, but you nevenr know ...)"
+        ],
+        "branch": "release/3"
+    },
     "3.53.0": {
         "feature": [
             "add support for Composer 2 [issues/59]",
@@ -13,7 +19,8 @@
             "introduce ready-to-use development environment setup for quicker developer onboarding [issues/65]",
             "improved linter rules to be a it less forgiving on excessive use of whitespace",
             "fix an issue where GIT applier was polled within the tests (due to there being repo-within-repo situation which made the applier to be excluded)"
-        ]
+        ],
+        "branch": "release/3"
     },
     "3.52.1": {
         "fix": [
