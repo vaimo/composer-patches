@@ -1,3 +1,0 @@
-#!/bin/sh
-cmd=${@}
-eval vendor/bin/phpcbf ${@}

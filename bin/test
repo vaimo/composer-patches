@@ -365,7 +365,7 @@ apply_patches() {
     local args=${1}
     local out_file=${2}
  
-    local command="COMPOSER_PATCHES_FATAL_FAIL=1 composer ${args} --ansi"
+    local command="composer ${args} --ansi"
  
     if [ "${VERBOSE}" == "1" ] ; then
         command="${command} -vvv"
