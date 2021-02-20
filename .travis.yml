@@ -10,7 +10,8 @@ cache:
     - "$HOME/.cache/composer"
     - "$HOME/.composer/cache"
 
-install:
+before_install:
+  
 
 script:
   - cp composer.lock composer-v2.lock
@@ -21,6 +22,6 @@ script:
   - rm -rf vendor
   - rm -rf $HOME/.composer/cache
   - cp composer-v2.lock composer.lock
-  - composer self-update --rollback
+  - composer self-update 2.0.9
   - composer install
   - composer ci:build
