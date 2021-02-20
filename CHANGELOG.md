@@ -2,7 +2,7 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## DEV-3.53.0
+## 3.53.0 (2021-02-20)
 
 ### Feature
 
@@ -15,7 +15,7 @@ _This file has been auto-generated from the contents of changelog.json_
 * improved linter rules to be a it less forgiving on excessive use of whitespace
 * fix an issue where GIT applier was polled within the tests (due to there being repo-within-repo situation which made the applier to be excluded)
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/DEV-3.53.0) [diff](https://github.com/vaimo/composer-patches/compare/3.52.1...DEV-3.53.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.0) [diff](https://github.com/vaimo/composer-patches/compare/3.52.1...3.53.0)
 
 ## 3.52.1 (2021-01-31)
 
