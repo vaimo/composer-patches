@@ -17,9 +17,10 @@ cache:
 before_install:
   - sudo apt-get -y install git
 
-jobs:
-  - COMPOSER_VERSION=1.8.4
-  - COMPOSER_VERSION=2.0.9
+env:
+  jobs:
+    - COMPOSER_VERSION=1.8.4
+    - COMPOSER_VERSION=2.0.9
 
 script:
   - rm -rf vendor
