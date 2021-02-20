@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.22.1
+
+changes in this release forward-ported from 3.53.1
+
+### Fix
+
+* minor issue addressed with V2-style call being in code without version-check (said call is currently backwards-compatible with V1, but you nevenr know ...)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.1) [diff](https://github.com/vaimo/composer-patches/compare/4.22.0...4.22.1)
+
 ## 4.22.0 (2021-02-20)
 
 changes in this release forward-ported from 3.53.0
@@ -726,7 +736,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.53.0...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.53.1...4.0.0)
+
+## 3.53.1 (2021-02-20)
+
+### Fix
+
+* minor issue addressed with V2-style call being in code without version-check (said call is currently backwards-compatible with V1, but you nevenr know ...)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.1) [diff](https://github.com/vaimo/composer-patches/compare/3.53.0...3.53.1)
 
 ## 3.53.0 (2021-02-20)
 

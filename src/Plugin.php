@@ -101,6 +101,7 @@ class Plugin implements
         }
 
         $runtimeUtils = new \Vaimo\ComposerPatches\Utils\RuntimeUtils();
+        $compExecutor = new \Vaimo\ComposerPatches\Compatibility\Executor();
 
         $lockSanitizer = $this->lockSanitizer;
         $bootstrap = $this->bootstrap;
@@ -109,10 +110,10 @@ class Plugin implements
             function () use ($bootstrap, $event) {
                 return $bootstrap->applyPatches($event->isDevMode());
             },
-            function () use ($event, $lockSanitizer) {
+            function () use ($event, $lockSanitizer, $compExecutor) {
                 $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
-
-                $repository->write($event->isDevMode(), $event->getComposer()->getInstallationManager());
+                $installationManager = $event->getComposer()->getInstallationManager();
+                $compExecutor->repositoryWrite($repository, $installationManager, $event->isDevMode());
                 $lockSanitizer->sanitize();
             }
         );
