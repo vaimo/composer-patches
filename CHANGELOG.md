@@ -2,7 +2,7 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 4.22.1
+## 4.22.1 (2021-02-20)
 
 changes in this release forward-ported from 3.53.1
 
