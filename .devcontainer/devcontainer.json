@@ -9,8 +9,6 @@
   "runServices": [
     "devbox"
   ],
-  "initializeCommand": "${localWorkspaceFolder}/.devcontainer/scripts/trigger-host.sh ${localWorkspaceFolder}",
-  "postAttachCommand": "${containerWorkspaceFolder}/src/.scripts/trigger-guest.sh",
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash",
     "files.autoSave": "onFocusChange",

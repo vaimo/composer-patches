@@ -155,7 +155,7 @@ Setup:
 5. `git reset .devcontainer Dockerfile docker-compose.yml mutagen.yml bin/phpcs bin/phpcbf`
 6. [open the project with VSCode that has Remote Container extension installed]
 7. [use the 'Reopen in Container' option that is given in a prompt that opens]
-8. (only on Windows) `mutagen project start`
+8. `mutagen project start`
 9. Use 'Terminal > New Terminal' to open a terminal within the IDE.
 10. [from the terminal you can install the packages, trigger debugger, etc]
 
