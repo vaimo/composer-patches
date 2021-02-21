@@ -103,7 +103,8 @@ class ComponentPool
         $configExtractor = new \Vaimo\ComposerPatches\Package\ConfigExtractors\VendorConfigExtractor(
             $packageInfoResolver
         );
-        $platformPackages = $this->resolveConstraintPackages($composerConfig);
+        $composerConfigUtils = new \Vaimo\ComposerPatches\Utils\ComposerConfigUtils();
+        $platformPackages = $composerConfigUtils->resolveConstraintPackages($composerConfig);
         $packageResolver = new \Vaimo\ComposerPatches\Composer\Plugin\PackageResolver(
             array($composer->getPackage())
         );
@@ -137,30 +138,6 @@ class ComponentPool
         return array_values(
             array_filter(array_replace($defaults, $this->components))
         );
-    }
-
-    private function resolveConstraintPackages(\Composer\Config $composerConfig)
-    {
-        $platformOverrides = array_filter(
-            (array)$composerConfig->get('platform')
-        );
-
-        if (!empty($platformOverrides)) {
-            $platformOverrides = array();
-        }
-
-        $platformRepo = new \Composer\Repository\PlatformRepository(
-            array(),
-            $platformOverrides ?: array()
-        );
-
-        $platformPackages = array();
-
-        foreach ($platformRepo->getPackages() as $package) {
-            $platformPackages[$package->getName()] = $package;
-        }
-
-        return $platformPackages;
     }
 
     public function registerComponent($name, $instance)
