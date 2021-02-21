@@ -208,23 +208,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     {
         $target = false;
 
-        $package = $this->extractSingleValue($data, PatchDefinition::PACKAGE);
-        $depends = $this->extractSingleValue($data, PatchDefinition::DEPENDS);
-        $version = $this->extractSingleValue($data, PatchDefinition::VERSION, '>=0.0.0');
-
-        if (strpos($version, ':') !== false) {
-            $valueParts = explode(':', $version);
-
-            $depends = trim(array_shift($valueParts));
-            $version = trim(implode(':', $valueParts));
-        }
-
-        if (strpos($package, ':') !== false) {
-            $valueParts = explode(':', $package);
-
-            $package = trim(array_shift($valueParts));
-            $version = trim(implode(':', $valueParts));
-        }
+        list($package, $version, $depends) = $this->resolveBaseData($data);
 
         if ($package) {
             $target = $package;
@@ -257,6 +241,27 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
             $this->normalizeDependencies($dependsList),
             $patchTypeFlags
         );
+    }
+
+    private function resolveBaseData(array $data)
+    {
+        $package = $this->extractSingleValue($data, PatchDefinition::PACKAGE);
+        $depends = $this->extractSingleValue($data, PatchDefinition::DEPENDS);
+        $version = $this->extractSingleValue($data, PatchDefinition::VERSION, '>=0.0.0');
+
+        if (strpos($version, ':') !== false) {
+            $valueParts = explode(':', $version);
+            $depends = trim(array_shift($valueParts));
+            $version = trim(implode(':', $valueParts));
+        }
+
+        if (strpos($package, ':') !== false) {
+            $valueParts = explode(':', $package);
+            $package = trim(array_shift($valueParts));
+            $version = trim(implode(':', $valueParts));
+        }
+
+        return array($package, $version, $depends);
     }
 
     private function normalizeDependencies($dependsList)

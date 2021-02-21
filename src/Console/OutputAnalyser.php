@@ -9,12 +9,9 @@ class OutputAnalyser
 {
     public function scanOutputForFailures($output, $separatorMatcher, array $failureMessages)
     {
-        $patternsWithResults = array_filter(
-            $failureMessages,
-            function ($pattern) use ($output) {
-                return $pattern && preg_match($pattern, $output);
-            }
-        );
+        $patternsWithResults = array_filter($failureMessages, function ($pattern) use ($output) {
+            return $pattern && preg_match($pattern, $output);
+        });
 
         if (!$patternsWithResults) {
             return array();

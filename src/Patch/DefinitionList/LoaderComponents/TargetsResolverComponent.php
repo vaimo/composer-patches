@@ -55,41 +55,54 @@ class TargetsResolverComponent implements \Vaimo\ComposerPatches\Interfaces\Defi
     public function process(array $patches, array $packagesByName)
     {
         foreach ($patches as $patchTarget => $packagePatches) {
-            foreach ($packagePatches as $index => $info) {
-                $targets = isset($info[PatchDefinition::TARGETS])
-                    ? $info[PatchDefinition::TARGETS]
-                    : array();
+            $targets = $this->collectTargets($packagesByName, $packagePatches);
 
-                if (!in_array(PatchDefinition::BUNDLE_TARGET, $targets, true)) {
-                    continue;
-                }
-
-                if (count($targets) > 1) {
-                    continue;
-                }
-
-                $path = $info[PatchDefinition::PATH];
-                $source = $info[PatchDefinition::SOURCE];
-
-                if (!file_exists($path)) {
-                    throw $this->createError('patch file not found', $source);
-                }
-
-                $paths = $this->patchFileAnalyser->getAllPaths(
-                    $this->patchFileLoader->loadWithNormalizedLineEndings($path)
-                );
-
-                $bundleTargets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths);
-
-                if (!$bundleTargets && !$this->gracefulMode) {
-                    throw $this->createError('zero matches', $source);
-                }
-
-                $patches[$patchTarget][$index][PatchDefinition::TARGETS] = array_unique($bundleTargets);
+            foreach ($targets as $index => $items) {
+                $patches[$patchTarget][$index][PatchDefinition::TARGETS] = $items;
             }
         }
 
         return $patches;
+    }
+
+    private function collectTargets($packagesByName, $packagePatches)
+    {
+        $result = array();
+
+        foreach ($packagePatches as $index => $info) {
+            $targets = isset($info[PatchDefinition::TARGETS])
+                ? $info[PatchDefinition::TARGETS]
+                : array();
+
+            if (!in_array(PatchDefinition::BUNDLE_TARGET, $targets, true)) {
+                continue;
+            }
+
+            if (count($targets) > 1) {
+                continue;
+            }
+
+            $path = $info[PatchDefinition::PATH];
+            $source = $info[PatchDefinition::SOURCE];
+
+            if (!file_exists($path)) {
+                throw $this->createError('patch file not found', $source);
+            }
+
+            $paths = $this->patchFileAnalyser->getAllPaths(
+                $this->patchFileLoader->loadWithNormalizedLineEndings($path)
+            );
+
+            $bundleTargets = $this->packageInfoResolver->resolveNamesFromPaths($packagesByName, $paths);
+
+            if (!$bundleTargets && !$this->gracefulMode) {
+                throw $this->createError('zero matches', $source);
+            }
+
+            $result[$index] = array_unique($bundleTargets);
+        }
+
+        return $result;
     }
 
     private function createError($reason, $source)

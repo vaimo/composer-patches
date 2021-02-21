@@ -36,11 +36,6 @@ class Applier
     private $templateUtils;
 
     /**
-     * @var \Vaimo\ComposerPatches\Utils\DataUtils
-     */
-    private $dataUtils;
-
-    /**
      * @var \Vaimo\ComposerPatches\Console\OutputAnalyser
      */
     private $outputAnalyser;
@@ -64,7 +59,6 @@ class Applier
         $this->shell = new \Vaimo\ComposerPatches\Shell($logger);
         $this->applierUtils = new \Vaimo\ComposerPatches\Utils\ConfigUtils();
         $this->templateUtils = new \Vaimo\ComposerPatches\Utils\TemplateUtils();
-        $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
         $this->outputAnalyser = new \Vaimo\ComposerPatches\Console\OutputAnalyser();
         $this->applierErrorFactory = new \Vaimo\ComposerPatches\Factories\ApplierErrorFactory();
     }
@@ -226,21 +220,7 @@ class Applier
             $cwd = $this->extractStringValue($args, PluginConfig::PATCHER_ARG_CWD);
             $resultKey = sprintf('%s | %s', $cwd, $command);
 
-            if ($passOnFailure) {
-                $this->logger->writeVerbose(
-                    \Vaimo\ComposerPatches\Logger::TYPE_NONE,
-                    '<comment>***</comment> '
-                    . 'The expected result to execution is a failure'
-                    . '<comment>***</comment>'
-                );
-            }
-
-            if (isset($this->resultCache[$resultKey])) {
-                $this->logger->writeVerbose(
-                    \Vaimo\ComposerPatches\Logger::TYPE_NONE,
-                    sprintf('(using cached result for: %s = %s)', $command, reset($this->resultCache[$resultKey]))
-                );
-            }
+            $this->outputBehaviourContextInfo($command, $resultKey, $passOnFailure);
 
             if (!isset($this->resultCache[$resultKey])) {
                 $this->resultCache[$resultKey] = $this->shell->execute($command, $cwd);
@@ -264,6 +244,25 @@ class Applier
         }
 
         return array(false, $output);
+    }
+
+    private function outputBehaviourContextInfo($command, $resultKey, $passOnFailure)
+    {
+        if ($passOnFailure) {
+            $this->logger->writeVerbose(
+                \Vaimo\ComposerPatches\Logger::TYPE_NONE,
+                '<comment>***</comment> '
+                . 'The expected result to execution is a failure'
+                . '<comment>***</comment>'
+            );
+        }
+
+        if (isset($this->resultCache[$resultKey])) {
+            $this->logger->writeVerbose(
+                \Vaimo\ComposerPatches\Logger::TYPE_NONE,
+                sprintf('(using cached result for: %s = %s)', $command, reset($this->resultCache[$resultKey]))
+            );
+        }
     }
 
     private function validateOutput($output, $operationFailures)
