@@ -43,31 +43,36 @@ class ListNormalizer
         $sanitizedList = $this->patchListSanitizer->getSanitizedList($list);
 
         foreach ($sanitizedList as $target => $packagePatches) {
-            $patches = array();
-
-            foreach ($packagePatches as $patchLabel => $patchConfig) {
-                $definitionItems = $this->definitionExploder->process(
-                    $patchLabel,
-                    $patchConfig
-                );
-
-                foreach ($definitionItems as $patchItem) {
-                    list($label, $data) = $patchItem;
-
-                    $patches[] = $this->definitionNormalizer->process(
-                        $target,
-                        $label,
-                        $data,
-                        $config
-                    );
-                }
-            }
-
-            $result[$target] = $patches;
+            $result[$target] = $this->createNormalizedList($target, $packagePatches, $config);
         }
 
         return array_filter(
             array_map('array_filter', $result)
         );
+    }
+
+    private function createNormalizedList($target, $patches, $config)
+    {
+        $result = array();
+
+        foreach ($patches as $patchLabel => $patchConfig) {
+            $definitionItems = $this->definitionExploder->process(
+                $patchLabel,
+                $patchConfig
+            );
+
+            foreach ($definitionItems as $patchItem) {
+                list($label, $data) = $patchItem;
+
+                $result[] = $this->definitionNormalizer->process(
+                    $target,
+                    $label,
+                    $data,
+                    $config
+                );
+            }
+        }
+
+        return $result;
     }
 }

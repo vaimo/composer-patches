@@ -27,7 +27,7 @@ class OutputGenerator
                 return;
             }
 
-            $prioritizedErrors = $this->prioritizeErrors($errors);
+            $prioritizedErrors = $this->prioritizeContentErrors($errors);
 
             $lines = array_merge(
                 array('Probable causes for the failure:', ''),
@@ -67,7 +67,7 @@ class OutputGenerator
         return $lines;
     }
 
-    private function prioritizeErrors(array $errors)
+    private function prioritizeContentErrors(array $errors)
     {
         $filters = array(
             'can\'t find file',

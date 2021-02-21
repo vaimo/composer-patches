@@ -100,8 +100,6 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         }
 
         $basePath = $this->getInstallPath($package);
-        $basePathLength = strlen($basePath);
-
         $results = array();
 
         foreach ($source as $item) {
@@ -110,36 +108,42 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                 sprintf('/%s/i', PluginConfig::PATCH_FILE_REGEX_MATCHER)
             );
 
-            $groups = array();
-
-            foreach ($paths as $path) {
-                $contents = $this->patchFileLoader->loadWithNormalizedLineEndings($path);
-
-                $definition = $this->createDefinitionItem($contents, array(
-                    PatchDefinition::PATH => $path,
-                    PatchDefinition::SOURCE => trim(
-                        substr($path, $basePathLength),
-                        DIRECTORY_SEPARATOR
-                    )
-                ));
-
-                if (!isset($definition[PatchDefinition::TARGET])) {
-                    continue;
-                }
-
-                $target = $definition[PatchDefinition::TARGET];
-
-                if (!isset($groups[$target])) {
-                    $groups[$target] = array();
-                }
-
-                $groups[$target][] = $definition;
-            }
-
-            $results[] = $groups;
+            $results[] = $this->createPatchDefinitions($basePath, $paths);
         }
 
         return $results;
+    }
+
+    private function createPatchDefinitions($basePath, array $paths)
+    {
+        $groups = array();
+        $basePathLength = strlen($basePath);
+
+        foreach ($paths as $path) {
+            $contents = $this->patchFileLoader->loadWithNormalizedLineEndings($path);
+
+            $definition = $this->createDefinitionItem($contents, array(
+                PatchDefinition::PATH => $path,
+                PatchDefinition::SOURCE => trim(
+                    substr($path, $basePathLength),
+                    DIRECTORY_SEPARATOR
+                )
+            ));
+
+            if (!isset($definition[PatchDefinition::TARGET])) {
+                continue;
+            }
+
+            $target = $definition[PatchDefinition::TARGET];
+
+            if (!isset($groups[$target])) {
+                $groups[$target] = array();
+            }
+
+            $groups[$target][] = $definition;
+        }
+
+        return $groups;
     }
 
     private function getInstallPath(\Composer\Package\PackageInterface $package)

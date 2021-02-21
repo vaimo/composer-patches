@@ -301,13 +301,15 @@ assert_scenario_output() {
         |sed 's/ *$//g' \
         > output.txt
 
-    local original_ifs=${IFS}
-    IFS=$'\n'    
-    for filter in $(cat ${output_filters}) ; do
-        sed -i.bak ${filter} output.txt
-        rm output.txt.bak
-    done
-    IFS=${original_ifs}
+    if [ -f ${output_filters} ] ; then
+        local original_ifs=${IFS}
+        IFS=$'\n'    
+        for filter in $(cat ${output_filters}) ; do
+            sed -i.bak ${filter} output.txt
+            rm output.txt.bak
+        done
+        IFS=${original_ifs}
+    fi
 
     rm ${output_file} 2>/dev/null
 
