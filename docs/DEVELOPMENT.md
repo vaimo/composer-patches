@@ -145,9 +145,10 @@ take the shortcut.
 
 System requirements:
 
-1. Have Docker installed.
-2. Have VSCode installed with 'Remote - Containers' extension.
-3. Have Mutagen installed (used for selecting syncing).
+1. Have [Docker](https://www.docker.com/) installed
+2. Have [Visual Studio Code](https://code.visualstudio.com/) installed 
+3. Hasve [Remote Containers](https://code.visualstudio.com/docs/remote/containers) extension installed on VSCode
+4. Have [Mutagen](https://mutagen.io) installed (used for selecting syncing)
 
 Setup:
 
