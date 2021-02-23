@@ -17,4 +17,3 @@ sync:
         - "/.vscode"
         - "/.history"
         - "/vendor"
-        - "/src"

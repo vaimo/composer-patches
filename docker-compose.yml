@@ -5,6 +5,4 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
-    volumes:
-      - ./src:/module/src
     entrypoint: tail -f /dev/null
