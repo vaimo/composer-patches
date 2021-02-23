@@ -5,7 +5,7 @@
 COPYRIGHT
 
 # Setup static code analysis
-vendor/bin/phpcs --config-set installed_paths 'vendor/phpcompatibility/php-compatibility'
-vendor/bin/phpcs --config-set error_severity 1
-vendor/bin/phpcs --config-set default_standard 'LOCAL'
-vendor/bin/phpcs --config-set parallel 1
+vendor/bin/phpcs --config-set installed_paths 'vendor/phpcompatibility/php-compatibility' 2>/dev/null
+vendor/bin/phpcs --config-set error_severity 1 2>/dev/null
+vendor/bin/phpcs --config-set default_standard 'LOCAL' 2>/dev/null
+vendor/bin/phpcs --config-set parallel 1 2>/dev/null
