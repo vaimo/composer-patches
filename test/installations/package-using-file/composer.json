@@ -8,7 +8,8 @@
         "vaimo/patches-file-owner": "1.0.0",
         "vaimo/composer-patches-target1": "1.0.0",
         "vaimo/composer-patches-target2": "1.2.0",
-        "vaimo/composer-patches-target3": "1.2.3"
+        "vaimo/composer-patches-target3": "1.2.3",
+        "vaimo/topological-sort": "^1.0"
     },
     "repositories": [
         {
