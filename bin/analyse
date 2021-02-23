@@ -6,8 +6,6 @@ COPYRIGHT
 
 type=${1}
 
-rm phpcs.xml 2>/dev/null
-
 if [ "${type}" == "" ] || [ "${type}" == "phpcs" ] ; then
     echo ">>> phpcs"
     vendor/bin/phpcs -p src
