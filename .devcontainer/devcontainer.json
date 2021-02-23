@@ -20,7 +20,7 @@
     "editor.wordSeparators": "`~!@#%^&*()-=+[{]}\\|;:'\",.<>/?",
     "phpSniffer.autoDetect": true,
     "editor.formatOnSave": true,
-    "phpSniffer.executablesFolder": "vendor/bin",
+    "phpSniffer.executablesFolder": "bin",
     "phpmd.rules": "phpmd.xml",
     "php.suggest.basic": false,
     "[php]": {
