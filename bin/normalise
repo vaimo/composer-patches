@@ -4,9 +4,6 @@
  See LICENSE_VAIMO.txt for license details.
 COPYRIGHT
 
-rm phpcs.xml 2>/dev/null
-ln -s $(pwd)/.config/phpcs/package.xml $(pwd)/phpcs.xml
-
 vendor/bin/phpcbf -p src
 
 exit 0
