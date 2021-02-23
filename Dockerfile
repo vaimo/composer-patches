@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     # Required for Mutagen termination
     procps \
     # Required by the Composer plugin
-    git unzip locales php-common \
+    git unzip locales \
     && docker-php-ext-install bcmath \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug
