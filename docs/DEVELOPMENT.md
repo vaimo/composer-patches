@@ -151,8 +151,8 @@ System requirements:
 
 Setup:
 
-4. `git checkout devbox .devcontainer Dockerfile docker-compose.yml mutagen.yml bin/phpcs bin/phpcbf`
-5. `git reset .devcontainer Dockerfile docker-compose.yml mutagen.yml bin/phpcs bin/phpcbf`
+4. `git checkout devbox .devcontainer Dockerfile docker-compose.yml mutagen.yml`
+5. `git reset .devcontainer Dockerfile docker-compose.yml mutagen.yml`
 6. [open the project with VSCode that has Remote Container extension installed]
 7. [use the 'Reopen in Container' option that is given in a prompt that opens]
 8. (only on Windows) `mutagen project start`
