@@ -12,6 +12,7 @@ use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class PatchesApplier
 {
@@ -150,17 +151,12 @@ class PatchesApplier
     public function apply(Repository $repository, array $patches)
     {
         $packages = $this->packageCollector->collect($repository);
-
         $packagesUpdated = false;
-
         $repositoryState = $this->repoStateGenerator->generate($repository);
-
         $applyQueue = $this->queueGenerator->generateApplyQueue($patches, $repositoryState);
         $removeQueue = $this->queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);
         $resetQueue = $this->queueGenerator->generateResetQueue($applyQueue);
-
         $applyQueue = array_map('array_filter', $applyQueue);
-
         $patchQueueFootprints = $this->patchListTransformer->createSimplifiedList($applyQueue);
 
         $labels = array_diff_key(
@@ -203,7 +199,6 @@ class PatchesApplier
             }
 
             $this->compExecutor->waitForCompletion($this->composer, $resets);
-
             $packagesUpdated = $packagesUpdated || (bool)array_filter($resetResult);
 
             if (!$hasPatches) {
