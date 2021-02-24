@@ -2,6 +2,21 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.22.3 (2021-02-24)
+
+changes in this release forward-ported from 3.53.3
+
+### Fix
+
+* patch applier crash when branch alias defined for root package (scenario: root-branch-alias) [pull/73]
+
+
+### Maintenance
+
+* make patch commands available when the plugin itself is a root package (just for the sake of allowing people to conduct quick experiments when developing)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.3) [diff](https://github.com/vaimo/composer-patches/compare/4.22.2...4.22.3)
+
 ## 4.22.2 (2021-02-24)
 
 changes in this release forward-ported from 3.53.2
