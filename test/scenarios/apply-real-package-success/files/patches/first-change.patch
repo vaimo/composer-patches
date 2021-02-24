@@ -1,7 +1,7 @@
 Change: Dependency => The cool thing
 
 @package vaimo/topological-sort
-@assert vaimo/topological-sort,Dependency,The cool thing
+@assert vaimo/topological-sort,,The cool thing,src/ElementNotFoundException.php
 
 --- src/ElementNotFoundException.php.org
 +++ src/ElementNotFoundException.php

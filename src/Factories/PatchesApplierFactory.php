@@ -106,6 +106,7 @@ class PatchesApplierFactory
         );
 
         return new \Vaimo\ComposerPatches\Repository\PatchesApplier(
+            $this->composer,
             $packageCollector,
             $repositoryManager,
             $packagePatchApplier,

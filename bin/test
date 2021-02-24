@@ -398,13 +398,23 @@ assert() {
     local name=$(echo ${assertion}|cut -d',' -f1)
     local before=$(echo ${assertion}|cut -d',' -f2)
     local after=$(echo ${assertion}|cut -d',' -f3)
+    local target=$(echo ${assertion}|cut -d',' -f4)
 
-    local contents=$(cat vendor/${name}/src/example.txt)
+    if [ "${target}" = "" ] ; then
+        target="src/example.txt"
+    fi
+
+    local file_path="vendor/${name}/${target}"
+    local contents=$(cat ${file_path})
 
     if [ "${invert}" != "" ] && [ "${invert}" != "0" ] ; then
         local tmp=${before}
         before=${after}
         after=${tmp}
+    fi
+
+    if echo "${contents}"|grep -qw "${after}" && [ "${before}" == "" ] ; then
+        return 0
     fi
 
     if echo "${contents}"|grep -qw "^${before}" && [ "${before}" == "${after}" ] ; then
@@ -427,10 +437,14 @@ assertion_error() {
     local name=$(echo ${assertion}|cut -d',' -f1)
     local before=$(echo ${assertion}|cut -d',' -f2)
     local after=$(echo ${assertion}|cut -d',' -f3)
+    local target=$(echo ${assertion}|cut -d',' -f4)
 
-    local file=vendor/${name}/src/example.txt
+    if [ "${target}" = "" ] ; then
+        target="src/example.txt"
+    fi
 
-    local contents=$(cat ${file})
+    local file_path="vendor/${name}/${target}"
+    local contents=$(cat ${file_path})
 
     if [ "${invert}" != "" ] && [ "${invert}" != "0" ] ; then
         local tmp=${before}
@@ -438,18 +452,21 @@ assertion_error() {
         after=${tmp}
     fi
 
-    _error "TARGET: ${file}"
+    _error "TARGET: ${file_path}"
     _error "ASSERTION: ${before} => ${after}"        
 }
 
 reset_packages() {
-    local installation_root=${1}
+    local scenarios_root=${1}
+    local installation_root=${2}
+
     local install_info_path="${installation_root}/vendor/composer/installed.json"
     
     local lock_path="${installation_root}/composer.lock"
 
     if [ -f ${install_info_path} ] ; then
-        perl -i.org -pe 's|(\s"name":\s")(vaimo/composer-patches-target)(.*)",|\1__\2\3",|g' \
+        filters=$(grep -r "@package" ${scenarios_root}|sed 's/.*@package\(.*\)/\1/g'|sort|uniq|tr '\n' '|'|tr -d ' '|tr -d '\r')
+        perl -i.org -pe "s%(\s\"name\":\s\")(${filters}|vaimo/composer-patches-target)(.*)\",%\1__\2\3\",%g" \
             ${install_info_path}
 
         rm ${install_info_path}.org
@@ -527,6 +544,7 @@ fi
     sandbox_root=$(pwd)
 
     installations=$(ls -1 installations)
+    scenarios_root=$(pwd)/scenarios
     scenarios=$(ls -1 scenarios)
 
     if [ "${PURGE}" == "1" ] ; then
@@ -585,7 +603,7 @@ fi
                     continue
                 fi
 
-                reset_packages "${installation_root}"
+                reset_packages "${scenarios_root}" "${installation_root}"
                 scenario_root=${sandbox_root}/scenarios/${scenario}
 
                 if ! run_tests "${scenario_root}" "${copy_target}" ; then
