@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.53.2 (2021-02-24)
+
+### Fix
+
+* patches applied before packages properly re-installed with Composer V2 (missed the fact that installations, like downloads are now done in asynchronous manner) [issues/70]
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.2) [diff](https://github.com/vaimo/composer-patches/compare/3.53.1...3.53.2)
+
 ## 3.53.1 (2021-02-20)
 
 ### Fix
