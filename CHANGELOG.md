@@ -761,7 +761,19 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.53.2...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.53.3...4.0.0)
+
+## 3.53.3 (2021-02-24)
+
+### Fix
+
+* patch applier crash when branch alias defined for root package (scenario: root-branch-alias) [pull/73]
+
+### Maintenance
+
+* make patch commands available when the plugin itself is a root package (just for the sake of allowing people to conduct quick experiments when developing)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.3) [diff](https://github.com/vaimo/composer-patches/compare/3.53.2...3.53.3)
 
 ## 3.53.2 (2021-02-24)
 

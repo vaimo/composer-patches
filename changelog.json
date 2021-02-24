@@ -501,6 +501,15 @@
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
     },
+    "3.53.3": {
+        "fix": [
+            "patch applier crash when branch alias defined for root package (scenario: root-branch-alias) [pull/73]"
+        ],
+        "maintenance": [
+            "make patch commands available when the plugin itself is a root package (just for the sake of allowing people to conduct quick experiments when developing)"
+        ],
+        "branch": "release/3"
+    },
     "3.53.2": {
         "fix": [
             "patches applied before packages properly re-installed with Composer V2 (missed the fact that installations, like downloads are now done in asynchronous manner) [issues/70]"
