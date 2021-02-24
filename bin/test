@@ -324,6 +324,7 @@ assert_scenario_output() {
         |grep -v "^Nothing to install, update or remove" \
         |grep -v "^Updating dependencies" \
         |grep -v "^Nothing to modify in lock file" \
+        |grep -v "^Warning: The lock file is not up to date with the latest changes in" \
         |sed 's/ *$//g' \
         > output.txt
 
