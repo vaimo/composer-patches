@@ -49,7 +49,7 @@ class InfoResolver
      */
     public function getSourcePath(PackageInterface $package)
     {
-        return !$package instanceof \Composer\Package\RootPackage
+        return !$package instanceof \Composer\Package\RootPackageInterface
             ? $this->installationManager->getInstallPath($package)
             : realpath(dirname(\Composer\Factory::getComposerFile()));
     }
@@ -110,7 +110,7 @@ class InfoResolver
                     break;
                 case Patch::CWD_INSTALL:
                 default:
-                    $this->installPathCache[$key] = $package instanceof \Composer\Package\RootPackage
+                    $this->installPathCache[$key] = $package instanceof \Composer\Package\RootPackageInterface
                         ? $this->vendorRoot
                         : $this->getSourcePath($package);
 

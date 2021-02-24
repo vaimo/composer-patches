@@ -125,7 +125,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $installPaths = array();
         foreach ($matches as $packageName => $package) {
-            $installPaths[$packageName] = $package instanceof \Composer\Package\RootPackage
+            $installPaths[$packageName] = $package instanceof \Composer\Package\RootPackageInterface
                 ? $projectRoot
                 : $installationManager->getInstallPath($package);
         }

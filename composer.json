@@ -13,6 +13,7 @@
     },
     "require-dev": {
         "composer/composer": "^1.0 || ^2.0",
+        "vaimo/composer-patches-proxy": "1.0.0",
         "phpcompatibility/php-compatibility": ">=9.1.1",
         "squizlabs/php_codesniffer": ">=2.9.2",
         "sebastian/phpcpd": ">=1.4.3",
@@ -113,5 +114,11 @@
         "psr-4": {
             "Vaimo\\ComposerPatches\\": "src"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "modules/proxy-plugin"
+        }
+    ]
 }

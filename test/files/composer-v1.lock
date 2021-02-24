@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8d0579e6132b0c32076a50508992ed43",
+    "content-hash": "b4cd7babfde157949855eb1d6ee7992d",
     "packages": [
         {
             "name": "drupol/phposinfo",
@@ -1678,16 +1678,16 @@
         },
         {
             "name": "vaimo/composer-changelogs",
-            "version": "0.17.0",
+            "version": "0.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vaimo/composer-changelogs.git",
-                "reference": "c431281fe814484d456aa1c4a160c58a75d7a205"
+                "reference": "2571ce0f1f314c5d5f212c2c7ea45890acd390f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vaimo/composer-changelogs/zipball/c431281fe814484d456aa1c4a160c58a75d7a205",
-                "reference": "c431281fe814484d456aa1c4a160c58a75d7a205",
+                "url": "https://api.github.com/repos/vaimo/composer-changelogs/zipball/2571ce0f1f314c5d5f212c2c7ea45890acd390f4",
+                "reference": "2571ce0f1f314c5d5f212c2c7ea45890acd390f4",
                 "shasum": ""
             },
             "require": {
@@ -1740,7 +1740,32 @@
                 "grouped changes",
                 "semantic meaning for change"
             ],
-            "time": "2021-02-14T18:35:41+00:00"
+            "time": "2021-02-24T02:01:08+00:00"
+        },
+        {
+            "name": "vaimo/composer-patches-proxy",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "modules/proxy-plugin",
+                "reference": "dff8e506021b367af344543407b26ab2db636ac6"
+            },
+            "require": {
+                "composer-plugin-api": "^1.0 || ^2.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Vaimo\\ComposerPatchesProxy\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vaimo\\ComposerPatchesProxy\\": "src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Proxy package to be able to use plugin commands provided by vaimo/composer-patches when having vaimo/composer-patches as the ROOT package"
         }
     ],
     "aliases": [],

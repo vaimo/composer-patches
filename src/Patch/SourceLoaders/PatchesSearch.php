@@ -148,7 +148,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
 
     private function getInstallPath(\Composer\Package\PackageInterface $package)
     {
-        if ($package instanceof \Composer\Package\RootPackage) {
+        if ($package instanceof \Composer\Package\RootPackageInterface) {
             return getcwd();
         }
 

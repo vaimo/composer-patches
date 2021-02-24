@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "25c98409e0f4a6e763d10f587c592c57",
+    "content-hash": "9a5cbfc19da267cc5e0450ccd7288a34",
     "packages": [
         {
             "name": "drupol/phposinfo",
@@ -293,16 +293,16 @@
         },
         {
             "name": "composer/composer",
-            "version": "2.0.9",
+            "version": "2.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "591c2c155cac0d2d7f34af41d3b1e29bcbfc685e"
+                "reference": "a5a5632da0b1c2d6fa9a3b65f1f4e90d1f04abb9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/591c2c155cac0d2d7f34af41d3b1e29bcbfc685e",
-                "reference": "591c2c155cac0d2d7f34af41d3b1e29bcbfc685e",
+                "url": "https://api.github.com/repos/composer/composer/zipball/a5a5632da0b1c2d6fa9a3b65f1f4e90d1f04abb9",
+                "reference": "a5a5632da0b1c2d6fa9a3b65f1f4e90d1f04abb9",
                 "shasum": ""
             },
             "require": {
@@ -370,7 +370,7 @@
             "support": {
                 "irc": "irc://irc.freenode.org/composer",
                 "issues": "https://github.com/composer/composer/issues",
-                "source": "https://github.com/composer/composer/tree/2.0.9"
+                "source": "https://github.com/composer/composer/tree/2.0.11"
             },
             "funding": [
                 {
@@ -386,7 +386,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-27T15:09:27+00:00"
+            "time": "2021-02-24T13:57:23+00:00"
         },
         {
             "name": "composer/semver",
@@ -1965,16 +1965,16 @@
         },
         {
             "name": "vaimo/composer-changelogs",
-            "version": "0.17.0",
+            "version": "0.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vaimo/composer-changelogs.git",
-                "reference": "c431281fe814484d456aa1c4a160c58a75d7a205"
+                "reference": "2571ce0f1f314c5d5f212c2c7ea45890acd390f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vaimo/composer-changelogs/zipball/c431281fe814484d456aa1c4a160c58a75d7a205",
-                "reference": "c431281fe814484d456aa1c4a160c58a75d7a205",
+                "url": "https://api.github.com/repos/vaimo/composer-changelogs/zipball/2571ce0f1f314c5d5f212c2c7ea45890acd390f4",
+                "reference": "2571ce0f1f314c5d5f212c2c7ea45890acd390f4",
                 "shasum": ""
             },
             "require": {
@@ -2032,7 +2032,35 @@
                 "issues": "https://github.com/vaimo/composer-changelogs/issues",
                 "source": "https://github.com/vaimo/composer-changelogs"
             },
-            "time": "2021-02-14T18:35:41+00:00"
+            "time": "2021-02-24T02:01:08+00:00"
+        },
+        {
+            "name": "vaimo/composer-patches-proxy",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "modules/proxy-plugin",
+                "reference": "de92f0313392e348b7b72cec7d4b55f430bf9716"
+            },
+            "require": {
+                "composer-plugin-api": "^1.0 || ^2.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Vaimo\\ComposerPatchesProxy\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vaimo\\ComposerPatchesProxy\\": "src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Proxy package to be able to use plugin commands provided by vaimo/composer-patches when having vaimo/composer-patches as the ROOT package",
+            "transport-options": {
+                "relative": true
+            }
         }
     ],
     "aliases": [],

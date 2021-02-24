@@ -1,0 +1,4 @@
+@config version "dev-master"
+@config extra/branch-alias/dev-master "1.0-dev"
+patch:validate
+patch:apply

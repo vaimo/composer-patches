@@ -51,7 +51,7 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
         $rootPackages = array_filter(
             $packagesByName,
             function ($package) {
-                return $package instanceof \Composer\Package\RootPackage;
+                return $package instanceof \Composer\Package\RootPackageInterface;
             }
         );
 
