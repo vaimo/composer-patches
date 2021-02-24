@@ -1,0 +1,18 @@
+{
+    "name": "vaimo/composer-patches-proxy",
+    "version": "1.0.0",
+    "type": "composer-plugin",
+    "description": "Proxy package to be able to use plugin commands provided by vaimo/composer-patches when having vaimo/composer-patches as the ROOT package",
+    "license": "MIT",
+    "require": {
+        "composer-plugin-api": "^1.0 || ^2.0"
+    },
+    "extra": {
+        "class": "Vaimo\\ComposerPatchesProxy\\Plugin"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vaimo\\ComposerPatchesProxy\\": "src"
+        }
+    }
+}

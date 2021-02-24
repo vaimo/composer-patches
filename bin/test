@@ -142,6 +142,32 @@ EOF
 EOF
 )
             fi
+
+            if [ "${command}" == "config" ] ; then
+                local path=$(echo ${args}|cut -d' ' -f1)
+                local value=$(echo ${args}|cut -d' ' -f2)
+                local package_config="composer.json"
+                
+                local php_script=$(cat <<EOF
+                if (file_exists('${package_config}')) {
+                    \$config = json_decode(file_get_contents('${package_config}'), true);
+
+                    \$pathSteps = explode('/', '${path}');
+                    \$node = &\$config;
+                    foreach(\$pathSteps as \$step) {
+                        if (!isset(\$node[\$step])) {
+                            \$node[\$step] = array();
+                        }
+                        \$node = &\$node[\$step];
+                    }
+                    \$node = ${value};
+                    unset(\$node);
+                
+                    file_put_contents('${package_config}', json_encode(\$config, JSON_PRETTY_PRINT));
+                }
+EOF
+)
+            fi
             
             if [ "${php_script}" != "" ] ; then
                 php -r "${php_script}" 2>/dev/null
@@ -298,6 +324,7 @@ assert_scenario_output() {
         |grep -v "^Nothing to install, update or remove" \
         |grep -v "^Updating dependencies" \
         |grep -v "^Nothing to modify in lock file" \
+        |grep -v "^Warning: The lock file is not up to date with the latest changes in" \
         |sed 's/ *$//g' \
         > output.txt
 

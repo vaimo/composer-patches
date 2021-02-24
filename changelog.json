@@ -4,6 +4,15 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.22.3": {
+        "overview": "changes in this release forward-ported from 3.53.3",
+        "fix": [
+            "patch applier crash when branch alias defined for root package (scenario: root-branch-alias) [pull/73]"
+        ],
+        "maintenance": [
+            "make patch commands available when the plugin itself is a root package (just for the sake of allowing people to conduct quick experiments when developing)"
+        ]
+    },
     "4.22.2": {
         "overview": "changes in this release forward-ported from 3.53.2",
         "fix": [
