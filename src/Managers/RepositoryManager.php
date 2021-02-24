@@ -28,6 +28,11 @@ class RepositoryManager
     private $consoleSilencer;
 
     /**
+     * @var \Vaimo\ComposerPatches\Compatibility\Executor
+     */
+    private $compExecutor;
+
+    /**
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface $packageResetStrategy
      * @param \Vaimo\ComposerPatches\Console\Silencer $consoleSilencer
@@ -40,6 +45,7 @@ class RepositoryManager
         $this->installationManager = $installationManager;
         $this->packageResetStrategy = $packageResetStrategy;
         $this->consoleSilencer = $consoleSilencer;
+        $this->compExecutor = new \Vaimo\ComposerPatches\Compatibility\Executor();
     }
 
     /**
@@ -59,11 +65,11 @@ class RepositoryManager
             );
         }
 
-        $installer = $this->installationManager;
-
-        $this->consoleSilencer->applyToCallback(
-            function () use ($installer, $repository, $operation) {
-                $installer->install($repository, $operation);
+        $compExecutor = $this->compExecutor;
+        $installationManager = $this->installationManager;
+        return $this->consoleSilencer->applyToCallback(
+            function () use ($compExecutor, $installationManager, $repository, $operation) {
+                return $compExecutor->processReinstallOperation($repository, $installationManager, $operation);
             }
         );
     }

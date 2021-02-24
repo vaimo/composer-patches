@@ -1,0 +1,8 @@
+Scanning packages for orphan patches
+Validation completed successfully
+Processing patches configuration
+  - Applying patches for vaimo/topological-sort (1)
+    ~ {{PATCHES-OWNER}}: patches/first-change.patch [NEW]
+      Change: Dependency => The cool thing
+
+Writing patch info to install file

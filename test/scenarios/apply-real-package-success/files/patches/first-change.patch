@@ -1,0 +1,16 @@
+Change: Dependency => The cool thing
+
+@package vaimo/topological-sort
+@assert vaimo/topological-sort,,The cool thing,src/ElementNotFoundException.php
+
+--- src/ElementNotFoundException.php.org
++++ src/ElementNotFoundException.php
+@@ -39,7 +39,7 @@
+      */
+     public static function create($source, $target)
+     {
+-        $message = sprintf('Dependency `%s` not found, required by `%s`', $target, $source);
++        $message = sprintf('The cool thing `%s` not found, required by `%s`', $target, $source);
+         $exception = new static($message, 0, null, $source, $target);
+ 
+         return $exception;

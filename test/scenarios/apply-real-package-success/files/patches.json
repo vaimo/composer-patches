@@ -1,0 +1,5 @@
+{
+    "vaimo/topological-sort": {
+        "Change: Dependency => The cool thing": "patches/first-change.patch"
+    }
+}
