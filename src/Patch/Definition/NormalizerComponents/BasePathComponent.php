@@ -43,9 +43,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         }
 
         $template = $this->resolveTemplate($ownerConfig, $target);
-
         list ($sourcePath, $sourceTags) = $this->deconstructSource($source);
-
         $nameParts = explode(ComposerConstants::PACKAGE_SEPARATOR, $target);
 
         $pathVariables = array(
@@ -94,7 +92,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         );
     }
 
-    private function shouldSkip(array $data, array $ownerConfig)
+    private function shouldSkip(array $ownerConfig, array $data)
     {
         if (!isset($ownerConfig[PluginConfig::PATCHES_BASE])) {
             return true;

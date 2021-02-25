@@ -2,6 +2,16 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.22.4
+
+changes in this release forward-ported from  3.53.4
+
+### Fix
+
+* bundled patches fail to apply when using patch-mapping configuration due to refactored code in 3.53.2 having messed up argument order used for a sub-function call in BasePathComponent
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.4) [diff](https://github.com/vaimo/composer-patches/compare/4.22.3...4.22.4)
+
 ## 4.22.3 (2021-02-24)
 
 changes in this release forward-ported from 3.53.3
@@ -761,7 +771,15 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.53.3...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.53.4...4.0.0)
+
+## 3.53.4 (2021-02-25)
+
+### Fix
+
+* bundled patches fail to apply when using patch-mapping configuration due to refactored code in 3.53.2 having messed up argument order used for a sub-function call in BasePathComponent
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.4) [diff](https://github.com/vaimo/composer-patches/compare/3.53.3...3.53.4)
 
 ## 3.53.3 (2021-02-24)
 

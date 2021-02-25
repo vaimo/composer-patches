@@ -4,6 +4,12 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.22.4": {
+        "overview": "changes in this release forward-ported from  3.53.4",
+        "fix": [
+            "bundled patches fail to apply when using patch-mapping configuration due to refactored code in 3.53.2 having messed up argument order used for a sub-function call in BasePathComponent"
+        ]
+    },
     "4.22.3": {
         "overview": "changes in this release forward-ported from 3.53.3",
         "fix": [
@@ -500,6 +506,12 @@
             "allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag",
             "allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package"
         ]
+    },
+    "3.53.4": {
+        "fix": [
+            "bundled patches fail to apply when using patch-mapping configuration due to refactored code in 3.53.2 having messed up argument order used for a sub-function call in BasePathComponent"
+        ],
+        "branch": "release/3"
     },
     "3.53.3": {
         "fix": [
