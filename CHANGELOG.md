@@ -2,6 +2,14 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 3.53.4 (2021-02-25)
+
+### Fix
+
+* bundled patches fail to apply when using patch-mapping configuration due to refactored code in 3.53.2 having messed up argument order used for a sub-function call in BasePathComponent
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.4) [diff](https://github.com/vaimo/composer-patches/compare/3.53.3...3.53.4)
+
 ## 3.53.3 (2021-02-24)
 
 ### Fix
