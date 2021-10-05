@@ -102,13 +102,15 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         $basePath = $this->getInstallPath($package);
         $results = array();
 
-        foreach ($source as $item) {
-            $paths = $this->fileSystemUtils->collectFilePathsRecursively(
-                $basePath . DIRECTORY_SEPARATOR . $item,
-                sprintf('/%s/i', PluginConfig::PATCH_FILE_REGEX_MATCHER)
-            );
+        foreach ($source as $sourceGlob) {
+            foreach (glob($sourceGlob) as $item) {
+                $paths = $this->fileSystemUtils->collectFilePathsRecursively(
+                    $basePath . DIRECTORY_SEPARATOR . $item,
+                    sprintf('/%s/i', PluginConfig::PATCH_FILE_REGEX_MATCHER)
+                );
 
-            $results[] = $this->createPatchDefinitions($basePath, $paths);
+                $results[] = $this->createPatchDefinitions($basePath, $paths);
+            }
         }
 
         return $results;
