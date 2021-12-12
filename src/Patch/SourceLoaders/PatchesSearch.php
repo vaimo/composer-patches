@@ -231,7 +231,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         $patchTypeFlags = array_fill_keys(
             explode(
                 PatchDefinition::TYPE_SEPARATOR,
-                $this->extractSingleValue($data, PatchDefinition::TYPE)
+                (string) $this->extractSingleValue($data, PatchDefinition::TYPE)
             ),
             true
         );
