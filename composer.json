@@ -24,7 +24,11 @@
         "platform": {
             "php": "5.3.9"
         },
-        "process-timeout": 3000
+        "process-timeout": 3000,
+        "allow-plugins": {
+            "vaimo/composer-patches-proxy": true,
+            "vaimo/composer-changelogs": true
+        }
     },
     "authors": [
         {
