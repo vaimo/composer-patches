@@ -20,6 +20,9 @@
         "phpmd/phpmd": ">=2.6.0",
         "vaimo/composer-changelogs": "^0.17.0"
     },
+    "conflict": {
+        "cweagans/composer-patches": "*"
+    },
     "config": {
         "platform": {
             "php": "5.3.9"
