@@ -5,9 +5,9 @@
  */
 namespace Vaimo\ComposerPatches\Config;
 
-use drupol\phposinfo\OsInfo;
-use drupol\phposinfo\Enum\OsName;
-use drupol\phposinfo\Enum\FamilyName;
+use loophp\phposinfo\OsInfo;
+use loophp\phposinfo\Enum\OsName;
+use loophp\phposinfo\Enum\FamilyName;
 
 class Context
 {

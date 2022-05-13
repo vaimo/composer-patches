@@ -67,11 +67,12 @@ absolutely everything
      protected function someFunction($someArg)
      {
 -        $var1 = 123;
-+        $var1 = 456;
++        $var1 = 456; // patched by composer-patches
          /**
           * rest of the logic of the function
           */
 ```
+As a good practice you might want to add a hint, that the file was patched.
 
 Full list of tag options (that cover all features of the plugin can be found [HERE](./docs/USAGE_BASIC.md#embedded-metadata)).
 

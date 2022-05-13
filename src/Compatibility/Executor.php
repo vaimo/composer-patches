@@ -8,6 +8,7 @@ namespace Vaimo\ComposerPatches\Compatibility;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\DependencyResolver\Operation\InstallOperation;
+use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\Installer\InstallationManager;
 
 class Executor
@@ -74,19 +75,23 @@ class Executor
     public function processReinstallOperation(
         WritableRepositoryInterface $repository,
         InstallationManager $installationManager,
-        InstallOperation $operation
+        InstallOperation $installOperation,
+        UninstallOperation $uninstallOperation
     ) {
         if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
-            return $installationManager->install($repository, $operation);
+            return $installationManager->install($repository, $installOperation);
         }
 
-        $package = $operation->getPackage();
+        $package = $installOperation->getPackage();
         $installer = $installationManager->getInstaller($package->getType());
 
-        return $installer
-            ->download($package)
-            ->then(function () use ($installationManager, $operation, $repository) {
-                $installationManager->install($repository, $operation);
+        return $installationManager
+            ->uninstall($repository, $uninstallOperation)
+            ->then(function()  use ($installer, $package) {
+                $installer->download($package);
+            })
+            ->then(function () use ($installationManager, $installOperation, $repository) {
+                $installationManager->install($repository, $installOperation);
             });
     }
 }

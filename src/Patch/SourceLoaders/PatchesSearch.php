@@ -231,7 +231,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         $patchTypeFlags = array_fill_keys(
             explode(
                 PatchDefinition::TYPE_SEPARATOR,
-                $this->extractSingleValue($data, PatchDefinition::TYPE)
+                $this->extractSingleValue($data, PatchDefinition::TYPE) ?? ''
             ),
             true
         );
@@ -271,7 +271,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                 $valueParts = explode(':', $item);
 
                 return array(
-                    trim(array_shift($valueParts)) => trim(array_shift($valueParts)) ?: '>=0.0.0'
+                    trim(array_shift($valueParts) ?? '') => trim(array_shift($valueParts) ?? '') ?: '>=0.0.0'
                 );
             },
             array_unique($dependsList)
