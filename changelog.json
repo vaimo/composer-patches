@@ -6,7 +6,9 @@
     ],
     "5.0.0": {
         "fix": [
-            "Drop php5 support, fix deprecation notices https://github.com/vaimo/composer-patches/pull/96/"
+            "Drop php5 support, Fix PHP 8.1 deprecation notices: https://github.com/vaimo/composer-patches/pull/96",
+            "Add conflict with cweagans/composer-patches: https://github.com/vaimo/composer-patches/pull/94",
+            "Uninstall package during ReInstallOperation for Composer v2 https://github.com/vaimo/composer-patches/pull/99"
         ]
     },
     "4.22.4": {
