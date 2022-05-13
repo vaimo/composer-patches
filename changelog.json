@@ -4,6 +4,11 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "5.0.0": {
+        "fix": [
+            "Drop php5 support, fix deprecation notices https://github.com/vaimo/composer-patches/pull/96/"
+        ]
+    },
     "4.22.4": {
         "overview": "changes in this release forward-ported from  3.53.4",
         "fix": [
