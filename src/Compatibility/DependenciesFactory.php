@@ -11,7 +11,7 @@ class DependenciesFactory
 {
     public function createCompositeRepository($repository)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             return new \Composer\Repository\CompositeRepository(array($repository));
         }
 
@@ -20,7 +20,7 @@ class DependenciesFactory
 
     public function createFileDownloader($appIO, $composer, $composerConfig, $cache)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             return new FileDownloader($appIO, $composerConfig, null, $cache);
         }
 
@@ -30,7 +30,7 @@ class DependenciesFactory
 
     public function createPackageDownloader($baseDownloader, $package)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             return $baseDownloader->getDownloaderForInstalledPackage($package);
         }
 
