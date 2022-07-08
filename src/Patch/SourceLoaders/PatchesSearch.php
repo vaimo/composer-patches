@@ -245,7 +245,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
 
     private function resolveBaseData(array $data)
     {
-        $package = $this->extractSingleValue($data, PatchDefinition::PACKAGE);
+        $package = $this->extractSingleValue($data, PatchDefinition::PACKAGE, '');
         $depends = $this->extractSingleValue($data, PatchDefinition::DEPENDS);
         $version = $this->extractSingleValue($data, PatchDefinition::VERSION, '>=0.0.0');
 
