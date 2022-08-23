@@ -6,25 +6,20 @@
 namespace Vaimo\ComposerPatches\Package;
 
 use Composer\DependencyResolver\Operation\OperationInterface;
+use Vaimo\ComposerPatches\Plugin;
 
 class OperationAnalyser
 {
-    /**
-     * @var \Vaimo\ComposerPatches\Package\ConfigAnalyser
-     */
-    private $configAnalyser;
-
-    public function __construct()
-    {
-        $this->configAnalyser = new \Vaimo\ComposerPatches\Package\ConfigAnalyser();
-    }
-
     public function isPatcherUninstallOperation(OperationInterface $operation)
     {
         if (!$operation instanceof \Composer\DependencyResolver\Operation\UninstallOperation) {
             return false;
         }
 
-        return $this->configAnalyser->ownsNamespace($operation->getPackage(), __NAMESPACE__);
+        return \in_array(
+            Plugin::COMPOSER_PACKAGE,
+            $operation->getPackage()->getNames(),
+            true
+        );
     }
 }

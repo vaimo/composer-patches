@@ -15,6 +15,8 @@ class Plugin implements
     \Composer\EventDispatcher\EventSubscriberInterface,
     \Composer\Plugin\Capable
 {
+    const COMPOSER_PACKAGE = 'vaimo/composer-patches';
+
     /**
      * @var \Vaimo\ComposerPatches\Package\OperationAnalyser
      */
