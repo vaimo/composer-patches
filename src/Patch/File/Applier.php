@@ -41,6 +41,11 @@ class Applier
     private $outputAnalyser;
 
     /**
+     * @var \Vaimo\ComposerPatches\Factories\ApplierErrorFactory
+     */
+    private $applierErrorFactory;
+
+    /**
      * @var array
      */
     private $resultCache;
