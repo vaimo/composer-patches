@@ -96,6 +96,13 @@ class ListCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Use latest information from package configurations in vendor folder'
         );
+
+        $this->addOption(
+            '--json',
+            null,
+            InputOption::VALUE_NONE,
+            'Output the list of patches in JSON format'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -193,8 +200,12 @@ class ListCommand extends \Composer\Command\BaseCommand
             ));
         }
 
-        $this->generateOutput($output, $patches);
-        
+        if ($input->getOption('json')) {
+            $output->writeln(json_encode($patches));
+        } else {
+            $this->generateOutput($output, $patches);
+        }
+
         return self::SUCCESS;
     }
 
