@@ -194,6 +194,8 @@ class ListCommand extends \Composer\Command\BaseCommand
         }
 
         $this->generateOutput($output, $patches);
+        
+        return self::SUCCESS;
     }
 
     private function createUnfilteredPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
