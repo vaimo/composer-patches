@@ -520,8 +520,8 @@ EOF
 
         php -r "${php_script}" 2>/dev/null
     fi
-    
-    composer install --ansi --no-plugins &>/dev/null
+
+    composer --no-interaction install --ansi --no-plugins &>/dev/null
 }
 
 sanitize() {
@@ -615,9 +615,9 @@ fi
             cp -R ${sandbox_root}/modules ${installation_root}
 
             if [ ! -f composer.lock ] ; then
-                composer install --ansi --no-plugins
+                composer --no-interaction install --ansi --no-plugins
             else
-                composer install --ansi --no-plugins &>/dev/null
+                composer --no-interaction install --ansi --no-plugins &>/dev/null
             fi
 
             cp composer.json composer.json.org
@@ -641,7 +641,7 @@ fi
                     cp composer.lock.org composer.lock
                     if [ "${cdiff}" != "" ] ; then
                         _info "RESTORING INSTALLATION"
-                        composer install --no-plugins
+                        composer --no-interaction install --no-plugins
                     fi
 
                     sanitize "${copy_target}"
@@ -654,7 +654,7 @@ fi
                     cp composer.lock.org composer.lock
                     if [ "${cdiff}" != "" ] ; then
                         _info "RESTORING INSTALLATION"
-                        composer install --no-plugins
+                        composer --no-interaction install --no-plugins
                     fi
                     
                     sanitize_scenario "${scenario_root}" "${copy_target}"
