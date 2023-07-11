@@ -393,9 +393,9 @@ process_assertions() {
 apply_patches() {
     local args=${1}
     local out_file=${2}
- 
-    local command="composer ${args} --ansi"
- 
+
+    local command="composer --no-interaction ${args} --ansi"
+
     if [ "${VERBOSE}" == "1" ] ; then
         command="${command} -vvv"
     fi
