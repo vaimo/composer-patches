@@ -394,6 +394,8 @@ apply_patches() {
     local args=${1}
     local out_file=${2}
 
+    composer --no-interaction config allow-plugins.vaimo/composer-patches-local true
+
     local command="composer --no-interaction ${args} --ansi"
 
     if [ "${VERBOSE}" == "1" ] ; then
