@@ -21,6 +21,10 @@ class LabelVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
 
     public function shouldProcess($label, $data)
     {
+        if ($label !== PatchDefinition::VERSION) {
+            return false;
+        }
+
         if (!is_array($data)) {
             return $this->valueAnalyser->isConstraint($data);
         }
