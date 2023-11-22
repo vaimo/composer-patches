@@ -85,11 +85,10 @@ class Executor
         $package = $installOperation->getPackage();
         $installer = $installationManager->getInstaller($package->getType());
 
-        return $installationManager
-            ->uninstall($repository, $uninstallOperation)
-            ->then(function()  use ($installer, $package) {
-                $installer->download($package);
-            })
+        $installationManager->uninstall($repository, $uninstallOperation);
+
+        return $installer
+            ->download($package)
             ->then(function () use ($installationManager, $installOperation, $repository) {
                 $installationManager->install($repository, $installOperation);
             });
