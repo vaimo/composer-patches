@@ -82,15 +82,15 @@ class Executor
             return $installationManager->install($repository, $installOperation);
         }
 
-        $package = $installOperation->getPackage();
-        $installer = $installationManager->getInstaller($package->getType());
-
-        $installationManager->uninstall($repository, $uninstallOperation);
-
-        return $installer
-            ->download($package)
+        return $installationManager
+            ->uninstall($repository, $uninstallOperation)
             ->then(function () use ($installationManager, $installOperation, $repository) {
-                $installationManager->install($repository, $installOperation);
+                $package = $installOperation->getPackage();
+                $installationManager->getInstaller($package->getType())
+                    ->download($package)
+                    ->then(function () use ($installationManager, $installOperation, $repository) {
+                        $installationManager->install($repository, $installOperation);
+                    });
             });
     }
 }
