@@ -5,6 +5,10 @@
  */
 namespace Vaimo\ComposerPatches\Compatibility;
 
+use Composer\Composer;
+use Composer\Util\SyncHelper;
+use React\Promise\Promise;
+use Vaimo\ComposerPatches\Exceptions\OperationFailure;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\DependencyResolver\Operation\InstallOperation;
@@ -76,7 +80,8 @@ class Executor
         WritableRepositoryInterface $repository,
         InstallationManager $installationManager,
         InstallOperation $installOperation,
-        UninstallOperation $uninstallOperation
+        UninstallOperation $uninstallOperation,
+        Composer $composer
     ) {
         if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
             return $installationManager->install($repository, $installOperation);
@@ -85,12 +90,18 @@ class Executor
         $package = $installOperation->getPackage();
         $installer = $installationManager->getInstaller($package->getType());
 
-        $installationManager->uninstall($repository, $uninstallOperation);
+        $promise = $installationManager->uninstall($repository, $uninstallOperation);
+        if (!$promise instanceof Promise) {
+            throw new OperationFailure("Uninstallation of {$package->getName()} failed");
+        }
 
-        return $installer
-            ->download($package)
-            ->then(function () use ($installationManager, $installOperation, $repository) {
-                $installationManager->install($repository, $installOperation);
-            });
+        return $promise->then(static function () use ($composer, $installer, $package) {
+            return SyncHelper::downloadAndInstallPackageSync(
+                $composer->getLoop(),
+                $composer->getDownloadManager(),
+                $installer->getInstallPath($package),
+                $package
+            );
+        });
     }
 }
