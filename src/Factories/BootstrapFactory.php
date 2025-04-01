@@ -36,8 +36,8 @@ class BootstrapFactory
 
     public function create(
         ConfigFactory $configFactory,
-        ListResolver $listResolver = null,
-        OutputStrategy $outputStrategy = null
+        ?ListResolver $listResolver = null,
+        ?OutputStrategy $outputStrategy = null
     ) {
         if ($listResolver === null) {
             $listResolver = new ListResolvers\ChangesListResolver(
