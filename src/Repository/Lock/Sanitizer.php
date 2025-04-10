@@ -40,6 +40,8 @@ class Sanitizer
             return;
         }
 
+        $dataChanged = false;
+
         $queriedPaths = array(
             implode('/', array(Config::PACKAGES, Constraint::ANY)),
             implode('/', array(Config::PACKAGES_DEV, Constraint::ANY))
@@ -53,6 +55,7 @@ class Sanitizer
             }
 
             unset($node[Config::CONFIG_ROOT][PluginConfig::APPLIED_FLAG]);
+            $dataChanged = true;
 
             if ($node[Config::CONFIG_ROOT]) {
                 continue;
@@ -63,6 +66,8 @@ class Sanitizer
 
         unset($node);
 
-        $this->lockerManager->writeLockData($lockData);
+        if ($dataChanged) {
+            $this->lockerManager->writeLockData($lockData);
+        }
     }
 }
