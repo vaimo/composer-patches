@@ -64,8 +64,8 @@ class Bootstrap
         \Vaimo\ComposerPatches\Composer\Context $composerContext,
         \Composer\IO\IOInterface $appIO,
         \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory,
-        \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver = null,
-        \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy = null
+        ?\Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver = null,
+        ?\Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy = null
     ) {
         $this->composerContext = $composerContext;
         $this->listResolver = $listResolver;
