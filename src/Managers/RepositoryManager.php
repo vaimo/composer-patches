@@ -5,6 +5,7 @@
  */
 namespace Vaimo\ComposerPatches\Managers;
 
+use Composer\Composer;
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\Package\PackageInterface;
 use Composer\DependencyResolver\Operation\UninstallOperation;
@@ -56,8 +57,11 @@ class RepositoryManager
      * @param PackageInterface $package
      * @throws \Vaimo\ComposerPatches\Exceptions\PackageResetException
      */
-    public function resetPackage(WritableRepositoryInterface $repository, PackageInterface $package)
-    {
+    public function resetPackage(
+        WritableRepositoryInterface $repository,
+        PackageInterface $package,
+        Composer $composer
+    ) {
         $resetOperation = new ResetOperation($package, 'Package reset due to changes in patches configuration');
         $uninstallOperation = new UninstallOperation($package);
 
@@ -70,8 +74,8 @@ class RepositoryManager
         $compExecutor = $this->compExecutor;
         $installationManager = $this->installationManager;
         return $this->consoleSilencer->applyToCallback(
-            function () use ($compExecutor, $installationManager, $repository, $resetOperation, $uninstallOperation) {
-                return $compExecutor->processReinstallOperation($repository, $installationManager, $resetOperation, $uninstallOperation);
+            function () use ($compExecutor, $installationManager, $repository, $resetOperation, $uninstallOperation, $composer) {
+                return $compExecutor->processReinstallOperation($repository, $installationManager, $resetOperation, $uninstallOperation, $composer);
             }
         );
     }
