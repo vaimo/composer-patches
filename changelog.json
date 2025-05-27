@@ -4,6 +4,33 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "5.2.1": {
+        "fix": [
+            "Fixes PHP 8.4 compatibility errors related to Implicitly marking parameter xxxxx as nullable is deprecated, the explicit nullable type must be used instead: https://github.com/vaimo/composer-patches/pull/121"
+        ]
+    },
+    "5.2.0": {
+        "fix": [
+            "Add JSON output format flag and correct return value in ListCommand: https://github.com/vaimo/composer-patches/pull/108",
+            "Resolve RuntimeException \"Could not delete file\": https://github.com/vaimo/composer-patches/pull/112"
+        ]
+    },
+    "5.1.2": {
+        "fix": [
+            "Resolve unzip error on applying new patches when composer cache is cleared: https://github.com/vaimo/composer-patches/pull/107"
+        ]
+    },
+    "5.1.1": {
+        "fix": [
+            "Fix deprecation message for PHP 8.2: https://github.com/vaimo/composer-patches/pull/105"
+        ]
+    },
+    "5.1.0": {
+        "fix": [
+            "Use the proper way to retrieve the Composer version: https://github.com/vaimo/composer-patches/pull/92",
+            "Fix PHP 8.1 deprecation notices"
+        ]
+    },
     "5.0.0": {
         "fix": [
             "Drop php5 support, Fix PHP 8.1 deprecation notices: https://github.com/vaimo/composer-patches/pull/96",

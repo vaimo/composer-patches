@@ -71,7 +71,12 @@ class RepositoryManager
         $installationManager = $this->installationManager;
         return $this->consoleSilencer->applyToCallback(
             function () use ($compExecutor, $installationManager, $repository, $resetOperation, $uninstallOperation) {
-                return $compExecutor->processReinstallOperation($repository, $installationManager, $resetOperation, $uninstallOperation);
+                return $compExecutor->processReinstallOperation(
+                    $repository,
+                    $installationManager,
+                    $resetOperation,
+                    $uninstallOperation
+                );
             }
         );
     }

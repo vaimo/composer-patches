@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b9305fa8fc0d6228532cfc03c1873014",
+    "content-hash": "4fe441cfa1aca8f42826af67c59f1859",
     "packages": [
         {
             "name": "loophp/phposinfo",
@@ -225,6 +225,7 @@
                 "issues": "https://github.com/camspiers/json-pretty/issues",
                 "source": "https://github.com/camspiers/json-pretty/tree/master"
             },
+            "abandoned": true,
             "time": "2016-02-06T01:25:58+00:00"
         },
         {
@@ -700,12 +701,12 @@
             "version": "5.2.12",
             "source": {
                 "type": "git",
-                "url": "https://github.com/justinrainbow/json-schema.git",
+                "url": "https://github.com/jsonrainbow/json-schema.git",
                 "reference": "ad87d5a5ca981228e0e205c2bc7dfb8e24559b60"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/ad87d5a5ca981228e0e205c2bc7dfb8e24559b60",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/ad87d5a5ca981228e0e205c2bc7dfb8e24559b60",
                 "reference": "ad87d5a5ca981228e0e205c2bc7dfb8e24559b60",
                 "shasum": ""
             },
@@ -760,8 +761,8 @@
                 "schema"
             ],
             "support": {
-                "issues": "https://github.com/justinrainbow/json-schema/issues",
-                "source": "https://github.com/justinrainbow/json-schema/tree/5.2.12"
+                "issues": "https://github.com/jsonrainbow/json-schema/issues",
+                "source": "https://github.com/jsonrainbow/json-schema/tree/5.2.12"
             },
             "time": "2022-04-13T08:02:27+00:00"
         },
@@ -1293,6 +1294,7 @@
                 "issues": "https://github.com/sebastianbergmann/phpcpd/issues",
                 "source": "https://github.com/sebastianbergmann/phpcpd/tree/2.0.4"
             },
+            "abandoned": true,
             "time": "2016-04-17T19:32:49+00:00"
         },
         {
@@ -1387,12 +1389,12 @@
             "version": "2.9.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
+                "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
                 "reference": "2acf168de78487db620ab4bc524135a13cfe6745"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/2acf168de78487db620ab4bc524135a13cfe6745",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/2acf168de78487db620ab4bc524135a13cfe6745",
                 "reference": "2acf168de78487db620ab4bc524135a13cfe6745",
                 "shasum": ""
             },
@@ -1463,6 +1465,20 @@
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer",
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
+            "funding": [
+                {
+                    "url": "https://github.com/PHPCSStandards",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/jrfnl",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/php_codesniffer",
+                    "type": "open_collective"
+                }
+            ],
             "time": "2018-11-07T22:31:41+00:00"
         },
         {
@@ -1647,6 +1663,7 @@
             "support": {
                 "source": "https://github.com/symfony/debug/tree/3.0"
             },
+            "abandoned": "symfony/error-handler",
             "time": "2016-07-30T07:22:48+00:00"
         },
         {
@@ -1855,12 +1872,12 @@
             },
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.23-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "autoload": {
@@ -1937,12 +1954,12 @@
             },
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.23-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "autoload": {
@@ -2014,12 +2031,12 @@
             },
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.23-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "autoload": {
@@ -2221,10 +2238,10 @@
             "extra": {
                 "class": "Vaimo\\ComposerChangelogs\\Plugin",
                 "changelog": {
-                    "source": "changelog.json",
                     "output": {
                         "md": "CHANGELOG.md"
-                    }
+                    },
+                    "source": "changelog.json"
                 }
             },
             "autoload": {
@@ -2292,13 +2309,14 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0.0",
+        "php": ">=7.1.0",
         "ext-json": "*",
-        "composer-plugin-api": "^1.0 || ^2.0"
+        "composer-plugin-api": "^1.0 || ^2.0",
+        "composer-runtime-api": "^1.0 || ^2.0"
     },
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.4.0"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.0.0"
 }

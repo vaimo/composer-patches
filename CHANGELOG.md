@@ -2,7 +2,59 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 4.22.4 (2021-02-25)
+## 5.2.1
+
+### Fix
+
+* Fixes PHP 8.4 compatibility errors related to Implicitly marking parameter xxxxx as nullable is deprecated, the explicit nullable type must be used instead: https://github.com/vaimo/composer-patches/pull/121
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.2.1) [diff](https://github.com/vaimo/composer-patches/compare/5.2.0...5.2.1)
+
+## 5.2.0
+
+### Fix
+
+* Add JSON output format flag and correct return value in ListCommand: https://github.com/vaimo/composer-patches/pull/108
+* Resolve RuntimeException "Could not delete file": https://github.com/vaimo/composer-patches/pull/112
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.2.0) [diff](https://github.com/vaimo/composer-patches/compare/5.1.2...5.2.0)
+
+## 5.1.2
+
+### Fix
+
+* Resolve unzip error on applying new patches when composer cache is cleared: https://github.com/vaimo/composer-patches/pull/107
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.1.2) [diff](https://github.com/vaimo/composer-patches/compare/5.1.1...5.1.2)
+
+## 5.1.1
+
+### Fix
+
+* Fix deprecation message for PHP 8.2: https://github.com/vaimo/composer-patches/pull/105
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.1.1) [diff](https://github.com/vaimo/composer-patches/compare/5.1.0...5.1.1)
+
+## 5.1.0
+
+### Fix
+
+* Use the proper way to retrieve the Composer version: https://github.com/vaimo/composer-patches/pull/92
+* Fix PHP 8.1 deprecation notices
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.1.0) [diff](https://github.com/vaimo/composer-patches/compare/5.0.0...5.1.0)
+
+## 5.0.0
+
+### Fix
+
+* Drop php5 support, Fix PHP 8.1 deprecation notices: https://github.com/vaimo/composer-patches/pull/96
+* Add conflict with cweagans/composer-patches: https://github.com/vaimo/composer-patches/pull/94
+* Uninstall package during ReInstallOperation for Composer v2 https://github.com/vaimo/composer-patches/pull/99
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.0.0) [diff](https://github.com/vaimo/composer-patches/compare/4.22.4...5.0.0)
+
+## 4.22.4
 
 changes in this release forward-ported from  3.53.4
 
@@ -12,7 +64,7 @@ changes in this release forward-ported from  3.53.4
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.4) [diff](https://github.com/vaimo/composer-patches/compare/4.22.3...4.22.4)
 
-## 4.22.3 (2021-02-24)
+## 4.22.3
 
 changes in this release forward-ported from 3.53.3
 
@@ -27,7 +79,7 @@ changes in this release forward-ported from 3.53.3
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.3) [diff](https://github.com/vaimo/composer-patches/compare/4.22.2...4.22.3)
 
-## 4.22.2 (2021-02-24)
+## 4.22.2
 
 changes in this release forward-ported from 3.53.2
 
@@ -37,7 +89,7 @@ changes in this release forward-ported from 3.53.2
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.2) [diff](https://github.com/vaimo/composer-patches/compare/4.22.1...4.22.2)
 
-## 4.22.1 (2021-02-20)
+## 4.22.1
 
 changes in this release forward-ported from 3.53.1
 
@@ -47,7 +99,7 @@ changes in this release forward-ported from 3.53.1
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.1) [diff](https://github.com/vaimo/composer-patches/compare/4.22.0...4.22.1)
 
-## 4.22.0 (2021-02-20)
+## 4.22.0
 
 changes in this release forward-ported from 3.53.0
 
@@ -65,7 +117,7 @@ changes in this release forward-ported from 3.53.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.0) [diff](https://github.com/vaimo/composer-patches/compare/4.21.1...4.22.0)
 
-## 4.21.1 (2021-01-31)
+## 4.21.1
 
 changes in this release forward-ported from 3.52.1
 
@@ -80,7 +132,7 @@ changes in this release forward-ported from 3.52.1
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.21.1) [diff](https://github.com/vaimo/composer-patches/compare/4.21.0...4.21.1)
 
-## 4.21.0 (2021-01-31)
+## 4.21.0
 
 changes in this release forward-ported from 3.52.0
 
@@ -107,7 +159,7 @@ changes in this release forward-ported from 3.52.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.21.0) [diff](https://github.com/vaimo/composer-patches/compare/4.20.2...4.21.0)
 
-## 4.20.2 (2019-09-25)
+## 4.20.2
 
 changes in this release forward-ported from 3.51.2
 
@@ -118,7 +170,7 @@ changes in this release forward-ported from 3.51.2
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.20.2) [diff](https://github.com/vaimo/composer-patches/compare/4.20.1...4.20.2)
 
-## 4.20.1 (2019-09-24)
+## 4.20.1
 
 changes in this release forward-ported from 3.51.1
 
@@ -136,7 +188,7 @@ changes in this release forward-ported from 3.51.1
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.20.1) [diff](https://github.com/vaimo/composer-patches/compare/4.20.0...4.20.1)
 
-## 4.20.0 (2019-09-16)
+## 4.20.0
 
 changes in this release forward-ported from 3.51.0
 
@@ -156,7 +208,7 @@ changes in this release forward-ported from 3.51.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.20.0) [diff](https://github.com/vaimo/composer-patches/compare/4.19.3...4.20.0)
 
-## 4.19.3 (2019-09-05)
+## 4.19.3
 
 changes in this release forward-ported from 3.50.3
 
@@ -172,7 +224,7 @@ changes in this release forward-ported from 3.50.3
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.3) [diff](https://github.com/vaimo/composer-patches/compare/4.19.2...4.19.3)
 
-## 4.19.2 (2019-09-02)
+## 4.19.2
 
 changes in this release forward-ported from 3.50.2
 
@@ -192,7 +244,7 @@ changes in this release forward-ported from 3.50.2
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.2) [diff](https://github.com/vaimo/composer-patches/compare/4.19.1...4.19.2)
 
-## 4.19.1 (2019-08-28)
+## 4.19.1
 
 changes in this release forward-ported from 3.50.1
 
@@ -207,7 +259,7 @@ changes in this release forward-ported from 3.50.1
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.1) [diff](https://github.com/vaimo/composer-patches/compare/4.19.0...4.19.1)
 
-## 4.19.0 (2019-08-28)
+## 4.19.0
 
 changes in this release forward-ported from 3.50.0
 
@@ -223,7 +275,7 @@ changes in this release forward-ported from 3.50.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.0) [diff](https://github.com/vaimo/composer-patches/compare/4.18.3...4.19.0)
 
-## 4.18.3 (2019-08-26)
+## 4.18.3
 
 changes in this release forward-ported from 3.49.3
 
@@ -238,7 +290,7 @@ changes in this release forward-ported from 3.49.3
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.18.3) [diff](https://github.com/vaimo/composer-patches/compare/4.18.2...4.18.3)
 
-## 4.18.2 (2019-08-26)
+## 4.18.2
 
 changes in this release forward-ported from 3.49.2
 
@@ -248,7 +300,7 @@ changes in this release forward-ported from 3.49.2
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.18.2) [diff](https://github.com/vaimo/composer-patches/compare/4.18.1...4.18.2)
 
-## 4.18.1 (2019-08-26)
+## 4.18.1
 
 changes in this release forward-ported from 3.49.1
 
@@ -258,7 +310,7 @@ changes in this release forward-ported from 3.49.1
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.18.1) [diff](https://github.com/vaimo/composer-patches/compare/4.18.0...4.18.1)
 
-## 4.18.0 (2019-08-26)
+## 4.18.0
 
 changes in this release forward-ported from 3.49.0
 
@@ -278,7 +330,7 @@ changes in this release forward-ported from 3.49.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.18.0) [diff](https://github.com/vaimo/composer-patches/compare/4.17.10...4.18.0)
 
-## 4.17.10 (2019-08-25)
+## 4.17.10
 
 changes in this release forward-ported from 3.48.10
 
@@ -293,7 +345,7 @@ changes in this release forward-ported from 3.48.10
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.10) [diff](https://github.com/vaimo/composer-patches/compare/4.17.9...4.17.10)
 
-## 4.17.9 (2019-08-22)
+## 4.17.9
 
 changes in this release forward-ported from 3.48.9
 
@@ -309,7 +361,7 @@ changes in this release forward-ported from 3.48.9
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.9) [diff](https://github.com/vaimo/composer-patches/compare/4.17.8...4.17.9)
 
-## 4.17.8 (2019-08-22)
+## 4.17.8
 
 changes in this release forward-ported from 3.48.8
 
@@ -319,7 +371,7 @@ changes in this release forward-ported from 3.48.8
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.8) [diff](https://github.com/vaimo/composer-patches/compare/4.17.7...4.17.8)
 
-## 4.17.7 (2019-08-22)
+## 4.17.7
 
 changes in this release forward-ported from 3.48.7
 
@@ -329,7 +381,7 @@ changes in this release forward-ported from 3.48.7
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.7) [diff](https://github.com/vaimo/composer-patches/compare/4.17.6...4.17.7)
 
-## 4.17.6 (2019-08-21)
+## 4.17.6
 
 changes in this release forward-ported from 3.48.6
 
@@ -344,7 +396,7 @@ changes in this release forward-ported from 3.48.6
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.6) [diff](https://github.com/vaimo/composer-patches/compare/4.17.5...4.17.6)
 
-## 4.17.5 (2019-08-21)
+## 4.17.5
 
 changes in this release forward-ported from 3.48.5
 
@@ -354,7 +406,7 @@ changes in this release forward-ported from 3.48.5
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.5) [diff](https://github.com/vaimo/composer-patches/compare/4.17.4...4.17.5)
 
-## 4.17.4 (2019-08-19)
+## 4.17.4
 
 changes in this release forward-ported from 3.48.4
 
@@ -364,7 +416,7 @@ changes in this release forward-ported from 3.48.4
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.4) [diff](https://github.com/vaimo/composer-patches/compare/4.17.3...4.17.4)
 
-## 4.17.3 (2019-08-19)
+## 4.17.3
 
 changes in this release forward-ported from 3.48.3
 
@@ -374,7 +426,7 @@ changes in this release forward-ported from 3.48.3
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.3) [diff](https://github.com/vaimo/composer-patches/compare/4.17.2...4.17.3)
 
-## 4.17.2 (2019-08-12)
+## 4.17.2
 
 changes in this release forward-ported from 3.48.2
 
@@ -384,7 +436,7 @@ changes in this release forward-ported from 3.48.2
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.2) [diff](https://github.com/vaimo/composer-patches/compare/4.17.1...4.17.2)
 
-## 4.17.1 (2019-08-11)
+## 4.17.1
 
 changes in this release forward-ported from 3.48.1
 
@@ -394,7 +446,7 @@ changes in this release forward-ported from 3.48.1
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.1) [diff](https://github.com/vaimo/composer-patches/compare/4.17.0...4.17.1)
 
-## 4.17.0 (2019-08-11)
+## 4.17.0
 
 changes in this release forward-ported from 3.48.0
 
@@ -415,7 +467,7 @@ changes in this release forward-ported from 3.48.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.0) [diff](https://github.com/vaimo/composer-patches/compare/4.16.2...4.17.0)
 
-## 4.16.2 (2019-07-26)
+## 4.16.2
 
 changes in this release forward-ported from 3.47.2
 
@@ -425,7 +477,7 @@ changes in this release forward-ported from 3.47.2
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.16.2) [diff](https://github.com/vaimo/composer-patches/compare/4.16.1...4.16.2)
 
-## 4.16.1 (2019-06-19)
+## 4.16.1
 
 all features and fixes in this release are forward-ported from 3.47.1
 
@@ -449,7 +501,7 @@ all features and fixes in this release are forward-ported from 3.47.1
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.16.1) [diff](https://github.com/vaimo/composer-patches/compare/4.16.0...4.16.1)
 
-## 4.16.0 (2019-04-09)
+## 4.16.0
 
 all features and fixes in this release are forward-ported from 3.47.0
 
@@ -465,7 +517,7 @@ all features and fixes in this release are forward-ported from 3.47.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.16.0) [diff](https://github.com/vaimo/composer-patches/compare/4.15.0...4.16.0)
 
-## 4.15.0 (2019-04-03)
+## 4.15.0
 
 This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports
 
@@ -486,7 +538,7 @@ All features and fixes in this release are forward-ported from 3.46.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.15.0) [diff](https://github.com/vaimo/composer-patches/compare/4.14.0...4.15.0)
 
-## 4.14.0 (2019-04-02)
+## 4.14.0
 
 all features and fixes in this release are forward-ported from 3.45.0
 
@@ -501,7 +553,7 @@ all features and fixes in this release are forward-ported from 3.45.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.14.0) [diff](https://github.com/vaimo/composer-patches/compare/4.13.0...4.14.0)
 
-## 4.13.0 (2019-04-01)
+## 4.13.0
 
 all features and fixes in this release are forward-ported from 3.44.0
 
@@ -511,7 +563,7 @@ all features and fixes in this release are forward-ported from 3.44.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.13.0) [diff](https://github.com/vaimo/composer-patches/compare/4.12.0...4.13.0)
 
-## 4.12.0 (2019-03-31)
+## 4.12.0
 
 all features and fixes in this release are forward-ported from 3.43.0
 
@@ -529,7 +581,7 @@ all features and fixes in this release are forward-ported from 3.43.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.12.0) [diff](https://github.com/vaimo/composer-patches/compare/4.11.0...4.12.0)
 
-## 4.11.0 (2019-03-21)
+## 4.11.0
 
 all features and fixes in this release are forward-ported from 3.42.0, 3.42.1 & 3.42.2
 
@@ -557,7 +609,7 @@ all features and fixes in this release are forward-ported from 3.42.0, 3.42.1 & 
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.11.0) [diff](https://github.com/vaimo/composer-patches/compare/4.10.0...4.11.0)
 
-## 4.10.0 (2019-02-20)
+## 4.10.0
 
 ### Feature
 
@@ -565,7 +617,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.11.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.10.0) [diff](https://github.com/vaimo/composer-patches/compare/4.9.0...4.10.0)
 
-## 4.9.0 (2019-02-12)
+## 4.9.0
 
 ### Feature
 
@@ -573,7 +625,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.10.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.9.0) [diff](https://github.com/vaimo/composer-patches/compare/4.8.2...4.9.0)
 
-## 4.8.2 (2019-02-12)
+## 4.8.2
 
 ### Maintenance
 
@@ -581,7 +633,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.9.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.8.2) [diff](https://github.com/vaimo/composer-patches/compare/4.8.1...4.8.2)
 
-## 4.8.1 (2019-02-12)
+## 4.8.1
 
 ### Fix
 
@@ -589,7 +641,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.8.2) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.8.1) [diff](https://github.com/vaimo/composer-patches/compare/4.8.0...4.8.1)
 
-## 4.8.0 (2019-02-12)
+## 4.8.0
 
 all features and fixes in this release are forward-ported from 3.39.0
 
@@ -615,7 +667,7 @@ all features and fixes in this release are forward-ported from 3.39.0
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.8.0) [diff](https://github.com/vaimo/composer-patches/compare/4.7.0...4.8.0)
 
-## 4.7.0 (2018-09-27)
+## 4.7.0
 
 ### Feature
 
@@ -627,7 +679,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.8.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.7.0) [diff](https://github.com/vaimo/composer-patches/compare/4.6.1...4.7.0)
 
-## 4.6.1 (2018-09-26)
+## 4.6.1
 
 ### Fix
 
@@ -635,7 +687,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.7.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.6.1) [diff](https://github.com/vaimo/composer-patches/compare/4.6.0...4.6.1)
 
-## 4.6.0 (2018-09-18)
+## 4.6.0
 
 ### Feature
 
@@ -647,7 +699,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.6.1) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.6.0) [diff](https://github.com/vaimo/composer-patches/compare/4.5.0...4.6.0)
 
-## 4.5.0 (2018-09-18)
+## 4.5.0
 
 ### Feature
 
@@ -661,7 +713,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.6.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.5.0) [diff](https://github.com/vaimo/composer-patches/compare/4.4.3...4.5.0)
 
-## 4.4.3 (2018-09-14)
+## 4.4.3
 
 ### Fix
 
@@ -669,7 +721,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.5.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.3) [diff](https://github.com/vaimo/composer-patches/compare/4.4.2...4.4.3)
 
-## 4.4.2 (2018-09-11)
+## 4.4.2
 
 ### Fix
 
@@ -677,7 +729,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.3) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.2) [diff](https://github.com/vaimo/composer-patches/compare/4.4.1...4.4.2)
 
-## 4.4.1 (2018-09-10)
+## 4.4.1
 
 ### Fix
 
@@ -685,7 +737,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.2) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.1) [diff](https://github.com/vaimo/composer-patches/compare/4.4.0...4.4.1)
 
-## 4.4.0 (2018-09-10)
+## 4.4.0
 
 ### Feature
 
@@ -698,7 +750,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.1) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.0) [diff](https://github.com/vaimo/composer-patches/compare/4.3.0...4.4.0)
 
-## 4.3.0 (2018-09-02)
+## 4.3.0
 
 ### Feature
 
@@ -712,7 +764,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.4.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.3.0) [diff](https://github.com/vaimo/composer-patches/compare/4.2.1...4.3.0)
 
-## 4.2.1 (2018-08-30)
+## 4.2.1
 
 ### Fix
 
@@ -720,7 +772,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.3.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.2.1) [diff](https://github.com/vaimo/composer-patches/compare/4.2.0...4.2.1)
 
-## 4.2.0 (2018-08-22)
+## 4.2.0
 
 ### Feature
 
@@ -735,7 +787,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.2.1) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.2.0) [diff](https://github.com/vaimo/composer-patches/compare/4.1.1...4.2.0)
 
-## 4.1.1 (2018-08-16)
+## 4.1.1
 
 ### Fix
 
@@ -747,7 +799,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.2.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.1) [diff](https://github.com/vaimo/composer-patches/compare/4.1.0...4.1.1)
 
-## 4.1.0 (2018-08-16)
+## 4.1.0
 
 ### Feature
 
@@ -755,7 +807,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.1) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https://github.com/vaimo/composer-patches/compare/4.0.0...4.1.0)
 
-## 4.0.0 (2018-08-15)
+## 4.0.0
 
 ### Breaking
 
@@ -773,7 +825,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.53.4...4.0.0)
 
-## 3.53.4 (2021-02-25)
+## 3.53.4
 
 ### Fix
 
@@ -781,7 +833,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.4) [diff](https://github.com/vaimo/composer-patches/compare/3.53.3...3.53.4)
 
-## 3.53.3 (2021-02-24)
+## 3.53.3
 
 ### Fix
 
@@ -793,7 +845,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.4) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.3) [diff](https://github.com/vaimo/composer-patches/compare/3.53.2...3.53.3)
 
-## 3.53.2 (2021-02-24)
+## 3.53.2
 
 ### Fix
 
@@ -801,7 +853,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.2) [diff](https://github.com/vaimo/composer-patches/compare/3.53.1...3.53.2)
 
-## 3.53.1 (2021-02-20)
+## 3.53.1
 
 ### Fix
 
@@ -809,7 +861,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.1) [diff](https://github.com/vaimo/composer-patches/compare/3.53.0...3.53.1)
 
-## 3.53.0 (2021-02-20)
+## 3.53.0
 
 ### Feature
 
@@ -824,7 +876,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.0) [diff](https://github.com/vaimo/composer-patches/compare/3.52.1...3.53.0)
 
-## 3.52.1 (2021-01-31)
+## 3.52.1
 
 ### Fix
 
@@ -836,7 +888,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.52.1) [diff](https://github.com/vaimo/composer-patches/compare/3.52.0...3.52.1)
 
-## 3.52.0 (2021-01-31)
+## 3.52.0
 
 ### Feature
 
@@ -859,7 +911,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.52.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.52.0) [diff](https://github.com/vaimo/composer-patches/compare/3.51.2...3.52.0)
 
-## 3.51.2 (2019-09-25)
+## 3.51.2
 
 ### Fix
 
@@ -868,7 +920,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.52.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.2) [diff](https://github.com/vaimo/composer-patches/compare/3.51.1...3.51.2)
 
-## 3.51.1 (2019-09-24)
+## 3.51.1
 
 ### Fix
 
@@ -883,7 +935,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.1) [diff](https://github.com/vaimo/composer-patches/compare/3.51.0...3.51.1)
 
-## 3.51.0 (2019-09-16)
+## 3.51.0
 
 ### Feature
 
@@ -899,7 +951,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.0) [diff](https://github.com/vaimo/composer-patches/compare/3.50.3...3.51.0)
 
-## 3.50.3 (2019-09-05)
+## 3.50.3
 
 ### Fix
 
@@ -912,7 +964,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.3) [diff](https://github.com/vaimo/composer-patches/compare/3.50.2...3.50.3)
 
-## 3.50.2 (2019-09-02)
+## 3.50.2
 
 ### Fix
 
@@ -929,7 +981,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.2) [diff](https://github.com/vaimo/composer-patches/compare/3.50.1...3.50.2)
 
-## 3.50.1 (2019-08-28)
+## 3.50.1
 
 ### Fix
 
@@ -941,7 +993,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.1) [diff](https://github.com/vaimo/composer-patches/compare/3.50.0...3.50.1)
 
-## 3.50.0 (2019-08-28)
+## 3.50.0
 
 ### Feature
 
@@ -954,7 +1006,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.0) [diff](https://github.com/vaimo/composer-patches/compare/3.49.3...3.50.0)
 
-## 3.49.3 (2019-08-26)
+## 3.49.3
 
 ### Fix
 
@@ -966,7 +1018,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.3) [diff](https://github.com/vaimo/composer-patches/compare/3.49.2...3.49.3)
 
-## 3.49.2 (2019-08-26)
+## 3.49.2
 
 ### Maintenance
 
@@ -974,7 +1026,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.2) [diff](https://github.com/vaimo/composer-patches/compare/3.49.1...3.49.2)
 
-## 3.49.1 (2019-08-26)
+## 3.49.1
 
 ### Maintenance
 
@@ -982,7 +1034,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.1) [diff](https://github.com/vaimo/composer-patches/compare/3.49.0...3.49.1)
 
-## 3.49.0 (2019-08-26)
+## 3.49.0
 
 ### Feature
 
@@ -998,7 +1050,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.0) [diff](https://github.com/vaimo/composer-patches/compare/3.48.10...3.49.0)
 
-## 3.48.10 (2019-08-25)
+## 3.48.10
 
 ### Fix
 
@@ -1010,7 +1062,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.10) [diff](https://github.com/vaimo/composer-patches/compare/3.48.9...3.48.10)
 
-## 3.48.9 (2019-08-22)
+## 3.48.9
 
 ### Fix
 
@@ -1023,7 +1075,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.10) [diff](http
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.9) [diff](https://github.com/vaimo/composer-patches/compare/3.48.8...3.48.9)
 
-## 3.48.8 (2019-08-22)
+## 3.48.8
 
 ### Fix
 
@@ -1031,7 +1083,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.9) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.8) [diff](https://github.com/vaimo/composer-patches/compare/3.48.7...3.48.8)
 
-## 3.48.7 (2019-08-22)
+## 3.48.7
 
 ### Fix
 
@@ -1039,7 +1091,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.8) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.7) [diff](https://github.com/vaimo/composer-patches/compare/3.48.6...3.48.7)
 
-## 3.48.6 (2019-08-21)
+## 3.48.6
 
 ### Fix
 
@@ -1051,7 +1103,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.7) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.6) [diff](https://github.com/vaimo/composer-patches/compare/3.48.5...3.48.6)
 
-## 3.48.5 (2019-08-20)
+## 3.48.5
 
 ### Fix
 
@@ -1059,7 +1111,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.6) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.5) [diff](https://github.com/vaimo/composer-patches/compare/3.48.4...3.48.5)
 
-## 3.48.4 (2019-08-19)
+## 3.48.4
 
 ### Fix
 
@@ -1067,7 +1119,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.5) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.4) [diff](https://github.com/vaimo/composer-patches/compare/3.48.3...3.48.4)
 
-## 3.48.3 (2019-08-19)
+## 3.48.3
 
 ### Fix
 
@@ -1075,7 +1127,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.4) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.3) [diff](https://github.com/vaimo/composer-patches/compare/3.48.2...3.48.3)
 
-## 3.48.2 (2019-08-12)
+## 3.48.2
 
 ### Maintenance
 
@@ -1083,7 +1135,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.2) [diff](https://github.com/vaimo/composer-patches/compare/3.48.1...3.48.2)
 
-## 3.48.1 (2019-08-11)
+## 3.48.1
 
 ### Fix
 
@@ -1091,7 +1143,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.1) [diff](https://github.com/vaimo/composer-patches/compare/3.48.0...3.48.1)
 
-## 3.48.0 (2019-08-11)
+## 3.48.0
 
 ### Feature
 
@@ -1108,7 +1160,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.0) [diff](https://github.com/vaimo/composer-patches/compare/3.47.2...3.48.0)
 
-## 3.47.2 (2019-07-26)
+## 3.47.2
 
 ### Fix
 
@@ -1116,7 +1168,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.2) [diff](https://github.com/vaimo/composer-patches/compare/3.47.1...3.47.2)
 
-## 3.47.1 (2019-06-19)
+## 3.47.1
 
 ### Fix
 
@@ -1137,7 +1189,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.1) [diff](https://github.com/vaimo/composer-patches/compare/3.47.0...3.47.1)
 
-## 3.47.0 (2019-04-09)
+## 3.47.0
 
 ### Feature
 
@@ -1150,7 +1202,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.47.0) [diff](https://github.com/vaimo/composer-patches/compare/3.46.0...3.47.0)
 
-## 3.46.0 (2019-04-03)
+## 3.46.0
 
 This release comes basically with re-written logic to the core of the patch apply queue generation due to issues with the old logic. The listing command now also uses same code which removes some of the confusion when using apply and seeing something different than what list reports
 
@@ -1169,7 +1221,7 @@ This release comes basically with re-written logic to the core of the patch appl
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.46.0) [diff](https://github.com/vaimo/composer-patches/compare/3.45.0...3.46.0)
 
-## 3.45.0 (2019-04-02)
+## 3.45.0
 
 ### Feature
 
@@ -1181,7 +1233,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.46.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.45.0) [diff](https://github.com/vaimo/composer-patches/compare/3.44.0...3.45.0)
 
-## 3.44.0 (2019-04-01)
+## 3.44.0
 
 ### Feature
 
@@ -1189,7 +1241,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.45.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.44.0) [diff](https://github.com/vaimo/composer-patches/compare/3.43.0...3.44.0)
 
-## 3.43.0 (2019-03-31)
+## 3.43.0
 
 ### Feature
 
@@ -1204,7 +1256,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.44.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.43.0) [diff](https://github.com/vaimo/composer-patches/compare/3.42.2...3.43.0)
 
-## 3.42.2 (2019-03-21)
+## 3.42.2
 
 ### Fix
 
@@ -1212,7 +1264,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.43.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.2) [diff](https://github.com/vaimo/composer-patches/compare/3.42.1...3.42.2)
 
-## 3.42.1 (2019-03-21)
+## 3.42.1
 
 ### Fix
 
@@ -1220,7 +1272,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.1) [diff](https://github.com/vaimo/composer-patches/compare/3.42.0...3.42.1)
 
-## 3.42.0 (2019-03-21)
+## 3.42.0
 
 ### Feature
 
@@ -1243,7 +1295,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.0) [diff](https://github.com/vaimo/composer-patches/compare/3.41.0...3.42.0)
 
-## 3.41.0 (2019-02-20)
+## 3.41.0
 
 ### Feature
 
@@ -1251,7 +1303,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.42.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.41.0) [diff](https://github.com/vaimo/composer-patches/compare/3.40.0...3.41.0)
 
-## 3.40.0 (2019-02-12)
+## 3.40.0
 
 ### Feature
 
@@ -1259,7 +1311,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.41.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.40.0) [diff](https://github.com/vaimo/composer-patches/compare/3.39.2...3.40.0)
 
-## 3.39.2 (2019-02-12)
+## 3.39.2
 
 ### Maintenance
 
@@ -1267,7 +1319,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.40.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.2) [diff](https://github.com/vaimo/composer-patches/compare/3.39.1...3.39.2)
 
-## 3.39.1 (2019-02-12)
+## 3.39.1
 
 ### Fix
 
@@ -1275,7 +1327,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.1) [diff](https://github.com/vaimo/composer-patches/compare/3.39.0...3.39.1)
 
-## 3.39.0 (2019-02-12)
+## 3.39.0
 
 ### Feature
 
@@ -1298,7 +1350,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.0) [diff](https://github.com/vaimo/composer-patches/compare/3.38.0...3.39.0)
 
-## 3.38.0 (2018-09-27)
+## 3.38.0
 
 ### Feature
 
@@ -1310,7 +1362,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.39.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.38.0) [diff](https://github.com/vaimo/composer-patches/compare/3.37.1...3.38.0)
 
-## 3.37.1 (2018-09-26)
+## 3.37.1
 
 ### Fix
 
@@ -1318,7 +1370,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.38.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.37.1) [diff](https://github.com/vaimo/composer-patches/compare/3.37.0...3.37.1)
 
-## 3.37.0 (2018-09-18)
+## 3.37.0
 
 ### Feature
 
@@ -1330,7 +1382,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.37.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.37.0) [diff](https://github.com/vaimo/composer-patches/compare/3.36.0...3.37.0)
 
-## 3.36.0 (2018-09-18)
+## 3.36.0
 
 ### Feature
 
@@ -1344,7 +1396,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.37.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.36.0) [diff](https://github.com/vaimo/composer-patches/compare/3.35.3...3.36.0)
 
-## 3.35.3 (2018-09-14)
+## 3.35.3
 
 ### Fix
 
@@ -1352,7 +1404,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.36.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.3) [diff](https://github.com/vaimo/composer-patches/compare/3.35.2...3.35.3)
 
-## 3.35.2 (2018-09-11)
+## 3.35.2
 
 ### Fix
 
@@ -1360,7 +1412,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.2) [diff](https://github.com/vaimo/composer-patches/compare/3.35.1...3.35.2)
 
-## 3.35.1 (2018-09-10)
+## 3.35.1
 
 ### Fix
 
@@ -1368,7 +1420,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.1) [diff](https://github.com/vaimo/composer-patches/compare/3.35.0...3.35.1)
 
-## 3.35.0 (2018-09-10)
+## 3.35.0
 
 ### Feature
 
@@ -1381,7 +1433,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.0) [diff](https://github.com/vaimo/composer-patches/compare/3.34.1...3.35.0)
 
-## 3.34.1 (2018-09-02)
+## 3.34.1
 
 ### Fix
 
@@ -1389,7 +1441,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.35.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.34.1) [diff](https://github.com/vaimo/composer-patches/compare/3.34.0...3.34.1)
 
-## 3.34.0 (2018-09-01)
+## 3.34.0
 
 ### Feature
 
@@ -1402,7 +1454,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.34.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.34.0) [diff](https://github.com/vaimo/composer-patches/compare/3.33.1...3.34.0)
 
-## 3.33.1 (2018-08-30)
+## 3.33.1
 
 ### Fix
 
@@ -1410,7 +1462,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.34.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.33.1) [diff](https://github.com/vaimo/composer-patches/compare/3.33.0...3.33.1)
 
-## 3.33.0 (2018-08-22)
+## 3.33.0
 
 ### Feature
 
@@ -1425,7 +1477,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.33.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.33.0) [diff](https://github.com/vaimo/composer-patches/compare/3.32.1...3.33.0)
 
-## 3.32.1 (2018-08-16)
+## 3.32.1
 
 ### Fix
 
@@ -1437,7 +1489,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.33.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.32.1) [diff](https://github.com/vaimo/composer-patches/compare/3.32.0...3.32.1)
 
-## 3.32.0 (2018-08-16)
+## 3.32.0
 
 ### Feature
 
@@ -1445,7 +1497,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.32.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.32.0) [diff](https://github.com/vaimo/composer-patches/compare/3.31.0...3.32.0)
 
-## 3.31.0 (2018-08-15)
+## 3.31.0
 
 ### Feature
 
@@ -1453,7 +1505,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.32.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.31.0) [diff](https://github.com/vaimo/composer-patches/compare/3.30.1...3.31.0)
 
-## 3.30.1 (2018-08-15)
+## 3.30.1
 
 ### Fix
 
@@ -1462,7 +1514,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.31.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.30.1) [diff](https://github.com/vaimo/composer-patches/compare/3.30.0...3.30.1)
 
-## 3.30.0 (2018-08-14)
+## 3.30.0
 
 ### Feature
 
@@ -1475,7 +1527,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.30.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.30.0) [diff](https://github.com/vaimo/composer-patches/compare/3.29.1...3.30.0)
 
-## 3.29.1 (2018-08-12)
+## 3.29.1
 
 ### Fix
 
@@ -1483,7 +1535,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.30.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.29.1) [diff](https://github.com/vaimo/composer-patches/compare/3.29.0...3.29.1)
 
-## 3.29.0 (2018-08-12)
+## 3.29.0
 
 ### Feature
 
@@ -1505,7 +1557,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.29.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.29.0) [diff](https://github.com/vaimo/composer-patches/compare/3.28.1...3.29.0)
 
-## 3.28.1 (2018-08-10)
+## 3.28.1
 
 ### Fix
 
@@ -1513,7 +1565,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.29.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.28.1) [diff](https://github.com/vaimo/composer-patches/compare/3.28.0...3.28.1)
 
-## 3.28.0 (2018-08-10)
+## 3.28.0
 
 ### Feature
 
@@ -1529,7 +1581,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.28.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.28.0) [diff](https://github.com/vaimo/composer-patches/compare/3.27.0...3.28.0)
 
-## 3.27.0 (2018-05-18)
+## 3.27.0
 
 ### Feature
 
@@ -1538,7 +1590,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.28.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.27.0) [diff](https://github.com/vaimo/composer-patches/compare/3.26.0...3.27.0)
 
-## 3.26.0 (2018-05-08)
+## 3.26.0
 
 ### Feature
 
@@ -1546,7 +1598,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.27.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.26.0) [diff](https://github.com/vaimo/composer-patches/compare/3.25.3...3.26.0)
 
-## 3.25.3 (2018-03-07)
+## 3.25.3
 
 ### Fix
 
@@ -1554,7 +1606,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.26.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.3) [diff](https://github.com/vaimo/composer-patches/compare/3.25.2...3.25.3)
 
-## 3.25.2 (2018-03-06)
+## 3.25.2
 
 ### Fix
 
@@ -1562,7 +1614,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.2) [diff](https://github.com/vaimo/composer-patches/compare/3.25.1...3.25.2)
 
-## 3.25.1 (2018-03-06)
+## 3.25.1
 
 ### Fix
 
@@ -1570,7 +1622,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.1) [diff](https://github.com/vaimo/composer-patches/compare/3.25.0...3.25.1)
 
-## 3.25.0 (2018-03-06)
+## 3.25.0
 
 ### Feature
 
@@ -1588,7 +1640,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.0) [diff](https://github.com/vaimo/composer-patches/compare/3.24.1...3.25.0)
 
-## 3.24.1 (2018-02-28)
+## 3.24.1
 
 ### Maintenance
 
@@ -1596,7 +1648,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.25.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.24.1) [diff](https://github.com/vaimo/composer-patches/compare/3.24.0...3.24.1)
 
-## 3.24.0 (2018-02-28)
+## 3.24.0
 
 ### Feature
 
@@ -1615,7 +1667,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.24.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.24.0) [diff](https://github.com/vaimo/composer-patches/compare/3.23.5...3.24.0)
 
-## 3.23.5 (2018-02-13)
+## 3.23.5
 
 ### Fix
 
@@ -1623,7 +1675,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.24.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.5) [diff](https://github.com/vaimo/composer-patches/compare/3.23.4...3.23.5)
 
-## 3.23.4 (2018-02-13)
+## 3.23.4
 
 ### Maintenance
 
@@ -1631,7 +1683,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.5) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.4) [diff](https://github.com/vaimo/composer-patches/compare/3.23.3...3.23.4)
 
-## 3.23.3 (2018-02-13)
+## 3.23.3
 
 ### Fix
 
@@ -1644,7 +1696,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.4) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.3) [diff](https://github.com/vaimo/composer-patches/compare/3.23.2...3.23.3)
 
-## 3.23.2 (2018-02-12)
+## 3.23.2
 
 ### Fix
 
@@ -1658,7 +1710,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.2) [diff](https://github.com/vaimo/composer-patches/compare/3.23.1...3.23.2)
 
-## 3.23.1 (2018-02-12)
+## 3.23.1
 
 ### Fix
 
@@ -1666,7 +1718,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.1) [diff](https://github.com/vaimo/composer-patches/compare/3.23.0...3.23.1)
 
-## 3.23.0 (2018-02-12)
+## 3.23.0
 
 ### Feature
 
@@ -1680,7 +1732,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.0) [diff](https://github.com/vaimo/composer-patches/compare/3.22.4...3.23.0)
 
-## 3.22.4 (2018-02-08)
+## 3.22.4
 
 ### Maintenance
 
@@ -1688,7 +1740,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.23.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.4) [diff](https://github.com/vaimo/composer-patches/compare/3.22.3...3.22.4)
 
-## 3.22.3 (2018-02-08)
+## 3.22.3
 
 ### Fix
 
@@ -1698,7 +1750,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.4) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.3) [diff](https://github.com/vaimo/composer-patches/compare/3.22.2...3.22.3)
 
-## 3.22.2 (2018-02-08)
+## 3.22.2
 
 ### Fix
 
@@ -1706,7 +1758,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.2) [diff](https://github.com/vaimo/composer-patches/compare/3.22.1...3.22.2)
 
-## 3.22.1 (2018-02-08)
+## 3.22.1
 
 ### Fix
 
@@ -1714,7 +1766,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.1) [diff](https://github.com/vaimo/composer-patches/compare/3.22.0...3.22.1)
 
-## 3.22.0 (2018-02-08)
+## 3.22.0
 
 ### Feature
 
@@ -1727,7 +1779,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.0) [diff](https://github.com/vaimo/composer-patches/compare/3.21.0...3.22.0)
 
-## 3.21.0 (2018-02-08)
+## 3.21.0
 
 ### Feature
 
@@ -1741,7 +1793,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.22.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.21.0) [diff](https://github.com/vaimo/composer-patches/compare/3.20.0...3.21.0)
 
-## 3.20.0 (2018-02-05)
+## 3.20.0
 
 ### Feature
 
@@ -1754,7 +1806,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.21.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.20.0) [diff](https://github.com/vaimo/composer-patches/compare/3.19.5...3.20.0)
 
-## 3.19.5 (2018-02-04)
+## 3.19.5
 
 ### Fix
 
@@ -1768,7 +1820,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.20.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.5) [diff](https://github.com/vaimo/composer-patches/compare/3.19.4...3.19.5)
 
-## 3.19.4 (2018-02-03)
+## 3.19.4
 
 ### Maintenance
 
@@ -1776,7 +1828,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.5) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.4) [diff](https://github.com/vaimo/composer-patches/compare/3.19.3...3.19.4)
 
-## 3.19.3 (2018-02-03)
+## 3.19.3
 
 ### Maintenance
 
@@ -1784,7 +1836,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.4) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.3) [diff](https://github.com/vaimo/composer-patches/compare/3.19.2...3.19.3)
 
-## 3.19.2 (2018-02-03)
+## 3.19.2
 
 ### Maintenance
 
@@ -1792,7 +1844,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.2) [diff](https://github.com/vaimo/composer-patches/compare/3.19.1...3.19.2)
 
-## 3.19.1 (2018-02-03)
+## 3.19.1
 
 ### Maintenance
 
@@ -1801,7 +1853,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.1) [diff](https://github.com/vaimo/composer-patches/compare/3.19.0...3.19.1)
 
-## 3.19.0 (2018-02-02)
+## 3.19.0
 
 ### Feature
 
@@ -1816,7 +1868,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.0) [diff](https://github.com/vaimo/composer-patches/compare/3.18.0...3.19.0)
 
-## 3.18.0 (2018-02-02)
+## 3.18.0
 
 ### Feature
 
@@ -1827,7 +1879,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.19.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.18.0) [diff](https://github.com/vaimo/composer-patches/compare/3.17.3...3.18.0)
 
-## 3.17.3 (2018-02-01)
+## 3.17.3
 
 ### Fix
 
@@ -1840,7 +1892,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.18.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.3) [diff](https://github.com/vaimo/composer-patches/compare/3.17.2...3.17.3)
 
-## 3.17.2 (2018-02-01)
+## 3.17.2
 
 ### Fix
 
@@ -1848,7 +1900,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.2) [diff](https://github.com/vaimo/composer-patches/compare/3.17.1...3.17.2)
 
-## 3.17.1 (2018-02-01)
+## 3.17.1
 
 ### Fix
 
@@ -1858,7 +1910,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.1) [diff](https://github.com/vaimo/composer-patches/compare/3.17.0...3.17.1)
 
-## 3.17.0 (2018-01-31)
+## 3.17.0
 
 ### Fix
 
@@ -1872,7 +1924,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.0) [diff](https://github.com/vaimo/composer-patches/compare/3.16.0...3.17.0)
 
-## 3.16.0 (2018-01-31)
+## 3.16.0
 
 ### Feature
 
@@ -1889,7 +1941,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.17.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.16.0) [diff](https://github.com/vaimo/composer-patches/compare/3.15.0...3.16.0)
 
-## 3.15.0 (2018-01-29)
+## 3.15.0
 
 ### Feature
 
@@ -1901,7 +1953,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.16.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.15.0) [diff](https://github.com/vaimo/composer-patches/compare/3.14.1...3.15.0)
 
-## 3.14.1 (2018-01-29)
+## 3.14.1
 
 ### Fix
 
@@ -1909,7 +1961,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.15.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.14.1) [diff](https://github.com/vaimo/composer-patches/compare/3.14.0...3.14.1)
 
-## 3.14.0 (2018-01-28)
+## 3.14.0
 
 ### Feature
 
@@ -1927,7 +1979,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.14.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.14.0) [diff](https://github.com/vaimo/composer-patches/compare/3.13.2...3.14.0)
 
-## 3.13.2 (2018-01-26)
+## 3.13.2
 
 ### Fix
 
@@ -1935,7 +1987,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.14.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.13.2) [diff](https://github.com/vaimo/composer-patches/compare/3.13.1...3.13.2)
 
-## 3.13.1 (2018-01-26)
+## 3.13.1
 
 ### Fix
 
@@ -1943,7 +1995,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.13.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.13.1) [diff](https://github.com/vaimo/composer-patches/compare/3.13.0...3.13.1)
 
-## 3.13.0 (2018-01-26)
+## 3.13.0
 
 ### Feature
 
@@ -1971,7 +2023,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.13.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.12.1) [diff](https://github.com/vaimo/composer-patches/compare/3.12.0...3.12.1)
 
-## 3.12.0 (2017-12-21)
+## 3.12.0
 
 ### Feature
 
@@ -1979,7 +2031,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.12.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.12.0) [diff](https://github.com/vaimo/composer-patches/compare/3.11.0...3.12.0)
 
-## 3.11.0 (2017-12-21)
+## 3.11.0
 
 ### Feature
 
@@ -1992,7 +2044,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.12.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.11.0) [diff](https://github.com/vaimo/composer-patches/compare/3.10.4...3.11.0)
 
-## 3.10.4 (2017-12-18)
+## 3.10.4
 
 ### Fix
 
@@ -2000,7 +2052,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.11.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.4) [diff](https://github.com/vaimo/composer-patches/compare/3.10.3...3.10.4)
 
-## 3.10.3 (2017-12-18)
+## 3.10.3
 
 ### Fix
 
@@ -2008,7 +2060,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.4) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.3) [diff](https://github.com/vaimo/composer-patches/compare/3.10.2...3.10.3)
 
-## 3.10.2 (2017-10-09)
+## 3.10.2
 
 ### Fix
 
@@ -2017,7 +2069,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.3) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.2) [diff](https://github.com/vaimo/composer-patches/compare/3.10.1...3.10.2)
 
-## 3.10.1 (2017-10-08)
+## 3.10.1
 
 ### Maintenance
 
@@ -2025,7 +2077,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.2) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.1) [diff](https://github.com/vaimo/composer-patches/compare/3.10.0...3.10.1)
 
-## 3.10.0 (2017-10-08)
+## 3.10.0
 
 ### Feature
 
@@ -2042,7 +2094,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.1) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.0) [diff](https://github.com/vaimo/composer-patches/compare/3.9.0...3.10.0)
 
-## 3.9.0 (2017-10-06)
+## 3.9.0
 
 ### Feature
 
@@ -2050,7 +2102,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.10.0) [diff](https
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.9.0) [diff](https://github.com/vaimo/composer-patches/compare/3.8.1...3.9.0)
 
-## 3.8.1 (2017-10-06)
+## 3.8.1
 
 ### Fix
 
@@ -2058,7 +2110,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.9.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.8.1) [diff](https://github.com/vaimo/composer-patches/compare/3.8.0...3.8.1)
 
-## 3.8.0 (2017-10-06)
+## 3.8.0
 
 ### Feature
 
@@ -2070,7 +2122,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.8.1) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.8.0) [diff](https://github.com/vaimo/composer-patches/compare/3.7.1...3.8.0)
 
-## 3.7.1 (2017-09-23)
+## 3.7.1
 
 ### Maintenance
 
@@ -2078,7 +2130,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.8.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.7.1) [diff](https://github.com/vaimo/composer-patches/compare/3.7.0...3.7.1)
 
-## 3.7.0 (2017-09-23)
+## 3.7.0
 
 ### Feature
 
@@ -2087,7 +2139,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.7.1) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.7.0) [diff](https://github.com/vaimo/composer-patches/compare/3.6.0...3.7.0)
 
-## 3.6.0 (2017-08-29)
+## 3.6.0
 
 ### Feature
 
@@ -2100,7 +2152,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.7.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.6.0) [diff](https://github.com/vaimo/composer-patches/compare/3.5.2...3.6.0)
 
-## 3.5.2 (2017-08-29)
+## 3.5.2
 
 ### Fix
 
@@ -2108,7 +2160,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.6.0) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.5.2) [diff](https://github.com/vaimo/composer-patches/compare/3.5.1...3.5.2)
 
-## 3.5.1 (2017-07-10)
+## 3.5.1
 
 ### Fix
 
@@ -2116,7 +2168,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.5.2) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.5.1) [diff](https://github.com/vaimo/composer-patches/compare/3.5.0...3.5.1)
 
-## 3.5.0 (2017-07-10)
+## 3.5.0
 
 ### Feature
 
@@ -2124,10 +2176,10 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.5.1) [diff](https:
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.5.0) [diff](https://github.com/vaimo/composer-patches/compare/3.4.0...3.5.0)
 
-## 3.4.0 (2017-07-09)
+## 3.4.0
 
 ### Feature
 
 * allow dev-only patches to be declared (see: Development patches)
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/3.4.0) [diff](https://github.com/vaimo/composer-patches/compare/d07e6a00af9c7c3a3c93460ea2f024eb0e05c5fd...3.4.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.4.0) [diff](https://github.com/vaimo/composer-patches/compare/0...3.4.0)
