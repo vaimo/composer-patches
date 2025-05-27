@@ -1,14 +1,17 @@
 name: Tests
 
 jobs:
-    php71:
-        runs:
-            using: 'docker',
-            image: '../../Dockerfile'
-            args:
-                - PHP_VERSION=7.1.32
+    build:
+        runs-on: ubuntu-latest,
         steps:
             - name: Install
-              run: composer install
-            - name: Run tests
-              run: composer ci:build
+              uses: php-actions/composer@v6
+              with:
+                  php_version: "7.1.33"
+                  working_dir: "../../"
+            - name: Build
+              uses: php-actions/composer@v6
+              with:
+                  php_version: "7.1.33"
+                  working_dir: "../../"
+                  command: "ci:build"
