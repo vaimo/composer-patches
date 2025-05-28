@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        versions: [ {php: "7.1.32", composer: "2.2"}, {php: "7.2.22", composer: "2.3.0"}, {php: "7.3.25", composer: "2.3.0"}, {php: "7.4.13", composer: "2.3.0"} ]
+        versions: [ {php: "7.4.33", composer: "2.3.0"}, {php: "8.0.30", composer: "2.3.0"}, {php: "8.1.32", composer: "2.3.0"}, {php: "8.2.28", composer: "2.6.0"}, {php: "8.3.22", composer: "2.7.0"}, {php: "8.4.7", composer: "2.8.0"} ]
     steps:
       - uses: actions/checkout@v3
 

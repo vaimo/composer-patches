@@ -4,11 +4,11 @@
     "license": "MIT",
     "description": "Applies a patch from a local or remote file to any package that is part of a given composer project. Patches can be defined both on project and on package level. Optional support for patch versioning, sequencing, custom patch applier configuration and patch command for testing/troubleshooting added patches.",
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=7.4.0",
         "ext-json": "*",
         "composer-plugin-api": "^1.0 || ^2.0",
         "composer-runtime-api": "^1.0 || ^2.0",
-        "loophp/phposinfo": "^1.6",
+        "loophp/phposinfo": "^1.7",
         "seld/jsonlint": "^1.7.1",
         "vaimo/topological-sort": "^1.0"
     },
@@ -120,10 +120,7 @@
     "autoload": {
         "psr-4": {
             "Vaimo\\ComposerPatches\\": "src"
-        },
-        "files": [
-            "compatibility/loophp-phposinfo.php"
-        ]
+        }
     },
     "repositories": [
         {
