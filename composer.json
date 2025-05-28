@@ -122,7 +122,10 @@
     "autoload": {
         "psr-4": {
             "Vaimo\\ComposerPatches\\": "src"
-        }
+        },
+        "files": [
+            "compatibility/loophp-phposinfo.php"
+        ]
     },
     "repositories": [
         {
