@@ -10,6 +10,7 @@ Processing patches configuration
 
 Writing patch info to install file
 Processing patches configuration
+  - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
   - Applying patches for vaimo/composer-patches-target1 (2)
     ~ {{PATCHES-OWNER}}: patches/1_second-change.patch [CHANGED]
       Change: valueC => valueX
