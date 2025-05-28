@@ -212,6 +212,7 @@ is_production_dependency()
         _line '=' 80
 
         composer config platform.php ${version}
+        composer config --no-plugins allow-plugins.vaimo/composer-patches-local true
 
         if ! composer update --ansi ; then
             exit 1

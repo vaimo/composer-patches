@@ -29,7 +29,8 @@
         },
         "process-timeout": 3000,
         "allow-plugins": {
-            "vaimo/*": true
+            "vaimo/composer-patches-proxy": true,
+            "vaimo/composer-changelogs": true
         }
     },
     "authors": [
