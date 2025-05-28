@@ -10,6 +10,7 @@
         "composer-runtime-api": "^1.0 || ^2.0",
         "loophp/phposinfo": "^1.7",
         "seld/jsonlint": "^1.7.1",
+        "symfony/console": "<7.0",
         "vaimo/topological-sort": "^1.0"
     },
     "require-dev": {

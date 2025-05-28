@@ -1,10 +1,12 @@
 Scanning packages for orphan patches
 Validation completed successfully
 Processing patches configuration
+  - Installing vaimo/composer-patches-sandbox (1.0.0): Mirroring from modules/composer-patches-sandbox
   - Applying patches for vaimo/composer-patches-sandbox (1)
     ~ {{PATCHES-OWNER}}: patches/multiple-packages-single-file.patch [NEW]
       Change: value17 => valueB; value5 => valueA
 
+  - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
   - Applying patches for vaimo/composer-patches-target1 (2)
     ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
       Change: value8 => valueC
