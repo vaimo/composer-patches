@@ -1,3 +1,2 @@
-Incorrect error: src/OsInfo.php,124,25,PHPCompatibility.Extensions.RemovedExtensions.famRemoved
-Graceful usage: src/OsInfo.php,179,23,PHPCompatibility.Constants.NewConstants.php_os_familyFound
-Graceful usage: src/OsInfo.php,180,50,PHPCompatibility.Constants.NewConstants.php_os_familyFound
+Incorrect error: src/OsInfo.php,103,25,PHPCompatibility.Extensions.RemovedExtensions.famRemoved
+Incorrect error: src/OsInfo.php,133,23,PHPCompatibility.Extensions.RemovedExtensions.famRemoved
