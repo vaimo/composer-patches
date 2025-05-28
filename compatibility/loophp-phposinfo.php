@@ -10,12 +10,12 @@
  */
 namespace {
     if (!class_exists('loophp\phposinfo\OsInfo') && class_exists('drupol\phposinfo\OsInfo')) {
-        class_alias('loophp\phposinfo\OsInfo', 'drupol\phposinfo\OsInfo');
-        class_alias('loophp\phposinfo\OsInfoInterface', 'drupol\phposinfo\OsInfoInterface');
-        class_alias('loophp\phposinfo\Enum\Enum', 'drupol\phposinfo\Enum\Enum');
-        class_alias('loophp\phposinfo\Enum\Family', 'drupol\phposinfo\Enum\Family');
-        class_alias('loophp\phposinfo\Enum\FamilyName', 'drupol\phposinfo\Enum\FamilyName');
-        class_alias('loophp\phposinfo\Enum\Os', 'drupol\phposinfo\Enum\Os');
-        class_alias('loophp\phposinfo\Enum\OsName', 'drupol\phposinfo\Enum\OsName');
+        class_alias('drupol\phposinfo\OsInfo', 'loophp\phposinfo\OsInfo');
+        class_alias('drupol\phposinfo\OsInfoInterface', 'loophp\phposinfo\OsInfoInterface');
+        class_alias('drupol\phposinfo\Enum\Enum', 'loophp\phposinfo\Enum\Enum');
+        class_alias('drupol\phposinfo\Enum\Family', 'loophp\phposinfo\Enum\Family');
+        class_alias('drupol\phposinfo\Enum\FamilyName', 'loophp\phposinfo\Enum\FamilyName');
+        class_alias('drupol\phposinfo\Enum\Os', 'loophp\phposinfo\Enum\Os');
+        class_alias('drupol\phposinfo\Enum\OsName', 'loophp\phposinfo\Enum\OsName');
     }
 }
