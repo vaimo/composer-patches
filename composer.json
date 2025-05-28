@@ -30,6 +30,7 @@
         },
         "process-timeout": 3000,
         "allow-plugins": {
+            "vaimo/composer-patches-local": true,
             "vaimo/composer-patches-proxy": true,
             "vaimo/composer-changelogs": true
         }
