@@ -50,7 +50,7 @@ validate_dependency()
 {
     local dependency=${1}
     local whitelist_root=${2}
-    
+
     local src_paths=$(get_autoload_paths "${dependency}")
 
     local code=$(echo ${dependency}|sed 's/\//-/g')
@@ -130,10 +130,18 @@ get_autoload_paths()
         ); 
                 
         if (isset(\$config['autoload']['psr-4'])) {
+            foreach (\$config['autoload']['psr-4'] as \$alias => \$path) {
+                \$config['autoload']['psr-4'][\$alias] = \$path ? \$path : './';
+            }
+
             echo implode(\PHP_EOL, \$config['autoload']['psr-4']);
         }
 
         if (isset(\$config['autoload']['psr-0'])) {
+            foreach (\$config['autoload']['psr-0'] as \$alias => \$path) {
+                \$config['autoload']['psr-0'][\$alias] = \$path ? \$path : './';
+            }
+
             echo implode(\PHP_EOL, \$config['autoload']['psr-0']);
         }
 SCRIPT
