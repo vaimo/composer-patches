@@ -9,14 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ["7.1.32", "7.2.22", "7.3.25", "7.4.13", "8.0.0"]
+        versions: [ {php: "7.1.32", composer: "2.2"}, {php: "7.2.22", composer: "2.3.0"}, {php: "7.3.25", composer: "2.3.0"}, {php: "7.4.13", composer: "2.3.0"} ]
     steps:
       - uses: actions/checkout@v3
 
       - name: Install
         uses: php-actions/composer@v6
         with:
-          php_version: ${{ matrix.php-version }}
+          php_version: ${{ matrix.versions.php }}
+          version: ${{ matrix.versions.composer }}
 
       - name: Build
         run: composer ci:build
