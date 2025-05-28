@@ -18,7 +18,11 @@
     ],
     "config": {
         "platform": {
-            "php": "8.0.30"
+            "php": "7.4.0"
+        },
+        "allow-plugins": {
+            "vaimo/composer-patches-local": true,
+            "vaimo/composer-patches-proxy": true
         }
     }
 }
