@@ -1,5 +1,4 @@
 Processing patches configuration
-  - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
   - Applying patches for vaimo/composer-patches-target1 (1)
     ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
       Change: value8 => valueC
