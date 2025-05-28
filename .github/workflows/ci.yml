@@ -21,9 +21,6 @@ jobs:
           version: ${{ matrix.versions.composer }}
           command: config platform.php ${{ matrix.versions.php }}
 
-      - name: Drop vaimo/composer-changelogs
-        run: composer remove --dev vaimo/composer-changelogs --no-update
-
       - name: Install
         run: composer update --ansi
 
