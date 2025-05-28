@@ -7,7 +7,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
+      fail-fast: false
       matrix:
         versions: [ {php: "7.1.32", composer: "2.2"}, {php: "7.2.22", composer: "2.3.0"}, {php: "7.3.25", composer: "2.3.0"}, {php: "7.4.13", composer: "2.3.0"} ]
     steps:
