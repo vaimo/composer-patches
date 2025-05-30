@@ -34,3 +34,5 @@ jobs:
 
       - name: Build
         run: composer ci:build --ansi
+        env:
+          COMPOSER_TESTS_ARE_RUNNING: 1
