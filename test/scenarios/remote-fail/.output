@@ -1,6 +1,6 @@
 Processing patches configuration
 
-In CurlDownloader.php line 613:
+In CurlDownloader.php:
 
   The "https://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url
   /single-package-single-file-no-version.patch" file could not be downloaded

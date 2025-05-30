@@ -1,6 +1,6 @@
 Processing patches configuration
 
-In TransportErrorHandler.php line 34:
+In TransportErrorHandler.php:
 
   Your configuration does not allow connections to http://raw.githubuserconte
   nt.com/vaimo/composer-patches/bad/patch/url/single-package-single-file-no-v

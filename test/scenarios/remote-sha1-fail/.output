@@ -1,6 +1,6 @@
 Processing patches configuration
 
-In FileDownloader.php line 211:
+In FileDownloader.php:
 
   The checksum verification of the file failed (downloaded from https://raw.g
   ithubusercontent.com/vaimo/composer-patches/release/3/test/scenarios/remote

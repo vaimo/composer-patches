@@ -34,6 +34,7 @@
     "config": {
         "process-timeout": 3000,
         "allow-plugins": {
+            "__vaimo/*": true,
             "vaimo/composer-patches-local": true,
             "vaimo/composer-patches-proxy": true
         }
