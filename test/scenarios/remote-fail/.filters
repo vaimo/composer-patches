@@ -1,3 +1,5 @@
 s/(.* 404 .*)/(404)/g
 s/In CurlDownloader.php line .*:/In CurlDownloader.php:/g
-s/Unhandled promise rejection with .* {main}//g
+/^#/d
+/^Stack trace/d
+/^Unhandled promise rejection/d
