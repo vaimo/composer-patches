@@ -1,6 +1,7 @@
 Scanning packages for orphan patches
 Validation completed successfully
 Processing patches configuration
+  - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
   - Applying patches for vaimo/composer-patches-target1 (2)
     ~ {{PATCHES-OWNER}}: patches/1_second-change.patch [MATCH]
       Change: valueX => valueY

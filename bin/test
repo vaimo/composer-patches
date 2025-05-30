@@ -12,7 +12,7 @@ source ${script_root}/lib/output.sh
 run_tests() {
     local scenario_root=${1}
     local copy_target=${2}
-    local composer_version=$(composer --version|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f1)
+    local composer_version=$(composer --version|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f2)
 
     local scenario_label=$(cat ${scenario_root}/.label)
 
@@ -69,7 +69,7 @@ EOF
         if [ "${line:0:1}" == "@" ] ; then
             local command=$(_trim_string ${line:1}|cut -d' ' -f1)
             local args=$(_trim_string ${line:1}|cut -d' ' -f2-)
-            
+
             local php_script=
             
             if [ "${command}" == "queue_update" ] ; then
@@ -90,7 +90,7 @@ EOF
                         return isset(\$item['name']) ? \$item['name'] : ''; 
                     }, \$packagesConfig);
                     \$index = array_search('${target}', \$names, true);
-                                
+
                     if (\$index !== false) {
                         \$packagesConfig[\$index]['version'] = '0.0.0';
                         \$packagesConfig[\$index]['version_normalized'] = '0.0.0';
@@ -277,7 +277,7 @@ assert_scenario_output() {
     local patches_owner=${1}
     local scenario_root=${2}
     local output_file=${3}
-    local composer_version=$(composer --version 2>/dev/null|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f1)
+    local composer_version=$(composer --version 2>/dev/null|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f2)
     local composer_major=${composer_version%%.*}
 
     local expected_output_file="${scenario_root}/.output"
