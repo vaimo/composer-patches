@@ -1,8 +1,8 @@
 name: CI
 
 on:
-  push:
-    branches: ["feature/package-maintenance"]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
