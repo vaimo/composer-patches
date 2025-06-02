@@ -1,8 +1,14 @@
-version: "3.8"
 services:
   devbox:
     container_name: composer-patches
     build:
       dockerfile: Dockerfile
       context: .
+      args:
+        - PHP_VERSION=8.2.28
+        - COMPOSER_VERSION=2.7.0
     entrypoint: tail -f /dev/null
+    environment:
+      - COMPOSER_PROCESS_TIMEOUT=0
+      - COMPOSER_NO_INTERACTION=1
+      - COMPOSER_NO_AUDIT=1

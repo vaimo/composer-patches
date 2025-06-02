@@ -3,7 +3,7 @@ sync:
     symlink:
       mode: ignore
     ignore:
-      vcs: true
+      vcs: false
   vscode:
     alpha: "./.devcontainer/vscode"
     beta: "docker://composer-patches/module/.vscode"
