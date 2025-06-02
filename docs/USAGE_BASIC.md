@@ -206,6 +206,8 @@ Multiple values can be also used in the declaration by providing them as array o
 The key "patches-base", etc are not mandatory to be declared when using patches-search as the exact path
 of the patches will already be known.
 
+Note that you can use also wildcard, for example `app/code/<vendor>/*/patches`
+
 ## Version Constraints
 
 There are several ways a version restriction for a patch can be defined, the choice on which one to use 
