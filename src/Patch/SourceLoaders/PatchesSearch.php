@@ -100,8 +100,6 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         }
 
         $basePath = $this->getInstallPath($package);
-        $basePathLength = strlen($basePath);
-
         $results = array();
 
         foreach ($source as $item) {
@@ -110,41 +108,47 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                 sprintf('/%s/i', PluginConfig::PATCH_FILE_REGEX_MATCHER)
             );
 
-            $groups = array();
-
-            foreach ($paths as $path) {
-                $contents = $this->patchFileLoader->loadWithNormalizedLineEndings($path);
-
-                $definition = $this->createDefinitionItem($contents, array(
-                    PatchDefinition::PATH => $path,
-                    PatchDefinition::SOURCE => trim(
-                        substr($path, $basePathLength),
-                        DIRECTORY_SEPARATOR
-                    )
-                ));
-
-                if (!isset($definition[PatchDefinition::TARGET])) {
-                    continue;
-                }
-
-                $target = $definition[PatchDefinition::TARGET];
-
-                if (!isset($groups[$target])) {
-                    $groups[$target] = array();
-                }
-
-                $groups[$target][] = $definition;
-            }
-
-            $results[] = $groups;
+            $results[] = $this->createPatchDefinitions($basePath, $paths);
         }
 
         return $results;
     }
 
+    private function createPatchDefinitions($basePath, array $paths)
+    {
+        $groups = array();
+        $basePathLength = strlen($basePath);
+
+        foreach ($paths as $path) {
+            $contents = $this->patchFileLoader->loadWithNormalizedLineEndings($path);
+
+            $definition = $this->createDefinitionItem($contents, array(
+                PatchDefinition::PATH => $path,
+                PatchDefinition::SOURCE => trim(
+                    substr($path, $basePathLength),
+                    DIRECTORY_SEPARATOR
+                )
+            ));
+
+            if (!isset($definition[PatchDefinition::TARGET])) {
+                continue;
+            }
+
+            $target = $definition[PatchDefinition::TARGET];
+
+            if (!isset($groups[$target])) {
+                $groups[$target] = array();
+            }
+
+            $groups[$target][] = $definition;
+        }
+
+        return $groups;
+    }
+
     private function getInstallPath(\Composer\Package\PackageInterface $package)
     {
-        if ($package instanceof \Composer\Package\RootPackage) {
+        if ($package instanceof \Composer\Package\RootPackageInterface) {
             return getcwd();
         }
 
@@ -204,23 +208,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
     {
         $target = false;
 
-        $package = $this->extractSingleValue($data, PatchDefinition::PACKAGE);
-        $depends = $this->extractSingleValue($data, PatchDefinition::DEPENDS);
-        $version = $this->extractSingleValue($data, PatchDefinition::VERSION, '>=0.0.0');
-
-        if (strpos($version, ':') !== false) {
-            $valueParts = explode(':', $version);
-
-            $depends = trim(array_shift($valueParts));
-            $version = trim(implode(':', $valueParts));
-        }
-
-        if (strpos($package, ':') !== false) {
-            $valueParts = explode(':', $package);
-
-            $package = trim(array_shift($valueParts));
-            $version = trim(implode(':', $valueParts));
-        }
+        list($package, $version, $depends) = $this->resolveBaseData($data);
 
         if ($package) {
             $target = $package;
@@ -243,7 +231,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         $patchTypeFlags = array_fill_keys(
             explode(
                 PatchDefinition::TYPE_SEPARATOR,
-                $this->extractSingleValue($data, PatchDefinition::TYPE)
+                $this->extractSingleValue($data, PatchDefinition::TYPE) ?? ''
             ),
             true
         );
@@ -255,6 +243,27 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         );
     }
 
+    private function resolveBaseData(array $data)
+    {
+        $package = $this->extractSingleValue($data, PatchDefinition::PACKAGE, '');
+        $depends = $this->extractSingleValue($data, PatchDefinition::DEPENDS);
+        $version = $this->extractSingleValue($data, PatchDefinition::VERSION, '>=0.0.0');
+
+        if (strpos($version, ':') !== false) {
+            $valueParts = explode(':', $version);
+            $depends = trim(array_shift($valueParts));
+            $version = trim(implode(':', $valueParts));
+        }
+
+        if (strpos($package, ':') !== false) {
+            $valueParts = explode(':', $package);
+            $package = trim(array_shift($valueParts));
+            $version = trim(implode(':', $valueParts));
+        }
+
+        return array($package, $version, $depends);
+    }
+
     private function normalizeDependencies($dependsList)
     {
         $dependsNormalized = array_map(
@@ -262,7 +271,7 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
                 $valueParts = explode(':', $item);
 
                 return array(
-                    trim(array_shift($valueParts)) => trim(array_shift($valueParts)) ?: '>=0.0.0'
+                    trim(array_shift($valueParts) ?? '') => trim(array_shift($valueParts) ?? '') ?: '>=0.0.0'
                 );
             },
             array_unique($dependsList)

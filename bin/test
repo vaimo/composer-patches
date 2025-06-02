@@ -142,6 +142,32 @@ EOF
 EOF
 )
             fi
+
+            if [ "${command}" == "config" ] ; then
+                local path=$(echo ${args}|cut -d' ' -f1)
+                local value=$(echo ${args}|cut -d' ' -f2)
+                local package_config="composer.json"
+                
+                local php_script=$(cat <<EOF
+                if (file_exists('${package_config}')) {
+                    \$config = json_decode(file_get_contents('${package_config}'), true);
+
+                    \$pathSteps = explode('/', '${path}');
+                    \$node = &\$config;
+                    foreach(\$pathSteps as \$step) {
+                        if (!isset(\$node[\$step])) {
+                            \$node[\$step] = array();
+                        }
+                        \$node = &\$node[\$step];
+                    }
+                    \$node = ${value};
+                    unset(\$node);
+                
+                    file_put_contents('${package_config}', json_encode(\$config, JSON_PRETTY_PRINT));
+                }
+EOF
+)
+            fi
             
             if [ "${php_script}" != "" ] ; then
                 php -r "${php_script}" 2>/dev/null
@@ -298,16 +324,19 @@ assert_scenario_output() {
         |grep -v "^Nothing to install, update or remove" \
         |grep -v "^Updating dependencies" \
         |grep -v "^Nothing to modify in lock file" \
+        |grep -v "^Warning: The lock file is not up to date with the latest changes in" \
         |sed 's/ *$//g' \
         > output.txt
 
-    local original_ifs=${IFS}
-    IFS=$'\n'    
-    for filter in $(cat ${output_filters}) ; do
-        sed -i.bak ${filter} output.txt
-        rm output.txt.bak
-    done
-    IFS=${original_ifs}
+    if [ -f ${output_filters} ] ; then
+        local original_ifs=${IFS}
+        IFS=$'\n'    
+        for filter in $(cat ${output_filters}) ; do
+            sed -i.bak ${filter} output.txt
+            rm output.txt.bak
+        done
+        IFS=${original_ifs}
+    fi
 
     rm ${output_file} 2>/dev/null
 
@@ -396,13 +425,23 @@ assert() {
     local name=$(echo ${assertion}|cut -d',' -f1)
     local before=$(echo ${assertion}|cut -d',' -f2)
     local after=$(echo ${assertion}|cut -d',' -f3)
+    local target=$(echo ${assertion}|cut -d',' -f4)
 
-    local contents=$(cat vendor/${name}/src/example.txt)
+    if [ "${target}" = "" ] ; then
+        target="src/example.txt"
+    fi
+
+    local file_path="vendor/${name}/${target}"
+    local contents=$(cat ${file_path})
 
     if [ "${invert}" != "" ] && [ "${invert}" != "0" ] ; then
         local tmp=${before}
         before=${after}
         after=${tmp}
+    fi
+
+    if echo "${contents}"|grep -qw "${after}" && [ "${before}" == "" ] ; then
+        return 0
     fi
 
     if echo "${contents}"|grep -qw "^${before}" && [ "${before}" == "${after}" ] ; then
@@ -425,10 +464,14 @@ assertion_error() {
     local name=$(echo ${assertion}|cut -d',' -f1)
     local before=$(echo ${assertion}|cut -d',' -f2)
     local after=$(echo ${assertion}|cut -d',' -f3)
+    local target=$(echo ${assertion}|cut -d',' -f4)
 
-    local file=vendor/${name}/src/example.txt
+    if [ "${target}" = "" ] ; then
+        target="src/example.txt"
+    fi
 
-    local contents=$(cat ${file})
+    local file_path="vendor/${name}/${target}"
+    local contents=$(cat ${file_path})
 
     if [ "${invert}" != "" ] && [ "${invert}" != "0" ] ; then
         local tmp=${before}
@@ -436,18 +479,21 @@ assertion_error() {
         after=${tmp}
     fi
 
-    _error "TARGET: ${file}"
+    _error "TARGET: ${file_path}"
     _error "ASSERTION: ${before} => ${after}"        
 }
 
 reset_packages() {
-    local installation_root=${1}
+    local scenarios_root=${1}
+    local installation_root=${2}
+
     local install_info_path="${installation_root}/vendor/composer/installed.json"
     
     local lock_path="${installation_root}/composer.lock"
 
     if [ -f ${install_info_path} ] ; then
-        perl -i.org -pe 's|(\s"name":\s")(vaimo/composer-patches-target)(.*)",|\1__\2\3",|g' \
+        filters=$(grep -r "@package" ${scenarios_root}|sed 's/.*@package\(.*\)/\1/g'|sort|uniq|tr '\n' '|'|tr -d ' '|tr -d '\r')
+        perl -i.org -pe "s%(\s\"name\":\s\")(${filters}|vaimo/composer-patches-target)(.*)\",%\1__\2\3\",%g" \
             ${install_info_path}
 
         rm ${install_info_path}.org
@@ -525,6 +571,7 @@ fi
     sandbox_root=$(pwd)
 
     installations=$(ls -1 installations)
+    scenarios_root=$(pwd)/scenarios
     scenarios=$(ls -1 scenarios)
 
     if [ "${PURGE}" == "1" ] ; then
@@ -583,7 +630,7 @@ fi
                     continue
                 fi
 
-                reset_packages "${installation_root}"
+                reset_packages "${scenarios_root}" "${installation_root}"
                 scenario_root=${sandbox_root}/scenarios/${scenario}
 
                 if ! run_tests "${scenario_root}" "${copy_target}" ; then

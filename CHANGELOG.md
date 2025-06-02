@@ -2,6 +2,41 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 4.22.4 (2021-02-25)
+
+changes in this release forward-ported from  3.53.4
+
+### Fix
+
+* bundled patches fail to apply when using patch-mapping configuration due to refactored code in 3.53.2 having messed up argument order used for a sub-function call in BasePathComponent
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.4) [diff](https://github.com/vaimo/composer-patches/compare/4.22.3...4.22.4)
+
+## 4.22.3 (2021-02-24)
+
+changes in this release forward-ported from 3.53.3
+
+### Fix
+
+* patch applier crash when branch alias defined for root package (scenario: root-branch-alias) [pull/73]
+
+
+### Maintenance
+
+* make patch commands available when the plugin itself is a root package (just for the sake of allowing people to conduct quick experiments when developing)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.3) [diff](https://github.com/vaimo/composer-patches/compare/4.22.2...4.22.3)
+
+## 4.22.2 (2021-02-24)
+
+changes in this release forward-ported from 3.53.2
+
+### Fix
+
+* patches applied before packages properly re-installed with Composer V2 (missed the fact that installations, like downloads are now done in asynchronous manner) [issues/70]
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.22.2) [diff](https://github.com/vaimo/composer-patches/compare/4.22.1...4.22.2)
+
 ## 4.22.1 (2021-02-20)
 
 changes in this release forward-ported from 3.53.1
@@ -736,7 +771,35 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/4.1.0) [diff](https:
 * allow patch failures to be passed over gracefully with COMPOSER_PATCHES_GRACEFUL flag
 * allow patch failures to be passed over gracefully with extra/patcher/graceful configuration in root package
 
-Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.53.1...4.0.0)
+Links: [src](https://github.com/vaimo/composer-patches/tree/4.0.0) [diff](https://github.com/vaimo/composer-patches/compare/3.53.4...4.0.0)
+
+## 3.53.4 (2021-02-25)
+
+### Fix
+
+* bundled patches fail to apply when using patch-mapping configuration due to refactored code in 3.53.2 having messed up argument order used for a sub-function call in BasePathComponent
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.4) [diff](https://github.com/vaimo/composer-patches/compare/3.53.3...3.53.4)
+
+## 3.53.3 (2021-02-24)
+
+### Fix
+
+* patch applier crash when branch alias defined for root package (scenario: root-branch-alias) [pull/73]
+
+### Maintenance
+
+* make patch commands available when the plugin itself is a root package (just for the sake of allowing people to conduct quick experiments when developing)
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.3) [diff](https://github.com/vaimo/composer-patches/compare/3.53.2...3.53.3)
+
+## 3.53.2 (2021-02-24)
+
+### Fix
+
+* patches applied before packages properly re-installed with Composer V2 (missed the fact that installations, like downloads are now done in asynchronous manner) [issues/70]
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/3.53.2) [diff](https://github.com/vaimo/composer-patches/compare/3.53.1...3.53.2)
 
 ## 3.53.1 (2021-02-20)
 

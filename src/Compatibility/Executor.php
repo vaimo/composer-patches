@@ -6,6 +6,10 @@
 namespace Vaimo\ComposerPatches\Compatibility;
 
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
+use Composer\Repository\WritableRepositoryInterface;
+use Composer\DependencyResolver\Operation\InstallOperation;
+use Composer\DependencyResolver\Operation\UninstallOperation;
+use Composer\Installer\InstallationManager;
 
 class Executor
 {
@@ -50,12 +54,43 @@ class Executor
         }
     }
 
-    public function waitDownloadCompletion($composer)
+    public function waitDownloadCompletion(\Composer\Composer $composer)
     {
         if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
             return;
         }
 
         $composer->getLoop()->getHttpDownloader()->wait();
+    }
+
+    public function waitForCompletion(\Composer\Composer $composer, array $processes)
+    {
+        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+            return;
+        }
+
+        $composer->getLoop()->wait($processes);
+    }
+
+    public function processReinstallOperation(
+        WritableRepositoryInterface $repository,
+        InstallationManager $installationManager,
+        InstallOperation $installOperation,
+        UninstallOperation $uninstallOperation
+    ) {
+        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+            return $installationManager->install($repository, $installOperation);
+        }
+
+        return $installationManager
+            ->uninstall($repository, $uninstallOperation)
+            ->then(function () use ($installationManager, $installOperation, $repository) {
+                $package = $installOperation->getPackage();
+                $installationManager->getInstaller($package->getType())
+                    ->download($package)
+                    ->then(function () use ($installationManager, $installOperation, $repository) {
+                        $installationManager->install($repository, $installOperation);
+                    });
+            });
     }
 }

@@ -23,15 +23,11 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
 
     public function normalize($target, $label, array $data, array $ownerConfig)
     {
-        if (!isset($ownerConfig[PluginConfig::PATCHES_BASE])) {
+        if ($this->shouldSkip($ownerConfig, $data)) {
             return array();
         }
 
         $source = $data[PatchDefinition::SOURCE];
-
-        if (parse_url($source, PHP_URL_SCHEME)) {
-            return array();
-        }
 
         if (is_numeric($label) && isset($data[PatchDefinition::LABEL])) {
             $label = $data[PatchDefinition::LABEL];
@@ -47,9 +43,7 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
         }
 
         $template = $this->resolveTemplate($ownerConfig, $target);
-
         list ($sourcePath, $sourceTags) = $this->deconstructSource($source);
-
         $nameParts = explode(ComposerConstants::PACKAGE_SEPARATOR, $target);
 
         $pathVariables = array(
@@ -96,6 +90,19 @@ class BasePathComponent implements \Vaimo\ComposerPatches\Interfaces\DefinitionN
             PatchDefinition::LABEL => $this->normalizeLabelForSourcePath($label, $sourcePath),
             PatchDefinition::SOURCE => $sourcePath
         );
+    }
+
+    private function shouldSkip(array $ownerConfig, array $data)
+    {
+        if (!isset($ownerConfig[PluginConfig::PATCHES_BASE])) {
+            return true;
+        }
+
+        if (parse_url($data[PatchDefinition::SOURCE], PHP_URL_SCHEME)) {
+            return true;
+        }
+
+        return false;
     }
 
     private function normalizeLabelForSourcePath($label, $sourcePath)

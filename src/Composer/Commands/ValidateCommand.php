@@ -128,7 +128,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $installPaths = array();
         foreach ($matches as $packageName => $package) {
-            $installPaths[$packageName] = $package instanceof \Composer\Package\RootPackage
+            $installPaths[$packageName] = $package instanceof \Composer\Package\RootPackageInterface
                 ? $projectRoot
                 : $installationManager->getInstallPath($package);
         }
@@ -280,11 +280,30 @@ class ValidateCommand extends \Composer\Command\BaseCommand
 
         $groups = array_fill_keys(array_keys($paths), array());
 
+        $results = array(
+            $this->findWithMissingConfig($orphanFiles, $paths),
+            $this->findWithMissingFile($orphanConfig, $paths, $statuses)
+        );
+
+        foreach ($results as $result) {
+            foreach ($result as $ownerName => $items) {
+                $groups[$ownerName] = array_merge($groups[$ownerName], $items);
+            }
+        }
+
+        return array_filter($groups);
+    }
+
+    private function findWithMissingConfig($orphanFiles, $paths)
+    {
+        $pathFlags = array_fill_keys(array_keys($paths), true);
+        $groups = array();
+
         foreach ($orphanFiles as $path => $config) {
             $ownerName = $config[Patch::OWNER];
             $installPath = $paths[$ownerName];
 
-            if (!isset($groups[$ownerName])) {
+            if (!isset($pathFlags[$ownerName])) {
                 continue;
             }
 
@@ -294,11 +313,19 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             );
         }
 
+        return $groups;
+    }
+
+    private function findWithMissingFile($orphanConfig, $paths, $statuses)
+    {
+        $pathFlags = array_fill_keys(array_keys($paths), true);
+        $groups = array();
+
         foreach ($orphanConfig as $path => $config) {
             $ownerName = $config[Patch::OWNER];
             $installPath = $paths[$ownerName];
 
-            if (!isset($groups[$ownerName])) {
+            if (!isset($pathFlags[$ownerName])) {
                 continue;
             }
 
@@ -310,7 +337,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
             );
         }
 
-        return array_filter($groups);
+        return $groups;
     }
 
     private function outputOrphans(OutputInterface $output, array $groups)

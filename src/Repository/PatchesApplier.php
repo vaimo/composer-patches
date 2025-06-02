@@ -12,9 +12,15 @@ use Vaimo\ComposerPatches\Patch\Definition as Patch;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class PatchesApplier
 {
+    /**
+     * @var \Composer\Composer
+     */
+    private $composer;
+
     /**
      * @var \Vaimo\ComposerPatches\Package\Collector
      */
@@ -91,16 +97,12 @@ class PatchesApplier
     private $outputGenerator;
 
     /**
-     * @param \Vaimo\ComposerPatches\Package\Collector $packageCollector
-     * @param \Vaimo\ComposerPatches\Managers\RepositoryManager $repositoryManager
-     * @param \Vaimo\ComposerPatches\Package\PatchApplier $patchApplier
-     * @param \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator $queueGenerator
-     * @param \Vaimo\ComposerPatches\Managers\PatcherStateManager $patcherStateManager
-     * @param \Vaimo\ComposerPatches\Package\PatchApplier\InfoLogger $patchInfoLogger
-     * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy
-     * @param \Vaimo\ComposerPatches\Logger $logger
+     * @var \Vaimo\ComposerPatches\Compatibility\Executor
      */
+    private $compExecutor;
+
     public function __construct(
+        \Composer\Composer $composer,
         \Vaimo\ComposerPatches\Package\Collector $packageCollector,
         \Vaimo\ComposerPatches\Managers\RepositoryManager $repositoryManager,
         \Vaimo\ComposerPatches\Package\PatchApplier $patchApplier,
@@ -110,6 +112,7 @@ class PatchesApplier
         \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy,
         \Vaimo\ComposerPatches\Logger $logger
     ) {
+        $this->composer = $composer;
         $this->packageCollector = $packageCollector;
         $this->repositoryManager = $repositoryManager;
         $this->packagePatchApplier = $patchApplier;
@@ -130,6 +133,7 @@ class PatchesApplier
         $this->statusConfig = new \Vaimo\ComposerPatches\Package\PatchApplier\StatusConfig();
         $this->packageUtils = new \Vaimo\ComposerPatches\Utils\PackageUtils();
         $this->dataUtils = new \Vaimo\ComposerPatches\Utils\DataUtils();
+        $this->compExecutor = new \Vaimo\ComposerPatches\Compatibility\Executor();
     }
 
     /**
@@ -147,17 +151,12 @@ class PatchesApplier
     public function apply(Repository $repository, array $patches)
     {
         $packages = $this->packageCollector->collect($repository);
-
         $packagesUpdated = false;
-
         $repositoryState = $this->repoStateGenerator->generate($repository);
-
         $applyQueue = $this->queueGenerator->generateApplyQueue($patches, $repositoryState);
         $removeQueue = $this->queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);
         $resetQueue = $this->queueGenerator->generateResetQueue($applyQueue);
-
         $applyQueue = array_map('array_filter', $applyQueue);
-
         $patchQueueFootprints = $this->patchListTransformer->createSimplifiedList($applyQueue);
 
         $labels = array_diff_key(
@@ -178,6 +177,7 @@ class PatchesApplier
             $itemsToReset = $this->dataUtils->extractItems($resetQueue, $patchTargets);
 
             $resetResult = array();
+            $resets = array();
 
             foreach ($itemsToReset as $targetName) {
                 $resetTarget = $packages[$targetName];
@@ -195,9 +195,10 @@ class PatchesApplier
                     );
                 }
 
-                $this->repositoryManager->resetPackage($repository, $resetTarget);
+                $resets[] = $this->repositoryManager->resetPackage($repository, $resetTarget);
             }
 
+            $this->compExecutor->waitForCompletion($this->composer, $resets);
             $packagesUpdated = $packagesUpdated || (bool)array_filter($resetResult);
 
             if (!$hasPatches) {

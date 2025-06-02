@@ -7,6 +7,7 @@ namespace Vaimo\ComposerPatches\Managers;
 
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\Package\PackageInterface;
+use Composer\DependencyResolver\Operation\UninstallOperation;
 
 use Vaimo\ComposerPatches\Composer\ResetOperation;
 
@@ -28,6 +29,11 @@ class RepositoryManager
     private $consoleSilencer;
 
     /**
+     * @var \Vaimo\ComposerPatches\Compatibility\Executor
+     */
+    private $compExecutor;
+
+    /**
      * @param \Composer\Installer\InstallationManager $installationManager
      * @param \Vaimo\ComposerPatches\Interfaces\PackageResetStrategyInterface $packageResetStrategy
      * @param \Vaimo\ComposerPatches\Console\Silencer $consoleSilencer
@@ -40,6 +46,7 @@ class RepositoryManager
         $this->installationManager = $installationManager;
         $this->packageResetStrategy = $packageResetStrategy;
         $this->consoleSilencer = $consoleSilencer;
+        $this->compExecutor = new \Vaimo\ComposerPatches\Compatibility\Executor();
     }
 
     /**
@@ -51,7 +58,8 @@ class RepositoryManager
      */
     public function resetPackage(WritableRepositoryInterface $repository, PackageInterface $package)
     {
-        $operation = new ResetOperation($package, 'Package reset due to changes in patches configuration');
+        $resetOperation = new ResetOperation($package, 'Package reset due to changes in patches configuration');
+        $uninstallOperation = new UninstallOperation($package);
 
         if (!$this->packageResetStrategy->shouldAllowReset($package)) {
             throw new \Vaimo\ComposerPatches\Exceptions\PackageResetException(
@@ -59,11 +67,11 @@ class RepositoryManager
             );
         }
 
-        $installer = $this->installationManager;
-
-        $this->consoleSilencer->applyToCallback(
-            function () use ($installer, $repository, $operation) {
-                $installer->install($repository, $operation);
+        $compExecutor = $this->compExecutor;
+        $installationManager = $this->installationManager;
+        return $this->consoleSilencer->applyToCallback(
+            function () use ($compExecutor, $installationManager, $repository, $resetOperation, $uninstallOperation) {
+                return $compExecutor->processReinstallOperation($repository, $installationManager, $resetOperation, $uninstallOperation);
             }
         );
     }

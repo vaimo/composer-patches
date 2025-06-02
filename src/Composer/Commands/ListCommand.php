@@ -96,6 +96,13 @@ class ListCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Use latest information from package configurations in vendor folder'
         );
+
+        $this->addOption(
+            '--json',
+            null,
+            InputOption::VALUE_NONE,
+            'Output the list of patches in JSON format'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -193,7 +200,13 @@ class ListCommand extends \Composer\Command\BaseCommand
             ));
         }
 
-        $this->generateOutput($output, $patches);
+        if ($input->getOption('json')) {
+            $output->writeln(json_encode($patches));
+        } else {
+            $this->generateOutput($output, $patches);
+        }
+
+        return self::SUCCESS;
     }
 
     private function createUnfilteredPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
@@ -299,7 +312,6 @@ class ListCommand extends \Composer\Command\BaseCommand
     private function createQueueGenerator(ListResolver $listResolver)
     {
         $changesListResolver = new ListResolvers\ChangesListResolver($listResolver);
-
         $stateAnalyser = new \Vaimo\ComposerPatches\Repository\State\Analyser();
 
         return new \Vaimo\ComposerPatches\Repository\PatchesApplier\QueueGenerator(
@@ -333,9 +345,9 @@ class ListCommand extends \Composer\Command\BaseCommand
             $output->writeln(sprintf('<info>%s</info>', $packageName));
 
             foreach ($patches as $path => $info) {
+                $owner = $info[Patch::OWNER];
                 $patchInfoLabel = $this->createStatusLabel($path, $info, $statusDecorators);
-
-                $output->writeln($patchInfoLabel);
+                $output->writeln($owner ? sprintf('  ~ %s', $patchInfoLabel) : $patchInfoLabel);
 
                 $descriptionLines = array_filter(
                     explode(PHP_EOL, $info[Patch::LABEL])
@@ -369,12 +381,8 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $statusLabel = sprintf(' [%s]', $stateDecorator);
 
-        if ($owner === Patch::OWNER_UNKNOWN) {
-            return sprintf('  ~ %s%s', $path, $statusLabel);
-        }
-
-        if ($owner) {
-            return sprintf('  ~ <info>%s</info>: %s%s', $owner, $path, $statusLabel);
+        if ($owner && $owner !== Patch::OWNER_UNKNOWN) {
+            return sprintf('<info>%s</info>: %s%s', $owner, $path, $statusLabel);
         }
 
         return sprintf('%s%s', $path, $statusLabel);
