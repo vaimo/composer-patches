@@ -135,8 +135,10 @@ version that would reflect the nature of the change. More details about the topi
 
 ## Development Container
 
-The modules ships with a dedicated development branch [devbox](https://github.com/vaimo/composer-changelogs/tree/devbox) 
-which contains configuration for spinning up a dedicated development environment that can be used together 
+### Option 1
+
+The modules ships with a dedicated development branch [devbox](https://github.com/vaimo/composer-changelogs/tree/devbox)
+which contains configuration for spinning up a dedicated development environment that can be used together
 with VSCode's [Remote Containers](https://code.visualstudio.com/docs/remote/containers).
 
 Note that there is no strict requirement to use such a setup, but it's what was used to author the plugin
@@ -145,10 +147,9 @@ take the shortcut.
 
 System requirements:
 
-1. Have [Docker](https://www.docker.com/) installed
-2. Have [Visual Studio Code](https://code.visualstudio.com/) installed 
-3. Hasve [Remote Containers](https://code.visualstudio.com/docs/remote/containers) extension installed on VSCode
-4. Have [Mutagen](https://mutagen.io) installed (used for selecting syncing)
+1. Have Docker installed.
+2. Have VSCode installed with 'Remote - Containers' extension.
+3. Have Mutagen installed (used for selecting syncing).
 
 Setup:
 
@@ -159,5 +160,33 @@ Setup:
 8. `mutagen project start`
 9. `docker-compose exec devbox composer install`
 
-Note this setup does come with a pre-bootstrapped xDebugger, you just have to use the Run menu 
+Note this setup does come with a pre-bootstrapped xDebugger, you just have to use the Run menu
 in VSCode and start listening and trigger a command via the terminal.
+
+### Option 2
+
+System requirements:
+
+* Have [Docker](https://www.docker.com/) installed
+* Have [Mutagen](https://mutagen.io) installed (used for selecting syncing)
+
+Setup:
+
+1. `git checkout devbox .devcontainer Dockerfile docker-compose.yml mutagen.yml`
+2. `git reset .devcontainer Dockerfile docker-compose.yml mutagen.yml`
+3. `docker-compose up -d`
+4. `mutagen project start`
+5. `docker-compose exec devbox composer config platform.php <PHP version>`
+6. `docker-compose exec devbox composer require --dev composer/composer:<Composer version> --no-update`
+7. `docker-compose exec devbox composer update`
+
+If you wish to change the PHP/Composer version:
+
+1. `docker-compose down --rmi all --volumes`
+2. `mutagen project terminate`
+3. Modify `docker-compose.yml` with the desired PHP and Composer version
+4. `docker-compose up -d`
+5. `mutagen project start`
+6. `docker-compose exec devbox composer config platform.php <PHP version>`
+7. `docker-compose exec devbox composer require --dev composer/composer:<Composer version> --no-update`
+8. `docker-compose exec devbox composer update`
