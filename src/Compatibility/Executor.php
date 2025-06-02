@@ -5,6 +5,10 @@
  */
 namespace Vaimo\ComposerPatches\Compatibility;
 
+use Composer\Composer;
+use Composer\Util\SyncHelper;
+use React\Promise\Promise;
+use Vaimo\ComposerPatches\Exceptions\OperationFailure;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\DependencyResolver\Operation\InstallOperation;
@@ -76,21 +80,28 @@ class Executor
         WritableRepositoryInterface $repository,
         InstallationManager $installationManager,
         InstallOperation $installOperation,
-        UninstallOperation $uninstallOperation
+        UninstallOperation $uninstallOperation,
+        Composer $composer
     ) {
         if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
             return $installationManager->install($repository, $installOperation);
         }
 
-        return $installationManager
-            ->uninstall($repository, $uninstallOperation)
-            ->then(function () use ($installationManager, $installOperation, $repository) {
-                $package = $installOperation->getPackage();
-                $installationManager->getInstaller($package->getType())
-                    ->download($package)
-                    ->then(function () use ($installationManager, $installOperation, $repository) {
-                        $installationManager->install($repository, $installOperation);
-                    });
-            });
+        $package = $installOperation->getPackage();
+        $installer = $installationManager->getInstaller($package->getType());
+
+        $promise = $installationManager->uninstall($repository, $uninstallOperation);
+        if (!$promise instanceof Promise) {
+            throw new OperationFailure("Uninstallation of {$package->getName()} failed");
+        }
+
+        return $promise->then(static function () use ($composer, $installer, $package) {
+            return SyncHelper::downloadAndInstallPackageSync(
+                $composer->getLoop(),
+                $composer->getDownloadManager(),
+                $installer->getInstallPath($package),
+                $package
+            );
+        });
     }
 }

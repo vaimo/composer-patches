@@ -195,7 +195,7 @@ class PatchesApplier
                     );
                 }
 
-                $resets[] = $this->repositoryManager->resetPackage($repository, $resetTarget);
+                $resets[] = $this->repositoryManager->resetPackage($repository, $resetTarget, $this->composer);
             }
 
             $this->compExecutor->waitForCompletion($this->composer, $resets);
