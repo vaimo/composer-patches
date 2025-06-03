@@ -5,6 +5,12 @@
  */
 namespace Vaimo\ComposerPatches\Config;
 
+if (!class_exists('loophp\phposinfo\OsInfo') && class_exists('drupol\phposinfo\OsInfo')) {
+    class_alias('drupol\phposinfo\OsInfo', 'loophp\phposinfo\OsInfo');
+    class_alias('drupol\phposinfo\Enum\FamilyName', 'loophp\phposinfo\Enum\FamilyName');
+    class_alias('drupol\phposinfo\Enum\OsName', 'loophp\phposinfo\Enum\OsName');
+}
+
 use loophp\phposinfo\OsInfo;
 use loophp\phposinfo\Enum\OsName;
 use loophp\phposinfo\Enum\FamilyName;
