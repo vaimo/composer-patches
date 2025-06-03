@@ -4,7 +4,7 @@
     "license": "MIT",
     "description": "Applies a patch from a local or remote file to any package that is part of a given composer project. Patches can be defined both on project and on package level. Optional support for patch versioning, sequencing, custom patch applier configuration and patch command for testing/troubleshooting added patches.",
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.1.0",
         "ext-json": "*",
         "composer-plugin-api": "^1.0 || ^2.0",
         "composer-runtime-api": "^1.0 || ^2.0",
