@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "18b1077772b4ebf4f624575fed5bfdb9",
+    "content-hash": "8164540002f76597336cf9906771296b",
     "packages": [
         {
             "name": "loophp/phposinfo",
@@ -2072,7 +2072,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.4.0",
+        "php": ">=7.0.0",
         "ext-json": "*",
         "composer-plugin-api": "^1.0 || ^2.0",
         "composer-runtime-api": "^1.0 || ^2.0"

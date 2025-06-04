@@ -8,7 +8,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         versions: [
           { php: "7.0.33", composer: 1.10.27 },

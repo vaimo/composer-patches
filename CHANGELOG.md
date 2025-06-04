@@ -2,6 +2,36 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 5.3.1 (2025-06-03)
+
+### Fix
+
+* Fixes issue where package can be installed with loophp/phposinfo 1.6, despite the package code having hard references to 1.7. The package should now work with both 1.6 and 1.7. https://github.com/vaimo/composer-patches/pull/127
+* Fixes accidentally missed backwards incompatibility added in 5.3.0, which would've locked the package only to PHP 7.4 and above. https://github.com/vaimo/composer-patches/pull/127
+* Updated minimum PHP version requirement to 7.1 from 7.0, since version 5.2.1 added PHP 8.4 compatibility changes that are not compatible with PHP 7.0. https://github.com/vaimo/composer-patches/pull/127
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.3.1) [diff](https://github.com/vaimo/composer-patches/compare/5.3.0...5.3.1)
+
+## 5.3.0 (2025-06-02)
+
+### Feature
+
+* Allow wildcard in patches search folder path: https://github.com/vaimo/composer-patches/pull/86
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.3.0) [diff](https://github.com/vaimo/composer-patches/compare/5.2.2...5.3.0)
+
+## 5.2.2 (2025-06-02)
+
+### Fix
+
+* Fixes issue where platform and platform-dev data types are modified for no reason in latest versions of Composer: https://github.com/vaimo/composer-patches/pull/126
+
+### Feature
+
+* Improved performance by preventing unnecessary lock file writing: https://github.com/vaimo/composer-patches/pull/123
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.2.2) [diff](https://github.com/vaimo/composer-patches/compare/5.2.1...5.2.2)
+
 ## 5.2.1 (2025-04-17)
 
 ### Fix
