@@ -5,6 +5,7 @@
  */
 namespace Vaimo\ComposerPatches\Compatibility;
 
+use Vaimo\ComposerPatches\Exceptions\OperationFailure;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\DependencyResolver\Operation\InstallOperation;
@@ -82,15 +83,29 @@ class Executor
             return $installationManager->install($repository, $installOperation);
         }
 
-        return $installationManager
-            ->uninstall($repository, $uninstallOperation)
-            ->then(function () use ($installationManager, $installOperation, $repository) {
-                $package = $installOperation->getPackage();
-                $installationManager->getInstaller($package->getType())
-                    ->download($package)
-                    ->then(function () use ($installationManager, $installOperation, $repository) {
-                        $installationManager->install($repository, $installOperation);
-                    });
+        $package = $installOperation->getPackage();
+        $installer = $installationManager->getInstaller($package->getType());
+
+        $uninstallPromise = $installationManager->uninstall($repository, $uninstallOperation);
+        if (!$uninstallPromise) {
+            throw new OperationFailure(sprintf('Uninstallation of %s failed', $package->getName()));
+        }
+
+        $downloadPromise = $installer->download($package);
+        if (!$downloadPromise) {
+            throw new OperationFailure(sprintf('Download of %s failed', $package->getName()));
+        }
+
+        $promise = \React\Promise\all([$uninstallPromise, $downloadPromise]);
+
+        return $promise->then(static function () use ($installationManager, $installOperation, $repository, $package) {
+            $installPromise = $installationManager->install($repository, $installOperation);
+            if (!$installPromise) {
+                throw new OperationFailure(sprintf('Install of %s failed', $package->getName()));
+            }
+
+            return $installPromise->then(static function () {
             });
+        });
     }
 }
