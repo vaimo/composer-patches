@@ -1,0 +1,4 @@
+s/In FileDownloader.php line .*:/In FileDownloader.php:/g
+/^#/d
+/^Stack trace/d
+/^Unhandled promise rejection/d

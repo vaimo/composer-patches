@@ -8,7 +8,7 @@
     
     <rule ref="PHPCompatibility" />
 
-    <config name="testVersion" value="5.3-"/>
+    <config name="testVersion" value="7.4-"/>
     
     <rule ref="PSR1"/>
     <rule ref="PSR2"/>

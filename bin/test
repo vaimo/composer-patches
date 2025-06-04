@@ -12,7 +12,7 @@ source ${script_root}/lib/output.sh
 run_tests() {
     local scenario_root=${1}
     local copy_target=${2}
-    local composer_version=$(composer --version|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f1)
+    local composer_version=$(composer --version|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f2)
 
     local scenario_label=$(cat ${scenario_root}/.label)
 
@@ -69,7 +69,7 @@ EOF
         if [ "${line:0:1}" == "@" ] ; then
             local command=$(_trim_string ${line:1}|cut -d' ' -f1)
             local args=$(_trim_string ${line:1}|cut -d' ' -f2-)
-            
+
             local php_script=
             
             if [ "${command}" == "queue_update" ] ; then
@@ -90,7 +90,7 @@ EOF
                         return isset(\$item['name']) ? \$item['name'] : ''; 
                     }, \$packagesConfig);
                     \$index = array_search('${target}', \$names, true);
-                                
+
                     if (\$index !== false) {
                         \$packagesConfig[\$index]['version'] = '0.0.0';
                         \$packagesConfig[\$index]['version_normalized'] = '0.0.0';
@@ -277,20 +277,20 @@ assert_scenario_output() {
     local patches_owner=${1}
     local scenario_root=${2}
     local output_file=${3}
-    local composer_version=$(composer --version 2>/dev/null|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f1)
+    local composer_version=$(composer --version 2>/dev/null|sed 's/Composer version \(.*\)/\1/g'|cut -d ' ' -f2)
     local composer_major=${composer_version%%.*}
 
     local expected_output_file="${scenario_root}/.output"
     local output_filters="${scenario_root}/.filters"
 
     if _is_macosx ; then
-        if [ "${composer_major}" = "2" ] && [ -f ${expected_output_file}-v2-darwin ] ; then
+        if [ "${composer_major}" = "1" ] && [ -f ${expected_output_file}-v1-darwin ] ; then
             expected_output_file="${expected_output_file}-v2-darwin"
         elif [ -f ${expected_output_file}-darwin ] ; then
             expected_output_file="${expected_output_file}-darwin"
         fi
-    elif [ "${composer_major}" = "2" ] && [ -f ${expected_output_file}-v2 ] ; then
-        expected_output_file="${expected_output_file}-v2"
+    elif [ "${composer_major}" = "1" ] && [ -f ${expected_output_file}-v1 ] ; then
+        expected_output_file="${expected_output_file}-v1"
     fi
 
     if [ ! -f ${output_file} ] ; then
@@ -325,6 +325,10 @@ assert_scenario_output() {
         |grep -v "^Updating dependencies" \
         |grep -v "^Nothing to modify in lock file" \
         |grep -v "^Warning: The lock file is not up to date with the latest changes in" \
+        |grep -v "^Debug: " \
+        |grep -v "^You are using Composer 1 which is deprecated." \
+        |grep -v "^Warning from https://repo.packagist.org: Support for Composer 1" \
+        |grep -v "^Package symfony/debug is abandoned" \
         |sed 's/ *$//g' \
         > output.txt
 
@@ -393,7 +397,7 @@ process_assertions() {
 apply_patches() {
     local args=${1}
     local out_file=${2}
- 
+
     local command="composer ${args} --ansi"
  
     if [ "${VERBOSE}" == "1" ] ; then
@@ -406,14 +410,12 @@ apply_patches() {
  
     cols=$(tput cols)
     rows=$(tput lines)
-    
+
     (
-        stty rows 50 cols 1000
         eval "${command}; return \${PIPESTATUS[0]}"
     )
         
     local result=${?}
-    stty rows ${rows} cols ${cols}
     
     return ${result};
 }
@@ -492,7 +494,7 @@ reset_packages() {
     local lock_path="${installation_root}/composer.lock"
 
     if [ -f ${install_info_path} ] ; then
-        filters=$(grep -r "@package" ${scenarios_root}|sed 's/.*@package\(.*\)/\1/g'|sort|uniq|tr '\n' '|'|tr -d ' '|tr -d '\r')
+        filters=$(grep -r "@package" ${scenarios_root}|sed 's/.*@package\(.*\)/\1/g'|sort|uniq|tr '\n' '|'|tr -d ' '|tr -d '\r'|sed 's/|$//g')
         perl -i.org -pe "s%(\s\"name\":\s\")(${filters}|vaimo/composer-patches-target)(.*)\",%\1__\2\3\",%g" \
             ${install_info_path}
 
@@ -519,7 +521,7 @@ EOF
         php -r "${php_script}" 2>/dev/null
     fi
     
-    composer install --ansi --no-plugins &>/dev/null
+    composer install --ansi &>/dev/null
 }
 
 sanitize() {
@@ -613,9 +615,9 @@ fi
             cp -R ${sandbox_root}/modules ${installation_root}
 
             if [ ! -f composer.lock ] ; then
-                composer install --ansi --no-plugins
+                composer install --ansi
             else
-                composer install --ansi --no-plugins &>/dev/null
+                composer install --ansi &>/dev/null
             fi
 
             cp composer.json composer.json.org
@@ -639,7 +641,7 @@ fi
                     cp composer.lock.org composer.lock
                     if [ "${cdiff}" != "" ] ; then
                         _info "RESTORING INSTALLATION"
-                        composer install --no-plugins
+                        composer install
                     fi
 
                     sanitize "${copy_target}"
@@ -652,7 +654,7 @@ fi
                     cp composer.lock.org composer.lock
                     if [ "${cdiff}" != "" ] ; then
                         _info "RESTORING INSTALLATION"
-                        composer install --no-plugins
+                        composer install
                     fi
                     
                     sanitize_scenario "${scenario_root}" "${copy_target}"

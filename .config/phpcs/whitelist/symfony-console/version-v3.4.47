@@ -1,0 +1,5 @@
+Graceful usage: Terminal.php,106,66,PHPCompatibility.FunctionUse.NewFunctions.sapi_windows_vt100_supportFound
+Graceful usage: Helper/QuestionHelper.php,163,14,PHPCompatibility.FunctionUse.NewFunctions.sapi_windows_cp_setFound
+Graceful usage: Output/StreamOutput.php,102,21,PHPCompatibility.FunctionUse.NewFunctions.sapi_windows_vt100_supportFound
+Graceful usage: Output/StreamOutput.php,109,21,PHPCompatibility.FunctionUse.NewFunctions.stream_isattyFound
+Incorrect error: Tests/Command/CommandTest.php,428,26,PHPCompatibility.FunctionDeclarations.NewClosure.ThisFoundOutsideClass

@@ -1,6 +1,7 @@
 Scanning packages for orphan patches
 Validation completed successfully
 Processing patches configuration
+  - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
   - Applying patches for vaimo/composer-patches-target1 (1)
     ~ {{PATCHES-OWNER}}: patches/some-changes.patch [NEW]
       Change: value8 => valueC
@@ -10,9 +11,6 @@ Processing patches configuration
       > PATCH                                                             
         @ src/example.txt                                                 
         ! Success changed to FAILURE due to output analysis (reversals):  
-          Reversed (or previously applied) patch detected!  Assuming -R.  
-                                                                          
-      > GIT                                                               
-        ! error: patch failed: src/example.txt:5                          
+          Reversed (or previously applied) patch detected!  Assuming -R.
                                                                           
       (For full, unfiltered details please use: composer patch:apply -vvv)

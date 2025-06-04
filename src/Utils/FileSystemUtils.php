@@ -9,11 +9,49 @@ class FileSystemUtils
 {
     public function collectFilePathsRecursively($rootPath, $pattern)
     {
+        if (strpos($rootPath, '*') !== false || strpos($rootPath, '?') !== false) {
+            $paths = $this->collectGlobs($rootPath, $pattern);
+
+            return array_filter($paths, function ($item) {
+                return is_file($item);
+            });
+        }
+
         $paths = $this->collectPathsRecursively($rootPath, $pattern);
 
         return array_filter($paths, function ($item) {
             return is_file($item);
         });
+    }
+
+    public function collectGlobs($rootPath, $pattern)
+    {
+        $iterator = new \GlobIterator($rootPath);
+
+        $files = array();
+
+        foreach ($iterator as $info) {
+            if ($info->isDir()) {
+                $files = array_merge($files, $this->collectPathsRecursively($info->getRealPath(), $pattern));
+                continue;
+            }
+
+            if (!$info->isFile() || !preg_match($pattern, $info->getRealPath())) {
+                continue;
+            }
+
+            $path = $info->getRealPath();
+            $files[$path] = $path;
+        }
+
+        $sequence = array_keys($files);
+
+        natsort($sequence);
+
+        return array_replace(
+            array_flip($sequence),
+            $files
+        );
     }
 
     public function collectPathsRecursively($rootPath, $pattern)

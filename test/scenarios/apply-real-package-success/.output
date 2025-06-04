@@ -1,6 +1,7 @@
 Scanning packages for orphan patches
 Validation completed successfully
 Processing patches configuration
+  - Installing vaimo/topological-sort (1.0.0): Extracting archive
   - Applying patches for vaimo/topological-sort (1)
     ~ {{PATCHES-OWNER}}: patches/first-change.patch [NEW]
       Change: Dependency => The cool thing

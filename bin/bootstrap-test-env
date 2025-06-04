@@ -14,6 +14,7 @@ if [ ! -L test/modules/${name}/src ] ; then
 fi
 
 cp composer.json test/modules/${name} 2>/dev/null
+cp compatibility.php test/modules/${name} 2>/dev/null
 
 sed -i.org 's|'${name}'"|'${name}'-local"|g' test/modules/${name}/composer.json
 rm test/modules/${name}/composer.json.org 2>/dev/null
