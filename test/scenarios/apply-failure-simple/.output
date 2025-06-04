@@ -1,4 +1,5 @@
 Processing patches configuration
+  - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
   - Applying patches for vaimo/composer-patches-target1 (1)
     ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
       Change: value8 => valueC
@@ -8,8 +9,5 @@ Processing patches configuration
       > PATCH
         @ src/example.txt
         ! Hunk #1 FAILED at 5.
-
-      > GIT
-        ! error: patch failed: src/example.txt:5
 
       (For full, unfiltered details please use: composer patch:apply -vvv)

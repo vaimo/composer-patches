@@ -11,9 +11,13 @@ class FileSystemUtils
     {
         if (strpos($rootPath, '*') !== false || strpos($rootPath, '?') !== false) {
             $paths = $this->collectGlobs($rootPath, $pattern);
-        } else {
-            $paths = $this->collectPathsRecursively($rootPath, $pattern);
+
+            return array_filter($paths, function ($item) {
+                return is_file($item);
+            });
         }
+
+        $paths = $this->collectPathsRecursively($rootPath, $pattern);
 
         return array_filter($paths, function ($item) {
             return is_file($item);

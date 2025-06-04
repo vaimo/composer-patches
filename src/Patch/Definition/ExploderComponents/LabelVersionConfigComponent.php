@@ -25,6 +25,11 @@ class LabelVersionConfigComponent implements \Vaimo\ComposerPatches\Interfaces\D
             return $this->valueAnalyser->isConstraint($data);
         }
 
+        $dataKeys = array_keys($data);
+        if (in_array(PatchDefinition::SOURCE, $dataKeys)) {
+            return false;
+        }
+
         return $this->valueAnalyser->isConstraint(reset($data));
     }
 

@@ -1,0 +1,14 @@
+Scanning packages for orphan patches
+Validation completed successfully
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-sandbox (1)
+    ~ {{PATCHES-OWNER}}: patches/multiple-packages-single-file.patch [MATCH]
+      Change: value17 => valueB; value5 => valueA
+
+  - Applying patches for vaimo/composer-patches-target1 (2)
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [MATCH]
+      Change: value8 => valueC
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-wildcard-version.patch [MATCH]
+      Change: value17 => valueX
+
+Writing patch info to install file

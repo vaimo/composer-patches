@@ -1,0 +1,15 @@
+Scanning packages for orphan patches
+Validation completed successfully
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-target1 (1)
+    ~ {{PATCHES-OWNER}}: patches/some-changes.patch [NEW]
+      Change: value8 => valueC
+      Failed to apply the patch. Halting execution!
+      Probable causes for the failure:                                    
+                                                                          
+      > PATCH                                                             
+        @ src/example.txt                                                 
+        ! Success changed to FAILURE due to output analysis (reversals):  
+          Reversed (or previously applied) patch detected!  Assuming -R.
+                                                                          
+      (For full, unfiltered details please use: composer patch:apply -vvv)

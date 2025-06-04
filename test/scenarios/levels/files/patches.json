@@ -1,0 +1,19 @@
+{
+    "vaimo/composer-patches-target1": {
+        "Change: value8 => valueC": {
+            "source": "patches/0_patch-level-1.patch",
+            "level": "1"
+        },
+        "Change: valueC => valueX": {
+            "level": "1",
+            "source": "patches/1_patch-level-1.patch"
+        },
+        "Change: valueX => valueY": {
+            "source": "patches/2_patch-level-0.patch",
+            "level": "0"
+        },
+        "Change: valueY => valueZ": {
+            "source": "patches/3_patch-no-level.patch"
+        }
+    }
+}

@@ -2,6 +2,88 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 5.3.1 (2025-06-03)
+
+### Fix
+
+* Fixes issue where package can be installed with loophp/phposinfo 1.6, despite the package code having hard references to 1.7. The package should now work with both 1.6 and 1.7. https://github.com/vaimo/composer-patches/pull/127
+* Fixes accidentally missed backwards incompatibility added in 5.3.0, which would've locked the package only to PHP 7.4 and above. https://github.com/vaimo/composer-patches/pull/127
+* Updated minimum PHP version requirement to 7.1 from 7.0, since version 5.2.1 added PHP 8.4 compatibility changes that are not compatible with PHP 7.0. https://github.com/vaimo/composer-patches/pull/127
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.3.1) [diff](https://github.com/vaimo/composer-patches/compare/5.3.0...5.3.1)
+
+## 5.3.0 (2025-06-02)
+
+### Feature
+
+* Allow wildcard in patches search folder path: https://github.com/vaimo/composer-patches/pull/86
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.3.0) [diff](https://github.com/vaimo/composer-patches/compare/5.2.2...5.3.0)
+
+## 5.2.2 (2025-06-02)
+
+### Fix
+
+* Fixes issue where platform and platform-dev data types are modified for no reason in latest versions of Composer: https://github.com/vaimo/composer-patches/pull/126
+
+### Feature
+
+* Improved performance by preventing unnecessary lock file writing: https://github.com/vaimo/composer-patches/pull/123
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.2.2) [diff](https://github.com/vaimo/composer-patches/compare/5.2.1...5.2.2)
+
+## 5.2.1 (2025-04-17)
+
+### Fix
+
+* Fixes PHP 8.4 compatibility errors related to Implicitly marking parameter xxxxx as nullable is deprecated, the explicit nullable type must be used instead: https://github.com/vaimo/composer-patches/pull/121
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.2.1) [diff](https://github.com/vaimo/composer-patches/compare/5.2.0...5.2.1)
+
+## 5.2.0 (2024-04-18)
+
+### Fix
+
+* Add JSON output format flag and correct return value in ListCommand: https://github.com/vaimo/composer-patches/pull/108
+* Resolve RuntimeException "Could not delete file": https://github.com/vaimo/composer-patches/pull/112
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.2.0) [diff](https://github.com/vaimo/composer-patches/compare/5.1.2...5.2.0)
+
+## 5.1.2 (2023-11-22)
+
+### Fix
+
+* Resolve unzip error on applying new patches when composer cache is cleared: https://github.com/vaimo/composer-patches/pull/107
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.1.2) [diff](https://github.com/vaimo/composer-patches/compare/5.1.1...5.1.2)
+
+## 5.1.1 (2023-03-09)
+
+### Fix
+
+* Fix deprecation message for PHP 8.2: https://github.com/vaimo/composer-patches/pull/105
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.1.1) [diff](https://github.com/vaimo/composer-patches/compare/5.1.0...5.1.1)
+
+## 5.1.0 (2022-07-08)
+
+### Fix
+
+* Use the proper way to retrieve the Composer version: https://github.com/vaimo/composer-patches/pull/92
+* Fix PHP 8.1 deprecation notices
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.1.0) [diff](https://github.com/vaimo/composer-patches/compare/5.0.0...5.1.0)
+
+## 5.0.0 (2022-05-13)
+
+### Fix
+
+* Drop php5 support, Fix PHP 8.1 deprecation notices: https://github.com/vaimo/composer-patches/pull/96
+* Add conflict with cweagans/composer-patches: https://github.com/vaimo/composer-patches/pull/94
+* Uninstall package during ReInstallOperation for Composer v2 https://github.com/vaimo/composer-patches/pull/99
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.0.0) [diff](https://github.com/vaimo/composer-patches/compare/4.22.4...5.0.0)
+
 ## 4.22.4 (2021-02-25)
 
 changes in this release forward-ported from  3.53.4

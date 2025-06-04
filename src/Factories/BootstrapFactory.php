@@ -34,10 +34,16 @@ class BootstrapFactory
         $this->appIO = $appIO;
     }
 
+    /**
+     * @param ConfigFactory $configFactory
+     * @param ListResolver|null $listResolver
+     * @param OutputStrategy|null $outputStrategy
+     * @return \Vaimo\ComposerPatches\Bootstrap
+     */
     public function create(
         ConfigFactory $configFactory,
-        ?ListResolver $listResolver = null,
-        ?OutputStrategy $outputStrategy = null
+        $listResolver = null,
+        $outputStrategy = null
     ) {
         if ($listResolver === null) {
             $listResolver = new ListResolvers\ChangesListResolver(

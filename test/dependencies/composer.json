@@ -7,8 +7,8 @@
         "vaimo/composer-patches-local": "@dev"
     },
     "require-dev": {
-        "phpcompatibility/php-compatibility": "^9.1.1",
-        "squizlabs/php_codesniffer": "^2.9.2"
+        "phpcompatibility/php-compatibility": ">=9.1.1",
+        "squizlabs/php_codesniffer": ">=2.9.2"
     },
     "repositories": [
         {
@@ -18,7 +18,11 @@
     ],
     "config": {
         "platform": {
-            "php": "7.2.22"
+            "php": "7.4.33"
+        },
+        "allow-plugins": {
+            "vaimo/composer-patches-local": true,
+            "vaimo/composer-patches-proxy": true
         }
     }
 }
