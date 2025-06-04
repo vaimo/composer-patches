@@ -1,0 +1,5 @@
+Graceful usage: Terminal.php,106,66,PHPCompatibility.FunctionUse.NewFunctions.sapi_windows_vt100_supportFound
+Graceful usage: Helper/ProgressBar.php,276,31,PHPCompatibility.FunctionUse.NewFunctions.is_countableFound
+Graceful usage: Helper/QuestionHelper.php,488,49,PHPCompatibility.FunctionUse.NewFunctions.stream_isattyFound
+Graceful usage: Output/StreamOutput.php,107,21,PHPCompatibility.FunctionUse.NewFunctions.sapi_windows_vt100_supportFound
+Graceful usage: Output/StreamOutput.php,114,21,PHPCompatibility.FunctionUse.NewFunctions.stream_isattyFound

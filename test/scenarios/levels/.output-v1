@@ -1,0 +1,14 @@
+Scanning packages for orphan patches
+Validation completed successfully
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-target1 (4)
+    ~ {{PATCHES-OWNER}}: patches/0_patch-level-1.patch [NEW]
+      Change: value8 => valueC
+    ~ {{PATCHES-OWNER}}: patches/1_patch-level-1.patch [NEW]
+      Change: valueC => valueX
+    ~ {{PATCHES-OWNER}}: patches/2_patch-level-0.patch [NEW]
+      Change: valueX => valueY
+    ~ {{PATCHES-OWNER}}: patches/3_patch-no-level.patch [NEW]
+      Change: valueY => valueZ
+
+Writing patch info to install file

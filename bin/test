@@ -284,13 +284,13 @@ assert_scenario_output() {
     local output_filters="${scenario_root}/.filters"
 
     if _is_macosx ; then
-        if [ "${composer_major}" = "2" ] && [ -f ${expected_output_file}-v2-darwin ] ; then
+        if [ "${composer_major}" = "1" ] && [ -f ${expected_output_file}-v1-darwin ] ; then
             expected_output_file="${expected_output_file}-v2-darwin"
         elif [ -f ${expected_output_file}-darwin ] ; then
             expected_output_file="${expected_output_file}-darwin"
         fi
-    elif [ "${composer_major}" = "2" ] && [ -f ${expected_output_file}-v2 ] ; then
-        expected_output_file="${expected_output_file}-v2"
+    elif [ "${composer_major}" = "1" ] && [ -f ${expected_output_file}-v1 ] ; then
+        expected_output_file="${expected_output_file}-v1"
     fi
 
     if [ ! -f ${output_file} ] ; then
@@ -326,6 +326,9 @@ assert_scenario_output() {
         |grep -v "^Nothing to modify in lock file" \
         |grep -v "^Warning: The lock file is not up to date with the latest changes in" \
         |grep -v "^Debug: " \
+        |grep -v "^You are using Composer 1 which is deprecated." \
+        |grep -v "^Warning from https://repo.packagist.org: Support for Composer 1" \
+        |grep -v "^Package symfony/debug is abandoned" \
         |sed 's/ *$//g' \
         > output.txt
 
@@ -394,7 +397,7 @@ process_assertions() {
 apply_patches() {
     local args=${1}
     local out_file=${2}
- 
+
     local command="composer ${args} --ansi"
  
     if [ "${VERBOSE}" == "1" ] ; then
@@ -407,7 +410,7 @@ apply_patches() {
  
     cols=$(tput cols)
     rows=$(tput lines)
-    
+
     (
         eval "${command}; return \${PIPESTATUS[0]}"
     )
@@ -491,7 +494,7 @@ reset_packages() {
     local lock_path="${installation_root}/composer.lock"
 
     if [ -f ${install_info_path} ] ; then
-        filters=$(grep -r "@package" ${scenarios_root}|sed 's/.*@package\(.*\)/\1/g'|sort|uniq|tr '\n' '|'|tr -d ' '|tr -d '\r')
+        filters=$(grep -r "@package" ${scenarios_root}|sed 's/.*@package\(.*\)/\1/g'|sort|uniq|tr '\n' '|'|tr -d ' '|tr -d '\r'|sed 's/|$//g')
         perl -i.org -pe "s%(\s\"name\":\s\")(${filters}|vaimo/composer-patches-target)(.*)\",%\1__\2\3\",%g" \
             ${install_info_path}
 

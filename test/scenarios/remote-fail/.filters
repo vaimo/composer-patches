@@ -1,5 +1,6 @@
 s/(.* 404 .*)/(404)/g
 s/In CurlDownloader.php line .*:/In CurlDownloader.php:/g
+s/In RemoteFilesystem.php line .*:/In RemoteFilesystem.php:/g
 /^#/d
 /^Stack trace/d
 /^Unhandled promise rejection/d

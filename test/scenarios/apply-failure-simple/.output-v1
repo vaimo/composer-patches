@@ -1,0 +1,12 @@
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-target1 (1)
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
+      Change: value8 => valueC
+      Failed to apply the patch. Halting execution!
+      Probable causes for the failure:
+
+      > PATCH
+        @ src/example.txt
+        ! Hunk #1 FAILED at 5.
+
+      (For full, unfiltered details please use: composer patch:apply -vvv)

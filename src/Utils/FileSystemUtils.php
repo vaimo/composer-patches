@@ -32,7 +32,7 @@ class FileSystemUtils
 
         foreach ($iterator as $info) {
             if ($info->isDir()) {
-                $files = [...$files, ...$this->collectPathsRecursively($info->getRealPath(), $pattern)];
+                $files = array_merge($files, $this->collectPathsRecursively($info->getRealPath(), $pattern));
                 continue;
             }
 
