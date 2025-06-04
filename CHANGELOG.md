@@ -2,6 +2,33 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 5.4.0
+
+### Maintenance
+
+* Added Github workflows config file, that runs ci:build command from the package against PHP versions 7.0 - 8.4. Different Composer versions also included.
+* Dropped sebastian/phpcpd from dev dependencies since this is abandoned and will not work with PHP 8.4, cleaned out all references from testing scripts.
+* Added explicit version requirement for symfony/console, since the code in the package will not work with versions 7 and above of symfony/console.
+* Updated bin/analyse-dependencies script to always run as if it was given 'current' in the parameters, since looping through different PHP versions and installing packages will not work anymore with the big differences between PHP versions.
+* Updated whitelists related to bin/analyse-dependencies script, since the bigger range of PHP versions means different versions of the dependencies.
+* Updated bin/test command to ignore Composer 1 deprecation warnings since these are not relevant during the tests.
+* Updated bin/test command to expect Composer 2 related outputs in .output files, while Composer 1 related outputs are expected to be in .output-v1.
+* Updated some test scenarios related to bin/test to ignore unhandled promise rejection errors for now, which come up in Composer >2.7.
+* Updated documentation a little bit, mainly cleaned out invalid whitespaces (which might show up weirdly depending on IDE) and updated development guidelines with few more details
+
+### Fix
+
+* Compatibility with PHP 7.0 restored, while still including support for PHP 8.4. Instead of explicitly marking the nullable parameters, dropped the explicit types from the parameters altogether.
+* Adjusted the loophp/phposinfo compatibility approach taken in 5.3.1 to autoloader based one, since the previous approach didn't work with the testsuite.
+* Fixed issue with bin/analyse-dependencies command not understanding empty autoloader paths of packages.
+* Fixed issue with bin/test command related to Composer version detection, which caused execution of queue_update and queue_install commands to not work correctly.
+* Fixed issue with Composer file manipulation during bin/test command, where only certain packages were meant to be modified with underscore prefix, but trailing separator caused the prefix to apply on all packages, which caused some side effects.
+* Fixed some loose issues found by bin/analyse command, mainly unnecessary else usages and excessively long line lengths
+* Fixed PHP >8.1 incompatibility with patch:validate command, where array_map and reset function usage together caused the command to break
+* Included alternative fix suggestion for https://github.com/vaimo/composer-patches/pull/110 and updated test scenarios to verify the fix
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.4.0) [diff](https://github.com/vaimo/composer-patches/compare/5.3.1...5.4.0)
+
 ## 5.3.1 (2025-06-03)
 
 ### Fix
