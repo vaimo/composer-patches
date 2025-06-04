@@ -104,7 +104,8 @@ class Executor
                 throw new OperationFailure(sprintf('Install of %s failed', $package->getName()));
             }
 
-            return $installPromise->then(static function () {});
+            return $installPromise->then(static function () {
+            });
         });
     }
 }
