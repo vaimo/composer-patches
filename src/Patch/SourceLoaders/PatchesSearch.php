@@ -269,9 +269,17 @@ class PatchesSearch implements \Vaimo\ComposerPatches\Interfaces\PatchSourceLoad
         $dependsNormalized = array_map(
             function ($item) {
                 $valueParts = explode(':', $item);
+                $packageName = trim(array_shift($valueParts) ?? '');
+                $version = trim(array_shift($valueParts) ?? '') ?: '>=0.0.0';
+
+                // Handle negated dependencies with ! prefix
+                if (strpos($packageName, '!') === 0) {
+                    $packageName = substr($packageName, 1);
+                    $version = array('version' => $version, 'negated' => true);
+                }
 
                 return array(
-                    trim(array_shift($valueParts) ?? '') => trim(array_shift($valueParts) ?? '') ?: '>=0.0.0'
+                    $packageName => $version
                 );
             },
             array_unique($dependsList)
