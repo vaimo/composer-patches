@@ -93,55 +93,82 @@ class ConstraintsComponent implements \Vaimo\ComposerPatches\Interfaces\Definiti
     {
         $comparisonResults = array();
 
-        foreach ($patchConstraints as $constraintTarget => $version) {
+        foreach ($patchConstraints as $constraintTarget => $constraint) {
+            // Check if this is a negated dependency (array format)
+            if (is_array($constraint) && isset($constraint['negated']) && $constraint['negated']) {
+                $version = $constraint['version'];
+                $packageExists = isset($packages[$constraintTarget]);
+
+                if (!$packageExists) {
+                    // Package not installed - negated dependency satisfied
+                    $comparisonResults[] = true;
+                    continue;
+                }
+
+                // Package is installed - check if version constraint fails
+                $package = $packages[$constraintTarget];
+                $matchResult = $this->checkVersionConstraint($package, $version, $rootRequires, $constraintTarget);
+                $comparisonResults[] = !$matchResult; // Negate the result
+                continue;
+            }
+
+            // Handle regular string constraints
+            $version = $constraint;
+
             if (!isset($packages[$constraintTarget])) {
                 continue;
             }
 
             $package = $packages[$constraintTarget];
 
-            $packageVersion = $package->getVersion();
-            $packageVersions = array($package->getVersion());
-
-            if (isset($rootRequires[$constraintTarget])) {
-                /** @var \Composer\Package\CompletePackageInterface $targetRootPackage */
-                $targetRootPackage = $rootRequires[$constraintTarget];
-
-                $prettyVersion = $this->packageUtils->getPrettyVersion($targetRootPackage);
-
-                $matches = array();
-                preg_match('/.* as (.*)$/', $prettyVersion, $matches);
-
-                if (isset($matches[1])) {
-                    $packageVersions[] = $matches[1];
-                }
-            }
-
-            if ($this->constraintUtils->isDevConstraint($packageVersion)) {
-                $definedVersion = $this->configExtractor->getConfig(
-                    $package,
-                    'version'
-                );
-
-                $packageVersions[] = $definedVersion;
-            }
-
-            $matchResult = false;
-
-            foreach (array_filter($packageVersions) as $packageVersion) {
-                $packageConstraint = $this->versionParser->parseConstraints($packageVersion);
-                $patchConstraint = $this->versionParser->parseConstraints($version);
-
-                $matchResult = $patchConstraint->matches($packageConstraint);
-
-                if ($matchResult) {
-                    break;
-                }
-            }
-
+            $matchResult = $this->checkVersionConstraint($package, $version, $rootRequires, $constraintTarget);
             $comparisonResults[] = $matchResult;
         }
 
         return $comparisonResults;
+    }
+
+    private function checkVersionConstraint($package, $version, $rootRequires, $constraintTarget)
+    {
+        $packageVersion = $package->getVersion();
+        $packageVersions = array($package->getVersion());
+
+        if (isset($rootRequires[$constraintTarget])) {
+            /** @var \Composer\Package\CompletePackageInterface $targetRootPackage */
+            $targetRootPackage = $rootRequires[$constraintTarget];
+
+            $prettyVersion = $this->packageUtils->getPrettyVersion($targetRootPackage);
+
+            $matches = array();
+            preg_match('/.* as (.*)$/', $prettyVersion, $matches);
+
+            if (isset($matches[1])) {
+                $packageVersions[] = $matches[1];
+            }
+        }
+
+        if ($this->constraintUtils->isDevConstraint($packageVersion)) {
+            $definedVersion = $this->configExtractor->getConfig(
+                $package,
+                'version'
+            );
+
+            $packageVersions[] = $definedVersion;
+        }
+
+        $matchResult = false;
+
+        foreach (array_filter($packageVersions) as $packageVersion) {
+            $packageConstraint = $this->versionParser->parseConstraints($packageVersion);
+            $patchConstraint = $this->versionParser->parseConstraints($version);
+
+            $matchResult = $patchConstraint->matches($packageConstraint);
+
+            if ($matchResult) {
+                break;
+            }
+        }
+
+        return $matchResult;
     }
 }

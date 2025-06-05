@@ -46,6 +46,9 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
             );
         }
 
+        // Handle negated dependencies in JSON config
+        $depends = $this->processNegatedDependencies($depends);
+
         return array(
             PatchDefinition::DEPENDS => $depends
         );
@@ -83,5 +86,22 @@ class DependencyComponent implements \Vaimo\ComposerPatches\Interfaces\Definitio
         }
 
         return $patternValues;
+    }
+
+    private function processNegatedDependencies(array $depends)
+    {
+        $processedDepends = array();
+
+        foreach ($depends as $packageName => $version) {
+            // Handle negated dependencies with ! prefix in JSON config
+            if (strpos($packageName, '!') === 0) {
+                $packageName = substr($packageName, 1);
+                $version = array('version' => $version, 'negated' => true);
+            }
+
+            $processedDepends[$packageName] = $version;
+        }
+
+        return $processedDepends;
     }
 }
