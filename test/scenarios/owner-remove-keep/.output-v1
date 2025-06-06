@@ -6,3 +6,5 @@ Processing patches configuration
       Change: value8 => valueC (expecting revert on owner removal)
 
 Writing patch info to install file
+Package operations: 0 installs, 0 updates, 1 removal
+  - Removing {{PATCHES-OWNER}} (1.0.0)

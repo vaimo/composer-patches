@@ -1,4 +1,5 @@
 patch:validate
 patch:apply
->composer remove {{PATCHES-OWNER}}
+remove {{PATCHES-OWNER}} --no-update
+update
 @assert vaimo/composer-patches-target1,value8,value8
