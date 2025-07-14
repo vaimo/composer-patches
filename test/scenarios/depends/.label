@@ -1,0 +1,1 @@
+should not apply patch when patch dependency is not fulfilled and should apply the patch when it is
