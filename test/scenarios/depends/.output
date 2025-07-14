@@ -1,0 +1,29 @@
+./composer.json has been updated
+Lock file operations: 0 installs, 0 updates, 1 removal
+  - Removing vaimo/composer-patches-target2 (1.2.0)
+Package operations: 0 installs, 0 updates, 1 removal
+  - Removing vaimo/composer-patches-target2 (1.2.0)
+Processing patches configuration
+Nothing to patch
+Using version ^1.2 for vaimo/composer-patches-target2
+./composer.json has been updated
+Lock file operations: 1 install, 0 updates, 0 removals
+  - Locking vaimo/composer-patches-target2 (1.2.0)
+Package operations: 1 install, 0 updates, 0 removals
+  - Installing vaimo/composer-patches-target2 (1.2.0): Mirroring from modules/composer-patches-target2
+Processing patches configuration
+  - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
+  - Applying patches for vaimo/composer-patches-target1 (1)
+    ~ {{PATCHES-OWNER}}: patches/change.patch [NEW]
+      Change
+
+Writing patch info to install file
+./composer.json has been updated
+Lock file operations: 0 installs, 0 updates, 1 removal
+  - Removing vaimo/composer-patches-target2 (1.2.0)
+Package operations: 0 installs, 0 updates, 1 removal
+  - Removing vaimo/composer-patches-target2 (1.2.0)
+Processing patches configuration
+  - Resetting patches for vaimo/composer-patches-target1 (1)
+  - Installing vaimo/composer-patches-target1 (1.0.0): Mirroring from modules/composer-patches-target1
+Writing patch info to install file

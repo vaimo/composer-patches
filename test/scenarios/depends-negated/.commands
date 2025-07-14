@@ -1,0 +1,6 @@
+remove vaimo/composer-patches-target2 --no-update
+update
+require vaimo/composer-patches-target2 --no-update
+update
+remove vaimo/composer-patches-target2 --no-update
+update

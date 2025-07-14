@@ -1,0 +1,10 @@
+{
+    "vaimo/composer-patches-target1": {
+        "Change": {
+            "source": "patches/change.patch",
+            "depends": {
+                "!vaimo/composer-patches-target2": ">=1.0.0"
+            }
+        }
+    }
+}
