@@ -5,6 +5,7 @@
  */
 namespace Vaimo\ComposerPatches\Config;
 
+// phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
 if (!class_exists('loophp\phposinfo\OsInfo') && class_exists('drupol\phposinfo\OsInfo')) {
     class_alias('drupol\phposinfo\OsInfo', 'loophp\phposinfo\OsInfo');
     class_alias('drupol\phposinfo\OsInfoInterface', 'loophp\phposinfo\OsInfoInterface');
