@@ -26,7 +26,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.4.0"
+            "php": "7.4.33"
         },
         "process-timeout": 3000,
         "allow-plugins": {

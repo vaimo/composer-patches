@@ -4,6 +4,24 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "5.5.2": {
+        "fix": [
+            "Fix incorrect handling of promises during package reset: https://github.com/vaimo/composer-patches/pull/124, https://github.com/vaimo/composer-patches/pull/119"
+        ]
+    },
+    "5.5.1": {
+        "fix": [
+            "Further adjusting the workaround created for loophp/phposinfo package backwards compatibility: https://github.com/vaimo/composer-patches/pull/133"
+        ]
+    },
+    "5.5.0": {
+        "feature": [
+            "Added support for negated dependencies: https://github.com/vaimo/composer-patches/pull/129"
+        ],
+        "maintenance": [
+            "Added tests for verify the support for negated dependencies: https://github.com/vaimo/composer-patches/pull/131"
+        ]
+    },
     "5.4.0": {
         "maintenance": [
             "Added Github workflows config file, that runs ci:build command from the package against PHP versions 7.0 - 8.4. Different Composer versions also included.",

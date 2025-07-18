@@ -2,7 +2,35 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 5.4.0
+## 5.5.2
+
+### Fix
+
+* Fix incorrect handling of promises during package reset: https://github.com/vaimo/composer-patches/pull/124, https://github.com/vaimo/composer-patches/pull/119
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.5.2) [diff](https://github.com/vaimo/composer-patches/compare/5.5.1...5.5.2)
+
+## 5.5.1 (2025-07-14)
+
+### Fix
+
+* Further adjusting the workaround created for loophp/phposinfo package backwards compatibility: https://github.com/vaimo/composer-patches/pull/133
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.5.1) [diff](https://github.com/vaimo/composer-patches/compare/5.5.0...5.5.1)
+
+## 5.5.0 (2025-07-14)
+
+### Feature
+
+* Added support for negated dependencies: https://github.com/vaimo/composer-patches/pull/129
+
+### Maintenance
+
+* Added tests for verify the support for negated dependencies: https://github.com/vaimo/composer-patches/pull/131
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.5.0) [diff](https://github.com/vaimo/composer-patches/compare/5.4.0...5.5.0)
+
+## 5.4.0 (2025-06-04)
 
 ### Maintenance
 
