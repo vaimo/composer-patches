@@ -16,7 +16,7 @@ class Executor
 {
     public function repositoryWrite($repository, $installationManager, $isDevMode)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             $repository->write();
             return;
         }
@@ -26,7 +26,7 @@ class Executor
 
     public function downloadPackage($downloader, $package, $source, $destDir, $errorHandler, &$patchData, &$errors)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             $downloader->download($package, $destDir, false);
             return;
         }
@@ -50,14 +50,14 @@ class Executor
 
     public function assignTmpPathForPatchData(&$patchData, $path)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             $patchData[PatchDefinition::PATH] = $path;
         }
     }
 
     public function waitDownloadCompletion(\Composer\Composer $composer)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             return;
         }
 
@@ -66,7 +66,7 @@ class Executor
 
     public function waitForCompletion(\Composer\Composer $composer, array $processes)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             return;
         }
 
@@ -79,7 +79,7 @@ class Executor
         InstallOperation $installOperation,
         UninstallOperation $uninstallOperation
     ) {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             return $installationManager->install($repository, $installOperation);
         }
 
