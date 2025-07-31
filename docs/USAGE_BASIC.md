@@ -150,7 +150,7 @@ to the user when patch is being applied.
 @label <value> (optional) overrides the description above when provided. Otherwise above info used
 @ticket <value> (optional) reference to some issue ID that relates to this fix (added to label)
 @link <value> (optional) url to additional data about this patch (added to label)
-@depends <value> (optional) other/package (make version constraint target another package instead) 
+@depends <value> (optional) other/package (make version constraint target another package instead). Use !other/package to apply patch only when package is NOT installed 
 @version <value> (optional) >=1.1.0 <1.4.0
 @after <value> (optional) Used in case a patch should be applied after another branch
 @before <value> (optional) Used in case a patch should be applied before another branch
@@ -206,6 +206,8 @@ Multiple values can be also used in the declaration by providing them as array o
 The key "patches-base", etc are not mandatory to be declared when using patches-search as the exact path
 of the patches will already be known.
 
+Note that you can use also wildcard, for example `app/code/<vendor>/*/patches`
+
 ## Version Constraints
 
 There are several ways a version restriction for a patch can be defined, the choice on which one to use 
@@ -229,6 +231,12 @@ apply correctly.
           "depends": {
             "other/package": ">=2.1.7",
             "php": ">=7.1.0"
+          }
+        },
+        "applies when unwanted/package is NOT installed": {
+          "source": "example/negated-dependency.patch",
+          "depends": {
+            "!unwanted/package": ">=1.0.0"
           }
         }
       }

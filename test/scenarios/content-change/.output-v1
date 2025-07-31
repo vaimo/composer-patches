@@ -1,0 +1,16 @@
+Scanning packages for orphan patches
+Validation completed successfully
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-target1 (2)
+    ~ {{PATCHES-OWNER}}: patches/0_initial-change.patch [NEW]
+      Change: value8 => valueC
+    ~ {{PATCHES-OWNER}}: patches/1_second-change.patch [NEW]
+      Change: valueC => valueX
+
+Writing patch info to install file
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-target1 (2)
+    ~ {{PATCHES-OWNER}}: patches/1_second-change.patch [CHANGED]
+      Change: valueC => valueX
+
+Writing patch info to install file

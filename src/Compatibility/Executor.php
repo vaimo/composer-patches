@@ -5,6 +5,7 @@
  */
 namespace Vaimo\ComposerPatches\Compatibility;
 
+use Vaimo\ComposerPatches\Exceptions\OperationFailure;
 use Vaimo\ComposerPatches\Patch\Definition as PatchDefinition;
 use Composer\Repository\WritableRepositoryInterface;
 use Composer\DependencyResolver\Operation\InstallOperation;
@@ -15,7 +16,7 @@ class Executor
 {
     public function repositoryWrite($repository, $installationManager, $isDevMode)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             $repository->write();
             return;
         }
@@ -25,7 +26,7 @@ class Executor
 
     public function downloadPackage($downloader, $package, $source, $destDir, $errorHandler, &$patchData, &$errors)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             $downloader->download($package, $destDir, false);
             return;
         }
@@ -49,14 +50,14 @@ class Executor
 
     public function assignTmpPathForPatchData(&$patchData, $path)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             $patchData[PatchDefinition::PATH] = $path;
         }
     }
 
     public function waitDownloadCompletion(\Composer\Composer $composer)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             return;
         }
 
@@ -65,7 +66,7 @@ class Executor
 
     public function waitForCompletion(\Composer\Composer $composer, array $processes)
     {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             return;
         }
 
@@ -78,19 +79,33 @@ class Executor
         InstallOperation $installOperation,
         UninstallOperation $uninstallOperation
     ) {
-        if (version_compare(\Composer\Composer::VERSION, '2.0', '<')) {
+        if (version_compare(\Composer\Composer::getVersion(), '2.0', '<')) {
             return $installationManager->install($repository, $installOperation);
         }
 
-        return $installationManager
-            ->uninstall($repository, $uninstallOperation)
-            ->then(function () use ($installationManager, $installOperation, $repository) {
-                $package = $installOperation->getPackage();
-                $installationManager->getInstaller($package->getType())
-                    ->download($package)
-                    ->then(function () use ($installationManager, $installOperation, $repository) {
-                        $installationManager->install($repository, $installOperation);
-                    });
+        $package = $installOperation->getPackage();
+        $installer = $installationManager->getInstaller($package->getType());
+
+        $uninstallPromise = $installationManager->uninstall($repository, $uninstallOperation);
+        if (!$uninstallPromise) {
+            throw new OperationFailure(sprintf('Uninstallation of %s failed', $package->getName()));
+        }
+
+        $downloadPromise = $installer->download($package);
+        if (!$downloadPromise) {
+            throw new OperationFailure(sprintf('Download of %s failed', $package->getName()));
+        }
+
+        $promise = \React\Promise\all([$uninstallPromise, $downloadPromise]);
+
+        return $promise->then(static function () use ($installationManager, $installOperation, $repository, $package) {
+            $installPromise = $installationManager->install($repository, $installOperation);
+            if (!$installPromise) {
+                throw new OperationFailure(sprintf('Install of %s failed', $package->getName()));
+            }
+
+            return $installPromise->then(static function () {
             });
+        });
     }
 }

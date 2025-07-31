@@ -22,7 +22,8 @@ class RepositoryUtils
     public function filterByDependency(WritableRepositoryInterface $repository, $dependencyName)
     {
         $depsRepository = $this->composerDependencies->createCompositeRepository($repository);
-        $dependentsList = array_map('reset', $depsRepository->getDependents($dependencyName));
+        $dependents = $depsRepository->getDependents($dependencyName);
+        $dependentsList = array_column($dependents, 0);
 
         return array_filter($dependentsList);
     }

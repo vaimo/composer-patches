@@ -11,6 +11,9 @@
     "vaimo/composer-patches-target3": {
         "Change: value17 => valueB": {
             ">1.2.3": "patches/single-package-single-file-non-matching-constraint.patch" 
+        },
+        "Change: value18 => valueB": {
+            "<=1.2.3": "patches/single-package-single-file-matching-constraint.patch"
         }
     }
 }

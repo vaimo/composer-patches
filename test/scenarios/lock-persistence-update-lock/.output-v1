@@ -13,9 +13,11 @@ Processing patches configuration
 
 Writing patch info to install file
 Package operations: 0 installs, 1 update, 0 removals
-  - Upgrading vaimo/composer-patches-target2 (0.0.0 => 1.2.0): Mirroring from modules/composer-patches-target2
+  - Updating vaimo/composer-patches-target2 (0.0.0 => 1.2.0): Mirroring from modules/composer-patches-target2
+
 Package operations: 0 installs, 1 update, 0 removals
-  - Upgrading vaimo/composer-patches-target1 (0.0.0 => 1.0.0): Mirroring from modules/composer-patches-target1
+  - Updating vaimo/composer-patches-target1 (0.0.0 => 1.0.0): Mirroring from modules/composer-patches-target1
+
 Package operations: 1 install, 0 updates, 0 removals
   - Installing vaimo/composer-patches-target2 (1.2.0): Mirroring from modules/composer-patches-target2
 Package operations: 1 install, 0 updates, 0 removals

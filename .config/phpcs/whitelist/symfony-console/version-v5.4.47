@@ -1,0 +1,4 @@
+Graceful usage: Completion/CompletionInput.php,120,74,PHPCompatibility.FunctionUse.NewFunctions.array_key_lastFound
+Graceful usage: Helper/ProgressBar.php,301,31,PHPCompatibility.FunctionUse.NewFunctions.is_countableFound
+Graceful usage: Helper/Table.php,810,51,PHPCompatibility.FunctionUse.NewFunctions.mb_str_splitFound
+Graceful usage: Input/ArgvInput.php,176,47,PHPCompatibility.FunctionUse.NewFunctions.array_key_firstFound

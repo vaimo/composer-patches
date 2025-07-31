@@ -2,6 +2,151 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 5.5.3 (2025-07-30)
+
+### Fix
+
+* Fix issue where Composer version comparisons did not work in preview builds of Composer: https://github.com/vaimo/composer-patches/pull/134
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.5.3) [diff](https://github.com/vaimo/composer-patches/compare/5.5.2...5.5.3)
+
+## 5.5.2 (2025-07-18)
+
+### Fix
+
+* Fix incorrect handling of promises during package reset: https://github.com/vaimo/composer-patches/pull/124, https://github.com/vaimo/composer-patches/pull/119
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.5.2) [diff](https://github.com/vaimo/composer-patches/compare/5.5.1...5.5.2)
+
+## 5.5.1 (2025-07-14)
+
+### Fix
+
+* Further adjusting the workaround created for loophp/phposinfo package backwards compatibility: https://github.com/vaimo/composer-patches/pull/133
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.5.1) [diff](https://github.com/vaimo/composer-patches/compare/5.5.0...5.5.1)
+
+## 5.5.0 (2025-07-14)
+
+### Feature
+
+* Added support for negated dependencies: https://github.com/vaimo/composer-patches/pull/129
+
+### Maintenance
+
+* Added tests for verify the support for negated dependencies: https://github.com/vaimo/composer-patches/pull/131
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.5.0) [diff](https://github.com/vaimo/composer-patches/compare/5.4.0...5.5.0)
+
+## 5.4.0 (2025-06-04)
+
+### Maintenance
+
+* Added Github workflows config file, that runs ci:build command from the package against PHP versions 7.0 - 8.4. Different Composer versions also included.
+* Dropped sebastian/phpcpd from dev dependencies since this is abandoned and will not work with PHP 8.4, cleaned out all references from testing scripts.
+* Added explicit version requirement for symfony/console, since the code in the package will not work with versions 7 and above of symfony/console.
+* Updated bin/analyse-dependencies script to always run as if it was given 'current' in the parameters, since looping through different PHP versions and installing packages will not work anymore with the big differences between PHP versions.
+* Updated whitelists related to bin/analyse-dependencies script, since the bigger range of PHP versions means different versions of the dependencies.
+* Updated bin/test command to ignore Composer 1 deprecation warnings since these are not relevant during the tests.
+* Updated bin/test command to expect Composer 2 related outputs in .output files, while Composer 1 related outputs are expected to be in .output-v1.
+* Updated some test scenarios related to bin/test to ignore unhandled promise rejection errors for now, which come up in Composer >2.7.
+* Updated documentation a little bit, mainly cleaned out invalid whitespaces (which might show up weirdly depending on IDE) and updated development guidelines with few more details
+
+### Fix
+
+* Compatibility with PHP 7.0 restored, while still including support for PHP 8.4. Instead of explicitly marking the nullable parameters, dropped the explicit types from the parameters altogether.
+* Adjusted the loophp/phposinfo compatibility approach taken in 5.3.1 to autoloader based one, since the previous approach didn't work with the testsuite.
+* Fixed issue with bin/analyse-dependencies command not understanding empty autoloader paths of packages.
+* Fixed issue with bin/test command related to Composer version detection, which caused execution of queue_update and queue_install commands to not work correctly.
+* Fixed issue with Composer file manipulation during bin/test command, where only certain packages were meant to be modified with underscore prefix, but trailing separator caused the prefix to apply on all packages, which caused some side effects.
+* Fixed some loose issues found by bin/analyse command, mainly unnecessary else usages and excessively long line lengths
+* Fixed PHP >8.1 incompatibility with patch:validate command, where array_map and reset function usage together caused the command to break
+* Included alternative fix suggestion for https://github.com/vaimo/composer-patches/pull/110 and updated test scenarios to verify the fix
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.4.0) [diff](https://github.com/vaimo/composer-patches/compare/5.3.1...5.4.0)
+
+## 5.3.1 (2025-06-03)
+
+### Fix
+
+* Fixes issue where package can be installed with loophp/phposinfo 1.6, despite the package code having hard references to 1.7. The package should now work with both 1.6 and 1.7. https://github.com/vaimo/composer-patches/pull/127
+* Fixes accidentally missed backwards incompatibility added in 5.3.0, which would've locked the package only to PHP 7.4 and above. https://github.com/vaimo/composer-patches/pull/127
+* Updated minimum PHP version requirement to 7.1 from 7.0, since version 5.2.1 added PHP 8.4 compatibility changes that are not compatible with PHP 7.0. https://github.com/vaimo/composer-patches/pull/127
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.3.1) [diff](https://github.com/vaimo/composer-patches/compare/5.3.0...5.3.1)
+
+## 5.3.0 (2025-06-02)
+
+### Feature
+
+* Allow wildcard in patches search folder path: https://github.com/vaimo/composer-patches/pull/86
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.3.0) [diff](https://github.com/vaimo/composer-patches/compare/5.2.2...5.3.0)
+
+## 5.2.2 (2025-06-02)
+
+### Fix
+
+* Fixes issue where platform and platform-dev data types are modified for no reason in latest versions of Composer: https://github.com/vaimo/composer-patches/pull/126
+
+### Feature
+
+* Improved performance by preventing unnecessary lock file writing: https://github.com/vaimo/composer-patches/pull/123
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.2.2) [diff](https://github.com/vaimo/composer-patches/compare/5.2.1...5.2.2)
+
+## 5.2.1 (2025-04-17)
+
+### Fix
+
+* Fixes PHP 8.4 compatibility errors related to Implicitly marking parameter xxxxx as nullable is deprecated, the explicit nullable type must be used instead: https://github.com/vaimo/composer-patches/pull/121
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.2.1) [diff](https://github.com/vaimo/composer-patches/compare/5.2.0...5.2.1)
+
+## 5.2.0 (2024-04-18)
+
+### Fix
+
+* Add JSON output format flag and correct return value in ListCommand: https://github.com/vaimo/composer-patches/pull/108
+* Resolve RuntimeException "Could not delete file": https://github.com/vaimo/composer-patches/pull/112
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.2.0) [diff](https://github.com/vaimo/composer-patches/compare/5.1.2...5.2.0)
+
+## 5.1.2 (2023-11-22)
+
+### Fix
+
+* Resolve unzip error on applying new patches when composer cache is cleared: https://github.com/vaimo/composer-patches/pull/107
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.1.2) [diff](https://github.com/vaimo/composer-patches/compare/5.1.1...5.1.2)
+
+## 5.1.1 (2023-03-09)
+
+### Fix
+
+* Fix deprecation message for PHP 8.2: https://github.com/vaimo/composer-patches/pull/105
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.1.1) [diff](https://github.com/vaimo/composer-patches/compare/5.1.0...5.1.1)
+
+## 5.1.0 (2022-07-08)
+
+### Fix
+
+* Use the proper way to retrieve the Composer version: https://github.com/vaimo/composer-patches/pull/92
+* Fix PHP 8.1 deprecation notices
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.1.0) [diff](https://github.com/vaimo/composer-patches/compare/5.0.0...5.1.0)
+
+## 5.0.0 (2022-05-13)
+
+### Fix
+
+* Drop php5 support, Fix PHP 8.1 deprecation notices: https://github.com/vaimo/composer-patches/pull/96
+* Add conflict with cweagans/composer-patches: https://github.com/vaimo/composer-patches/pull/94
+* Uninstall package during ReInstallOperation for Composer v2 https://github.com/vaimo/composer-patches/pull/99
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.0.0) [diff](https://github.com/vaimo/composer-patches/compare/4.22.4...5.0.0)
+
 ## 4.22.4 (2021-02-25)
 
 changes in this release forward-ported from  3.53.4

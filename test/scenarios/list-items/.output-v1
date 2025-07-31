@@ -1,0 +1,34 @@
+Scanning packages for orphan patches
+Validation completed successfully
+vaimo/composer-patches-sandbox
+  ~ {{PATCHES-OWNER}}: patches/multiple-packages-single-file.patch [NEW]
+    Change: value17 => valueB; value5 => valueA
+
+vaimo/composer-patches-target1
+  ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
+    Change: value8 => valueC
+  ~ {{PATCHES-OWNER}}: patches/single-package-single-file-wildcard-version.patch [NEW]
+    Change: value17 => valueX
+
+Processing patches configuration
+  - Applying patches for vaimo/composer-patches-sandbox (1)
+    ~ {{PATCHES-OWNER}}: patches/multiple-packages-single-file.patch [NEW]
+      Change: value17 => valueB; value5 => valueA
+
+  - Applying patches for vaimo/composer-patches-target1 (2)
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [NEW]
+      Change: value8 => valueC
+    ~ {{PATCHES-OWNER}}: patches/single-package-single-file-wildcard-version.patch [NEW]
+      Change: value17 => valueX
+
+Writing patch info to install file
+vaimo/composer-patches-sandbox
+  ~ {{PATCHES-OWNER}}: patches/multiple-packages-single-file.patch [APPLIED]
+    Change: value17 => valueB; value5 => valueA
+
+vaimo/composer-patches-target1
+  ~ {{PATCHES-OWNER}}: patches/single-package-single-file-no-version.patch [APPLIED]
+    Change: value8 => valueC
+  ~ {{PATCHES-OWNER}}: patches/single-package-single-file-wildcard-version.patch [APPLIED]
+    Change: value17 => valueX
+

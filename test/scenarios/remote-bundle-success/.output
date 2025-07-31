@@ -1,4 +1,6 @@
 Processing patches configuration
+  - Installing vaimo/composer-patches-target2 (1.2.0): Mirroring from modules/composer-patches-target2
+  - Installing vaimo/composer-patches-target3 (1.2.3): Mirroring from modules/composer-patches-target3
   - Applying patches for vaimo/composer-patches-sandbox (1)
     ~ {{PATCHES-OWNER}}: https://raw.githubusercontent.com/vaimo/composer-patches/release/3/test/scenarios/remote-bundle-success/files/patches/multiple-packages-single-file.patch [NEW]
       Change: multiple

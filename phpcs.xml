@@ -1,1 +1,25 @@
-/Users/katana/repos/composer-patches/.config/phpcs/package.xml
+<?xml version="1.0"?>
+<!--
+ Copyright (c) Vaimo Group. All rights reserved.
+ See LICENSE_VAIMO.txt for license details.
+-->
+<ruleset name="LOCAL">
+    <description>PHP CodeSniffer rules for Composer Patches</description>
+    
+    <rule ref="PHPCompatibility" />
+
+    <config name="testVersion" value="7.4-"/>
+    
+    <rule ref="PSR1"/>
+    <rule ref="PSR2"/>
+
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
+        <properties>
+            <property name="ignoreBlankLines" value="false"/>
+        </properties>
+    </rule>
+    
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace.EmptyLines">
+        <severity>5</severity>
+    </rule>
+</ruleset>

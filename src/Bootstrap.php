@@ -57,15 +57,15 @@ class Bootstrap
      * @param \Vaimo\ComposerPatches\Composer\Context $composerContext
      * @param \Composer\IO\IOInterface $appIO
      * @param \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory
-     * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver
-     * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy
+     * @param \Vaimo\ComposerPatches\Interfaces\ListResolverInterface|null $listResolver
+     * @param \Vaimo\ComposerPatches\Strategies\OutputStrategy|null $outputStrategy
      */
     public function __construct(
         \Vaimo\ComposerPatches\Composer\Context $composerContext,
         \Composer\IO\IOInterface $appIO,
         \Vaimo\ComposerPatches\Factories\ConfigFactory $configFactory,
-        ?\Vaimo\ComposerPatches\Interfaces\ListResolverInterface $listResolver = null,
-        ?\Vaimo\ComposerPatches\Strategies\OutputStrategy $outputStrategy = null
+        $listResolver = null,
+        $outputStrategy = null
     ) {
         $this->composerContext = $composerContext;
         $this->listResolver = $listResolver;

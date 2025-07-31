@@ -1,0 +1,10 @@
+Processing patches configuration
+
+In RemoteFilesystem.php:
+
+  The "https://raw.githubusercontent.com/vaimo/composer-patches/bad/patch/url
+  /single-package-single-file-no-version.patch" file could not be downloaded
+  (404)
+
+
+

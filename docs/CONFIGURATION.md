@@ -5,8 +5,8 @@ are being applied.
 
 ## Overview
 
-The plugin ships with a pre-configured configuration for the patch applier, but changes to said defaults
-can be made by defining overrides under the following keys.
+The plugin ships with a pre-configured configuration for the patch applier, but changes to said defaults
+can be made by defining overrides under the following keys.
 
 ```json
 {
@@ -103,7 +103,8 @@ Some things to point out on patcher configuration:
  
 1. The options search, search-dev, file, file-dev, depends and paths can be declared on main level 
    of 'extra' config as well, but users are encouraged to keep every configuration option of the module
-   in under one key that would allow the 'extra' not to be littered with multiple configuration key options. 
+   in under one key that would allow the 'extra' not to be littered with multiple configuration key options.
+   * **Note** that with search and search-dev you can use also wildcard, for example `app/code/<vendor>/*/patches`
 2. Sequence dictates everything. If applier code or operation is not mentioned in sequence configuration, 
    it's not going to be taken into account. This means that users can easily override the whole standard
    configuration.
@@ -131,10 +132,10 @@ Some things to point out on patcher configuration:
 12. In case your package includes other patches other than just the ones that are applied with this plugin, consider
     using patcher/ignore to exclude those the folders that contain such patches. Otherwise false failures will
     be encountered when running `patch:validate`.
-13. Every applier operation can be specified to have a unique command per OS type. If none is specified for 
+13. Every applier operation can be specified to have a unique command per OS type. If none is specified for 
     specific OS, the default value is used.
-14. Sanity operation sequence is used to validate that certain patch applier is available in given system. 
-    Appropriate error response is given when none of the specified appliers is available.  
+14. Sanity operation sequence is used to validate that certain patch applier is available in given system. 
+    Appropriate error response is given when none of the specified appliers is available.  
 
 Appliers are executed in the sequence dictated by sequence where several path levels are used with 
 validation until validation success is hit. Note that each applier will be visited before moving on to 
@@ -263,7 +264,7 @@ Patches can also be just defined for a certain OS family.
 ```
 
 Note that the OS-based split can also be introduced on `appliers` configuration key where the single value 
-can be replaced with a dictionary that features a `default` key and keys per OS type that requires a call
+can be replaced with a dictionary that features a `default` key and keys per OS type that requires a call
 configuration that differs from the default.
 
 ```json

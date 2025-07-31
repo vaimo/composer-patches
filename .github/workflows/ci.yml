@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        versions: [
+          { php: "7.0.33", composer: 1.10.27 },
+          { php: "7.1", composer: 1.10.27 },
+          { php: "7.2", composer: 1.10.27 },
+          { php: "7.3", composer: 2.2.25 },
+          { php: "7.4", composer: 2.3.10 },
+          { php: "8.0", composer: 2.3.10 },
+          { php: "8.1", composer: 2.3.10 },
+          { php: "8.2", composer: 2.7.7 },
+          { php: "8.3", composer: 2.7.7 },
+          { php: "8.4", composer: 2.8.9 }
+        ]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Prepare PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.versions.php }}
+          tools: composer:${{ matrix.versions.composer }}
+
+      - name: Prepare Composer PHP platform
+        run: composer config platform.php ${{ matrix.versions.php }}
+
+      - name: Explicitly require composer/composer with matching version in require-dev
+        run: composer require --dev composer/composer:${{ matrix.versions.composer }} --no-update
+
+      - name: Drop vaimo/composer-changelogs from require-dev since this is not compatible with >=8.3
+        run: composer remove --dev vaimo/composer-changelogs --no-update
+
+      - name: Install
+        run: composer update --ansi
+
+      - name: Build
+        run: composer ci:build --ansi
+        env:
+          COMPOSER_TESTS_ARE_RUNNING: 1

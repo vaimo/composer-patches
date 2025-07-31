@@ -105,6 +105,11 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
     }
 
+    /**
+     * @inheritDoc
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $composer = $this->getComposer();
@@ -202,11 +207,13 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         if ($input->getOption('json')) {
             $output->writeln(json_encode($patches));
-        } else {
-            $this->generateOutput($output, $patches);
+
+            return 0;
         }
 
-        return self::SUCCESS;
+        $this->generateOutput($output, $patches);
+
+        return 0;
     }
 
     private function createUnfilteredPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
