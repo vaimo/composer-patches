@@ -2,7 +2,15 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
-## 5.5.2
+## 5.5.3 (2025-07-30)
+
+### Fix
+
+* Fix issue where Composer version comparisons did not work in preview builds of Composer: https://github.com/vaimo/composer-patches/pull/134
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.5.3) [diff](https://github.com/vaimo/composer-patches/compare/5.5.2...5.5.3)
+
+## 5.5.2 (2025-07-18)
 
 ### Fix
 

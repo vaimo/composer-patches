@@ -9,6 +9,8 @@ test/installations/**/modules
 test/installations/**/patches
 test/installations/**/patches.json
 test/dependencies/modules
+test/dependencies/phpcs.xml
+test/dependencies/composer.json
 *.org
 .history
 output.exp

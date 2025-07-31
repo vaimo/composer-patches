@@ -4,6 +4,11 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "5.5.3": {
+        "fix": [
+            "Fix issue where Composer version comparisons did not work in preview builds of Composer: https://github.com/vaimo/composer-patches/pull/134"
+        ]
+    },
     "5.5.2": {
         "fix": [
             "Fix incorrect handling of promises during package reset: https://github.com/vaimo/composer-patches/pull/124, https://github.com/vaimo/composer-patches/pull/119"
