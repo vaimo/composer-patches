@@ -11,7 +11,7 @@
         "loophp/phposinfo": "^1.6 || ^1.7",
         "seld/jsonlint": "^1.7.1",
         "symfony/console": "<7.0",
-        "vaimo/topological-sort": "^1.0"
+        "vaimo/topological-sort": "^1.0 || ^2.0"
     },
     "require-dev": {
         "composer/composer": "^1.0 || ^2.0",

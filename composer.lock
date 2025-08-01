@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b5fe0439649fb66409899ad044f348d7",
+    "content-hash": "31262edf9c0f5521f74c7767d3b0dc87",
     "packages": [
         {
             "name": "loophp/phposinfo",
@@ -992,34 +992,36 @@
         },
         {
             "name": "vaimo/topological-sort",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vaimo/topological-sort.git",
-                "reference": "e19b93df2bac0e995ecd4b982ec4ea2fb1131e64"
+                "reference": "100f3bcc903a45f3ad7d559fe239fd9fa659d3c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vaimo/topological-sort/zipball/e19b93df2bac0e995ecd4b982ec4ea2fb1131e64",
-                "reference": "e19b93df2bac0e995ecd4b982ec4ea2fb1131e64",
+                "url": "https://api.github.com/repos/vaimo/topological-sort/zipball/100f3bcc903a45f3ad7d559fe239fd9fa659d3c0",
+                "reference": "100f3bcc903a45f3ad7d559fe239fd9fa659d3c0",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3"
+                "php": ">=7.0"
             },
             "require-dev": {
-                "codeclimate/php-test-reporter": "dev-master",
-                "phpcompatibility/php-compatibility": "^9.1.1",
-                "phpmd/phpmd": "^2.6.0",
-                "phpunit/phpunit": "~4.0",
-                "squizlabs/php_codesniffer": "^2.9.2",
-                "symfony/console": "~2.5 || ~3.0 || ~4.0"
+                "phpcompatibility/php-compatibility": "^9",
+                "phpunit/phpunit": "~6.0 || ~7.0 || ~8.0 || ~9.0",
+                "squizlabs/php_codesniffer": "^2.9.2 || ^3.13",
+                "symfony/console": "~3.0 || ~4.0 || ~5.0"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
-                    "Vaimo\\TopSort\\": "src/",
-                    "Vaimo\\TopSort\\Tests\\": "tests/Tests/"
+                    "Vaimo\\TopSort\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1032,16 +1034,22 @@
                     "email": "marc@marcjschmidt.de"
                 }
             ],
-            "description": "High-Performance TopSort/Dependency resolving algorithm (compatibility version to work with 5.3)",
+            "description": "High-Performance TopSort/Dependency resolving algorithm (compatibility version to work with 7.0 - 7.2)",
             "keywords": [
                 "dependency resolving",
                 "topological sort",
                 "topsort"
             ],
             "support": {
-                "source": "https://github.com/vaimo/topological-sort/tree/1.0.0"
+                "source": "https://github.com/vaimo/topological-sort/tree/2.0.0"
             },
-            "time": "2019-04-13T14:15:06+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/marcj",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-01T11:07:43+00:00"
         }
     ],
     "packages-dev": [
