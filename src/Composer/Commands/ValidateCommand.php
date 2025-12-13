@@ -46,7 +46,7 @@ class ValidateCommand extends \Composer\Command\BaseCommand
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Scanning packages for orphan patches</info>');
 

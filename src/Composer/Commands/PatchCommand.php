@@ -115,7 +115,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
      * @return int|void|null
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $composer = $this->getComposer();
 

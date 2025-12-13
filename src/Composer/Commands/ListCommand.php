@@ -110,7 +110,7 @@ class ListCommand extends \Composer\Command\BaseCommand
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $composer = $this->getComposer();
 
