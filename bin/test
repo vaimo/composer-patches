@@ -329,6 +329,7 @@ assert_scenario_output() {
         |grep -v "^You are using Composer 1 which is deprecated." \
         |grep -v "^Warning from https://repo.packagist.org: Support for Composer 1" \
         |grep -v "^Package symfony/debug is abandoned" \
+        |grep -v "^Deprecation Notice: Since symfony/console 7.4" \
         |sed 's/ *$//g' \
         > output.txt
 
