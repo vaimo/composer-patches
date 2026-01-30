@@ -41,7 +41,7 @@ jobs:
         run: composer remove --dev vaimo/composer-changelogs --no-update
 
       - name: Install
-        run: composer update --ansi
+        run: composer update --ansi -vvv
 
       - name: Build
         run: composer ci:build --ansi
