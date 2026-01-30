@@ -30,6 +30,7 @@ jobs:
         with:
           php-version: ${{ matrix.versions.php }}
           tools: composer:${{ matrix.versions.composer }}
+          coverage: none
 
       - name: Get composer cache directory
         id: composer-cache
