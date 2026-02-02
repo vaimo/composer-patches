@@ -4,6 +4,33 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "6.0.0": {
+        "breaking": [
+            "Dropped possibility to install the package with Composer 1 as we haven't been able to guarantee the support since 5.5.4",
+            "Dropped possibility to install the package with PHP 7.0 in favor of symfony/console 8",
+            "Updated Composer command classes with symfony/console 8 support, which include void return types that are only supported in PHP >=7.1"
+        ],
+        "feature": [
+            "Added support for symfony/console 8"
+        ],
+        "maintenance": [
+            "Updated README files related to Composer 1 and release branches"
+        ]
+    },
+    "5.6.0": {
+        "feature": [
+            "Added support for symfony/console 7: https://github.com/vaimo/composer-patches/pull/139"
+        ],
+        "maintenance": [
+            "Dropped Composer 1 from Github workflows of the repository",
+            "Updated testsuite and dependency checks ran in workflows to take symfony/console 7 into account"
+        ]
+    },
+    "5.5.4": {
+        "fix": [
+            "Updated vaimo/topological-sort dependency to allow installing latest version with PHP compatibility improvements: https://github.com/vaimo/composer-patches/pull/135"
+        ]
+    },
     "5.5.3": {
         "fix": [
             "Fix issue where Composer version comparisons did not work in preview builds of Composer: https://github.com/vaimo/composer-patches/pull/134"
