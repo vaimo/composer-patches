@@ -10,7 +10,6 @@ jobs:
     strategy:
       matrix:
         versions: [
-          { php: "7.0.33", composer: 2.2.26 },
           { php: "7.1", composer: 2.2.26 },
           { php: "7.2", composer: 2.2.26 },
           { php: "7.3", composer: 2.2.26 },
