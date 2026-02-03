@@ -23,7 +23,7 @@ use Vaimo\ComposerPatches\Utils\PathUtils;
  */
 class ValidateCommand extends \Composer\Command\BaseCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 

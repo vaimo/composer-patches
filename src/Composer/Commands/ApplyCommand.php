@@ -7,7 +7,7 @@ namespace Vaimo\ComposerPatches\Composer\Commands;
 
 class ApplyCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
