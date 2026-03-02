@@ -2,6 +2,54 @@
 
 _This file has been auto-generated from the contents of changelog.json_
 
+## 6.0.1
+
+### Maintenance
+
+* Updated dev dependency to vaimo/composer-changelogs to allow installing version with equal PHP version support as in version 6 of the patcher: https://github.com/vaimo/composer-patches/pull/147
+* Removed workarounds in Github workflows to get around vaimo/composer-changelogs incompatibilities since the package now works as is
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/6.0.1) [diff](https://github.com/vaimo/composer-patches/compare/6.0.0...6.0.1)
+
+## 6.0.0 (2026-02-03)
+
+### Breaking
+
+* Dropped possibility to install the package with Composer 1 as we haven't been able to guarantee the support since 5.5.4
+* Dropped possibility to install the package with PHP 7.0 in favor of symfony/console 8
+* Updated Composer command classes with symfony/console 8 support, which include void return types that are only supported in PHP >=7.1
+
+### Feature
+
+* Added support for symfony/console 8
+
+### Maintenance
+
+* Updated README files related to Composer 1 and release branches
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/6.0.0) [diff](https://github.com/vaimo/composer-patches/compare/5.6.0...6.0.0)
+
+## 5.6.0 (2026-01-29)
+
+### Feature
+
+* Added support for symfony/console 7: https://github.com/vaimo/composer-patches/pull/139
+
+### Maintenance
+
+* Dropped Composer 1 from Github workflows of the repository
+* Updated testsuite and dependency checks ran in workflows to take symfony/console 7 into account
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.6.0) [diff](https://github.com/vaimo/composer-patches/compare/5.5.4...5.6.0)
+
+## 5.5.4 (2025-08-01)
+
+### Fix
+
+* Updated vaimo/topological-sort dependency to allow installing latest version with PHP compatibility improvements: https://github.com/vaimo/composer-patches/pull/135
+
+Links: [src](https://github.com/vaimo/composer-patches/tree/5.5.4) [diff](https://github.com/vaimo/composer-patches/compare/5.5.3...5.5.4)
+
 ## 5.5.3 (2025-07-30)
 
 ### Fix
@@ -258,7 +306,7 @@ changes in this release forward-ported from 3.51.2
 
 ### Fix
 
-* some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)
+* some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)
 * errors not listed when file reference not available within patch (affects brief reporting, everything worked as expected with -vvv)
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.20.2) [diff](https://github.com/vaimo/composer-patches/compare/4.20.1...4.20.2)
@@ -269,10 +317,10 @@ changes in this release forward-ported from 3.51.1
 
 ### Fix
 
-* allow the plugin to be installed as dependency to globally installed package (as part of dependency of some global package); previously caused every composer call to crash with class declaration conflict
-* patch error reporting includes patch creation date where just path should have been shown
-* patch errors caused by output analysis did not include the raw output line that caused the failure detector to trigger
-* outdated documentation reference in code when specifying unsecure URL endpoint for a patch to be downloaded from
+* allow the plugin to be installed as dependency to globally installed package (as part of dependency of some global package); previously caused every composer call to crash with class declaration conflict
+* patch error reporting includes patch creation date where just path should have been shown
+* patch errors caused by output analysis did not include the raw output line that caused the failure detector to trigger
+* outdated documentation reference in code when specifying unsecure URL endpoint for a patch to be downloaded from
 
 
 ### Maintenance
@@ -292,7 +340,7 @@ changes in this release forward-ported from 3.51.0
 
 ### Fix
 
-* proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose [issues/38]
+* proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose [issues/38]
 
 
 ### Maintenance
@@ -307,7 +355,7 @@ changes in this release forward-ported from 3.50.3
 
 ### Fix
 
-* running 'composer update --lock' not cleaning up composer.lock afterwards when patches already applied. No such issue when no patches applied at all (running 'update' with --lock does not apply the patches); This situation resulted in patches being perceived as already applied when a package with such a lock was installed
+* running 'composer update --lock' not cleaning up composer.lock afterwards when patches already applied. No such issue when no patches applied at all (running 'update' with --lock does not apply the patches); This situation resulted in patches being perceived as already applied when a package with such a lock was installed
 
 
 ### Maintenance
@@ -331,7 +379,7 @@ changes in this release forward-ported from 3.50.2
 ### Maintenance
 
 * removed lock files from tests to make sure that initial setup always ends up installing the latest package dependencies
-* make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)
+* make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)
 * run tests (including the test that the module can be installed) on multiple PHP versions: 5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3
 * run Compatibility rule-set on all installations
 
@@ -343,7 +391,7 @@ changes in this release forward-ported from 3.50.1
 
 ### Fix
 
-* the command patch:list not usable when some patch configuration included remote patches that would have resulted in 404 errors on apply (now listing said patches with proper errors)
+* the command patch:list not usable when some patch configuration included remote patches that would have resulted in 404 errors on apply (now listing said patches with proper errors)
 
 
 ### Maintenance
@@ -364,7 +412,7 @@ changes in this release forward-ported from 3.50.0
 ### Fix
 
 * the configuration value of 'secure-http' not having any effect (value usage ignored); Now properly handled by remote filesystem implementation
-* allow retries on failed downloads (switch from using remote filesystem to file downloader which allows the usage of caching and retry logic in place for Composer package downloads)
+* allow retries on failed downloads (switch from using remote filesystem to file downloader which allows the usage of caching and retry logic in place for Composer package downloads)
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.19.0) [diff](https://github.com/vaimo/composer-patches/compare/4.18.3...4.19.0)
 
@@ -374,12 +422,12 @@ changes in this release forward-ported from 3.49.3
 
 ### Fix
 
-* needless whitespace in output when using patches-search (extra line for patch label added for no reason)
+* needless whitespace in output when using patches-search (extra line for patch label added for no reason)
 
 
 ### Maintenance
 
-* introduces output expectation for each test scenario
+* introduces output expectation for each test scenario
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.18.3) [diff](https://github.com/vaimo/composer-patches/compare/4.18.2...4.18.3)
 
@@ -409,12 +457,12 @@ changes in this release forward-ported from 3.49.0
 
 ### Feature
 
-* allow very precise configuration for specific OS based on OS names in drupol\phposinfo\Enum\OsName
+* allow very precise configuration for specific OS based on OS names in drupol\phposinfo\Enum\OsName
 
 
 ### Fix
 
-* switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used
+* switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used
 
 
 ### Maintenance
@@ -450,7 +498,7 @@ changes in this release forward-ported from 3.48.9
 ### Maintenance
 
 * improved test coverage where 'redo' and 'undo' also get covered
-* allow multiple commands to be called per test
+* allow multiple commands to be called per test
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/4.17.9) [diff](https://github.com/vaimo/composer-patches/compare/4.17.8...4.17.9)
 
@@ -1008,7 +1056,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.52.0) [diff](https
 
 ### Fix
 
-* some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)
+* some errors not properly reported in the 'most likely' errors brief report (for patches with corrupt content)
 * errors not listed when file reference not available within patch (affects brief reporting, everything worked as expected with -vvv)
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.2) [diff](https://github.com/vaimo/composer-patches/compare/3.51.1...3.51.2)
@@ -1017,10 +1065,10 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.2) [diff](https
 
 ### Fix
 
-* allow the plugin to be installed as dependency to globally installed package (as part of dependency of some global package); previously caused every composer call to crash with class declaration conflict
-* patch error reporting includes patch creation date where just path should have been shown
-* patch errors caused by output analysis did not include the raw output line that caused the failure detector to trigger
-* outdated documentation reference in code when specifying unsecure URL endpoint for a patch to be downloaded from
+* allow the plugin to be installed as dependency to globally installed package (as part of dependency of some global package); previously caused every composer call to crash with class declaration conflict
+* patch error reporting includes patch creation date where just path should have been shown
+* patch errors caused by output analysis did not include the raw output line that caused the failure detector to trigger
+* outdated documentation reference in code when specifying unsecure URL endpoint for a patch to be downloaded from
 
 ### Maintenance
 
@@ -1036,7 +1084,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.1) [diff](https
 
 ### Fix
 
-* proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose [issues/38]
+* proper support for FreeBSD 'patch' command that does not have the call arguments of --no-backup-if-mismatch and --verbose [issues/38]
 
 ### Maintenance
 
@@ -1048,7 +1096,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.51.0) [diff](https
 
 ### Fix
 
-* running 'composer update --lock' not cleaning up composer.lock afterwards when patches already applied. No such issue when no patches applied at all (running 'update' with --lock does not apply the patches); This situation resulted in patches being perceived as already applied when a package with such a lock was installed
+* running 'composer update --lock' not cleaning up composer.lock afterwards when patches already applied. No such issue when no patches applied at all (running 'update' with --lock does not apply the patches); This situation resulted in patches being perceived as already applied when a package with such a lock was installed
 
 ### Maintenance
 
@@ -1068,7 +1116,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.3) [diff](https
 ### Maintenance
 
 * removed lock files from tests to make sure that initial setup always ends up installing the latest package dependencies
-* make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)
+* make sure that under no conditions, the Packagist package will not end up being used in tests (using aliased package)
 * run tests (including the test that the module can be installed) on multiple PHP versions: 5.3 5.4 5.5 5.6 7.0 7.1 7.2 7.3
 * run Compatibility ruleset on all installations
 
@@ -1078,7 +1126,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.2) [diff](https
 
 ### Fix
 
-* the command patch:list not usable when some patch configuration included remote patches that would have resulted in 404 errors on apply (now listing said patches with proper errors)
+* the command patch:list not usable when some patch configuration included remote patches that would have resulted in 404 errors on apply (now listing said patches with proper errors)
 
 ### Maintenance
 
@@ -1095,7 +1143,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.1) [diff](https
 ### Fix
 
 * the configuration value of 'secure-http' not having any effect (value usage ignored); Now properly handled by remote filesystem implementation
-* allow retries on failed downloads (switch from using remote filesystem to file downloader which allows the usage of caching and retry logic in place for Composer package downloads)
+* allow retries on failed downloads (switch from using remote filesystem to file downloader which allows the usage of caching and retry logic in place for Composer package downloads)
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.0) [diff](https://github.com/vaimo/composer-patches/compare/3.49.3...3.50.0)
 
@@ -1103,11 +1151,11 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.50.0) [diff](https
 
 ### Fix
 
-* needless whitespace in output when using patches-search (extra line for patch label added for no reason)
+* needless whitespace in output when using patches-search (extra line for patch label added for no reason)
 
 ### Maintenance
 
-* introduces output expectation for each test scenario
+* introduces output expectation for each test scenario
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.3) [diff](https://github.com/vaimo/composer-patches/compare/3.49.2...3.49.3)
 
@@ -1131,11 +1179,11 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.49.1) [diff](https
 
 ### Feature
 
-* allow very precise configuration for specific OS based on OS names in drupol\phposinfo\Enum\OsName
+* allow very precise configuration for specific OS based on OS names in drupol\phposinfo\Enum\OsName
 
 ### Fix
 
-* switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used [issues/36]
+* switched over to using drupol/phposinfo instead of tivie/php-os-detector which was only detecting the OS that php binary was built for and not the actual OS the php binary was being used [issues/36]
 
 ### Maintenance
 
@@ -1164,7 +1212,7 @@ Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.10) [diff](http
 ### Maintenance
 
 * improved test coverage where 'redo' and 'undo' also get covered
-* allow multiple commands to be called per test
+* allow multiple commands to be called per test
 
 Links: [src](https://github.com/vaimo/composer-patches/tree/3.48.9) [diff](https://github.com/vaimo/composer-patches/compare/3.48.8...3.48.9)
 
