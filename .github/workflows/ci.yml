@@ -37,9 +37,6 @@ jobs:
       - name: Explicitly require composer/composer with matching version in require-dev
         run: composer require --dev composer/composer:${{ matrix.versions.composer }} --no-update
 
-      - name: Drop vaimo/composer-changelogs from require-dev since this is not compatible with >=8.3
-        run: composer remove --dev vaimo/composer-changelogs --no-update
-
       - name: Install
         run: composer update --ansi
 

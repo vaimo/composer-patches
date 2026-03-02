@@ -141,7 +141,7 @@ version that would reflect the nature of the change. More details about the topi
 
 ### Option 1
 
-The modules ships with a dedicated development branch [devbox](https://github.com/vaimo/composer-changelogs/tree/devbox)
+The modules ships with a dedicated development branch [devbox](https://github.com/vaimo/composer-patches/tree/devbox)
 which contains configuration for spinning up a dedicated development environment that can be used together
 with VSCode's [Remote Containers](https://code.visualstudio.com/docs/remote/containers).
 
@@ -197,6 +197,3 @@ If you wish to change the PHP/Composer version:
 
 > **Note:** Keep in mind that these changes will update composer.json and composer.lock, so take care when committing
 > changes!
-
-> **Note:** vaimo/composer-changelogs is not supported in all PHP versions, so depending on the PHP version
-> you may need to temporarily drop it from composer.json
