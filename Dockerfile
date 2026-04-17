@@ -1,5 +1,5 @@
 ARG PHP_VERSION
-FROM php:${PHP_VERSION}-cli
+FROM php:${PHP_VERSION}
 
 WORKDIR /module
 
