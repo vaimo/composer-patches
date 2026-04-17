@@ -25,7 +25,7 @@ use Vaimo\ComposerPatches\Composer\Context as ComposerContext;
  */
 class ListCommand extends \Composer\Command\BaseCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -110,7 +110,7 @@ class ListCommand extends \Composer\Command\BaseCommand
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $composer = $this->getComposer();
 

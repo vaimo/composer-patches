@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class UndoCommand extends \Vaimo\ComposerPatches\Composer\Commands\PatchCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 

@@ -17,10 +17,9 @@ making the changes there and merging them upwards to newer MAJOR versions.
 Note that when dealing with bug-fixes, developer MUST use the lowest MAJOR version as starting point that 
 has said bug/issue rather than just fixing it on the latest line.
 
-> **Note:** As of 2025 although we have major branches for versions 3 and 4, these have not been maintained! There's
-> also currently no intention to do so, since master branch (version 5) is so far ahead of the two. If there's ever
-> going to be version 6 of the package, then we should continue the practice of maintaining also past major versions.
-> Until then this instruction about using lowest major release branch can be ignored!
+> **Note:** As of 2025 although we have major branches for versions 3 and 4, these have not been maintained!
+> There's also currently no intention to do so, since version 5 is so far ahead of the two. Consider
+> version 5 the lowest MAJOR release branch!
 
 ## Commands
 
@@ -142,7 +141,7 @@ version that would reflect the nature of the change. More details about the topi
 
 ### Option 1
 
-The modules ships with a dedicated development branch [devbox](https://github.com/vaimo/composer-changelogs/tree/devbox)
+The modules ships with a dedicated development branch [devbox](https://github.com/vaimo/composer-patches/tree/devbox)
 which contains configuration for spinning up a dedicated development environment that can be used together
 with VSCode's [Remote Containers](https://code.visualstudio.com/docs/remote/containers).
 
@@ -198,6 +197,3 @@ If you wish to change the PHP/Composer version:
 
 > **Note:** Keep in mind that these changes will update composer.json and composer.lock, so take care when committing
 > changes!
-
-> **Note:** vaimo/composer-changelogs is not supported in all PHP versions, so depending on the PHP version
-> you may need to temporarily drop it from composer.json

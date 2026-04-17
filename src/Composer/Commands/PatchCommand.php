@@ -24,7 +24,7 @@ use Vaimo\ComposerPatches\Environment;
  */
 class PatchCommand extends \Composer\Command\BaseCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('patch');
         $this->setDescription('Apply registered patches to current project');
@@ -115,7 +115,7 @@ class PatchCommand extends \Composer\Command\BaseCommand
      * @return int|void|null
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $composer = $this->getComposer();
 

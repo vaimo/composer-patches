@@ -142,3 +142,11 @@ auto-loader generation), developers are advised to re-execute `composer install`
 Ideally, plugins should always be updated with explicit `--no-plugins` flag added to the `composer update`
 call to avoid issues that plugin usage with potentially mixed logic from two different plugin releases
 being in use.
+
+## Composer 1
+
+After officially dying in late 2025, hopefully this is not a concern for many, but in case you do
+need the patcher with Composer 1, we're suggesting using version 5.5.4 of the package. This is the
+last version where we've been able to verify Composer 1 support. Version 5 may still receive some
+updates, and we try to make sure they're backwards compatible, but means to verify this have become
+very limited.
