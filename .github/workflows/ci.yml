@@ -10,17 +10,17 @@ jobs:
     strategy:
       matrix:
         versions: [
-          { php: "7.0.33", composer: 2.2.27 },
-          { php: "7.1.33", composer: 2.2.27 },
-          { php: "7.2.34", composer: 2.2.27 },
-          { php: "7.3.33", composer: 2.2.27 },
-          { php: "7.4.33", composer: 2.9.7 },
-          { php: "8.0.30", composer: 2.9.7 },
-          { php: "8.1.34", composer: 2.9.7 },
-          { php: "8.2.30", composer: 2.9.7 },
-          { php: "8.3.30", composer: 2.9.7 },
-          { php: "8.4.20", composer: 2.9.7 },
-          { php: "8.5.5", composer: 2.9.7 }
+          { php: "7.0.33", composer: 2.2.28 },
+          { php: "7.1.33", composer: 2.2.28 },
+          { php: "7.2.34", composer: 2.2.28 },
+          { php: "7.3.33", composer: 2.2.28 },
+          { php: "7.4.33", composer: 2.9.8 },
+          { php: "8.0.30", composer: 2.9.8 },
+          { php: "8.1.34", composer: 2.9.8 },
+          { php: "8.2.31", composer: 2.9.8 },
+          { php: "8.3.31", composer: 2.9.8 },
+          { php: "8.4.21", composer: 2.9.8 },
+          { php: "8.5.6", composer: 2.9.8 }
         ]
     steps:
       - uses: actions/checkout@v3
