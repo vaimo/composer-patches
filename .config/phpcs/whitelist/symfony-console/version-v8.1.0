@@ -1,0 +1,8 @@
+Incorrect error: Helper/ProgressBar.php,457,38,PHPCompatibility.Variables.ForbiddenThisUseContexts.Unset
+Incorrect error: Helper/ProgressBar.php,496,38,PHPCompatibility.Variables.ForbiddenThisUseContexts.Unset
+Incorrect error: Output/AnsiColorMode.php,63,23,PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext
+Incorrect error: Output/AnsiColorMode.php,64,37,PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext
+Incorrect error: Output/AnsiColorMode.php,65,35,PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext
+Incorrect error: Output/AnsiColorMode.php,72,23,PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext
+Incorrect error: Output/AnsiColorMode.php,73,28,PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext
+Incorrect error: Output/AnsiColorMode.php,74,28,PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext
