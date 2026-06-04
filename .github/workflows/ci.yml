@@ -20,7 +20,7 @@ jobs:
           { php: "8.2.31", composer: 2.9.8 },
           { php: "8.3.31", composer: 2.9.8 },
           { php: "8.4.21", composer: 2.9.8 },
-          { php: "8.5.6", composer: 2.9.8 }
+          { php: "8.5.6", composer: 2.10.0 }
         ]
     steps:
       - uses: actions/checkout@v3
