@@ -1,0 +1,3 @@
+>php {{OWNER-ROOT}}/configure-patch-bin.php composer.json
+patch:validate
+patch:apply

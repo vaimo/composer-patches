@@ -37,16 +37,22 @@ class Shell
     public function execute($command, $cwd = null)
     {
         if (strpos($command, '<') === 0) {
-            return array(true, trim($command, '< '));
+            $output = trim($command, '< ');
+
+            return array(true, $output, $output);
         }
 
         $processExecutor = $this->getProcessExecutor();
         $logger = $this->logger;
 
         $output = '';
+        $stdout = '';
 
-        $outputHandler = function ($type, $data) use ($logger, &$output) {
+        $outputHandler = function ($type, $data) use ($logger, &$output, &$stdout) {
             $output .= $data;
+            if ($type !== 'err') {
+                $stdout .= $data;
+            }
             $logger->writeVerbose('comment', trim($data));
         };
 
@@ -56,7 +62,7 @@ class Shell
 
         $result = $processExecutor->execute($command, $outputHandler, $cwd);
 
-        return array($result === 0, $output);
+        return array($result === 0, $output, $stdout);
     }
 
     private function getProcessExecutor()
