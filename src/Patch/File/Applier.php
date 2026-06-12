@@ -190,10 +190,16 @@ class Applier
                 ? $patcher[$operationCode]
                 : array($patcher[$operationCode]);
 
-            list($result, $output) = $this->resolveOperationOutput($applierOperations, $args, $operationFailures);
+            list($result, $output, $stdout) = $this->resolveOperationOutput(
+                $applierOperations,
+                $args,
+                $operationFailures
+            );
 
-            if ($output !== false) {
-                $operationResults[$operationCode] = $output;
+            if ($stdout !== false) {
+                // Previous operation results are interpolated into later commands,
+                // so only stdout is safe to treat as machine-readable output.
+                $operationResults[$operationCode] = $stdout;
             }
 
             if ($result) {
@@ -217,6 +223,7 @@ class Applier
         );
 
         $output = '';
+        $stdout = '';
 
         foreach ($applierOperations as $operation) {
             $passOnFailure = strpos($operation, '!') === 0;
@@ -231,7 +238,7 @@ class Applier
                 $this->resultCache[$resultKey] = $this->shell->execute($command, $cwd);
             }
 
-            list($result, $output) = $this->resultCache[$resultKey];
+            list($result, $output, $stdout) = $this->resultCache[$resultKey];
 
             if ($result) {
                 $this->validateOutput($output, $operationFailures);
@@ -245,10 +252,10 @@ class Applier
                 continue;
             }
 
-            return array($result, $output);
+            return array($result, $output, $stdout);
         }
 
-        return array(false, $output);
+        return array(false, $output, $stdout);
     }
 
     private function outputBehaviourContextInfo($command, $resultKey, $passOnFailure)
