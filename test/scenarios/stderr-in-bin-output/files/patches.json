@@ -1,0 +1,5 @@
+{
+    "vaimo/composer-patches-target1": {
+        "Change: value8 => valueX": "patches/first-change.patch"
+    }
+}
