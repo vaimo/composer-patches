@@ -183,15 +183,30 @@ class ListCommand extends \Composer\Command\BaseCommand
 
             $patchesQueue = $listResolver->resolvePatchesQueue($allPatches);
 
-            $excludedPatches = $patchListUpdater->updateStatuses(
-                array_filter($patchListUtils->diffListsByPath($patchesQueue, $filteredPatches)),
-                'excluded'
+            $excludedPatches = array_filter($patchListUtils->diffListsByPath($patchesQueue, $filteredPatches));
+
+            $constraintCheckedPool = $this->createConstraintCheckedPatchLoaderPool($composerContext);
+            $constraintCheckedLoader = $loaderFactory->create($constraintCheckedPool, $pluginConfig, $isDevMode);
+
+            $constraintValidPatches = $listResolver->resolvePatchesQueue(
+                $constraintCheckedLoader->loadFromPackagesRepository($repository)
             );
 
-            $patches = array_replace_recursive(
-                $patches,
-                $patchListUpdater->updateStatuses($excludedPatches, 'excluded')
+            $excludedPatches = $patchListUpdater->embedInfoToItems($excludedPatches, array(
+                Patch::APPLICABLE => false
+            ));
+
+            $excludedPatches = array_replace_recursive(
+                $excludedPatches,
+                $patchListUpdater->embedInfoToItems(
+                    $patchListUtils->intersectListsByPath($excludedPatches, $constraintValidPatches),
+                    array(Patch::APPLICABLE => true)
+                )
             );
+
+            $excludedPatches = $patchListUpdater->updateStatuses($excludedPatches, 'excluded');
+
+            $patches = array_replace_recursive($patches, $excludedPatches);
 
             array_walk($patches, function (array &$group) {
                 ksort($group);
@@ -218,12 +233,7 @@ class ListCommand extends \Composer\Command\BaseCommand
 
     private function createUnfilteredPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
     {
-        $composer = $composerContext->getLocalComposer();
-
-        $packageInfoResolver = new \Vaimo\ComposerPatches\Package\InfoResolver(
-            $composer->getInstallationManager(),
-            $composer->getConfig()->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR)
-        );
+        $packageInfoResolver = $this->createPackageInfoResolver($composerContext);
 
         $componentOverrides =  array(
             'constraints' => false,
@@ -235,6 +245,30 @@ class ListCommand extends \Composer\Command\BaseCommand
         );
 
         return $this->createLoaderPool($composerContext, $componentOverrides);
+    }
+
+    private function createConstraintCheckedPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
+    {
+        $packageInfoResolver = $this->createPackageInfoResolver($composerContext);
+
+        $componentOverrides = array(
+            'local-exclude' => false,
+            'root-patch' => false,
+            'global-exclude' => false,
+            'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver, true)
+        );
+
+        return $this->createLoaderPool($composerContext, $componentOverrides);
+    }
+
+    private function createPackageInfoResolver(\Vaimo\ComposerPatches\Composer\Context $composerContext)
+    {
+        $composer = $composerContext->getLocalComposer();
+
+        return new \Vaimo\ComposerPatches\Package\InfoResolver(
+            $composer->getInstallationManager(),
+            $composer->getConfig()->get(\Vaimo\ComposerPatches\Composer\ConfigKeys::VENDOR_DIR)
+        );
     }
 
     private function composerFilteredPatchesList($patches, $additions, $removals, $withAffected, $filters, $statuses)
