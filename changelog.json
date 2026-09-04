@@ -4,6 +4,11 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "6.0.3": {
+        "maintenance": [
+            "Added an 'applicable' flag to 'patch:list' output, distinguishing patches excluded due to version/platform constraint mismatches from patches excluded for other reasons (skip, exclude config, local/root-patch scoping)"
+        ]
+    },
     "6.0.1": {
         "maintenance": [
             "Updated dev dependency to vaimo/composer-changelogs to allow installing version with equal PHP version support as in version 6 of the patcher: https://github.com/vaimo/composer-patches/pull/147",
