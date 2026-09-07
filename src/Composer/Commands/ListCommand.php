@@ -96,6 +96,13 @@ class ListCommand extends \Composer\Command\BaseCommand
             InputOption::VALUE_NONE,
             'Use latest information from package configurations in vendor folder'
         );
+
+        $this->addOption(
+            '--json',
+            null,
+            InputOption::VALUE_NONE,
+            'Output the list of patches in JSON format'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -193,7 +200,15 @@ class ListCommand extends \Composer\Command\BaseCommand
             ));
         }
 
+        if ($input->getOption('json')) {
+            $output->writeln(json_encode($patches));
+
+            return 0;
+        }
+
         $this->generateOutput($output, $patches);
+
+        return 0;
     }
 
     private function createUnfilteredPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
