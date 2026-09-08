@@ -248,6 +248,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             'local-exclude' => false,
             'root-patch' => false,
             'global-exclude' => false,
+            'custom-exclude' => false,
             'targets-resolver' => new LoaderComponents\TargetsResolverComponent($packageInfoResolver, true)
         );
 
