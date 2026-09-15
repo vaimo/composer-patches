@@ -180,11 +180,11 @@ class ListCommand extends \Composer\Command\BaseCommand
 
             $excludedPatches = array_filter($patchListUtils->diffListsByPath($patchesQueue, $filteredPatches));
 
-            $constraintCheckedPool = $this->createConstraintCheckedPatchLoaderPool($composerContext);
-            $constraintCheckedLoader = $loaderFactory->create($constraintCheckedPool, $pluginConfig, $isDevMode);
+            $constraintPool = $this->createConstraintCheckedPatchLoaderPool($composerContext);
+            $constraintLoader = $loaderFactory->create($constraintPool, $pluginConfig, $isDevMode);
 
-            $constraintValidPatches = $listResolver->resolvePatchesQueue(
-                $constraintCheckedLoader->loadFromPackagesRepository($repository)
+            $validPatches = $listResolver->resolvePatchesQueue(
+                $constraintLoader->loadFromPackagesRepository($repository)
             );
 
             $excludedPatches = $patchListUpdater->embedInfoToItems($excludedPatches, array(
@@ -194,7 +194,7 @@ class ListCommand extends \Composer\Command\BaseCommand
             $excludedPatches = array_replace_recursive(
                 $excludedPatches,
                 $patchListUpdater->embedInfoToItems(
-                    $patchListUtils->intersectListsByPath($excludedPatches, $constraintValidPatches),
+                    $patchListUtils->intersectListsByPath($excludedPatches, $validPatches),
                     array(Patch::APPLICABLE => true)
                 )
             );
