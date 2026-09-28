@@ -170,7 +170,9 @@ class ListCommand extends \Composer\Command\BaseCommand
             );
 
         if ($shouldAddExcludes) {
-            $unfilteredPool = $this->createUnfilteredPatchLoaderPool($composerContext);
+            $packageInfoResolver = $this->createPackageInfoResolver($composerContext);
+
+            $unfilteredPool = $this->createUnfilteredPatchLoaderPool($composerContext, $packageInfoResolver);
 
             $unfilteredLoader = $loaderFactory->create($unfilteredPool, $pluginConfig, $isDevMode);
 
@@ -180,7 +182,7 @@ class ListCommand extends \Composer\Command\BaseCommand
 
             $excludedPatches = array_filter($patchListUtils->diffListsByPath($patchesQueue, $filteredPatches));
 
-            $constraintPool = $this->createConstraintCheckedPatchLoaderPool($composerContext);
+            $constraintPool = $this->createConstraintCheckedPatchLoaderPool($composerContext, $packageInfoResolver);
             $constraintLoader = $loaderFactory->create($constraintPool, $pluginConfig, $isDevMode);
 
             $validPatches = $listResolver->resolvePatchesQueue(
@@ -226,10 +228,10 @@ class ListCommand extends \Composer\Command\BaseCommand
         return 0;
     }
 
-    private function createUnfilteredPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
-    {
-        $packageInfoResolver = $this->createPackageInfoResolver($composerContext);
-
+    private function createUnfilteredPatchLoaderPool(
+        \Vaimo\ComposerPatches\Composer\Context $composerContext,
+        \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
+    ) {
         $componentOverrides =  array(
             'constraints' => false,
             'platform' => false,
@@ -242,10 +244,10 @@ class ListCommand extends \Composer\Command\BaseCommand
         return $this->createLoaderPool($composerContext, $componentOverrides);
     }
 
-    private function createConstraintCheckedPatchLoaderPool(\Vaimo\ComposerPatches\Composer\Context $composerContext)
-    {
-        $packageInfoResolver = $this->createPackageInfoResolver($composerContext);
-
+    private function createConstraintCheckedPatchLoaderPool(
+        \Vaimo\ComposerPatches\Composer\Context $composerContext,
+        \Vaimo\ComposerPatches\Package\InfoResolver $packageInfoResolver
+    ) {
         $componentOverrides = array(
             'local-exclude' => false,
             'root-patch' => false,
