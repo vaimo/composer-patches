@@ -29,6 +29,7 @@ class Definition
     const SKIP = 'skip';
     const LOCAL = 'local';
     const CATEGORY = 'category';
+    const APPLICABLE = 'applicable';
 
     const CWD = 'cwd';
     const CWD_INSTALL = 'install';

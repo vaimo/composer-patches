@@ -4,6 +4,14 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.22.5": {
+        "feature": [
+            "Backported '--json' output flag for 'patch:list' from later releases"
+        ],
+        "maintenance": [
+            "Added an 'applicable' flag to 'patch:list' JSON output, distinguishing patches excluded due to version/platform constraint mismatches from patches excluded for other reasons (skip, exclude config, local/root-patch scoping)"
+        ]
+    },
     "4.22.4": {
         "overview": "changes in this release forward-ported from  3.53.4",
         "fix": [
