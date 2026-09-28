@@ -161,6 +161,10 @@ class ListCommand extends \Composer\Command\BaseCommand
 
         $patches = array_filter($filteredPatches);
 
+        $patches = $patchListUpdater->embedInfoToItems($patches, array(
+            Patch::APPLICABLE => true
+        ), true);
+
         $filterUtils = new \Vaimo\ComposerPatches\Utils\FilterUtils();
 
         $shouldAddExcludes = $withExcluded
