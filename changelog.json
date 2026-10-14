@@ -4,6 +4,11 @@
         "possible to generate change-logs in other formats as well (when needed) and to do automatic releases based on",
         "added change-log records. More on how to use it: https://github.com/vaimo/composer-changelogs"
     ],
+    "4.23.0": {
+        "fix": [
+            "Bundle patches that touch several packages were applied in the order of the first target group they appear in instead of the resolved (declared / @after / @before) order, causing patches to be applied before their prerequisites and fail: https://github.com/vaimo/composer-patches/issues/169, https://github.com/vaimo/composer-patches/pull/170"
+        ]
+    },
     "4.22.5": {
         "feature": [
             "Backported '--json' output flag for 'patch:list' from later releases"

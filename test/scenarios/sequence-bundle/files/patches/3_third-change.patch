@@ -1,0 +1,29 @@
+Change: value9 => valueC (target1); valueB => valueC (target2)
+
+@type bundle
+
+@assert vaimo/composer-patches-target1,value9,valueC
+@assert vaimo/composer-patches-target2,value5,valueC
+
+--- vaimo/composer-patches-target1/src/example.txt.org
++++ vaimo/composer-patches-target1/src/example.txt
+@@ -6,7 +6,7 @@
+ value6
+ value7
+ value8
+-value9
++valueC
+ value10
+ value11
+ value12
+--- vaimo/composer-patches-target2/src/example.txt.org
++++ vaimo/composer-patches-target2/src/example.txt
+@@ -2,7 +2,7 @@
+ valueA
+ value3
+ value4
+-valueB
++valueC
+ value6
+ value7
+ value8
