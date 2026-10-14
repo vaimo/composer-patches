@@ -70,7 +70,35 @@ class QueueGenerator
             array()
         );
 
-        return $this->updateStatusMarkers($queue, $repositoryState);
+        return $this->restoreSequence(
+            $this->updateStatusMarkers($queue, $repositoryState),
+            $patches
+        );
+    }
+
+    /**
+     * Building the queue groups the patches by target and back, which moves a bundle patch up to the first
+     * target group it appears in. Restore the sequence of the incoming list so that the declared order and
+     * before/after directives also hold for bundle patches that touch different packages first.
+     *
+     * @param array $queue
+     * @param array $patches
+     * @return array
+     */
+    private function restoreSequence(array $queue, array $patches)
+    {
+        foreach ($queue as $origin => $items) {
+            if (!isset($patches[$origin])) {
+                continue;
+            }
+
+            $queue[$origin] = array_replace(
+                array_intersect_key($patches[$origin], $items),
+                $items
+            );
+        }
+
+        return $queue;
     }
 
     private function updateStatusMarkers($patches, $repositoryState)
