@@ -153,7 +153,10 @@ class PatchesApplier
         $packages = $this->packageCollector->collect($repository);
         $packagesUpdated = false;
         $repositoryState = $this->repoStateGenerator->generate($repository);
-        $applyQueue = $this->queueGenerator->generateApplyQueue($patches, $repositoryState);
+        $applyQueue = $this->sortByDefinitionOrder(
+            $this->queueGenerator->generateApplyQueue($patches, $repositoryState),
+            $patches
+        );
         $removeQueue = $this->queueGenerator->generateRemovalQueue($applyQueue, $repositoryState);
         $resetQueue = $this->queueGenerator->generateResetQueue($applyQueue);
         $applyQueue = array_map('array_filter', $applyQueue);
@@ -229,6 +232,36 @@ class PatchesApplier
         }
 
         return $packagesUpdated;
+    }
+
+    /**
+     * Queue generation regroups patches by target package, which loses the declared (and before/after
+     * sorted) order for bundle patches. Restore the order of the definition list.
+     *
+     * @param array $queue
+     * @param array $patches
+     * @return array
+     */
+    private function sortByDefinitionOrder(array $queue, array $patches)
+    {
+        foreach ($queue as $target => $items) {
+            if (!isset($patches[$target])) {
+                continue;
+            }
+
+            $order = array();
+
+            foreach ($patches[$target] as $path => $info) {
+                $order[] = !empty($info[Patch::URL]) ? $info[Patch::URL] : $path;
+            }
+
+            $queue[$target] = array_replace(
+                array_intersect_key(array_flip($order), $items),
+                $items
+            );
+        }
+
+        return $queue;
     }
 
     private function updatePackage(Package $package, Repository $repository, array $additions, array $removals)
