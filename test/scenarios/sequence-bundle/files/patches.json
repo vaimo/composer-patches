@@ -1,0 +1,10 @@
+{
+    "*": {
+        "Change: value1 => valueA (target1); value2 => valueA (target2)": "patches/1_first-change.patch",
+        "Change: value5 => valueB (target2)": "patches/2_second-change.patch",
+        "Change: value9 => valueC (target1); valueB => valueC (target2)": {
+            "source": "patches/3_third-change.patch",
+            "after": "second-change"
+        }
+    }
+}
